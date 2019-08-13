@@ -79,7 +79,6 @@ public class CarpetSettings
             category = EXPERIMENTAL
     )
     public static boolean entityMomentumLoss = true;
-
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$
     //   | $$     | $$  | $$  \__/| $$  \__/| $$$$  /$$$$
@@ -89,6 +88,8 @@ public class CarpetSettings
     //   | $$    /$$$$$$|  $$$$$$/|  $$$$$$/| $$ \/  | $$
     //   |__/   |______/ \______/  \______/ |__/     |__/    END OF TISCM
 
+    
+    
     @Rule(
             desc = "Fixes server crashing supposedly on falling behind 60s in ONE tick, yeah bs.",
             extra = "Fixed 1.12 watchdog crash in 1.13 pre-releases, reintroduced with 1.13, GG.",
@@ -300,6 +301,7 @@ public class CarpetSettings
         @Override
         public String description() { return "You must choose a value from 1 to 1024";}
     }
+    
     @Rule(
             desc = "Customizable piston push limit",
             options = {"10", "12", "14", "100"},
@@ -331,13 +333,13 @@ public class CarpetSettings
             validate = FillLimitLimits.class
     )
     public static int fillLimit = 32768;
-
     @Rule(
             desc = "Customizable maximal entity collision limits, 0 for no limits",
             options = {"0", "1", "20"},
             category = OPTIMIZATION,
             validate = Validator.NONNEGATIVE_NUMBER.class
     )
+
     public static int maxEntityCollisions = 0;
 
     /*
@@ -375,7 +377,26 @@ public class CarpetSettings
             validate = SetMotd.class
     )
     public static String customMOTD = "_";
-
+    
+    //=====================================================
+    @Rule(
+            desc = "Disable MOJANG's verification of players with certain names, usually bots",
+            extra = {"use '_' to disable the option",
+            		"Other strings will be considered the prefixes of bots' names"},
+            options = {"_","bot_"},
+            category = OPTIMIZATION,
+            validate = SetMotd.class
+    )
+    public static String StartOfBotsNames = "_";
+    // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
+    //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$
+    //   | $$     | $$  | $$  \__/| $$  \__/| $$$$  /$$$$
+    //   | $$     | $$  |  $$$$$$ | $$      | $$ $$/$$ $$
+    //   | $$     | $$   \____  $$| $$      | $$  $$$| $$
+    //   | $$     | $$   /$$  \ $$| $$    $$| $$\  $ | $$
+    //   | $$    /$$$$$$|  $$$$$$/|  $$$$$$/| $$ \/  | $$
+    //   |__/   |______/ \______/  \______/ |__/     |__/    BELOW IS TISCM ¡ü¡ü¡ü
+    //=====================================================
     @Rule(desc = "Cactus in dispensers rotates blocks.", extra = "Rotates block anti-clockwise if possible", category = FEATURE)
     public static boolean rotatorBlock = false;
 
