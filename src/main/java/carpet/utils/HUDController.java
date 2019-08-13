@@ -13,6 +13,7 @@ import net.minecraft.util.Tuple;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.world.WorldServer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -80,6 +81,9 @@ public class HUDController
         if (LoggerRegistry.__packets)
             LoggerRegistry.getLogger("packets").log(()-> packetCounter());
 
+        if (LoggerRegistry.__villagecount)
+            LoggerRegistry.getLogger("villagecount").log(() -> send_total_villages(server));
+
         for (EntityPlayer player: player_huds.keySet())
         {
             SPacketPlayerListHeaderFooter packet = new SPacketPlayerListHeaderFooter();
@@ -127,6 +131,19 @@ public class HUDController
                 Messenger.c("w I/" + PacketCounter.totalIn + " O/" + PacketCounter.totalOut),
         };
         PacketCounter.reset();
+        return ret;
+    }
+
+    private static ITextComponent [] send_total_villages(MinecraftServer server)
+    {
+        int villagecount = 0;
+        for (WorldServer world : server.getWorlds()){
+            villagecount += world.getVillageCollection().getVillageList().size();
+        }
+
+        ITextComponent [] ret =  new ITextComponent[]{
+                Messenger.c("w Villages:" + villagecount),
+        };
         return ret;
     }
 }

@@ -7,7 +7,18 @@
  import com.google.common.collect.Maps;
  import com.google.common.collect.Queues;
  import com.google.common.collect.Sets;
-@@ -489,9 +490,16 @@
+@@ -55,6 +56,10 @@
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
++//TISCM: add chunk debug
++import carpet.logging.LoggerRegistry;
++import carpet.logging.logHelpers.ChunkLogHelper;
++
+ public class Chunk implements IChunk
+ {
+     private static final Logger LOGGER = LogManager.getLogger();
+@@ -489,9 +494,16 @@
          }
      }
  
@@ -24,7 +35,7 @@
          int i = pos.getX() & 15;
          int j = pos.getY();
          int k = pos.getZ() & 15;
-@@ -568,14 +576,26 @@
+@@ -568,14 +580,26 @@
                      }
                  }
  
@@ -53,3 +64,43 @@
  
                      if (tileentity1 == null)
                      {
+@@ -894,6 +918,19 @@
+                 return !(p_212383_0_ instanceof EntityPlayer);
+             }));
+         }
++
++        //TISCM: chunk debug
++        if (LoggerRegistry.__chunkdebug){
++            if (this.world.dimension.isNether()) {
++                this.world.chunkLogHelper.onChunkNewState("Nether", this.x, this.z, "l Loaded");
++            }
++            else if (this.world.dimension.hasSkyLight()){
++                this.world.chunkLogHelper.onChunkNewState("Overworld", this.x, this.z, "l Loaded");
++            }
++            else{
++                this.world.chunkLogHelper.onChunkNewState("End", this.x, this.z, "l Loaded");
++            }
++        }
+     }
+ 
+     public void onUnload()
+@@ -909,6 +946,19 @@
+         {
+             this.world.unloadEntities(classinheritancemultimap);
+         }
++
++        //TISCM: chunk debug
++        if (LoggerRegistry.__chunkdebug){
++            if (this.world.dimension.isNether()) {
++                this.world.chunkLogHelper.onChunkNewState("Nether", this.x, this.z, "r Unloaded");
++            }
++            else if (this.world.dimension.hasSkyLight()){
++                this.world.chunkLogHelper.onChunkNewState("Overworld", this.x, this.z, "r Unloaded");
++            }
++            else {
++                this.world.chunkLogHelper.onChunkNewState("End", this.x, this.z, "r Unloaded");
++            }
++        }
+     }
+ 
+     public void markDirty()
