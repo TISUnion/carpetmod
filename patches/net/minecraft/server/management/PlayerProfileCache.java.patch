@@ -1,0 +1,25 @@
+--- a/net/minecraft/server/management/PlayerProfileCache.java
++++ b/net/minecraft/server/management/PlayerProfileCache.java
+@@ -80,6 +80,13 @@
+     private static GameProfile lookupProfile(GameProfileRepository profileRepoIn, String name)
+     {
+         final GameProfile[] agameprofile = new GameProfile[1];
++        
++        if (!(carpet.settings.CarpetSettings.StartOfBotsNames == "_") && name.startsWith(carpet.settings.CarpetSettings.StartOfBotsNames))
++        {
++            GameProfile defaultProfile = new GameProfile(EntityPlayer.getUUID(new GameProfile((UUID)null, name)), name);
++            return defaultProfile;	
++        }
++        
+         ProfileLookupCallback profilelookupcallback = new ProfileLookupCallback()
+         {
+             public void onProfileLookupSucceeded(GameProfile p_onProfileLookupSucceeded_1_)
+@@ -101,6 +108,8 @@
+         }
+ 
+         return agameprofile[0];
++        
++        
+     }
+ 
+     public static void setOnlineMode(boolean onlineModeIn)
