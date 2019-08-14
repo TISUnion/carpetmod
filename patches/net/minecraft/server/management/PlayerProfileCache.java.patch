@@ -5,7 +5,7 @@
      {
          final GameProfile[] agameprofile = new GameProfile[1];
 +        
-+        if (!(carpet.settings.CarpetSettings.StartOfBotsNames == "_") && name.startsWith(carpet.settings.CarpetSettings.StartOfBotsNames))
++        if (!(carpet.settings.CarpetSettings.withStartBotnames == "_") && name.startsWith(carpet.settings.CarpetSettings.withStartBotnames))
 +        {
 +            GameProfile defaultProfile = new GameProfile(EntityPlayer.getUUID(new GameProfile((UUID)null, name)), name);
 +            return defaultProfile;	
