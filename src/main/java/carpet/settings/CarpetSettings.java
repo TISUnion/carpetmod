@@ -80,6 +80,12 @@ public class CarpetSettings
     )
     public static boolean entityMomentumLoss = true;
     
+    @Rule(
+            desc = "Disable the rendering of stained glass on maps",
+            category = EXPERIMENTAL
+    )
+    public static boolean StainedGlassNoMapRendering = true;
+
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$
     //   | $$     | $$  | $$  \__/| $$  \__/| $$$$  /$$$$
