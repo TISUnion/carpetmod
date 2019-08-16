@@ -1,0 +1,15 @@
+--- a/net/minecraft/block/Block.java
++++ b/net/minecraft/block/Block.java
+@@ -175,7 +175,11 @@
+     @Deprecated
+     public MaterialColor getMaterialColor(IBlockState state, IBlockReader worldIn, BlockPos pos)
+     {
+-        return this.materialColor;
++    	if (carpet.settings.CarpetSettings.StainedGlassNoMapRendering && state.getMaterial() == state.getMaterial().GLASS)
++    	{
++    		return this.materialColor.AIR;
++    	}
++    	return this.materialColor;
+     }
+ 
+     @Deprecated
