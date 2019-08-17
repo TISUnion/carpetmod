@@ -84,7 +84,7 @@ public class CarpetSettings
             desc = "Disable the rendering of stained glass on maps",
             category = EXPERIMENTAL
     )
-    public static boolean StainedGlassNoMapRendering = true;
+    public static boolean stainedGlassNoMapRendering = true;
 
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$
