@@ -5,7 +5,7 @@
      public MaterialColor getMaterialColor(IBlockState state, IBlockReader worldIn, BlockPos pos)
      {
 -        return this.materialColor;
-+    	if (carpet.settings.CarpetSettings.StainedGlassNoMapRendering && state.getMaterial() == state.getMaterial().GLASS)
++    	if (carpet.settings.CarpetSettings.stainedGlassNoMapRendering && state.getMaterial() == state.getMaterial().GLASS)
 +    	{
 +    		return this.materialColor.AIR;
 +    	}
