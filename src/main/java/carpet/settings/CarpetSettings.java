@@ -383,37 +383,6 @@ public class CarpetSettings
     )
     public static String customMOTD = "_";
     
-   
-    // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
-    //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$
-    //   | $$     | $$  | $$  \__/| $$  \__/| $$$$  /$$$$
-    //   | $$     | $$  |  $$$$$$ | $$      | $$ $$/$$ $$
-    //   | $$     | $$   \____  $$| $$      | $$  $$$| $$
-    //   | $$     | $$   /$$  \ $$| $$    $$| $$\  $ | $$
-    //   | $$    /$$$$$$|  $$$$$$/|  $$$$$$/| $$ \/  | $$
-    //   |__/   |______/ \______/  \______/ |__/     |__/
-    //
-    //New features added at TISCarpet goes here for easier reading please
-    
-    @Rule(
-            desc = "Disable MOJANG's verification of players with certain names, usually bots",
-            extra = {"use '_' to disable the option",
-            		"Other strings will be considered the prefixes of bots' names"},
-            options = {"_","bot_"},
-            category = OPTIMIZATION,
-            validate = SetMotd.class
-    )
-    public static String withStartBotnames = "_";
-    
-    // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
-    //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$
-    //   | $$     | $$  | $$  \__/| $$  \__/| $$$$  /$$$$
-    //   | $$     | $$  |  $$$$$$ | $$      | $$ $$/$$ $$
-    //   | $$     | $$   \____  $$| $$      | $$  $$$| $$
-    //   | $$     | $$   /$$  \ $$| $$    $$| $$\  $ | $$
-    //   | $$    /$$$$$$|  $$$$$$/|  $$$$$$/| $$ \/  | $$
-    //   |__/   |______/ \______/  \______/ |__/     |__/    END OF TISCM
-    
     @Rule(desc = "Cactus in dispensers rotates blocks.", extra = "Rotates block anti-clockwise if possible", category = FEATURE)
     public static boolean rotatorBlock = false;
 
