@@ -93,10 +93,10 @@ public class CarpetSettings
     public static boolean cacheExplosions = false;
 
     @Rule(
-    		desc = "Treat any subchunk with light changes as a not-empty subchunk to solve the missing sky/block light in empty subchunk after reloading the chunk",
-    	    extra = "no more ghost shadows below giant floating buildings",
-    		category = {EXPERIMENTAL, BUGFIX}
-    		)
+            desc = "Treat any subchunk with light changes as a not-empty subchunk to solve the missing sky/block light in empty subchunk after reloading the chunk",
+            extra = "no more ghost shadows below giant floating buildings",
+            category = {EXPERIMENTAL, BUGFIX}
+            )
     public static boolean missingLightFix = false;
     
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
