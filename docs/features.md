@@ -16,7 +16,7 @@ warn: Features here is incomplete, some features in original carpet or developin
 * entityMomentumLoss: disable the entity momentum cancellation / 关闭加载区块时实体会丢失速度
 * stainedGlassNoMapRendering: disable stained glass rendering on maps / 关闭地图上渲染染色玻璃
 * cacheExplosions: Caching explosions, useful for situations eg pearl cannon / 爆炸缓存，对珍珠炮等情况优化巨大
-* missingLightFix: Treat any subchunk with light changes as a not-empty subchunk to solve the missing sky/block light in empty subchunk after reloading the chunk / 修复无方块区块不储存变化后的光照的特性
+* missingLightFix: Treat any subchunk with light changes as a not-empty subchunk to solve the missing sky/block light in empty subchunk after reloading the chunk / 将光照变化过的子区块视作非空子区块，以修复浮空建筑下的黑影等bug
 * * YEET：
   * yeetFishAI: yeet fish followGroupLeaderAI for less lag / 去掉实体鱼造成巨大卡顿的followGroupLeaderAI
   * yeetGolemSpawn: yeet Golems spawning at village for faster stacking at 14k iron farm test / 跳过铁傀儡生成使小墨的14k刷铁塔堆叠更快
