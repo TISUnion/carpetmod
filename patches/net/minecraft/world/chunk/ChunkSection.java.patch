@@ -39,11 +39,11 @@
 +        //TISCM missing light fix
 +        if (CarpetSettings.missingLightFix)
 +        {
-+        	return this.blockRefCount == 0 && skyLigthRefCount == 0 && blockLightRefCount == 0;
++            return this.blockRefCount == 0 && skyLigthRefCount == 0 && blockLightRefCount == 0;
 +        }
 +        else
 +        {
-+        	return this.blockRefCount == 0;
++            return this.blockRefCount == 0;
 +        }
      }
  
@@ -57,7 +57,7 @@
 +        --this.skyLigthRefCount;
 +        if (value != defaultSkyLight)
 +        {
-+        	++this.skyLigthRefCount;
++            ++this.skyLigthRefCount;
 +        }
      }
  
@@ -71,7 +71,7 @@
 +        --this.blockLightRefCount;
 +        if (value != defaultBlockLight)
 +        {
-+        	++this.blockLightRefCount;
++            ++this.blockLightRefCount;
 +        }
      }
  
@@ -95,11 +95,11 @@
 +                    //TISCM missing light fix
 +                    if (this.storeSkylight && this.skyLight.get(i, j, k) != defaultSkyLight)
 +                    {
-+                    	++this.skyLigthRefCount;
++                        ++this.skyLigthRefCount;
 +                    }
 +                    if (this.blockLight.get(i, j, k) != defaultBlockLight)
 +                    {
-+                    	++this.blockLightRefCount;
++                        ++this.blockLightRefCount;
 +                    }
                  }
              }
