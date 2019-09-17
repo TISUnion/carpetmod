@@ -48,13 +48,19 @@
      }
  
      public boolean needsRandomTickAny()
-@@ -106,6 +125,13 @@
+@@ -105,7 +124,19 @@
+ 
      public void setSkyLight(int x, int y, int z, int value)
      {
++        //TISCM missing light fix
++        if (this.skyLight.get(x, y, z) != defaultSkyLight)
++        {
++            --this.skyLigthRefCount;
++        }
++        
          this.skyLight.set(x, y, z, value);
 +
 +        //TISCM missing light fix
-+        --this.skyLigthRefCount;
 +        if (value != defaultSkyLight)
 +        {
 +            ++this.skyLigthRefCount;
@@ -62,13 +68,19 @@
      }
  
      public int getSkyLight(int x, int y, int z)
-@@ -116,6 +142,13 @@
+@@ -115,7 +146,19 @@
+ 
      public void setBlockLight(int x, int y, int z, int value)
      {
++        //TISCM missing light fix
++        if (this.blockLight.get(x, y, z) != defaultBlockLight)
++        {
++            --this.blockLightRefCount;
++        }
++        
          this.blockLight.set(x, y, z, value);
 +
 +        //TISCM missing light fix
-+        --this.blockLightRefCount;
 +        if (value != defaultBlockLight)
 +        {
 +            ++this.blockLightRefCount;
@@ -76,7 +88,7 @@
      }
  
      public int getBlockLight(int x, int y, int z)
-@@ -129,6 +162,10 @@
+@@ -129,6 +172,10 @@
          this.tickRefCount = 0;
          this.fluidRefCount = 0;
  
@@ -87,7 +99,7 @@
          for (int i = 0; i < 16; ++i)
          {
              for (int j = 0; j < 16; ++j)
-@@ -157,6 +194,16 @@
+@@ -157,6 +204,16 @@
                              ++this.fluidRefCount;
                          }
                      }
