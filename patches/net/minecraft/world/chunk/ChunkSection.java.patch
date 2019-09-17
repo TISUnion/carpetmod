@@ -1,0 +1,106 @@
+--- a/net/minecraft/world/chunk/ChunkSection.java
++++ b/net/minecraft/world/chunk/ChunkSection.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.world.chunk;
+ 
++import carpet.settings.CarpetSettings;
+ import net.minecraft.block.Block;
+ import net.minecraft.block.state.IBlockState;
+ import net.minecraft.fluid.IFluidState;
+@@ -17,6 +18,13 @@
+     private NibbleArray blockLight;
+     private NibbleArray skyLight;
+ 
++    //TISCM missing light fix
++    private static final int defaultSkyLight = 15;
++    private static final int defaultBlockLight = 0;
++    private int skyLigthRefCount;
++    private int blockLightRefCount;
++    private boolean storeSkylight;
++
+     public ChunkSection(int y, boolean storeSkylight)
+     {
+         this.yBase = y;
+@@ -27,6 +35,9 @@
+         {
+             this.skyLight = new NibbleArray();
+         }
++
++        //TISCM missing light fix
++        this.storeSkylight = storeSkylight;
+     }
+ 
+     public IBlockState get(int x, int y, int z)
+@@ -80,7 +91,15 @@
+ 
+     public boolean isEmpty()
+     {
+-        return this.blockRefCount == 0;
++        //TISCM missing light fix
++        if (CarpetSettings.missingLightFix)
++        {
++        	return this.blockRefCount == 0 && skyLigthRefCount == 0 && blockLightRefCount == 0;
++        }
++        else
++        {
++        	return this.blockRefCount == 0;
++        }
+     }
+ 
+     public boolean needsRandomTickAny()
+@@ -106,6 +125,13 @@
+     public void setSkyLight(int x, int y, int z, int value)
+     {
+         this.skyLight.set(x, y, z, value);
++
++        //TISCM missing light fix
++        --this.skyLigthRefCount;
++        if (value != defaultSkyLight)
++        {
++        	++this.skyLigthRefCount;
++        }
+     }
+ 
+     public int getSkyLight(int x, int y, int z)
+@@ -116,6 +142,13 @@
+     public void setBlockLight(int x, int y, int z, int value)
+     {
+         this.blockLight.set(x, y, z, value);
++
++        //TISCM missing light fix
++        --this.blockLightRefCount;
++        if (value != defaultBlockLight)
++        {
++        	++this.blockLightRefCount;
++        }
+     }
+ 
+     public int getBlockLight(int x, int y, int z)
+@@ -129,6 +162,10 @@
+         this.tickRefCount = 0;
+         this.fluidRefCount = 0;
+ 
++        //TISCM missing light fix
++        this.blockLightRefCount = 0;
++        this.skyLigthRefCount = 0;
++
+         for (int i = 0; i < 16; ++i)
+         {
+             for (int j = 0; j < 16; ++j)
+@@ -157,6 +194,16 @@
+                             ++this.fluidRefCount;
+                         }
+                     }
++
++                    //TISCM missing light fix
++                    if (this.storeSkylight && this.skyLight.get(i, j, k) != defaultSkyLight)
++                    {
++                    	++this.skyLigthRefCount;
++                    }
++                    if (this.blockLight.get(i, j, k) != defaultBlockLight)
++                    {
++                    	++this.blockLightRefCount;
++                    }
+                 }
+             }
+         }
