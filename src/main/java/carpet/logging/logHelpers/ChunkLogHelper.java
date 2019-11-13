@@ -6,10 +6,19 @@ import net.minecraft.util.text.ITextComponent;
 
 public class ChunkLogHelper {
 
-    public static void onChunkNewState(String dimname, int chunkx, int chunkz, String state){
+    public static void onChunkNewState(String dimname, int chunkx, int chunkz, String state, long gameTime){
 
         LoggerRegistry.getLogger("chunkdebug").log( () -> new ITextComponent[]{
-                Messenger.c("t " + dimname + " ", "w X:" + chunkx + " ", "w Z:" + chunkz + " ", state)});
+                Messenger.c(
+                        "g [" + gameTime + "] ",
+                        "w X:" + chunkx + " ", 
+                        "w Z:" + chunkz + " ", 
+                        state + " ",
+                        "g at ", 
+                        "y " + BlockUpdatesLogHelper.getTickStage(),
+                        "g  in ",
+                        "e " + dimname
+                        )});
     }
 
 }

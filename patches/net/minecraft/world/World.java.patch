@@ -1,17 +1,18 @@
 --- a/net/minecraft/world/World.java
 +++ b/net/minecraft/world/World.java
-@@ -1,5 +1,10 @@
+@@ -1,5 +1,11 @@
  package net.minecraft.world;
  
 +import carpet.helpers.TickSpeed;
 +import carpet.logging.logHelpers.BlockUpdatesLogHelper;
++import carpet.logging.logHelpers.TileEntityListLogHelper;
 +import carpet.settings.CarpetSettings;
 +import carpet.utils.CarpetProfiler;
 +import carpet.utils.LightingEngine;
  import com.google.common.base.MoreObjects;
  import com.google.common.collect.Lists;
  import it.unimi.dsi.fastutil.longs.LongSet;
-@@ -115,7 +120,14 @@
+@@ -115,7 +121,14 @@
      private boolean processingLoadedTiles;
      private final WorldBorder worldBorder;
      int[] lightUpdateBlockList = new int['\u8000'];
@@ -27,7 +28,7 @@
      protected World(ISaveHandler p_i49813_1_, @Nullable WorldSavedDataStorage p_i49813_2_, WorldInfo p_i49813_3_, Dimension p_i49813_4_, Profiler p_i49813_5_, boolean p_i49813_6_)
      {
          this.saveHandler = p_i49813_1_;
-@@ -125,6 +137,8 @@
+@@ -125,6 +138,8 @@
          this.dimension = p_i49813_4_;
          this.isRemote = p_i49813_6_;
          this.worldBorder = p_i49813_4_.createWorldBorder();
@@ -36,7 +37,7 @@
      }
  
      public Biome getBiome(BlockPos pos)
-@@ -238,7 +252,7 @@
+@@ -238,7 +253,7 @@
          {
              Chunk chunk = this.getChunk(pos);
              Block block = newState.getBlock();
@@ -45,7 +46,7 @@
  
              if (iblockstate == null)
              {
-@@ -277,7 +291,9 @@
+@@ -277,7 +292,9 @@
                          }
                      }
  
@@ -56,7 +57,7 @@
                      {
                          int i = flags & -2;
                          iblockstate.updateDiagonalNeighbors(this, pos, i);
-@@ -1199,6 +1215,12 @@
+@@ -1199,6 +1216,12 @@
      {
          this.profiler.startSection("entities");
          this.profiler.startSection("global");
@@ -69,7 +70,7 @@
  
          for (int i = 0; i < this.weatherEffects.size(); ++i)
          {
-@@ -1259,6 +1281,7 @@
+@@ -1259,6 +1282,7 @@
          for (int i1 = 0; i1 < this.loadedEntityList.size(); ++i1)
          {
              Entity entity2 = this.loadedEntityList.get(i1);
@@ -77,7 +78,7 @@
              Entity entity3 = entity2.getRidingEntity();
  
              if (entity3 != null)
-@@ -1273,7 +1296,8 @@
+@@ -1273,7 +1297,8 @@
  
              this.profiler.startSection("tick");
  
@@ -87,7 +88,7 @@
              {
                  try
                  {
-@@ -1304,11 +1328,16 @@
+@@ -1304,14 +1329,25 @@
                  this.loadedEntityList.remove(i1--);
                  this.onEntityRemoved(entity2);
              }
@@ -104,7 +105,16 @@
  
          if (!this.tileEntitiesToBeRemoved.isEmpty())
          {
-@@ -1323,12 +1352,15 @@
++            // TISCM TileEntityListLogger
++            for (TileEntity te : tileEntitiesToBeRemoved)
++            {
++                TileEntityListLogHelper.log(this.getGameTime(), "ToBeRemoved", te);
++            }
++            // end TISCM TileEntityListLogger
+             this.tickableTileEntities.removeAll(this.tileEntitiesToBeRemoved);
+             this.loadedTileEntityList.removeAll(this.tileEntitiesToBeRemoved);
+             this.tileEntitiesToBeRemoved.clear();
+@@ -1323,12 +1359,15 @@
          while (iterator.hasNext())
          {
              TileEntity tileentity = iterator.next();
@@ -121,7 +131,7 @@
                  {
                      try
                      {
-@@ -1359,6 +1391,7 @@
+@@ -1359,6 +1398,7 @@
                      this.getChunk(tileentity.getPos()).removeTileEntity(tileentity.getPos());
                  }
              }
@@ -129,7 +139,7 @@
          }
  
          this.processingLoadedTiles = false;
-@@ -1389,6 +1422,7 @@
+@@ -1389,9 +1429,14 @@
  
              this.addedTileEntityList.clear();
          }
@@ -137,7 +147,38 @@
  
          this.profiler.endSection();
          this.profiler.endSection();
-@@ -1514,7 +1548,8 @@
++
++        // TISCM TileEntityListLogger
++        TileEntityListLogHelper.flush();
++        // end TISCM TileEntityListLogger
+     }
+ 
+     protected void tickPlayers()
+@@ -1414,6 +1459,10 @@
+             this.notifyBlockUpdate(blockpos, iblockstate, iblockstate, 2);
+         }
+ 
++        // TISCM TileEntityListLogger
++        TileEntityListLogHelper.log(this.getGameTime(), "Added to loaded", tile);
++        // end TISCM TileEntityListLogger
++        
+         return flag;
+     }
+ 
+@@ -1422,6 +1471,12 @@
+         if (this.processingLoadedTiles)
+         {
+             this.addedTileEntityList.addAll(tileEntityCollection);
++            // TISCM TileEntityListLogger
++            for (TileEntity te : tileEntityCollection)
++            {
++                TileEntityListLogHelper.log(this.getGameTime(), "Added to pending", te);
++            }
++            // end TISCM TileEntityListLogger
+         }
+         else
+         {
+@@ -1514,7 +1569,8 @@
                  this.getChunk(entityIn.chunkCoordX, entityIn.chunkCoordZ).removeEntityAtIndex(entityIn, entityIn.chunkCoordY);
              }
  
@@ -147,7 +188,18 @@
              {
                  entityIn.addedToChunk = false;
              }
-@@ -2149,6 +2184,13 @@
+@@ -1883,6 +1939,10 @@
+     public void removeTileEntity(BlockPos pos)
+     {
+         TileEntity tileentity = this.getTileEntity(pos);
++        
++        // TISCM TileEntityListLogger
++        TileEntityListLogHelper.log(this.getGameTime(), "Removed", pos);
++        // end TISCM TileEntityListLogger
+ 
+         if (tileentity != null && this.processingLoadedTiles)
+         {
+@@ -2149,6 +2209,13 @@
  
      public boolean checkLightFor(EnumLightType lightType, BlockPos pos)
      {
@@ -161,7 +213,7 @@
          if (!this.isAreaLoaded(pos, 17, false))
          {
              return false;
-@@ -3204,4 +3246,17 @@
+@@ -3204,4 +3271,17 @@
      public abstract RecipeManager getRecipeManager();
  
      public abstract NetworkTagManager getTags();

@@ -43,6 +43,11 @@ public class BlockUpdatesLogHelper {
     {
         BlockUpdatesLogHelper.stage = stage;
     }
+
+    public static String getTickStage()
+    {
+        return BlockUpdatesLogHelper.stage;
+    }
     
     public static void setGameTime(long gameTime)
     {

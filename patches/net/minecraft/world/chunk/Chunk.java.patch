@@ -9,18 +9,19 @@
  import com.google.common.collect.Maps;
  import com.google.common.collect.Queues;
  import com.google.common.collect.Sets;
-@@ -55,6 +58,10 @@
+@@ -55,6 +58,11 @@
  import org.apache.logging.log4j.LogManager;
  import org.apache.logging.log4j.Logger;
  
 +//TISCM: add chunk debug
 +import carpet.logging.LoggerRegistry;
 +import carpet.logging.logHelpers.ChunkLogHelper;
++import carpet.logging.logHelpers.TileEntityListLogHelper;
 +
  public class Chunk implements IChunk
  {
      private static final Logger LOGGER = LogManager.getLogger();
-@@ -89,6 +96,19 @@
+@@ -89,6 +97,19 @@
      private int neighborCount;
      private final AtomicInteger field_205757_F = new AtomicInteger();
      private final ChunkPos field_212816_F;
@@ -40,7 +41,7 @@
  
      @OnlyIn(Dist.CLIENT)
      public Chunk(World worldIn, int cx, int cz, Biome[] biomesIn)
-@@ -212,37 +232,45 @@
+@@ -212,37 +233,45 @@
              {
                  if (this.world.dimension.hasSkyLight())
                  {
@@ -112,7 +113,7 @@
                      }
                  }
              }
-@@ -339,40 +367,52 @@
+@@ -339,40 +368,52 @@
              int j = heightmap.getHeight(x & 15, z & 15);
              int k = this.x * 16 + x;
              int l = this.z * 16 + z;
@@ -191,7 +192,7 @@
                  }
              }
  
-@@ -380,19 +420,23 @@
+@@ -380,19 +421,23 @@
              {
                  this.heightMapMinimum = j;
              }
@@ -225,7 +226,7 @@
              }
  
              this.dirty = true;
-@@ -489,9 +533,16 @@
+@@ -489,9 +534,16 @@
          }
      }
  
@@ -242,7 +243,7 @@
          int i = pos.getX() & 15;
          int j = pos.getY();
          int k = pos.getZ() & 15;
-@@ -517,10 +568,16 @@
+@@ -517,10 +569,16 @@
                  }
  
                  chunksection = new ChunkSection(j >> 4 << 4, this.world.dimension.hasSkyLight());
@@ -260,7 +261,7 @@
              chunksection.set(i, j & 15, k, state);
              this.heightMap.get(Heightmap.Type.MOTION_BLOCKING).update(i, j, k, state);
              this.heightMap.get(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES).update(i, j, k, state);
-@@ -551,10 +608,14 @@
+@@ -551,10 +609,14 @@
                      int i1 = state.getOpacity(this.world, pos);
                      int j1 = iblockstate.getOpacity(this.world, pos);
                      this.relightBlock(i, j, k, state);
@@ -278,7 +279,7 @@
                      }
                  }
  
-@@ -568,14 +629,26 @@
+@@ -568,14 +630,26 @@
                      }
                  }
  
@@ -307,7 +308,7 @@
  
                      if (tileentity1 == null)
                      {
-@@ -596,6 +669,9 @@
+@@ -596,6 +670,9 @@
  
      public int getLightFor(EnumLightType type, BlockPos pos)
      {
@@ -317,7 +318,7 @@
          return this.getLight(type, pos, this.world.getDimension().hasSkyLight());
      }
  
-@@ -651,10 +727,18 @@
+@@ -651,10 +728,18 @@
                  {
                      return;
                  }
@@ -338,7 +339,7 @@
              }
  
              if (light == EnumLightType.SKY)
-@@ -680,6 +764,9 @@
+@@ -680,6 +765,9 @@
  
      public int getLightSubtracted(BlockPos pos, int amount, boolean hasSkylight)
      {
@@ -348,22 +349,24 @@
          int i = pos.getX() & 15;
          int j = pos.getY();
          int k = pos.getZ() & 15;
-@@ -894,10 +981,32 @@
+@@ -894,10 +982,34 @@
                  return !(p_212383_0_ instanceof EntityPlayer);
              }));
          }
 +
 +        //TISCM: chunk debug
 +        if (LoggerRegistry.__chunkdebug){
++            String dimname = new String();
 +            if (this.world.dimension.isNether()) {
-+                ChunkLogHelper.onChunkNewState("Nether", this.x, this.z, "l Loaded tick: " + this.world.getGameTime());
++                dimname = "Nether";
 +            }
 +            else if (this.world.dimension.hasSkyLight()){
-+                ChunkLogHelper.onChunkNewState("Overworld", this.x, this.z, "l Loaded tick: " + this.world.getGameTime());
++                dimname = "Overworld";
 +            }
 +            else{
-+                ChunkLogHelper.onChunkNewState("End", this.x, this.z, "l Loaded tick: " + this.world.getGameTime());
++                dimname = "End";
 +            }
++            ChunkLogHelper.onChunkNewState(dimname, this.x, this.z, "l Loaded", this.world.getGameTime());
 +        }
 +        
 +        // [TISCM] Newlight
@@ -381,22 +384,24 @@
          this.loaded = false;
  
          for (TileEntity tileentity : this.tileEntities.values())
-@@ -909,6 +1018,23 @@
+@@ -909,6 +1021,25 @@
          {
              this.world.unloadEntities(classinheritancemultimap);
          }
 +
 +        //TISCM: chunk debug
 +        if (LoggerRegistry.__chunkdebug){
++            String dimname = new String();
 +            if (this.world.dimension.isNether()) {
-+                ChunkLogHelper.onChunkNewState("Nether", this.x, this.z, "r Unloaded tick: " + this.world.getGameTime());
++                dimname = "Nether";
 +            }
 +            else if (this.world.dimension.hasSkyLight()){
-+                ChunkLogHelper.onChunkNewState("Overworld", this.x, this.z, "r Unloaded tick: " + this.world.getGameTime());
++                dimname = "Overworld";
 +            }
-+            else {
-+                ChunkLogHelper.onChunkNewState("End", this.x, this.z, "r Unloaded tick: " + this.world.getGameTime());
++            else{
++                dimname = "End";
 +            }
++            ChunkLogHelper.onChunkNewState(dimname, this.x, this.z, "r Unloaded", this.world.getGameTime());
 +        }
 +        
 +        // [TISCM] Newlight
@@ -405,7 +410,7 @@
      }
  
      public void markDirty()
-@@ -997,6 +1123,9 @@
+@@ -997,6 +1128,9 @@
  
      public void tick(boolean skipRecheckGaps)
      {
@@ -415,7 +420,7 @@
          if (this.isGapLightingUpdated && this.world.dimension.hasSkyLight() && !skipRecheckGaps)
          {
              this.recheckGaps(this.world.isRemote);
-@@ -1138,9 +1267,28 @@
+@@ -1138,9 +1272,28 @@
                  this.sections[l].recalculateRefCounts();
              }
          }
@@ -446,7 +451,7 @@
          for (TileEntity tileentity : this.tileEntities.values())
          {
              tileentity.updateContainingBlockInfo();
-@@ -1497,4 +1645,52 @@
+@@ -1497,4 +1650,52 @@
          QUEUED,
          CHECK;
      }
