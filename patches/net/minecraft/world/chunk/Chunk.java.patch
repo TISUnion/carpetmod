@@ -348,11 +348,20 @@
          int i = pos.getX() & 15;
          int j = pos.getY();
          int k = pos.getZ() & 15;
-@@ -894,6 +981,21 @@
+@@ -869,7 +956,7 @@
+         this.deferredTileEntities.put(new BlockPos(nbt.getInt("x"), nbt.getInt("y"), nbt.getInt("z")), nbt);
+     }
+ 
+-    public void removeTileEntity(BlockPos pos)
++    public void  removeTileEntity(BlockPos pos)
+     {
+         if (this.loaded)
+         {
+@@ -894,10 +981,34 @@
                  return !(p_212383_0_ instanceof EntityPlayer);
              }));
          }
-+        
++   
 +        //TISCM: chunk debug
 +        if (LoggerRegistry.__chunkdebug){
 +            String dimname = new String();
@@ -367,14 +376,27 @@
 +            }
 +            ChunkLogHelper.onChunkNewState(dimname, this.x, this.z, "l Loaded", this.world.getGameTime());
 +        }
++        
++        // [TISCM] Newlight
++        if (CarpetSettings.newLight)
++        {
++            LightingHooks.onLoadServer(this.world, this);
++        }
      }
  
      public void onUnload()
-@@ -909,6 +1011,21 @@
+     {
++        // [TISCM] Newlight
++        if (CarpetSettings.newLight)
++            this.world.getLightingEngine().procLightUpdates();
+         this.loaded = false;
+ 
+         for (TileEntity tileentity : this.tileEntities.values())
+@@ -909,6 +1020,25 @@
          {
              this.world.unloadEntities(classinheritancemultimap);
          }
-+        
++
 +        //TISCM: chunk debug
 +        if (LoggerRegistry.__chunkdebug){
 +            String dimname = new String();
@@ -389,6 +411,104 @@
 +            }
 +            ChunkLogHelper.onChunkNewState(dimname, this.x, this.z, "r Unloaded", this.world.getGameTime());
 +        }
++        
++        // [TISCM] Newlight
++        if (CarpetSettings.newLight)
++            LightingHooks.onUnload(this.world, this);
      }
  
      public void markDirty()
+@@ -997,6 +1127,9 @@
+ 
+     public void tick(boolean skipRecheckGaps)
+     {
++        // [TISCM] Newlight
++        if (CarpetSettings.newLight)
++            LightingHooks.onTick(this.world, this);
+         if (this.isGapLightingUpdated && this.world.dimension.hasSkyLight() && !skipRecheckGaps)
+         {
+             this.recheckGaps(this.world.isRemote);
+@@ -1138,9 +1271,28 @@
+                 this.sections[l].recalculateRefCounts();
+             }
+         }
+-
++        
++        // [TISCM] Newlight - start
++        long[] oldHeightMap = null;
++        if (CarpetSettings.newLight)
++        {
++            this.isLightPopulated = true;
++            
++            if (!fullChunk)
++            {
++                Heightmap map = this.getHeightmap(Heightmap.Type.LIGHT_BLOCKING);
++                oldHeightMap = new long[map.getDataArray().length];
++                System.arraycopy(map.getDataArray(), 0, oldHeightMap, 0, oldHeightMap.length);
++            }
++        }
++        // [TISCM] Newlight - end
++        
+         this.generateHeightMap();
+-
++        
++        // [TISCM] Newlight - start
++        if (CarpetSettings.newLight)
++            LightingHooks.relightSkylightColumns(this.world, this, oldHeightMap);
++        // [TISCM] Newlight - end
+         for (TileEntity tileentity : this.tileEntities.values())
+         {
+             tileentity.updateContainingBlockInfo();
+@@ -1497,4 +1649,52 @@
+         QUEUED,
+         CHECK;
+     }
++    
++    // [TISCM] Newlight - getters and setters
++    public int[] getNeighborLightChecks() {
++        return this.neighborLightChecks;
++    }
++    public void setNeighborLightChecks(int[] in) {
++        this.neighborLightChecks = in;
++    }
++    
++    public int[] getLightTrackings() {
++        return this.lightTrackings;
++    }
++    public void setLightTrackings(int[] in) {
++        this.lightTrackings = in;
++    }
++    
++    public int[] getNeighborLightTrackings() {
++        return this.neighborLightTrackings;
++    }
++    public void setNeighborLightTrackings(int[] in) {
++        this.neighborLightTrackings = in;
++    }
++    
++    public int getNeighborsLoaded() {
++        return this.neighborLoaded;
++    }
++    public void setNeighborsLoaded(int in) {
++        this.neighborLoaded = in;
++    }
++    
++    public boolean getPendingBoundaryChecks() { return this.pendingBoundaryChecks; }
++    public void setPendingBoundaryChecks(boolean value) { this.pendingBoundaryChecks = value; }
++    
++    public short getPendingNeighborLightInits() {
++        return this.pendingNeighborLightInits;
++    }
++    public void setPendingNeighborLightInits(short in) {
++        this.pendingNeighborLightInits = in;
++    }
++    
++    public boolean getIsLightPopulated()
++    {
++        return this.isLightPopulated;
++    }
++    public void setIsLightPopulated(boolean value)
++    {
++        this.isLightPopulated = value;
++    }
+ }
