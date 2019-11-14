@@ -9,8 +9,6 @@ import net.minecraft.util.math.shapes.VoxelShapes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.security.cert.CertificateNotYetValidException;
-
 import static carpet.settings.RuleCategory.*;
 
 public class CarpetSettings
@@ -105,6 +103,17 @@ public class CarpetSettings
             category = {EXPERIMENTAL, OPTIMIZATION}
     )
     public static boolean newLight = false;
+
+    @Rule(
+            desc = "improve the search algorithm for nether portal",
+            extra = "try super cache please",
+            category = {EXPERIMENTAL, OPTIMIZATION}
+    )
+    public static EnumPortalSearcher betterPortalSearcher = EnumPortalSearcher.VANILLA;
+
+    public enum EnumPortalSearcher {
+        VANILLA, SPIRAL, BOX, SUPER_CACHE
+    }
     
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$
@@ -519,5 +528,4 @@ public class CarpetSettings
             category = YEET
     )
     public static boolean yeetVillagerAi = false;
-
 }
