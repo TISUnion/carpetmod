@@ -9,19 +9,18 @@
  import com.google.common.collect.Maps;
  import com.google.common.collect.Queues;
  import com.google.common.collect.Sets;
-@@ -55,6 +58,11 @@
+@@ -55,6 +58,10 @@
  import org.apache.logging.log4j.LogManager;
  import org.apache.logging.log4j.Logger;
  
 +//TISCM: add chunk debug
 +import carpet.logging.LoggerRegistry;
 +import carpet.logging.logHelpers.ChunkLogHelper;
-+import carpet.logging.logHelpers.TileEntityListLogHelper;
 +
  public class Chunk implements IChunk
  {
      private static final Logger LOGGER = LogManager.getLogger();
-@@ -89,6 +97,19 @@
+@@ -89,6 +96,19 @@
      private int neighborCount;
      private final AtomicInteger field_205757_F = new AtomicInteger();
      private final ChunkPos field_212816_F;
@@ -41,7 +40,7 @@
  
      @OnlyIn(Dist.CLIENT)
      public Chunk(World worldIn, int cx, int cz, Biome[] biomesIn)
-@@ -212,37 +233,45 @@
+@@ -212,37 +232,45 @@
              {
                  if (this.world.dimension.hasSkyLight())
                  {
@@ -113,7 +112,7 @@
                      }
                  }
              }
-@@ -339,40 +368,52 @@
+@@ -339,40 +367,52 @@
              int j = heightmap.getHeight(x & 15, z & 15);
              int k = this.x * 16 + x;
              int l = this.z * 16 + z;
@@ -192,7 +191,7 @@
                  }
              }
  
-@@ -380,19 +421,23 @@
+@@ -380,19 +420,23 @@
              {
                  this.heightMapMinimum = j;
              }
@@ -226,7 +225,7 @@
              }
  
              this.dirty = true;
-@@ -489,9 +534,16 @@
+@@ -489,9 +533,16 @@
          }
      }
  
@@ -243,7 +242,7 @@
          int i = pos.getX() & 15;
          int j = pos.getY();
          int k = pos.getZ() & 15;
-@@ -517,10 +569,16 @@
+@@ -517,10 +568,16 @@
                  }
  
                  chunksection = new ChunkSection(j >> 4 << 4, this.world.dimension.hasSkyLight());
@@ -261,7 +260,7 @@
              chunksection.set(i, j & 15, k, state);
              this.heightMap.get(Heightmap.Type.MOTION_BLOCKING).update(i, j, k, state);
              this.heightMap.get(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES).update(i, j, k, state);
-@@ -551,10 +609,14 @@
+@@ -551,10 +608,14 @@
                      int i1 = state.getOpacity(this.world, pos);
                      int j1 = iblockstate.getOpacity(this.world, pos);
                      this.relightBlock(i, j, k, state);
@@ -279,7 +278,7 @@
                      }
                  }
  
-@@ -568,14 +630,26 @@
+@@ -568,14 +629,26 @@
                      }
                  }
  
@@ -308,7 +307,7 @@
  
                      if (tileentity1 == null)
                      {
-@@ -596,6 +670,9 @@
+@@ -596,6 +669,9 @@
  
      public int getLightFor(EnumLightType type, BlockPos pos)
      {
@@ -318,7 +317,7 @@
          return this.getLight(type, pos, this.world.getDimension().hasSkyLight());
      }
  
-@@ -651,10 +728,18 @@
+@@ -651,10 +727,18 @@
                  {
                      return;
                  }
@@ -339,7 +338,7 @@
              }
  
              if (light == EnumLightType.SKY)
-@@ -680,6 +765,9 @@
+@@ -680,6 +764,9 @@
  
      public int getLightSubtracted(BlockPos pos, int amount, boolean hasSkylight)
      {
@@ -349,24 +348,11 @@
          int i = pos.getX() & 15;
          int j = pos.getY();
          int k = pos.getZ() & 15;
-<<<<<<< HEAD
-@@ -894,10 +982,34 @@
-=======
-@@ -869,7 +956,7 @@
-         this.deferredTileEntities.put(new BlockPos(nbt.getInt("x"), nbt.getInt("y"), nbt.getInt("z")), nbt);
-     }
- 
--    public void removeTileEntity(BlockPos pos)
-+    public void  removeTileEntity(BlockPos pos)
-     {
-         if (this.loaded)
-         {
-@@ -894,10 +981,32 @@
->>>>>>> TIS-Server
+@@ -894,6 +981,21 @@
                  return !(p_212383_0_ instanceof EntityPlayer);
              }));
          }
-+
++        
 +        //TISCM: chunk debug
 +        if (LoggerRegistry.__chunkdebug){
 +            String dimname = new String();
@@ -381,27 +367,14 @@
 +            }
 +            ChunkLogHelper.onChunkNewState(dimname, this.x, this.z, "l Loaded", this.world.getGameTime());
 +        }
-+        
-+        // [TISCM] Newlight
-+        if (CarpetSettings.newLight)
-+        {
-+            LightingHooks.onLoadServer(this.world, this);
-+        }
      }
  
      public void onUnload()
-     {
-+        // [TISCM] Newlight
-+        if (CarpetSettings.newLight)
-+            this.world.getLightingEngine().procLightUpdates();
-         this.loaded = false;
- 
-         for (TileEntity tileentity : this.tileEntities.values())
-@@ -909,6 +1021,25 @@
+@@ -909,6 +1011,21 @@
          {
              this.world.unloadEntities(classinheritancemultimap);
          }
-+
++        
 +        //TISCM: chunk debug
 +        if (LoggerRegistry.__chunkdebug){
 +            String dimname = new String();
@@ -416,104 +389,6 @@
 +            }
 +            ChunkLogHelper.onChunkNewState(dimname, this.x, this.z, "r Unloaded", this.world.getGameTime());
 +        }
-+        
-+        // [TISCM] Newlight
-+        if (CarpetSettings.newLight)
-+            LightingHooks.onUnload(this.world, this);
      }
  
      public void markDirty()
-@@ -997,6 +1128,9 @@
- 
-     public void tick(boolean skipRecheckGaps)
-     {
-+        // [TISCM] Newlight
-+        if (CarpetSettings.newLight)
-+            LightingHooks.onTick(this.world, this);
-         if (this.isGapLightingUpdated && this.world.dimension.hasSkyLight() && !skipRecheckGaps)
-         {
-             this.recheckGaps(this.world.isRemote);
-@@ -1138,9 +1272,28 @@
-                 this.sections[l].recalculateRefCounts();
-             }
-         }
--
-+        
-+        // [TISCM] Newlight - start
-+        long[] oldHeightMap = null;
-+        if (CarpetSettings.newLight)
-+        {
-+            this.isLightPopulated = true;
-+            
-+            if (!fullChunk)
-+            {
-+                Heightmap map = this.getHeightmap(Heightmap.Type.LIGHT_BLOCKING);
-+                oldHeightMap = new long[map.getDataArray().length];
-+                System.arraycopy(map.getDataArray(), 0, oldHeightMap, 0, oldHeightMap.length);
-+            }
-+        }
-+        // [TISCM] Newlight - end
-+        
-         this.generateHeightMap();
--
-+        
-+        // [TISCM] Newlight - start
-+        if (CarpetSettings.newLight)
-+            LightingHooks.relightSkylightColumns(this.world, this, oldHeightMap);
-+        // [TISCM] Newlight - end
-         for (TileEntity tileentity : this.tileEntities.values())
-         {
-             tileentity.updateContainingBlockInfo();
-@@ -1497,4 +1650,52 @@
-         QUEUED,
-         CHECK;
-     }
-+    
-+    // [TISCM] Newlight - getters and setters
-+    public int[] getNeighborLightChecks() {
-+        return this.neighborLightChecks;
-+    }
-+    public void setNeighborLightChecks(int[] in) {
-+        this.neighborLightChecks = in;
-+    }
-+    
-+    public int[] getLightTrackings() {
-+        return this.lightTrackings;
-+    }
-+    public void setLightTrackings(int[] in) {
-+        this.lightTrackings = in;
-+    }
-+    
-+    public int[] getNeighborLightTrackings() {
-+        return this.neighborLightTrackings;
-+    }
-+    public void setNeighborLightTrackings(int[] in) {
-+        this.neighborLightTrackings = in;
-+    }
-+    
-+    public int getNeighborsLoaded() {
-+        return this.neighborLoaded;
-+    }
-+    public void setNeighborsLoaded(int in) {
-+        this.neighborLoaded = in;
-+    }
-+    
-+    public boolean getPendingBoundaryChecks() { return this.pendingBoundaryChecks; }
-+    public void setPendingBoundaryChecks(boolean value) { this.pendingBoundaryChecks = value; }
-+    
-+    public short getPendingNeighborLightInits() {
-+        return this.pendingNeighborLightInits;
-+    }
-+    public void setPendingNeighborLightInits(short in) {
-+        this.pendingNeighborLightInits = in;
-+    }
-+    
-+    public boolean getIsLightPopulated()
-+    {
-+        return this.isLightPopulated;
-+    }
-+    public void setIsLightPopulated(boolean value)
-+    {
-+        this.isLightPopulated = value;
-+    }
- }
