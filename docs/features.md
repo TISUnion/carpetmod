@@ -37,6 +37,7 @@ warn: Features here maybe incomplete, some features in original carpet or develo
 * `/log chunkdebug`: chunk loading/unloading / 区块加载/卸载记录器
 * `/log villagecount`: log village count / 村庄数量记录器
 * `/log tileticklist`: log tile tick list for making tiletick EMP / NTE列表记录器，有助于制作NTE EMP
+* `/log tileentitylist`: log when a tile entity is added to or removed from world's loadedTileEntityList / 方块实体列表记录器，记录方块实体从世界的loadedTileEntityList中添加或删除
 * `/log blockupdates`: log NeighborChanged and PostPlacement of observers pointing to a wool block, and powered state changes of activator rails / 记录指着羊毛方块上的侦测器所发生的的NeighborChanged与PostPlacement，与羊毛块上的激活铁轨的充能状态改变
   * `/log blockupdates all`: log all updates, default stats / 记录所有更新，默认状态
   * `/log blockupdates unique`: log unique updates. Turn it on if you don't want to be spammed by redstone dusts / 只记录不同的更新，如果你不想被红石粉刷屏的话可以开

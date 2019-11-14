@@ -108,7 +108,7 @@
 +            // TISCM TileEntityListLogger
 +            for (TileEntity te : tileEntitiesToBeRemoved)
 +            {
-+                TileEntityListLogHelper.log(this.getGameTime(), "ToBeRemoved", te);
++                TileEntityListLogHelper.log(this.getGameTime(), this.getDimension().getType().getId(), "ToBeRemoved", te);
 +            }
 +            // end TISCM TileEntityListLogger
              this.tickableTileEntities.removeAll(this.tileEntitiesToBeRemoved);
@@ -159,7 +159,7 @@
          }
  
 +        // TISCM TileEntityListLogger
-+        TileEntityListLogHelper.log(this.getGameTime(), "Added to loaded", tile);
++        TileEntityListLogHelper.log(this.getGameTime(), this.getDimension().getType().getId(), "Added", tile);
 +        // end TISCM TileEntityListLogger
 +        
          return flag;
@@ -172,7 +172,7 @@
 +            // TISCM TileEntityListLogger
 +            for (TileEntity te : tileEntityCollection)
 +            {
-+                TileEntityListLogHelper.log(this.getGameTime(), "Added to pending", te);
++                TileEntityListLogHelper.log(this.getGameTime(), this.getDimension().getType().getId(), "Pending", te);
 +            }
 +            // end TISCM TileEntityListLogger
          }
@@ -194,7 +194,7 @@
          TileEntity tileentity = this.getTileEntity(pos);
 +        
 +        // TISCM TileEntityListLogger
-+        TileEntityListLogHelper.log(this.getGameTime(), "Removed", pos);
++        TileEntityListLogHelper.log(this.getGameTime(), this.getDimension().getType().getId(), "Removed", pos);
 +        // end TISCM TileEntityListLogger
  
          if (tileentity != null && this.processingLoadedTiles)

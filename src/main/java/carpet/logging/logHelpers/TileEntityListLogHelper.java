@@ -15,20 +15,24 @@ import net.minecraft.util.text.ITextComponent;
 public class TileEntityListLogHelper {
     private static List<ITextComponent> messages = Lists.newArrayList();
     
-    public static void log(long gameTime, String msg, BlockPos pos)
+    public static void log(long gameTime, int dimensionID, String msg, BlockPos pos)
     {
+        
         TileEntityListLogHelper.messages.add(Messenger.c(
                 "g [" + gameTime + "] ",
-                "w " + msg + " ",
+                "w " + "TE" + " ",
+                "t " + msg + " ",
                 Messenger.tp("w", pos),
                 "g  at ", 
-                "e " + BlockUpdatesLogHelper.getTickStage()
+                "y " + BlockUpdatesLogHelper.getTickStage() + " ",
+                "g in ",
+                "e " + BlockUpdatesLogHelper.getDimension(dimensionID)
                 ));
     }
-    
-    public static void log(long gameTime, String msg, TileEntity te)
+
+    public static void log(long gameTime, int dimensionID, String msg, TileEntity te)
     {
-        TileEntityListLogHelper.log(gameTime, msg, te.getPos());
+        TileEntityListLogHelper.log(gameTime, dimensionID, msg, te.getPos());
     }
         
     public static void flush()
