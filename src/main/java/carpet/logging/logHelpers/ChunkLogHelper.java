@@ -3,22 +3,22 @@ package carpet.logging.logHelpers;
 import carpet.logging.LoggerRegistry;
 import carpet.utils.Messenger;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.World;
 
-public class ChunkLogHelper {
-
-    public static void onChunkNewState(String dimname, int chunkx, int chunkz, String state, long gameTime){
-
+public class ChunkLogHelper
+{
+    public static void onChunkNewState(World worldIn, int x, int z, String state)
+    {
         LoggerRegistry.getLogger("chunkdebug").log( () -> new ITextComponent[]{
                 Messenger.c(
-                        "g [" + gameTime + "] ",
-                        "w X:" + chunkx + " ", 
-                        "w Z:" + chunkz + " ", 
+                        "g [" + worldIn.getGameTime() + "] ",
+                        "w X:" + x + " ",
+                        "w Z:" + z + " ",
                         state + " ",
-                        "g at ", 
-                        "y " + BlockUpdatesLogHelper.getTickStage(),
+                        "g at ",
+                        "y " + MicroTickLogHelper.getTickStage(),
                         "g  in ",
-                        "e " + dimname
-                        )});
+                        "e " + MicroTickLogHelper.getDimension(worldIn.getDimension().getType().getId())
+                )});
     }
-
 }

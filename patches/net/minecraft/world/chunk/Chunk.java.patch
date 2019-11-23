@@ -357,24 +357,14 @@
      {
          if (this.loaded)
          {
-@@ -894,10 +981,34 @@
+@@ -894,10 +981,24 @@
                  return !(p_212383_0_ instanceof EntityPlayer);
              }));
          }
 +   
 +        //TISCM: chunk debug
 +        if (LoggerRegistry.__chunkdebug){
-+            String dimname = new String();
-+            if (this.world.dimension.isNether()) {
-+                dimname = "Nether";
-+            }
-+            else if (this.world.dimension.hasSkyLight()){
-+                dimname = "Overworld";
-+            }
-+            else{
-+                dimname = "End";
-+            }
-+            ChunkLogHelper.onChunkNewState(dimname, this.x, this.z, "l Loaded", this.world.getGameTime());
++            ChunkLogHelper.onChunkNewState(this.getWorld(), this.x, this.z, "l Loaded");
 +        }
 +        
 +        // [TISCM] Newlight
@@ -392,24 +382,14 @@
          this.loaded = false;
  
          for (TileEntity tileentity : this.tileEntities.values())
-@@ -909,6 +1020,25 @@
+@@ -909,6 +1010,15 @@
          {
              this.world.unloadEntities(classinheritancemultimap);
          }
 +
 +        //TISCM: chunk debug
 +        if (LoggerRegistry.__chunkdebug){
-+            String dimname = new String();
-+            if (this.world.dimension.isNether()) {
-+                dimname = "Nether";
-+            }
-+            else if (this.world.dimension.hasSkyLight()){
-+                dimname = "Overworld";
-+            }
-+            else{
-+                dimname = "End";
-+            }
-+            ChunkLogHelper.onChunkNewState(dimname, this.x, this.z, "r Unloaded", this.world.getGameTime());
++            ChunkLogHelper.onChunkNewState(this.getWorld(), this.x, this.z, "r Unloaded");
 +        }
 +        
 +        // [TISCM] Newlight
@@ -418,7 +398,7 @@
      }
  
      public void markDirty()
-@@ -997,6 +1127,9 @@
+@@ -997,6 +1107,9 @@
  
      public void tick(boolean skipRecheckGaps)
      {
@@ -428,7 +408,7 @@
          if (this.isGapLightingUpdated && this.world.dimension.hasSkyLight() && !skipRecheckGaps)
          {
              this.recheckGaps(this.world.isRemote);
-@@ -1138,9 +1271,28 @@
+@@ -1138,9 +1251,28 @@
                  this.sections[l].recalculateRefCounts();
              }
          }
@@ -459,7 +439,7 @@
          for (TileEntity tileentity : this.tileEntities.values())
          {
              tileentity.updateContainingBlockInfo();
-@@ -1497,4 +1649,52 @@
+@@ -1497,4 +1629,52 @@
          QUEUED,
          CHECK;
      }

@@ -1,0 +1,45 @@
+--- a/net/minecraft/block/BlockTripWireHook.java
++++ b/net/minecraft/block/BlockTripWireHook.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.block;
+ 
++import carpet.logging.logHelpers.MicroTickLogHelper;
+ import com.google.common.base.MoreObjects;
+ import java.util.Random;
+ import javax.annotation.Nullable;
+@@ -153,6 +154,7 @@
+                 if (j == p_176260_6_)
+                 {
+                     worldIn.getPendingBlockTicks().scheduleTick(pos, this, this.tickRate(worldIn));
++                    MicroTickLogHelper.onComponentAddToTileTickList(worldIn, pos, this.tickRate(worldIn)); // TISCM Micro Tick logger
+                     flag2 &= flag4;
+                 }
+             }
+@@ -166,7 +168,14 @@
+         {
+             BlockPos blockpos1 = pos.offset(enumfacing, i);
+             EnumFacing enumfacing1 = enumfacing.getOpposite();
++            boolean oldPoweredState = worldIn.getBlockState(blockpos1).get(POWERED);
+             worldIn.setBlockState(blockpos1, iblockstate1.with(FACING, enumfacing1), 3);
++            // TISCM Micro Tick logger
++            if (oldPoweredState != iblockstate1.get(POWERED))
++            {
++                MicroTickLogHelper.onComponentPowered(worldIn, blockpos1, iblockstate1.get(POWERED));
++            }
++            // end TISCM Micro Tick logger
+             this.notifyNeighbors(worldIn, blockpos1, enumfacing1);
+             this.playSound(worldIn, blockpos1, flag2, flag3, flag, flag1);
+         }
+@@ -176,6 +185,12 @@
+         if (!p_176260_4_)
+         {
+             worldIn.setBlockState(pos, iblockstate1.with(FACING, enumfacing), 3);
++            // TISCM Micro Tick logger
++            if (flag1 != iblockstate1.get(POWERED))
++            {
++                MicroTickLogHelper.onComponentPowered(worldIn, pos, iblockstate1.get(POWERED));
++            }
++            // end TISCM Micro Tick logger
+ 
+             if (p_176260_5_)
+             {

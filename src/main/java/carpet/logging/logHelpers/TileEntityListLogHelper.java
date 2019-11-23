@@ -24,9 +24,9 @@ public class TileEntityListLogHelper {
                 "t " + msg + " ",
                 Messenger.tp("w", pos),
                 "g  at ", 
-                "y " + BlockUpdatesLogHelper.getTickStage() + " ",
+                "y " + MicroTickLogHelper.getTickStage() + " ",
                 "g in ",
-                "e " + BlockUpdatesLogHelper.getDimension(dimensionID)
+                "e " + MicroTickLogHelper.getDimension(dimensionID)
                 ));
     }
 

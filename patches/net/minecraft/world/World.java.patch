@@ -4,7 +4,7 @@
  package net.minecraft.world;
  
 +import carpet.helpers.TickSpeed;
-+import carpet.logging.logHelpers.BlockUpdatesLogHelper;
++import carpet.logging.logHelpers.MicroTickLogHelper;
 +import carpet.logging.logHelpers.TileEntityListLogHelper;
 +import carpet.settings.CarpetSettings;
 +import carpet.utils.CarpetProfiler;
@@ -65,7 +65,7 @@
 +        int did = this.dimension.getType().getId();
 +        String world_name = (did==0)?"Overworld":((did<0?"The Nether":"The End"));
 +        CarpetProfiler.ProfilerToken tok_entities = CarpetProfiler.start_section_concurrent(world_name, "Entities", this.isRemote);
-+        BlockUpdatesLogHelper.setTickStage("Entities"); // TISCM Block Updates logger
++        MicroTickLogHelper.setTickStage("Entities"); // TISCM Micro Tick logger
 +        // end
  
          for (int i = 0; i < this.weatherEffects.size(); ++i)
@@ -101,7 +101,7 @@
  
 +
          this.profiler.endStartSection("blockEntities");
-+        BlockUpdatesLogHelper.setTickStage("TileEntities"); // TISCM Block Updates logger
++        MicroTickLogHelper.setTickStage("TileEntities"); // TISCM Micro Tick logger
  
          if (!this.tileEntitiesToBeRemoved.isEmpty())
          {

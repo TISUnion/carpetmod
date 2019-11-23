@@ -7,7 +7,7 @@
 +import carpet.helpers.TickSpeed;
 +import carpet.settings.CarpetSettings;
 +import carpet.utils.CarpetProfiler;
-+import carpet.logging.logHelpers.BlockUpdatesLogHelper;
++import carpet.logging.logHelpers.MicroTickLogHelper;
  import com.google.common.base.Stopwatch;
  import com.google.common.collect.Lists;
  import com.google.common.collect.Maps;
@@ -104,7 +104,7 @@
          if (this.tickCounter % 900 == 0)
          {
 +            CarpetProfiler.start_section(null, "Autosave");
-+            BlockUpdatesLogHelper.setTickStage("AutoSave"); // TISCM Block Updates logger
++            MicroTickLogHelper.setTickStage("AutoSave"); // TISCM Micro Tick logger
              this.profiler.startSection("save");
              this.playerList.saveAllPlayerData();
              this.saveAllWorlds(true);
@@ -136,7 +136,7 @@
          }
  
          this.profiler.endStartSection("commandFunctions");
-+        BlockUpdatesLogHelper.setTickStage("CommandFunctions"); // TISCM Block Updates logger
++        MicroTickLogHelper.setTickStage("CommandFunctions"); // TISCM Micro Tick logger
          this.getFunctionManager().tick();
          this.profiler.endStartSection("levels");
  
@@ -145,7 +145,7 @@
          }
  
 +        CarpetProfiler.start_section(null, "Network");
-+        BlockUpdatesLogHelper.setTickStage("Network"); // TISCM Block Updates logger
++        MicroTickLogHelper.setTickStage("Network"); // TISCM Micro Tick logger
          this.profiler.endStartSection("connection");
          this.getNetworkSystem().tick();
          this.profiler.endStartSection("players");

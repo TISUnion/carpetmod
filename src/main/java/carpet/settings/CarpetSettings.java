@@ -114,6 +114,18 @@ public class CarpetSettings
     public enum EnumPortalSearcher {
         VANILLA, SPIRAL, BOX, SUPER_CACHE
     }
+
+    @Rule(
+            desc = "Display actions of redstone components and blockupdates with wool block",
+            extra = {
+                    "Use /log microtick to start logging",
+                    "endrods will detect block updates and redstone components will show their actions",
+                    "repeater, comparator, observer: pointing towards wool",
+                    "endrod, rtorch, rails, buttons, etc.: placed on wool",
+            },
+            category = {COMMAND, CREATIVE}
+    )
+    public static boolean microTick = false;
     
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$

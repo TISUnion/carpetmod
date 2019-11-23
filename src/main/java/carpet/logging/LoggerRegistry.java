@@ -32,7 +32,7 @@ public class LoggerRegistry
     public static boolean __villagecount;
     public static boolean __memory;
     public static boolean __tileticklist;
-    public static boolean __blockupdates;
+    public static boolean __microtick;
     public static boolean __tileentitylist;
 
     public static void initLoggers()
@@ -62,8 +62,8 @@ public class LoggerRegistry
         //TISCM: add tile tick list
         registerLogger("tileticklist", new Logger("tileticklist", null, null)); 
 
-        //TISCM: add block updates
-        registerLogger("blockupdates", new Logger("blockupdates", "all", new String[]{"all", "unique"})); 
+        //TISCM: add micro tick
+        registerLogger("microtick", new Logger("microtick", "all", new String[]{"all", "unique"}));
         
         //TISCM: add tile entity list
         registerLogger("tileentitylist", new Logger("tileentitylist", null, null)); 

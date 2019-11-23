@@ -1,19 +1,18 @@
 --- a/net/minecraft/block/BlockRailPowered.java
 +++ b/net/minecraft/block/BlockRailPowered.java
-@@ -1,6 +1,12 @@
+@@ -1,6 +1,11 @@
  package net.minecraft.block;
  
 +import carpet.logging.LoggerRegistry;
-+import carpet.logging.logHelpers.BlockUpdatesLogHelper;
++import carpet.logging.logHelpers.MicroTickLogHelper;
 +import carpet.settings.CarpetSettings;
 +import carpet.utils.WoolTool;
  import net.minecraft.block.state.IBlockState;
-+import net.minecraft.init.Blocks;
 +import net.minecraft.item.EnumDyeColor;
  import net.minecraft.state.BooleanProperty;
  import net.minecraft.state.EnumProperty;
  import net.minecraft.state.IProperty;
-@@ -25,7 +31,8 @@
+@@ -25,7 +30,8 @@
  
      protected boolean findPoweredRailSignal(World worldIn, BlockPos pos, IBlockState state, boolean p_176566_4_, int p_176566_5_)
      {
@@ -23,22 +22,11 @@
          {
              return false;
          }
-@@ -180,6 +187,18 @@
+@@ -180,6 +186,7 @@
          if (flag1 != flag)
          {
              worldIn.setBlockState(pos, state.with(POWERED, Boolean.valueOf(flag1)), 3);
-+            
-+            // TISCM Block Updates logger
-+            if (LoggerRegistry.__blockupdates && !worldIn.isRemote() && worldIn.getBlockState(pos).getBlock() == Blocks.ACTIVATOR_RAIL)
-+            {
-+                EnumDyeColor color = WoolTool.getWoolColorAtPosition(worldIn.getWorld(), pos.down());
-+                if (color != null)
-+                {
-+                    BlockUpdatesLogHelper.onBlockUpdated(pos, flag1 ? "Powered" : "Depowered", worldIn.getDimension().getType().getId(), color);
-+                }
-+            }
-+            // end TISCM Block Updates logger
-+            
++            MicroTickLogHelper.onComponentPowered(worldIn, pos, flag1); // TISCM Micro Tick logger
              worldIn.notifyNeighborsOfStateChange(pos.down(), this);
  
              if (state.get(SHAPE).isAscending())
