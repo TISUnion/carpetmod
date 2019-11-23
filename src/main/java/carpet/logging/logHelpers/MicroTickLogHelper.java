@@ -334,6 +334,35 @@ public class MicroTickLogHelper
                 this.texts = texts;
                 this.stage = null;
             }
+
+            public boolean equals(Object obj)
+            {
+                if (this == obj)
+                {
+                    return true;
+                }
+                if (!(obj instanceof MicroTickLogHelperMessage))
+                {
+                    return false;
+                }
+
+                MicroTickLogHelperMessage o = (MicroTickLogHelperMessage) obj;
+                boolean ret = this.dimensionID == o.dimensionID && this.pos.equals(o.pos) && this.color.equals(o.color) && this.stage.equals(o.stage);
+                ret |= this.texts.length == o.texts.length;
+                if (!ret)
+                {
+                    return ret;
+                }
+                for (int i = 0; i < this.texts.length; i++)
+                    if (this.texts[i] instanceof String && !this.texts[i].equals(o.texts[i]))
+                        return false;
+                return ret;
+            }
+
+            public int hashCode()
+            {
+                return dimensionID + pos.hashCode() * 2 + color.hashCode();
+            }
         }
     }
 }
