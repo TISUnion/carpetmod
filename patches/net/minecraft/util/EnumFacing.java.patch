@@ -39,7 +39,39 @@
          EnumFacing enumfacing = flag ? EAST : WEST;
          EnumFacing enumfacing1 = flag1 ? UP : DOWN;
          EnumFacing enumfacing2 = flag2 ? SOUTH : NORTH;
-@@ -510,4 +527,10 @@
+@@ -121,9 +138,14 @@
+         return this.axisDirection;
+     }
+ 
++    /**
++     * Avoid the modulo/abs operations
++     * @author JellySquid
++     */
+     public EnumFacing getOpposite()
+     {
+-        return byIndex(this.opposite);
++        // return byIndex(this.opposite);
++        return VALUES[this.opposite];
+     }
+ 
+     @OnlyIn(Dist.CLIENT)
+@@ -299,9 +321,14 @@
+         return (float)((this.horizontalIndex & 3) * 90);
+     }
+ 
++    /**
++     * Do not allocate an excessive number of Direction arrays
++     * @author JellySquid
++     */
+     public static EnumFacing random(Random rand)
+     {
+-        return values()[rand.nextInt(values().length)];
++        // return values()[rand.nextInt(values().length)];
++        return VALUES[rand.nextInt(VALUES.length)];
+     }
+ 
+     public static EnumFacing getFacingFromVector(double x, double y, double z)
+@@ -510,4 +537,10 @@
              return Iterators.forArray(this.facingValues);
          }
      }

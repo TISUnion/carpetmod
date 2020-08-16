@@ -1,0 +1,46 @@
+--- a/net/minecraft/util/math/AxisAlignedBB.java
++++ b/net/minecraft/util/math/AxisAlignedBB.java
+@@ -40,14 +40,41 @@
+         this(min.x, min.y, min.z, max.x, max.y, max.z);
+     }
+ 
++    /**
++     * Simplify the code to better help the JVM optimize it
++     * @author JellySquid
++     */
+     public double getMin(EnumFacing.Axis axis)
+     {
+-        return axis.getCoordinate(this.minX, this.minY, this.minZ);
++        // return axis.getCoordinate(this.minX, this.minY, this.minZ);
++        switch (axis.ordinal()) {
++            case 0: //X
++                return this.minX;
++            case 1: //Y
++                return this.minY;
++            case 2: //Z
++                return this.minZ;
++        }
++
++        throw new IllegalArgumentException();
+     }
+ 
++    /**
++     * Simplify the code to better help the JVM optimize it
++     * @author JellySquid
++     */
+     public double getMax(EnumFacing.Axis axis)
+     {
+-        return axis.getCoordinate(this.maxX, this.maxY, this.maxZ);
++        // return axis.getCoordinate(this.maxX, this.maxY, this.maxZ);
++        switch (axis.ordinal()) {
++            case 0: //X
++                return this.maxX;
++            case 1: //Y
++                return this.maxY;
++            case 2: //Z
++                return this.maxZ;
++        }
++        throw new IllegalArgumentException();
+     }
+ 
+     public boolean equals(Object p_equals_1_)
