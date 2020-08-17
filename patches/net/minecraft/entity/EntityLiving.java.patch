@@ -30,7 +30,20 @@
      private EntityLivingBase attackTarget;
      private final EntitySenses senses;
      private final NonNullList<ItemStack> inventoryHands = NonNullList.withSize(2, ItemStack.EMPTY);
-@@ -110,6 +118,13 @@
+@@ -89,7 +97,12 @@
+     private boolean isLeashed;
+     private Entity leashHolder;
+     private NBTTagCompound leashNBTTag;
++    /**
++     * Lithium change
++     */
++    private static final EntityEquipmentSlot[] ENTITY_EQUIPMENT_SLOTS = EntityEquipmentSlot.values();
+ 
++
+     protected EntityLiving(EntityType<?> type, World worldIn)
+     {
+         super(type, worldIn);
+@@ -110,6 +123,13 @@
          }
      }
  
@@ -44,7 +57,7 @@
      protected void initEntityAI()
      {
      }
-@@ -423,6 +438,11 @@
+@@ -423,6 +443,11 @@
  
              compound.put("Leash", nbttagcompound2);
          }
@@ -56,7 +69,34 @@
  
          compound.putBoolean("LeftHanded", this.isLeftHanded());
  
-@@ -1447,10 +1467,16 @@
+@@ -912,7 +937,7 @@
+ 
+     protected void dropEquipment(boolean wasRecentlyHit, int lootingModifier)
+     {
+-        for (EntityEquipmentSlot entityequipmentslot : EntityEquipmentSlot.values())
++        for (EntityEquipmentSlot entityequipmentslot : ENTITY_EQUIPMENT_SLOTS)
+         {
+             ItemStack itemstack = this.getItemStackFromSlot(entityequipmentslot);
+             float f = this.getDropChance(entityequipmentslot);
+@@ -973,7 +998,7 @@
+ 
+             boolean flag = true;
+ 
+-            for (EntityEquipmentSlot entityequipmentslot : EntityEquipmentSlot.values())
++            for (EntityEquipmentSlot entityequipmentslot : ENTITY_EQUIPMENT_SLOTS)
+             {
+                 if (entityequipmentslot.getSlotType() == EntityEquipmentSlot.Type.ARMOR)
+                 {
+@@ -1136,7 +1161,7 @@
+             this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, EnchantmentHelper.addRandomEnchantment(this.rand, this.getHeldItemMainhand(), (int)(5.0F + f * (float)this.rand.nextInt(18)), false));
+         }
+ 
+-        for (EntityEquipmentSlot entityequipmentslot : EntityEquipmentSlot.values())
++        for (EntityEquipmentSlot entityequipmentslot : ENTITY_EQUIPMENT_SLOTS)
+         {
+             if (entityequipmentslot.getSlotType() == EntityEquipmentSlot.Type.ARMOR)
+             {
+@@ -1447,10 +1472,16 @@
          float f = (float)this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getValue();
          int i = 0;
  

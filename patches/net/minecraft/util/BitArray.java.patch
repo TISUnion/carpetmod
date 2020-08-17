@@ -1,0 +1,79 @@
+--- a/net/minecraft/util/BitArray.java
++++ b/net/minecraft/util/BitArray.java
+@@ -1,6 +1,8 @@
+ package net.minecraft.util;
+ 
+ import net.minecraft.util.math.MathHelper;
++import net.minecraft.world.chunk.BlockStateContainer;
++import net.minecraft.world.chunk.IBlockStatePalette;
+ import org.apache.commons.lang3.Validate;
+ 
+ public class BitArray
+@@ -81,4 +83,67 @@
+     {
+         return this.bitsPerEntry;
+     }
++
++    public <T> short[] compact(IBlockStatePalette<T> srcPalette, IBlockStatePalette<T> destPalette, T def) {
++        if (this.arraySize >= Short.MAX_VALUE) {
++            throw new IllegalStateException("Array too large");
++        }
++
++        short[] flattened = new short[this.arraySize];
++        short[] unique = new short[this.arraySize];
++
++        int len = this.longArray.length;
++
++        if (len == 0) {
++            return flattened;
++        }
++
++        int prevWord = 0;
++
++        long word = this.longArray[0];
++        long nextWord = (len > 1) ? this.longArray[1] : 0L;
++
++        int bits = 0;
++        int i = 0;
++
++        while (i < this.arraySize) {
++            int wordIdx = bits >> 6;
++            int nextWordIdx = ((bits + this.bitsPerEntry) - 1) >> 6;
++            int bitIdx = bits ^ (wordIdx << 6);
++
++            if (wordIdx != prevWord) {
++                word = nextWord;
++                nextWord = ((wordIdx + 1) < len) ? this.longArray[wordIdx + 1] : 0L;
++                prevWord = wordIdx;
++            }
++
++            int j;
++
++            if (wordIdx == nextWordIdx) {
++                j = (int) ((word >>> bitIdx) & this.maxEntryValue);
++            } else {
++                j = (int) (((word >>> bitIdx) | (nextWord << (64 - bitIdx))) & this.maxEntryValue);
++            }
++
++            if (j != 0) {
++                int remappedPalettedId = unique[j];
++
++                if (remappedPalettedId == 0) {
++                    T obj = srcPalette.get(j);
++                    int id = destPalette.idFor(obj);
++
++                    remappedPalettedId = id + 1;
++
++                    unique[j] = (short) remappedPalettedId;
++                }
++
++                flattened[i] = (short) (remappedPalettedId - 1);
++            }
++
++            bits += this.bitsPerEntry;
++            ++i;
++        }
++
++        return flattened;
++    }
+ }

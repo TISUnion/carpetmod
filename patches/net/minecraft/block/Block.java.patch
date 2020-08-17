@@ -1,6 +1,15 @@
 --- a/net/minecraft/block/Block.java
 +++ b/net/minecraft/block/Block.java
-@@ -175,7 +175,11 @@
+@@ -6,6 +6,8 @@
+ import java.util.Random;
+ import java.util.stream.Stream;
+ import javax.annotation.Nullable;
++
++import me.jellysquid.mods.lithium.config.LiConfig;
+ import net.minecraft.block.material.EnumPushReaction;
+ import net.minecraft.block.material.Material;
+ import net.minecraft.block.material.MaterialColor;
+@@ -175,7 +177,11 @@
      @Deprecated
      public MaterialColor getMaterialColor(IBlockState state, IBlockReader worldIn, BlockPos pos)
      {
@@ -13,3 +22,33 @@
      }
  
      @Deprecated
+@@ -1763,12 +1769,20 @@
+             private final IBlockState state;
+             private final IBlockState adjacentState;
+             private final EnumFacing side;
++            /** Lithium: cached hash*/
++            private final int cachedHash;
+ 
+             public RenderSideCacheKey(IBlockState state, IBlockState adjacentState, EnumFacing side)
+             {
+                 this.state = state;
+                 this.adjacentState = adjacentState;
+                 this.side = side;
++                if (LiConfig.CachedHashCode.cachedBlockRenderSideCacheKey)
++                {
++                    cachedHash = Objects.hash(this.state, this.adjacentState, this.side);
++                } else {
++                    cachedHash = 0;
++                }
+             }
+ 
+             public boolean equals(Object p_equals_1_)
+@@ -1790,7 +1804,7 @@
+ 
+             public int hashCode()
+             {
+-                return Objects.hash(this.state, this.adjacentState, this.side);
++                return (LiConfig.CachedHashCode.cachedBlockRenderSideCacheKey) ? cachedHash : Objects.hash(this.state, this.adjacentState, this.side);
+             }
+         }
+ }

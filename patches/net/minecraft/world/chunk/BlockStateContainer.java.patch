@@ -1,0 +1,142 @@
+--- a/net/minecraft/world/chunk/BlockStateContainer.java
++++ b/net/minecraft/world/chunk/BlockStateContainer.java
+@@ -5,6 +5,10 @@
+ import java.util.concurrent.locks.ReentrantLock;
+ import java.util.function.Function;
+ import java.util.stream.Collectors;
++
++import me.jellysquid.mods.lithium.common.world.chunk.palette.LithiumHashPalette;
++import me.jellysquid.mods.lithium.common.world.chunk.palette.LithiumPaletteResizeListener;
++import me.jellysquid.mods.lithium.config.LiConfig;
+ import net.minecraft.crash.CrashReport;
+ import net.minecraft.crash.CrashReportCategory;
+ import net.minecraft.crash.ReportedException;
+@@ -17,7 +21,7 @@
+ import net.minecraftforge.api.distmarker.Dist;
+ import net.minecraftforge.api.distmarker.OnlyIn;
+ 
+-public class BlockStateContainer<T> implements IBlockStatePaletteResizer<T>
++public class BlockStateContainer<T> implements IBlockStatePaletteResizer<T>, LithiumPaletteResizeListener<T>
+ {
+     private final IBlockStatePalette<T> field_205521_b;
+     private final IBlockStatePaletteResizer<T> field_205522_c = (p_205517_0_, p_205517_1_) ->
+@@ -78,14 +82,21 @@
+         {
+             this.bits = bitsIn;
+ 
+-            if (this.bits <= 4)
++            if (this.bits <= ((LiConfig.Chunk.fastChunkPalette_tweakedThresholdScaleOf3) ? 3 : 4))
+             {
+-                this.bits = 4;
++                this.bits = ((LiConfig.Chunk.fastChunkPalette_tweakedThresholdScaleOf3) ? 3 : 4);
+                 this.palette = new BlockStatePaletteLinear<>(this.registry, this.bits, this, this.deserializer);
+             }
+             else if (this.bits < 9)
+             {
+-                this.palette = new BlockStatePaletteHashMap<>(this.registry, this.bits, this, this.deserializer, this.serializer);
++                if (LiConfig.Chunk.fastChunkPalette)
++                {
++                    this.palette = new LithiumHashPalette<>(this.registry, this.bits, this, this.deserializer, this.serializer);
++                }
++                else
++                {
++                    this.palette = new BlockStatePaletteHashMap<>(this.registry, this.bits, this, this.deserializer, this.serializer);
++                }
+             }
+             else
+             {
+@@ -214,6 +225,11 @@
+ 
+     public void writeChunkPalette(NBTTagCompound compound, String paletteName, String paletteDataName)
+     {
++        if (LiConfig.Chunk.fastChunkSerialization)
++        {
++            writeChunkPalette_Lithium(compound, paletteName, paletteDataName);
++            return;
++        }
+         this.lock();
+         BlockStatePaletteHashMap<T> blockstatepalettehashmap = new BlockStatePaletteHashMap<>(this.registry, this.bits, this.field_205522_c, this.deserializer, this.serializer);
+         blockstatepalettehashmap.idFor(this.defaultState);
+@@ -243,4 +259,82 @@
+     {
+         return 1 + this.palette.getSerializedSize() + PacketBuffer.getVarIntSize(this.storage.size()) + this.storage.getBackingLongArray().length * 8;
+     }
++
++    @Override
++    public int onLithiumResize(int size, T obj) {
++        this.lock();
++
++        if (size > this.bits) {
++            BitArray oldData = this.storage;
++            IBlockStatePalette<T> oldPalette = this.palette;
++
++            this.setBits(size);
++
++            for (int i = 0; i < oldData.size(); ++i) {
++                T oldObj = oldPalette.get(oldData.getAt(i));
++
++                if (oldObj != null) {
++                    this.set(i, oldObj);
++                }
++            }
++        }
++
++        int ret = this.palette.idFor(obj);
++
++        this.unlock();
++
++        return ret;
++    }
++
++    /**
++     * This patch incorporates a number of changes to significantly reduce the time needed to serialize.
++     * - Iterate over the packed integer array using a specialized consumer instead of a naive for-loop.
++     * - Maintain a temporary list of int->int mappings between the working data array and compacted data array. If a
++     * mapping doesn't exist yet, create it in the compacted palette. This allows us to avoid the many lookups through
++     * the palette and saves considerable time.
++     * - If the palette didn't change size after compaction, avoid the step of copying all the data into a new packed
++     * integer array and simply use a memcpy to clone the working array (storing it alongside the current working palette.)
++     *
++     * @author JellySquid
++     */
++    private void writeChunkPalette_Lithium(NBTTagCompound tag, String paletteKey, String dataKey) {
++        this.lock();
++
++        LithiumHashPalette<T> compactedPalette = new LithiumHashPalette<>(this.registry, this.bits, null, this.deserializer, this.serializer);
++        compactedPalette.idFor(this.defaultState);
++
++        short[] remapped = (this.storage)
++                .compact(this.palette, compactedPalette, this.defaultState);
++
++        int originalIntSize = this.storage.bitsPerEntry();
++        int copyIntSize = Math.max(4, MathHelper.log2DeBruijn(compactedPalette.getSize()));
++
++        // If the palette didn't change sizes, there's no reason to copy anything
++        if (this.palette instanceof LithiumHashPalette && originalIntSize == copyIntSize) {
++            long[] array = this.storage.getBackingLongArray();
++            long[] copy = new long[array.length];
++
++            System.arraycopy(array, 0, copy, 0, array.length);
++
++            NBTTagList paletteTag = new NBTTagList();
++            ((LithiumHashPalette<T>) this.palette).toTag(paletteTag);
++
++            tag.put(paletteKey, paletteTag);
++            tag.putLongArray(dataKey, copy);
++        } else {
++            BitArray copy = new BitArray(copyIntSize, 4096);
++
++            for (int i = 0; i < remapped.length; ++i) {
++                copy.setAt(i, remapped[i]);
++            }
++
++            NBTTagList paletteTag = new NBTTagList();
++            compactedPalette.toTag(paletteTag);
++
++            tag.put(paletteKey, paletteTag);
++            tag.putLongArray(dataKey, copy.getBackingLongArray());
++        }
++
++        this.unlock();
++    }
+ }

@@ -149,7 +149,7 @@
  
 -    public List<NextTickListEntry<T>> getPending(MutableBoundingBox p_205366_1_, boolean remove)
 -    {
-+    public List<NextTickListEntry<T>> getPending(MutableBoundingBox p_205366_1_, boolean remove) {
++    protected List<NextTickListEntry<T>> getPending(MutableBoundingBox p_205366_1_, boolean remove) {
          List<NextTickListEntry<T>> list = null;
  
 -        for (int i = 0; i < 2; ++i)

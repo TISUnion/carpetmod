@@ -15,12 +15,12 @@
  import javax.annotation.Nonnull;
  import javax.annotation.Nullable;
 +
++import me.jellysquid.mods.lithium.common.world.scheduler.LithiumServerTickScheduler;
 +import me.jellysquid.mods.lithium.config.LiConfig;
-+import me.jellysquid.mods.lithium.scheduler.LithiumServerTickScheduler;
  import net.minecraft.block.Block;
  import net.minecraft.block.BlockEventData;
  import net.minecraft.block.state.IBlockState;
-@@ -98,14 +105,8 @@
+@@ -98,17 +105,13 @@
      private int updateEntityTick;
      private final Teleporter worldTeleporter;
      private final WorldEntitySpawner entitySpawner = new WorldEntitySpawner();
@@ -37,7 +37,12 @@
      protected final VillageSiege villageSiege = new VillageSiege(this);
      ObjectLinkedOpenHashSet<BlockEventData> blockEventQueue = new ObjectLinkedOpenHashSet<>();
      private boolean insideTick;
-@@ -122,6 +123,35 @@
++    /** Lithium: avoidAlloc */
++    private final BlockPos.MutableBlockPos mutableBlockPosForRandomTicks = new BlockPos.MutableBlockPos();
+ 
+     public WorldServer(MinecraftServer server, ISaveHandler p_i49819_2_, WorldSavedDataStorage p_i49819_3_, WorldInfo p_i49819_4_, DimensionType p_i49819_5_, Profiler p_i49819_6_)
+     {
+@@ -122,6 +125,35 @@
          this.calculateInitialSkylight();
          this.calculateInitialWeather();
          this.getWorldBorder().setSize(server.getMaxWorldSize());
@@ -49,8 +54,8 @@
 +                    IRegistry.BLOCK::getOrDefault,
 +                    this::tickBlock
 +            );
-+            this.pendingFluidTicks = new LithiumServerTickScheduler<>(this, (p_205774_0_) ->
-+                    p_205774_0_ == null || p_205774_0_ == Fluids.EMPTY,
++            this.pendingFluidTicks = new LithiumServerTickScheduler<>(this, (fluid) ->
++                    fluid == null || fluid == Fluids.EMPTY,
 +                    IRegistry.FLUID::getKey,
 +                    IRegistry.FLUID::getOrDefault,
 +                    this::tickFluid
@@ -73,7 +78,7 @@
      }
  
      public WorldServer init()
-@@ -191,13 +221,24 @@
+@@ -191,13 +223,24 @@
              this.wakeAllPlayers();
          }
  
@@ -98,7 +103,7 @@
  
          this.profiler.endStartSection("chunkSource");
          this.chunkProvider.tick(hasTimeLeft);
-@@ -208,24 +249,42 @@
+@@ -208,24 +251,42 @@
              this.setSkylightSubtracted(j);
          }
  
@@ -142,7 +147,7 @@
          this.profiler.endSection();
          this.sendQueuedBlockEvents();
          this.insideTick = false;
-@@ -270,7 +329,7 @@
+@@ -270,7 +331,7 @@
                  }
              }
  
@@ -151,7 +156,7 @@
          }
      }
  
-@@ -306,6 +365,13 @@
+@@ -306,6 +367,13 @@
      {
          if (this.allPlayersSleeping && !this.isRemote)
          {
@@ -165,7 +170,16 @@
              for (EntityPlayer entityplayer : this.playerEntities)
              {
                  if (!entityplayer.isSpectator() && !entityplayer.isPlayerFullyAsleep())
-@@ -407,6 +473,13 @@
+@@ -371,7 +439,7 @@
+             int j = MathHelper.floor(entityplayer.posX) + this.rand.nextInt(11) - 5;
+             int k = MathHelper.floor(entityplayer.posY) + this.rand.nextInt(11) - 5;
+             int l = MathHelper.floor(entityplayer.posZ) + this.rand.nextInt(11) - 5;
+-            this.checkLight(new BlockPos(j, k, l));
++            this.checkLight(mutableBlockPosForRandomTicks.setPos(j, k, l));
+         }
+ 
+         this.profiler.endSection();
+@@ -407,6 +475,13 @@
                  chunk.enqueueRelightChecks();
                  this.profiler.endStartSection("tickChunk");
                  chunk.tick(false);
@@ -179,7 +193,33 @@
                  this.profiler.endStartSection("thunder");
  
                  if (flag && flag1 && this.rand.nextInt(100000) == 0)
-@@ -499,7 +572,7 @@
+@@ -439,7 +514,9 @@
+                 {
+                     this.updateLCG = this.updateLCG * 3 + 1013904223;
+                     int i2 = this.updateLCG >> 2;
+-                    BlockPos blockpos1 = this.getHeight(Heightmap.Type.MOTION_BLOCKING, new BlockPos(j + (i2 & 15), 0, k + (i2 >> 8 & 15)));
++                    mutableBlockPosForRandomTicks.setPos(j + (i2 & 15), 0, k + (i2 >> 8 & 15));
++                    mutableBlockPosForRandomTicks.setY(this.getHeight(Heightmap.Type.MOTION_BLOCKING, mutableBlockPosForRandomTicks.getX(), mutableBlockPosForRandomTicks.getZ()));
++                    BlockPos blockpos1 = mutableBlockPosForRandomTicks;
+                     BlockPos blockpos2 = blockpos1.down();
+                     Biome biome = this.getBiome(blockpos1);
+ 
+@@ -480,12 +557,12 @@
+ 
+                                 if (iblockstate.ticksRandomly())
+                                 {
+-                                    iblockstate.randomTick(this, new BlockPos(j1 + j, l1 + chunksection.getYLocation(), k1 + k), this.rand);
++                                    iblockstate.randomTick(this, mutableBlockPosForRandomTicks.setPos(j1 + j, l1 + chunksection.getYLocation(), k1 + k), this.rand);
+                                 }
+ 
+                                 if (ifluidstate.ticksRandomly())
+                                 {
+-                                    ifluidstate.randomTick(this, new BlockPos(j1 + j, l1 + chunksection.getYLocation(), k1 + k), this.rand);
++                                    ifluidstate.randomTick(this, mutableBlockPosForRandomTicks.setPos(j1 + j, l1 + chunksection.getYLocation(), k1 + k), this.rand);
+                                 }
+ 
+                                 this.profiler.endSection();
+@@ -499,7 +576,7 @@
          }
      }
  
@@ -188,7 +228,7 @@
      {
          BlockPos blockpos = this.getHeight(Heightmap.Type.MOTION_BLOCKING, pos);
          AxisAlignedBB axisalignedbb = (new AxisAlignedBB(blockpos, new BlockPos(blockpos.getX(), this.getHeight(), blockpos.getZ()))).grow(3.0D);
-@@ -608,7 +681,14 @@
+@@ -608,7 +685,14 @@
      {
          if (this.worldInfo.getGenerator() != WorldType.DEBUG_ALL_BLOCK_STATES)
          {
@@ -203,7 +243,7 @@
              this.pendingFluidTicks.tick();
          }
      }
-@@ -1032,7 +1112,7 @@
+@@ -1032,7 +1116,7 @@
  
              if (this.fireBlockEvent(blockeventdata))
              {

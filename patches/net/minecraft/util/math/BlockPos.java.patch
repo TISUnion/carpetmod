@@ -1,0 +1,22 @@
+--- a/net/minecraft/util/math/BlockPos.java
++++ b/net/minecraft/util/math/BlockPos.java
+@@ -5,6 +5,7 @@
+ import java.util.List;
+ import javax.annotation.concurrent.Immutable;
+ import net.minecraft.entity.Entity;
++import net.minecraft.util.AxisRotation;
+ import net.minecraft.util.EnumFacing;
+ import net.minecraft.util.Rotation;
+ import net.minecraftforge.api.distmarker.Dist;
+@@ -365,6 +366,11 @@
+                 return this.setPos(vec.getX(), vec.getY(), vec.getZ());
+             }
+ 
++            public BlockPos.MutableBlockPos setPos(AxisRotation axis, int x, int y, int z)
++            { //1.14 method from Lithium
++                return this.setPos(axis.getCoordinate(x, y, z, EnumFacing.Axis.X), axis.getCoordinate(x, y, z, EnumFacing.Axis.Y), axis.getCoordinate(x, y, z, EnumFacing.Axis.Z));
++            }
++
+             public BlockPos.MutableBlockPos move(EnumFacing facing)
+             {
+                 return this.move(facing, 1);
