@@ -40,9 +40,17 @@ public class LiConfig {
      * {@link net.minecraft.util.BitArray}
      */
     public static class Chunk {
-        public static boolean fastChunkPalette = true;
-        public static boolean fastChunkPalette_tweakedThresholdScaleOf3 = true;
-        public static boolean fastChunkSerialization = true;
+        public final static boolean fastChunkPalette = true;
+        public final static boolean fastChunkPalette_tweakedThresholdScaleOf3 = true;
+        public final static boolean fastChunkSerialization = true;
+    }
+
+    /**
+     * Class modified:
+     * {@link net.minecraft.entity.ai.EntityAITasks}
+     */
+    public static class Entity {
+        public final static boolean newAITaskEntryContainer = true;
     }
 
     /**

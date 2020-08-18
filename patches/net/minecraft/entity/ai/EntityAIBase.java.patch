@@ -1,0 +1,28 @@
+--- a/net/minecraft/entity/ai/EntityAIBase.java
++++ b/net/minecraft/entity/ai/EntityAIBase.java
+@@ -37,4 +37,25 @@
+     {
+         return this.mutexBits;
+     }
++
++    /**
++     * have int and boolean inside the task object to avoid allocating new shell object
++     */
++    public int taskPriority;
++    public boolean isTaskUsing;
++    public boolean hasBeenInitializedAsTask = false;
++
++    public static class FakeTask extends EntityAIBase
++    {
++        public final EntityAIBase base;
++        public FakeTask(EntityAIBase base)
++        {
++            this.base = base;
++        }
++
++        @Override
++        public boolean shouldExecute() {
++            throw new UnsupportedOperationException();
++        }
++    }
+ }

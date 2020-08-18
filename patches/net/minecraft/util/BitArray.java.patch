@@ -9,11 +9,14 @@
  import org.apache.commons.lang3.Validate;
  
  public class BitArray
-@@ -81,4 +83,67 @@
+@@ -81,4 +83,70 @@
      {
          return this.bitsPerEntry;
      }
 +
++    /**
++     * Lithium
++     */
 +    public <T> short[] compact(IBlockStatePalette<T> srcPalette, IBlockStatePalette<T> destPalette, T def) {
 +        if (this.arraySize >= Short.MAX_VALUE) {
 +            throw new IllegalStateException("Array too large");

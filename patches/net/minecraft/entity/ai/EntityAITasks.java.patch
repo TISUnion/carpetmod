@@ -1,0 +1,263 @@
+--- a/net/minecraft/entity/ai/EntityAITasks.java
++++ b/net/minecraft/entity/ai/EntityAITasks.java
+@@ -1,18 +1,26 @@
+ package net.minecraft.entity.ai;
+ 
+ import com.google.common.collect.Sets;
+-import java.util.Iterator;
+-import java.util.Set;
+-import javax.annotation.Nullable;
++import me.jellysquid.mods.lithium.config.LiConfig;
+ import net.minecraft.profiler.Profiler;
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
++import javax.annotation.Nullable;
++import java.util.Iterator;
++import java.util.Set;
++
+ public class EntityAITasks
+ {
+     private static final Logger LOGGER = LogManager.getLogger();
+-    private final Set<EntityAITasks.EntityAITaskEntry> taskEntries = Sets.newLinkedHashSet();
+-    private final Set<EntityAITasks.EntityAITaskEntry> executingTaskEntries = Sets.newLinkedHashSet();
++    private Set<EntityAITasks.EntityAITaskEntry> taskEntries; // May not be initialized if using newAITaskEntryContainer
++    private Set<EntityAITasks.EntityAITaskEntry> executingTaskEntries;// The same
++
++    /** Initialized only if using newAITaskEntryContainer*/
++    private Set<EntityAIBase> taskEntries_new;
++    /** Initialized only if using newAITaskEntryContainer*/
++    private Set<EntityAIBase> executingTaskEntries_new;
++
+     private final Profiler profiler;
+     private int tickCount;
+     private int tickRate = 3;
+@@ -21,15 +29,52 @@
+     public EntityAITasks(Profiler profilerIn)
+     {
+         this.profiler = profilerIn;
++        if (LiConfig.Entity.newAITaskEntryContainer)
++        {
++            this.taskEntries_new = Sets.newLinkedHashSet();
++            this.executingTaskEntries_new = Sets.newLinkedHashSet();
++        }
++        else
++        {
++            this.taskEntries = Sets.newLinkedHashSet();
++            this.executingTaskEntries = Sets.newLinkedHashSet();
++        }
+     }
+ 
+     public void addTask(int priority, EntityAIBase task)
+     {
++        if (LiConfig.Entity.newAITaskEntryContainer)
++        {
++            addTask_new(priority, task);
++            return;
++        }
+         this.taskEntries.add(new EntityAITasks.EntityAITaskEntry(priority, task));
+     }
+ 
++    private void addTask_new(int priority, EntityAIBase task)
++    {
++        if (task instanceof EntityAIBase.FakeTask)
++        {
++            //To ensure each fake task has the real AIBase
++            task = new EntityAIBase.FakeTask(((EntityAIBase.FakeTask) task).base);
++        }
++        else if (task.hasBeenInitializedAsTask)
++        {
++            task = new EntityAIBase.FakeTask(task);
++        }
++        task.taskPriority = priority;
++        task.hasBeenInitializedAsTask = true;
++        this.taskEntries_new.add(task);
++    }
++
+     public void removeTask(EntityAIBase task)
+     {
++        if (LiConfig.Entity.newAITaskEntryContainer)
++        {
++            removeTask_new(task);
++            return;
++        }
++
+         Iterator<EntityAITasks.EntityAITaskEntry> iterator = this.taskEntries.iterator();
+ 
+         while (iterator.hasNext())
+@@ -52,8 +97,31 @@
+         }
+     }
+ 
++    private void removeTask_new(EntityAIBase task)
++    {
++        if (this.taskEntries_new.remove(task))
++        {
++            if (task instanceof EntityAIBase.FakeTask)
++            {
++                task = ((EntityAIBase.FakeTask) task).base;
++            }
++            if (task.isTaskUsing)
++            {
++                task.resetTask();
++                task.isTaskUsing = false;
++                this.executingTaskEntries_new.remove(task);
++            }
++        }
++    }
++
+     public void tick()
+     {
++        if (LiConfig.Entity.newAITaskEntryContainer)
++        {
++            tick_new();
++            return;
++        }
++
+         this.profiler.startSection("goalSetup");
+ 
+         if (this.tickCount++ % this.tickRate == 0)
+@@ -109,6 +177,76 @@
+         }
+     }
+ 
++    private void tick_new()
++    {
++        this.profiler.startSection("goalSetup");
++
++        if (this.tickCount++ % this.tickRate == 0)
++        {
++            for (EntityAIBase aiBase : this.taskEntries_new)
++            {
++                EntityAIBase inner;
++                if (aiBase instanceof EntityAIBase.FakeTask)
++                {
++                    inner = ((EntityAIBase.FakeTask) aiBase).base;
++                }
++                else
++                {
++                    inner = aiBase;
++                }
++                if (aiBase.isTaskUsing)
++                {
++                    if (!this.canUse_new(inner) || !inner.shouldContinueExecuting())
++                    {
++                        aiBase.isTaskUsing = false;
++                        inner.resetTask();
++                        this.executingTaskEntries_new.remove(aiBase);
++                    }
++                }
++                else if (this.canUse_new(inner) && inner.shouldExecute())
++                {
++                    aiBase.isTaskUsing = true;
++                    inner.startExecuting();
++                    this.executingTaskEntries_new.add(aiBase);
++                }
++            }
++        }
++        else
++        {
++            Iterator<EntityAIBase> iterator = this.executingTaskEntries_new.iterator();
++
++            while (iterator.hasNext())
++            {
++                EntityAIBase eB = iterator.next();
++                EntityAIBase inner = (eB instanceof EntityAIBase.FakeTask) ?
++                        ((EntityAIBase.FakeTask) eB).base : eB;
++                if (!inner.shouldContinueExecuting())
++                {
++                    eB.isTaskUsing = false;
++                    inner.resetTask();
++                    iterator.remove();
++                }
++
++            }
++        }
++
++        this.profiler.endSection();
++
++        if (!this.executingTaskEntries_new.isEmpty())
++        {
++            this.profiler.startSection("goalTick");
++
++            for (EntityAIBase entityAIBase2 : this.executingTaskEntries_new)
++            {
++                EntityAIBase inner = (entityAIBase2 instanceof EntityAIBase.FakeTask) ?
++                        ((EntityAIBase.FakeTask) entityAIBase2).base : entityAIBase2;
++                inner.tick();
++            }
++
++            this.profiler.endSection();
++        }
++    }
++
+     private boolean canContinue(EntityAITasks.EntityAITaskEntry taskEntry)
+     {
+         return taskEntry.action.shouldContinueExecuting();
+@@ -148,6 +286,47 @@
+         }
+     }
+ 
++    private boolean canUse_new(EntityAIBase task)
++    {
++        if (task instanceof EntityAIBase.FakeTask)
++        {
++            throw new UnsupportedOperationException();
++        }
++        if (this.executingTaskEntries.isEmpty())
++        {
++            return true;
++        }
++        else if (this.isControlFlagDisabled(task.getMutexBits()))
++        {
++            return false;
++        }
++        else
++        {
++            for (EntityAIBase eTask : this.executingTaskEntries_new)
++            {
++                EntityAIBase executingTask = (eTask instanceof EntityAIBase.FakeTask) ?
++                        ((EntityAIBase.FakeTask) eTask).base : eTask;
++                if (executingTask != task)
++                {
++                    if (task.taskPriority >= executingTask.taskPriority)
++                    {
++                        // if (!this.areTasksCompatible(task, entityaitasks$entityaitaskentry))
++                        if ((task.getMutexBits() & executingTask.getMutexBits()) != 0)
++                        {
++                            return false;
++                        }
++                    }
++                    else if (!executingTask.isInterruptible())
++                    {
++                        return false;
++                    }
++                }
++            }
++
++            return true;
++        }
++    }
++
+     private boolean areTasksCompatible(EntityAITasks.EntityAITaskEntry taskEntry1, EntityAITasks.EntityAITaskEntry taskEntry2)
+     {
+         return (taskEntry1.action.getMutexBits() & taskEntry2.action.getMutexBits()) == 0;
+@@ -192,15 +371,15 @@
+             this.action = task;
+         }
+ 
+-        public boolean equals(@Nullable Object p_equals_1_)
++        public boolean equals(@Nullable Object another)
+         {
+-            if (this == p_equals_1_)
++            if (this == another)
+             {
+                 return true;
+             }
+             else
+             {
+-                return p_equals_1_ != null && this.getClass() == p_equals_1_.getClass() ? this.action.equals(((EntityAITasks.EntityAITaskEntry)p_equals_1_).action) : false;
++                return (another != null && this.getClass() == another.getClass()) && this.action.equals(((EntityAITaskEntry) another).action);
+             }
+         }
+ 
