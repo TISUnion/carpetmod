@@ -204,7 +204,7 @@
 +        {
 +            throw new UnsupportedOperationException();
 +        }
-+        if (this.executingTaskEntries.isEmpty())
++        if (this.executingTaskEntries_new.isEmpty())
 +        {
 +            return true;
 +        }
