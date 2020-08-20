@@ -1,0 +1,43 @@
+--- a/net/minecraft/network/play/server/SPacketSpawnMob.java
++++ b/net/minecraft/network/play/server/SPacketSpawnMob.java
+@@ -4,6 +4,9 @@
+ import java.util.List;
+ import java.util.UUID;
+ import javax.annotation.Nullable;
++
++import me.jellysquid.mods.lithium.common.entity.data.DataTrackerHelper;
++import me.jellysquid.mods.lithium.config.LiConfig;
+ import net.minecraft.entity.EntityLivingBase;
+ import net.minecraft.network.Packet;
+ import net.minecraft.network.PacketBuffer;
+@@ -84,6 +87,10 @@
+         this.velocityY = (int)(d2 * 8000.0D);
+         this.velocityZ = (int)(d3 * 8000.0D);
+         this.dataManager = entityIn.getDataManager();
++        if (LiConfig.Entity.entityDataManagerNoLock)
++        {
++            this.dataManagerEntries = this.dataManager.getAll();
++        }
+     }
+ 
+     public void readPacketData(PacketBuffer buf) throws IOException
+@@ -117,7 +124,18 @@
+         buf.writeShort(this.velocityX);
+         buf.writeShort(this.velocityY);
+         buf.writeShort(this.velocityZ);
+-        this.dataManager.writeEntries(buf);
++        if (LiConfig.Entity.entityDataManagerNoLock)
++        {
++            /*
++            Use copies we made earlier to avoid off-thread access of the DataTracker.
++            This allows us to remove all the locks in EntityDataManager
++             */
++            DataTrackerHelper.toPacketByteBuf(buf, this.dataManagerEntries.iterator());
++        }
++        else
++        {
++            this.dataManager.writeEntries(buf);
++        }
+     }
+ 
+     public void processPacket(INetHandlerPlayClient handler)

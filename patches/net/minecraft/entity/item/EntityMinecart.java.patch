@@ -1,0 +1,75 @@
+--- a/net/minecraft/entity/item/EntityMinecart.java
++++ b/net/minecraft/entity/item/EntityMinecart.java
+@@ -310,13 +310,13 @@
+             int k = MathHelper.floor(this.posY);
+             int l = MathHelper.floor(this.posZ);
+ 
+-            if (this.world.getBlockState(new BlockPos(j, k - 1, l)).isIn(BlockTags.RAILS))
++            if (this.getBlockState(j, k - 1, l).isIn(BlockTags.RAILS))
+             {
+                 --k;
+             }
+ 
+             BlockPos blockpos = new BlockPos(j, k, l);
+-            IBlockState iblockstate = this.world.getBlockState(blockpos);
++            IBlockState iblockstate = this.getBlockState(blockpos);
+ 
+             if (iblockstate.isIn(BlockTags.RAILS))
+             {
+@@ -612,22 +612,22 @@
+             }
+             else if (railshape == RailShape.EAST_WEST)
+             {
+-                if (this.world.getBlockState(pos.west()).isNormalCube())
++                if (this.getBlockState(pos.west()).isNormalCube())
+                 {
+                     this.motionX = 0.02D;
+                 }
+-                else if (this.world.getBlockState(pos.east()).isNormalCube())
++                else if (this.getBlockState(pos.east()).isNormalCube())
+                 {
+                     this.motionX = -0.02D;
+                 }
+             }
+             else if (railshape == RailShape.NORTH_SOUTH)
+             {
+-                if (this.world.getBlockState(pos.north()).isNormalCube())
++                if (this.getBlockState(pos.north()).isNormalCube())
+                 {
+                     this.motionZ = 0.02D;
+                 }
+-                else if (this.world.getBlockState(pos.south()).isNormalCube())
++                else if (this.getBlockState(pos.south()).isNormalCube())
+                 {
+                     this.motionZ = -0.02D;
+                 }
+@@ -669,12 +669,12 @@
+         int j = MathHelper.floor(y);
+         int k = MathHelper.floor(z);
+ 
+-        if (this.world.getBlockState(new BlockPos(i, j - 1, k)).isIn(BlockTags.RAILS))
++        if (this.getBlockState(i, j - 1, k).isIn(BlockTags.RAILS))
+         {
+             --j;
+         }
+ 
+-        IBlockState iblockstate = this.world.getBlockState(new BlockPos(i, j, k));
++        IBlockState iblockstate = this.getBlockState(i, j, k);
+ 
+         if (iblockstate.isIn(BlockTags.RAILS))
+         {
+@@ -719,12 +719,12 @@
+         int j = MathHelper.floor(p_70489_3_);
+         int k = MathHelper.floor(p_70489_5_);
+ 
+-        if (this.world.getBlockState(new BlockPos(i, j - 1, k)).isIn(BlockTags.RAILS))
++        if (this.getBlockState(i, j - 1, k).isIn(BlockTags.RAILS))
+         {
+             --j;
+         }
+ 
+-        IBlockState iblockstate = this.world.getBlockState(new BlockPos(i, j, k));
++        IBlockState iblockstate = this.getBlockState(i, j, k);
+ 
+         if (iblockstate.isIn(BlockTags.RAILS))
+         {

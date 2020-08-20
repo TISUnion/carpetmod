@@ -1,0 +1,20 @@
+--- a/net/minecraft/entity/passive/EntityTurtle.java
++++ b/net/minecraft/entity/passive/EntityTurtle.java
+@@ -319,7 +319,7 @@
+         {
+             BlockPos blockpos = new BlockPos(this);
+ 
+-            if (this.world.getBlockState(blockpos.down()).getBlock() == Blocks.SAND)
++            if (this.getBlockState(blockpos.down()).getBlock() == Blocks.SAND)
+             {
+                 this.world.playEvent(2001, blockpos, Block.getStateId(Blocks.SAND.getDefaultState()));
+             }
+@@ -452,7 +452,7 @@
+                         vec3d = RandomPositionGenerator.findRandomTargetBlockTowards(this.turtle, 8, 7, new Vec3d((double)blockpos.getX(), (double)blockpos.getY(), (double)blockpos.getZ()));
+                     }
+ 
+-                    if (vec3d != null && !flag && this.turtle.world.getBlockState(new BlockPos(vec3d)).getBlock() != Blocks.WATER)
++                    if (vec3d != null && !flag && this.turtle.getBlockState(new BlockPos(vec3d)).getBlock() != Blocks.WATER)
+                     {
+                         vec3d = RandomPositionGenerator.findRandomTargetBlockTowards(this.turtle, 16, 5, new Vec3d((double)blockpos.getX(), (double)blockpos.getY(), (double)blockpos.getZ()));
+                     }

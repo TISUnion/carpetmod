@@ -8,15 +8,17 @@
  import com.google.common.collect.Iterables;
  import com.google.common.collect.Lists;
  import com.google.common.collect.Sets;
-@@ -59,6 +61,7 @@
- import net.minecraft.server.MinecraftServer;
- import net.minecraft.tags.FluidTags;
- import net.minecraft.tags.Tag;
-+import net.minecraft.tileentity.TileEntity;
- import net.minecraft.util.DamageSource;
- import net.minecraft.util.EnumActionResult;
- import net.minecraft.util.EnumBlockRenderType;
-@@ -94,6 +97,7 @@
+@@ -13,6 +15,9 @@
+ import java.util.Set;
+ import java.util.UUID;
+ import javax.annotation.Nullable;
++
++import me.jellysquid.mods.lithium.common.cache.EntityChunkCache;
++import me.jellysquid.mods.lithium.config.LiConfig;
+ import net.minecraft.advancements.CriteriaTriggers;
+ import net.minecraft.block.Block;
+ import net.minecraft.block.BlockFence;
+@@ -94,6 +99,7 @@
  import net.minecraft.world.gen.Heightmap;
  import net.minecraftforge.api.distmarker.Dist;
  import net.minecraftforge.api.distmarker.OnlyIn;
@@ -24,7 +26,7 @@
  import org.apache.logging.log4j.LogManager;
  import org.apache.logging.log4j.Logger;
  
-@@ -151,6 +155,8 @@
+@@ -151,6 +157,8 @@
      protected Random rand;
      public int ticksExisted;
      private int fire;
@@ -33,10 +35,82 @@
      protected boolean inWater;
      protected double submergedHeight;
      protected boolean eyesInWater;
-@@ -570,6 +576,12 @@
+@@ -191,6 +199,9 @@
+     private boolean isPositionDirty;
+     private final double[] pistonDeltas;
+     private long pistonDeltasGameTime;
++    //Lithium below
++    private final EntityChunkCache chunkCache;
++    private final BlockPos.MutableBlockPos scratchPos = new BlockPos.MutableBlockPos();
+ 
+     public Entity(EntityType<?> entityTypeIn, World worldIn)
+     {
+@@ -225,6 +236,17 @@
+         this.dataManager.register(SILENT, false);
+         this.dataManager.register(NO_GRAVITY, false);
+         this.registerData();
++
++        //Lithium
++        if (LiConfig.Entity.entityChunkCache)
++        {
++            this.chunkCache = new EntityChunkCache(this);
++            this.chunkCache.updateChunks(this.boundingBox);
++        }
++        else
++        {
++            this.chunkCache = null;
++        }
+     }
+ 
+     public EntityType<?> getType()
+@@ -380,6 +402,10 @@
+ 
+     public void tick()
+     {
++        if (LiConfig.Entity.entityChunkCache)
++        {
++            this.chunkCache.updateChunks(this.boundingBox);
++        }
+         if (!this.world.isRemote)
+         {
+             this.setFlag(6, this.isGlowing());
+@@ -390,6 +416,11 @@
+ 
+     public void baseTick()
+     {
++        if (LiConfig.Entity.entityChunkCache)
++        {
++            this.chunkCache.updateChunks(this.boundingBox);
++        }
++
+         this.world.profiler.startSection("entityBaseTick");
+ 
+         if (this.isPassenger() && this.getRidingEntity().removed)
+@@ -509,6 +540,11 @@
+ 
+         this.firstUpdate = false;
+         this.world.profiler.endSection();
++
++        if (LiConfig.Entity.entityChunkCache)
++        {
++            this.chunkCache.updateChunks(this.boundingBox);
++        }
+     }
+ 
+     protected void decrementTimeUntilPortal()
+@@ -570,6 +606,21 @@
  
      public void move(MoverType type, double x, double y, double z)
      {
++        if (LiConfig.Entity.skipMovementTickIfSpeedSquaredLessThan0point0001 &&
++                (type == MoverType.SELF) && (x*x + y*y + z*z < 0.0001D ))
++        {
++            // Check if the entity is actually going to move any meaningful distance. If not,
++            // we can avoid expensive collision checking code. We only permit this optimization
++            // if the entity is moving itself as there may be some special edge cases with pistons.
++            return;
++        }
++
 +        if (CarpetSettings.optimizeVoxelCode)
 +        {
 +            move_new(type, x, y, z);
@@ -46,11 +120,63 @@
          if (this.noClip)
          {
              this.setBoundingBox(this.getBoundingBox().offset(x, y, z));
-@@ -979,7 +991,422 @@
+@@ -852,22 +903,26 @@
+             this.collidedVertically = d3 != y;
+             this.onGround = this.collidedVertically && d3 < 0.0D;
+             this.collided = this.collidedHorizontally || this.collidedVertically;
+-            int j1 = MathHelper.floor(this.posX);
+-            int k = MathHelper.floor(this.posY - (double)0.2F);
+-            int k1 = MathHelper.floor(this.posZ);
+-            BlockPos blockpos = new BlockPos(j1, k, k1);
+-            IBlockState iblockstate = this.world.getBlockState(blockpos);
++            int bpX = MathHelper.floor(this.posX);
++            int bpY = MathHelper.floor(this.posY - (double)0.2F);
++            int bpZ = MathHelper.floor(this.posZ);
+ 
++            int prevScratchPosX = scratchPos.getX();
++            int prevScratchPosY = scratchPos.getY();
++            int prevScratchPosZ = scratchPos.getZ();
++            BlockPos.MutableBlockPos blockpos = scratchPos.setPos(bpX, bpY, bpZ);
++            IBlockState iblockstate = this.getBlockState(blockpos);
++
+             if (iblockstate.isAir())
+             {
+-                BlockPos blockpos1 = blockpos.down();
+-                IBlockState iblockstate1 = this.world.getBlockState(blockpos1);
++                IBlockState iblockstate1 = this.getBlockState(bpX, bpY-1, bpZ);
+                 Block block1 = iblockstate1.getBlock();
+ 
+                 if (block1 instanceof BlockFence || block1 instanceof BlockWall || block1 instanceof BlockFenceGate)
+                 {
+                     iblockstate = iblockstate1;
+-                    blockpos = blockpos1;
++                    // blockpos = blockpos1;
++                    blockpos.move(0,-1,0);
+                 }
+             }
+ 
+@@ -937,6 +992,8 @@
+                 }
+             }
+ 
++            scratchPos.setPos(prevScratchPosX, prevScratchPosY, prevScratchPosZ); //return the prev value
++
+             try
+             {
+                 this.doBlockCollisions();
+@@ -951,7 +1008,7 @@
+ 
+             boolean flag1 = this.isInWaterRainOrBubbleColumn();
+ 
+-            if (this.world.isFlammableWithin(this.getBoundingBox().shrink(0.001D)))
++            if (this.isFlammableWithin_new(this.getBoundingBox().shrink(0.001D)))
+             {
+                 if (!flag1)
+                 {
+@@ -979,7 +1036,431 @@
              this.world.profiler.endSection();
          }
      }
--
 +    
 +    public void move_new(MoverType type, double x, double y, double z)
 +    {
@@ -338,22 +464,28 @@
 +            this.collidedVertically = d3 != y;
 +            this.onGround = this.collidedVertically && d3 < 0.0D;
 +            this.collided = this.collidedHorizontally || this.collidedVertically;
-+            int j1 = MathHelper.floor(this.posX);
-+            int k = MathHelper.floor(this.posY - (double)0.2F);
-+            int k1 = MathHelper.floor(this.posZ);
-+            BlockPos blockpos = new BlockPos(j1, k, k1);
-+            IBlockState iblockstate = this.world.getBlockState(blockpos);
++            int bpX = MathHelper.floor(this.posX);
++            int bpY = MathHelper.floor(this.posY - (double)0.2F);
++            int bpZ = MathHelper.floor(this.posZ);
+ 
++            int prevScratchPosX = scratchPos.getX();
++            int prevScratchPosY = scratchPos.getY();
++            int prevScratchPosZ = scratchPos.getZ();
++            BlockPos.MutableBlockPos blockpos = scratchPos.setPos(bpX, bpY, bpZ);
++            IBlockState iblockstate = this.getBlockState(blockpos);
 +            
 +            if (iblockstate.isAir())
 +            {
-+                BlockPos blockpos1 = blockpos.down();
-+                IBlockState iblockstate1 = this.world.getBlockState(blockpos1);
++                IBlockState iblockstate1 = this.getBlockState(blockpos.move(0,-1,0));
 +                Block block1 = iblockstate1.getBlock();
 +                
 +                if (block1 instanceof BlockFence || block1 instanceof BlockWall || block1 instanceof BlockFenceGate)
 +                {
 +                    iblockstate = iblockstate1;
-+                    blockpos = blockpos1;
++                }
++                else
++                {
++                    blockpos.move(0,1,0);
 +                }
 +            }
 +            
@@ -422,7 +554,10 @@
 +                    this.nextFlap = this.playFlySound(this.distanceWalkedOnStepModified);
 +                }
 +            }
-+            
++
++            blockpos.setPos(prevScratchPosX, prevScratchPosY, prevScratchPosZ);
++            //return the scratch value
++
 +            try
 +            {
 +                this.doBlockCollisions();
@@ -437,7 +572,7 @@
 +            
 +            boolean flag1 = this.isInWaterRainOrBubbleColumn();
 +            
-+            if (this.world.isFlammableWithin(this.getBoundingBox().shrink(0.001D)))
++            if (this.isFlammableWithin_new(this.getBoundingBox().shrink(0.001D)))
 +            {
 +                if (!flag1)
 +                {
@@ -470,7 +605,104 @@
      protected float determineNextStepDistance()
      {
          return (float)((int)this.distanceWalkedOnStepModified + 1);
-@@ -1566,6 +1993,13 @@
+@@ -1027,7 +1508,7 @@
+                         for (int k = blockpos$pooledmutableblockpos.getZ(); k <= blockpos$pooledmutableblockpos1.getZ(); ++k)
+                         {
+                             blockpos$pooledmutableblockpos2.setPos(i, j, k);
+-                            IBlockState iblockstate = this.world.getBlockState(blockpos$pooledmutableblockpos2);
++                            IBlockState iblockstate = this.getBlockState(blockpos$pooledmutableblockpos2);
+ 
+                             try
+                             {
+@@ -1056,7 +1537,7 @@
+     {
+         if (!blockIn.getMaterial().isLiquid())
+         {
+-            SoundType soundtype = this.world.getBlockState(pos.up()).getBlock() == Blocks.SNOW ? Blocks.SNOW.getSoundType() : blockIn.getBlock().getSoundType();
++            SoundType soundtype = this.getBlockState(pos.getX(), pos.getY() + 1, pos.getZ()).getBlock() == Blocks.SNOW ? Blocks.SNOW.getSoundType() : blockIn.getBlock().getSoundType();
+             this.playSound(soundtype.getStepSound(), soundtype.getVolume() * 0.15F, soundtype.getPitch());
+         }
+     }
+@@ -1175,7 +1656,24 @@
+ 
+     private boolean isInBubbleColumn()
+     {
+-        return this.world.getBlockState(new BlockPos(this)).getBlock() == Blocks.BUBBLE_COLUMN;
++        if (LiConfig.Entity.entityChunkCache)
++        {
++            int ox = scratchPos.getX();
++            int oy = scratchPos.getY();
++            int oz = scratchPos.getZ();
++            boolean b = this.chunkCache.getBlockState(
++                    scratchPos.setPos(
++                            MathHelper.floor(this.posX),
++                            MathHelper.floor(this.posY),
++                            MathHelper.floor(this.posZ)
++                    )) == Blocks.BUBBLE_COLUMN;
++            scratchPos.setPos(ox, oy, oz);
++            return b;
++        }
++        else
++        {
++            return this.world.getBlockState(new BlockPos(this)).getBlock() == Blocks.BUBBLE_COLUMN;
++        }
+     }
+ 
+     public boolean isWet()
+@@ -1294,11 +1792,10 @@
+ 
+     protected void createRunningParticles()
+     {
+-        int i = MathHelper.floor(this.posX);
+-        int j = MathHelper.floor(this.posY - (double)0.2F);
+-        int k = MathHelper.floor(this.posZ);
+-        BlockPos blockpos = new BlockPos(i, j, k);
+-        IBlockState iblockstate = this.world.getBlockState(blockpos);
++        int x = MathHelper.floor(this.posX);
++        int y = MathHelper.floor(this.posY - (double)0.2F);
++        int z = MathHelper.floor(this.posZ);
++        IBlockState iblockstate = this.getBlockState(x, y, z);
+ 
+         if (iblockstate.getRenderType() != EnumBlockRenderType.INVISIBLE)
+         {
+@@ -1308,6 +1805,10 @@
+ 
+     public boolean areEyesInFluid(Tag<Fluid> tagIn)
+     {
++        if (LiConfig.Entity.entityChunkCache)
++        {
++            return areEyesInFluid_new(tagIn);
++        }
+         if (this.getRidingEntity() instanceof EntityBoat)
+         {
+             return false;
+@@ -1321,6 +1822,25 @@
+         }
+     }
+ 
++    private boolean areEyesInFluid_new(Tag<Fluid> tagIn)
++    {
++        if (this.getRidingEntity() instanceof EntityBoat)
++        {
++            return false;
++        }
++        else
++        {
++            double eyeY = this.posY + (double)this.getEyeHeight();
++            int bX = MathHelper.floor(this.posX);
++            int bY = MathHelper.floor(eyeY);
++            int bZ = MathHelper.floor(this.posZ);
++
++            IFluidState ifluidstate = this.chunkCache.getFluidState(bX, bY, bZ);
++            return ifluidstate.isTagged(tagIn)
++                    && eyeY < (bY + ifluidstate.getHeight() + 0.11111111D);
++        }
++    }
++
+     public boolean isInLava()
+     {
+         return this.world.isMaterialInBB(this.getBoundingBox().shrink((double)0.1F, (double)0.4F, (double)0.1F), Material.LAVA);
+@@ -1566,6 +2086,13 @@
          return partialTicks == 1.0F ? this.rotationYaw : this.prevRotationYaw + (this.rotationYaw - this.prevRotationYaw) * partialTicks;
      }
  
@@ -484,7 +716,7 @@
      protected final Vec3d getVectorForRotation(float pitch, float yaw)
      {
          float f = pitch * ((float)Math.PI / 180F);
-@@ -1762,22 +2196,27 @@
+@@ -1762,22 +2289,27 @@
              this.motionX = nbttaglist2.getDouble(0);
              this.motionY = nbttaglist2.getDouble(1);
              this.motionZ = nbttaglist2.getDouble(2);
@@ -525,7 +757,16 @@
              this.posX = nbttaglist.getDouble(0);
              this.posY = nbttaglist.getDouble(1);
              this.posZ = nbttaglist.getDouble(2);
-@@ -2821,6 +3260,10 @@
+@@ -1953,7 +2485,7 @@
+                     {
+                         blockpos$pooledmutableblockpos.setPos(k, j, l);
+ 
+-                        if (this.world.getBlockState(blockpos$pooledmutableblockpos).causesSuffocation())
++                        if (this.getBlockState(blockpos$pooledmutableblockpos).causesSuffocation())
+                         {
+                             boolean flag = true;
+                             return flag;
+@@ -2821,6 +3353,10 @@
  
      public EnumFacing getHorizontalFacing()
      {
@@ -536,3 +777,93 @@
          return EnumFacing.fromAngle((double)this.rotationYaw);
      }
  
+@@ -3254,4 +3790,89 @@
+     {
+         return this.submergedHeight;
+     }
++
++    /** Lithium */
++    private final BlockPos.MutableBlockPos mutableBlockPosForBlockOrFluidStateGetter = new BlockPos.MutableBlockPos();
++
++    /** Lithium */
++    public IBlockState getBlockState(BlockPos blockPos)
++    {
++        if (LiConfig.Entity.entityChunkCache)
++        {
++            return this.chunkCache.getBlockState(blockPos);
++        }
++        else
++        {
++            return this.world.getBlockState(blockPos);
++        }
++    }
++
++    /** Lithium */
++    public IBlockState getBlockState(int x, int y, int z)
++    {
++        if (LiConfig.Entity.entityChunkCache)
++        {
++            return this.chunkCache.getBlockState(x, y, z);
++        }
++        else
++        {
++            return this.world.getBlockState(mutableBlockPosForBlockOrFluidStateGetter.setPos(x, y, z));
++        }
++    }
++
++    /** Lithium */
++    public IFluidState getFluidState(BlockPos blockPos)
++    {
++        if (LiConfig.Entity.entityChunkCache)
++        {
++            return this.chunkCache.getFluidState(blockPos);
++        }
++        else
++        {
++            return this.world.getFluidState(blockPos);
++        }
++    }
++
++    /** Lithium */
++    public IFluidState getFluidState(int x, int y, int z)
++    {
++        if (LiConfig.Entity.entityChunkCache)
++        {
++            return this.chunkCache.getFluidState(x, y, z);
++        }
++        else
++        {
++            return this.world.getFluidState(mutableBlockPosForBlockOrFluidStateGetter.setPos(x, y, z));
++        }
++    }
++
++    /** Lithium */
++    public boolean isFlammableWithin_new(AxisAlignedBB box)
++    {
++        if (!LiConfig.Entity.entityChunkCache)
++        {
++            return this.world.isFlammableWithin(box);
++        }
++        int minX = MathHelper.floor(box.minX);
++        int maxX = MathHelper.ceil(box.maxX);
++        int minY = MathHelper.floor(box.minY);
++        int maxY = MathHelper.ceil(box.maxY);
++        int minZ = MathHelper.floor(box.minZ);
++        int maxZ = MathHelper.ceil(box.maxZ);
++
++        for (int x = minX; x < maxX; ++x) {
++            for (int y = minY; y < maxY; ++y) {
++                for (int z = minZ; z < maxZ; ++z) {
++                    Block block = this.chunkCache.getBlockState(x, y, z).getBlock();
++
++                    if (block == Blocks.FIRE || block == Blocks.LAVA) {
++                        return true;
++                    }
++                }
++            }
++        }
++
++        return false;
++    }
++
+ }

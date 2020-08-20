@@ -1,0 +1,26 @@
+--- a/net/minecraft/entity/boss/EntityWither.java
++++ b/net/minecraft/entity/boss/EntityWither.java
+@@ -69,6 +69,8 @@
+         return p_210135_0_ instanceof EntityLivingBase && ((EntityLivingBase)p_210135_0_).getCreatureAttribute() != CreatureAttribute.UNDEAD && ((EntityLivingBase)p_210135_0_).attackable();
+     };
+ 
++    private final BlockPos.MutableBlockPos mutableBlockPosBuffer$1 = new BlockPos.MutableBlockPos();
++
+     public EntityWither(World worldIn)
+     {
+         super(EntityType.WITHER, worldIn);
+@@ -368,8 +370,12 @@
+                                 int i3 = l1 + k2;
+                                 int k = i1 + j;
+                                 int l = i2 + l2;
+-                                BlockPos blockpos = new BlockPos(i3, k, l);
+-                                IBlockState iblockstate = this.world.getBlockState(blockpos);
++
++                                int prevScratchPosX = mutableBlockPosBuffer$1.getX();
++                                int prevScratchPosY = mutableBlockPosBuffer$1.getY();
++                                int prevScratchPosZ = mutableBlockPosBuffer$1.getZ();
++                                BlockPos blockpos = mutableBlockPosBuffer$1.setPos(i3, k, l);
++                                IBlockState iblockstate = this.getBlockState(blockpos);
+                                 Block block = iblockstate.getBlock();
+ 
+                                 if (!iblockstate.isAir() && canDestroyBlock(block))

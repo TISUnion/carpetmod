@@ -10,6 +10,15 @@
  import net.minecraft.advancements.CriteriaTriggers;
  import net.minecraft.entity.Entity;
  import net.minecraft.entity.EntityLivingBase;
+@@ -68,7 +71,7 @@
+                 {
+                     if (entitylivingbase instanceof EntityPlayerMP)
+                     {
+-                        CriteriaTriggers.ENTER_BLOCK.trigger((EntityPlayerMP)entitylivingbase, this.world.getBlockState(blockpos));
++                        CriteriaTriggers.ENTER_BLOCK.trigger((EntityPlayerMP)entitylivingbase, this.getBlockState(blockpos));
+                     }
+ 
+                     tileentityendgateway.teleportEntity(entitylivingbase);
 @@ -92,7 +95,8 @@
              {
                  EntityPlayerMP entityplayermp = (EntityPlayerMP)entitylivingbase;

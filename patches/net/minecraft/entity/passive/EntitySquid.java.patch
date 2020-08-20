@@ -1,0 +1,21 @@
+--- a/net/minecraft/entity/passive/EntitySquid.java
++++ b/net/minecraft/entity/passive/EntitySquid.java
+@@ -15,7 +15,6 @@
+ import net.minecraft.util.DamageSource;
+ import net.minecraft.util.ResourceLocation;
+ import net.minecraft.util.SoundEvent;
+-import net.minecraft.util.math.BlockPos;
+ import net.minecraft.util.math.MathHelper;
+ import net.minecraft.util.math.Vec3d;
+ import net.minecraft.world.IWorld;
+@@ -291,8 +290,8 @@
+             if (entitylivingbase != null)
+             {
+                 Vec3d vec3d = new Vec3d(EntitySquid.this.posX - entitylivingbase.posX, EntitySquid.this.posY - entitylivingbase.posY, EntitySquid.this.posZ - entitylivingbase.posZ);
+-                IBlockState iblockstate = EntitySquid.this.world.getBlockState(new BlockPos(EntitySquid.this.posX + vec3d.x, EntitySquid.this.posY + vec3d.y, EntitySquid.this.posZ + vec3d.z));
+-                IFluidState ifluidstate = EntitySquid.this.world.getFluidState(new BlockPos(EntitySquid.this.posX + vec3d.x, EntitySquid.this.posY + vec3d.y, EntitySquid.this.posZ + vec3d.z));
++                IBlockState iblockstate = EntitySquid.this.getBlockState(MathHelper.floor(EntitySquid.this.posX + vec3d.x), MathHelper.floor(EntitySquid.this.posY + vec3d.y), MathHelper.floor(EntitySquid.this.posZ + vec3d.z));
++                IFluidState ifluidstate = EntitySquid.this.getFluidState(MathHelper.floor(EntitySquid.this.posX + vec3d.x), MathHelper.floor(EntitySquid.this.posY + vec3d.y), MathHelper.floor(EntitySquid.this.posZ + vec3d.z));
+ 
+                 if (ifluidstate.isTagged(FluidTags.WATER) || iblockstate.isAir())
+                 {

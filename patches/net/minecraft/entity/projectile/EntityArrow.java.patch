@@ -1,0 +1,20 @@
+--- a/net/minecraft/entity/projectile/EntityArrow.java
++++ b/net/minecraft/entity/projectile/EntityArrow.java
+@@ -182,7 +182,7 @@
+         }
+ 
+         BlockPos blockpos = new BlockPos(this.xTile, this.yTile, this.zTile);
+-        IBlockState iblockstate = this.world.getBlockState(blockpos);
++        IBlockState iblockstate = this.getBlockState(blockpos);
+ 
+         if (!iblockstate.isAir() && !flag)
+         {
+@@ -362,7 +362,7 @@
+             this.xTile = blockpos.getX();
+             this.yTile = blockpos.getY();
+             this.zTile = blockpos.getZ();
+-            IBlockState iblockstate = this.world.getBlockState(blockpos);
++            IBlockState iblockstate = this.getBlockState(blockpos);
+             this.inBlockState = iblockstate;
+             this.motionX = (double)((float)(raytraceResultIn.hitVec.x - this.posX));
+             this.motionY = (double)((float)(raytraceResultIn.hitVec.y - this.posY));

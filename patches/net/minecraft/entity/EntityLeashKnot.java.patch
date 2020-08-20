@@ -1,0 +1,11 @@
+--- a/net/minecraft/entity/EntityLeashKnot.java
++++ b/net/minecraft/entity/EntityLeashKnot.java
+@@ -126,7 +126,7 @@
+ 
+     public boolean onValidSurface()
+     {
+-        return this.world.getBlockState(this.hangingPosition).getBlock() instanceof BlockFence;
++        return this.getBlockState(this.hangingPosition).getBlock() instanceof BlockFence;
+     }
+ 
+     public static EntityLeashKnot createKnot(World worldIn, BlockPos fence)

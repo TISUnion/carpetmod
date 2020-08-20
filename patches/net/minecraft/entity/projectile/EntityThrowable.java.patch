@@ -30,6 +30,15 @@
      }
  
      protected EntityThrowable(EntityType<?> type, double p_i48541_2_, double p_i48541_4_, double p_i48541_6_, World p_i48541_8_)
+@@ -213,7 +225,7 @@
+ 
+         if (raytraceresult != null)
+         {
+-            if (raytraceresult.type == RayTraceResult.Type.BLOCK && this.world.getBlockState(raytraceresult.getBlockPos()).getBlock() == Blocks.NETHER_PORTAL)
++            if (raytraceresult.type == RayTraceResult.Type.BLOCK && this.getBlockState(raytraceresult.getBlockPos()).getBlock() == Blocks.NETHER_PORTAL)
+             {
+                 this.setPortal(raytraceresult.getBlockPos());
+             }
 @@ -274,9 +286,27 @@
              this.motionY -= (double)f2;
          }

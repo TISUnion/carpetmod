@@ -46,7 +46,7 @@
          this.calculateInitialSkylight();
          this.calculateInitialWeather();
          this.getWorldBorder().setSize(server.getMaxWorldSize());
-+        if (LiConfig.World.world_useLithiumTickScheduler)
++        if (LiConfig.FastContainers.lithiumTickScheduler)
 +        {
 +            this.pendingBlockTicks = new LithiumServerTickScheduler<>(this, (block) ->
 +                    block == null || block.getDefaultState().isAir(),

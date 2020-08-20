@@ -1,0 +1,39 @@
+--- a/net/minecraft/network/play/server/SPacketSpawnPlayer.java
++++ b/net/minecraft/network/play/server/SPacketSpawnPlayer.java
+@@ -4,6 +4,9 @@
+ import java.util.List;
+ import java.util.UUID;
+ import javax.annotation.Nullable;
++
++import me.jellysquid.mods.lithium.common.entity.data.DataTrackerHelper;
++import me.jellysquid.mods.lithium.config.LiConfig;
+ import net.minecraft.entity.player.EntityPlayer;
+ import net.minecraft.network.Packet;
+ import net.minecraft.network.PacketBuffer;
+@@ -38,6 +41,10 @@
+         this.yaw = (byte)((int)(player.rotationYaw * 256.0F / 360.0F));
+         this.pitch = (byte)((int)(player.rotationPitch * 256.0F / 360.0F));
+         this.watcher = player.getDataManager();
++        if (LiConfig.Entity.entityDataManagerNoLock)
++        {
++            this.dataManagerEntries = this.watcher.getAll();
++        }
+     }
+ 
+     public void readPacketData(PacketBuffer buf) throws IOException
+@@ -61,7 +68,14 @@
+         buf.writeDouble(this.z);
+         buf.writeByte(this.yaw);
+         buf.writeByte(this.pitch);
+-        this.watcher.writeEntries(buf);
++        if (LiConfig.Entity.entityDataManagerNoLock)
++        {
++            DataTrackerHelper.toPacketByteBuf(buf, this.dataManagerEntries.iterator());
++        }
++        else
++        {
++            this.watcher.writeEntries(buf);
++        }
+     }
+ 
+     public void processPacket(INetHandlerPlayClient handler)

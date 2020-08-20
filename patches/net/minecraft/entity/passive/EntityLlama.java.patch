@@ -1,0 +1,11 @@
+--- a/net/minecraft/entity/passive/EntityLlama.java
++++ b/net/minecraft/entity/passive/EntityLlama.java
+@@ -442,7 +442,7 @@
+                 }
+             }
+ 
+-            IBlockState iblockstate = this.world.getBlockState(new BlockPos(this.posX, this.posY - 0.2D - (double)this.prevRotationYaw, this.posZ));
++            IBlockState iblockstate = this.getBlockState(MathHelper.floor(this.posX), MathHelper.floor(this.posY - 0.2D - (double)this.prevRotationYaw), MathHelper.floor(this.posZ));
+             Block block = iblockstate.getBlock();
+ 
+             if (!iblockstate.isAir() && !this.isSilent())

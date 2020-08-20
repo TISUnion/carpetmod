@@ -1,0 +1,29 @@
+--- a/net/minecraft/entity/passive/AbstractHorse.java
++++ b/net/minecraft/entity/passive/AbstractHorse.java
+@@ -272,7 +272,7 @@
+                 }
+             }
+ 
+-            IBlockState iblockstate = this.world.getBlockState(new BlockPos(this.posX, this.posY - 0.2D - (double)this.prevRotationYaw, this.posZ));
++            IBlockState iblockstate = this.getBlockState(MathHelper.floor(this.posX), MathHelper.floor(this.posY - 0.2D - (double)this.prevRotationYaw), MathHelper.floor(this.posZ));
+             Block block = iblockstate.getBlock();
+ 
+             if (!iblockstate.isAir() && !this.isSilent())
+@@ -409,7 +409,7 @@
+         {
+             SoundType soundtype = blockIn.getBlock().getSoundType();
+ 
+-            if (this.world.getBlockState(pos.up()).getBlock() == Blocks.SNOW)
++            if (this.getBlockState(pos.up()).getBlock() == Blocks.SNOW)
+             {
+                 soundtype = Blocks.SNOW.getSoundType();
+             }
+@@ -636,7 +636,7 @@
+ 
+             if (this.canEatGrass())
+             {
+-                if (!this.isEatingHaystack() && !this.isBeingRidden() && this.rand.nextInt(300) == 0 && this.world.getBlockState(new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.posY) - 1, MathHelper.floor(this.posZ))).getBlock() == Blocks.GRASS_BLOCK)
++                if (!this.isEatingHaystack() && !this.isBeingRidden() && this.rand.nextInt(300) == 0 && this.getBlockState(MathHelper.floor(this.posX), MathHelper.floor(this.posY) - 1, MathHelper.floor(this.posZ)).getBlock() == Blocks.GRASS_BLOCK)
+                 {
+                     this.setEatingHaystack(true);
+                 }

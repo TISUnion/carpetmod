@@ -1,0 +1,11 @@
+--- a/net/minecraft/entity/item/EntityEnderCrystal.java
++++ b/net/minecraft/entity/item/EntityEnderCrystal.java
+@@ -61,7 +61,7 @@
+         {
+             BlockPos blockpos = new BlockPos(this);
+ 
+-            if (this.world.dimension instanceof EndDimension && this.world.getBlockState(blockpos).isAir())
++            if (this.world.dimension instanceof EndDimension && this.getBlockState(blockpos).isAir())
+             {
+                 this.world.setBlockState(blockpos, Blocks.FIRE.getDefaultState());
+             }

@@ -48,6 +48,15 @@
      }
  
      protected boolean canTriggerWalking()
+@@ -132,7 +152,7 @@
+ 
+             if (this.onGround)
+             {
+-                f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ))).getBlock().getSlipperiness() * 0.98F;
++                f = this.getBlockState(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ)).getBlock().getSlipperiness() * 0.98F;
+             }
+ 
+             this.motionX *= (double)f;
 @@ -205,8 +225,12 @@
              {
                  if (this.age != -32768 && other.age != -32768)

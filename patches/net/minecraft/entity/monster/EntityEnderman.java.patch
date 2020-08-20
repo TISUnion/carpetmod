@@ -1,0 +1,22 @@
+--- a/net/minecraft/entity/monster/EntityEnderman.java
++++ b/net/minecraft/entity/monster/EntityEnderman.java
+@@ -462,8 +462,8 @@
+                 int j = MathHelper.floor(this.enderman.posY + random.nextDouble() * 2.0D);
+                 int k = MathHelper.floor(this.enderman.posZ - 1.0D + random.nextDouble() * 2.0D);
+                 BlockPos blockpos = new BlockPos(i, j, k);
+-                IBlockState iblockstate = iworld.getBlockState(blockpos);
+-                IBlockState iblockstate1 = iworld.getBlockState(blockpos.down());
++                IBlockState iblockstate = this.enderman.getBlockState(blockpos);
++                IBlockState iblockstate1 = this.enderman.getBlockState(blockpos.down());
+                 IBlockState iblockstate2 = this.enderman.getHeldBlockState();
+ 
+                 if (iblockstate2 != null && this.func_195924_a(iworld, blockpos, iblockstate2, iblockstate, iblockstate1))
+@@ -512,7 +512,7 @@
+                 int j = MathHelper.floor(this.enderman.posY + random.nextDouble() * 3.0D);
+                 int k = MathHelper.floor(this.enderman.posZ - 2.0D + random.nextDouble() * 4.0D);
+                 BlockPos blockpos = new BlockPos(i, j, k);
+-                IBlockState iblockstate = world.getBlockState(blockpos);
++                IBlockState iblockstate = this.enderman.getBlockState(blockpos);
+                 Block block = iblockstate.getBlock();
+                 RayTraceResult raytraceresult = world.rayTraceBlocks(new Vec3d((double)((float)MathHelper.floor(this.enderman.posX) + 0.5F), (double)((float)j + 0.5F), (double)((float)MathHelper.floor(this.enderman.posZ) + 0.5F)), new Vec3d((double)((float)i + 0.5F), (double)((float)j + 0.5F), (double)((float)k + 0.5F)), RayTraceFluidMode.NEVER, true, false);
+                 boolean flag = raytraceresult != null && raytraceresult.getBlockPos().equals(blockpos);

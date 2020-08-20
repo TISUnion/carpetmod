@@ -166,6 +166,42 @@
          }
      }
  
+@@ -1499,7 +1568,7 @@
+ 
+     public EntityPlayer.SleepResult trySleep(BlockPos bedLocation)
+     {
+-        EnumFacing enumfacing = this.world.getBlockState(bedLocation).get(BlockHorizontal.HORIZONTAL_FACING);
++        EnumFacing enumfacing = this.getBlockState(bedLocation).get(BlockHorizontal.HORIZONTAL_FACING);
+ 
+         if (!this.world.isRemote)
+         {
+@@ -1594,7 +1663,7 @@
+     public void wakeUpPlayer(boolean immediately, boolean updateWorldFlag, boolean setSpawn)
+     {
+         this.setSize(0.6F, 1.8F);
+-        IBlockState iblockstate = this.world.getBlockState(this.bedLocation);
++        IBlockState iblockstate = this.getBlockState(this.bedLocation);
+ 
+         if (this.bedLocation != null && iblockstate.getBlock() instanceof BlockBed)
+         {
+@@ -1626,7 +1695,7 @@
+ 
+     private boolean isInBed()
+     {
+-        return this.world.getBlockState(this.bedLocation).getBlock() instanceof BlockBed;
++        return this.getBlockState(this.bedLocation).getBlock() instanceof BlockBed;
+     }
+ 
+     @Nullable
+@@ -1783,7 +1852,7 @@
+             double d3 = this.getLookVec().y;
+             double d4 = d3 < -0.2D ? 0.085D : 0.06D;
+ 
+-            if (d3 <= 0.0D || this.isJumping || !this.world.getBlockState(new BlockPos(this.posX, this.posY + 1.0D - 0.1D, this.posZ)).getFluidState().isEmpty())
++            if (d3 <= 0.0D || this.isJumping || !this.getBlockState(new BlockPos(this.posX, this.posY + 1.0D - 0.1D, this.posZ)).getFluidState().isEmpty())
+             {
+                 this.motionY += (d3 - this.motionY) * d4;
+             }
 @@ -2241,6 +2310,20 @@
          this.setRightShoulderEntity(new NBTTagCompound());
      }

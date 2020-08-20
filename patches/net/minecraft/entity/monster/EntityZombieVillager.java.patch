@@ -9,3 +9,12 @@
      private UUID converstionStarter;
  
      public EntityZombieVillager(World worldIn)
+@@ -224,7 +226,7 @@
+                 {
+                     for (int i1 = (int)this.posZ - 4; i1 < (int)this.posZ + 4 && j < 14; ++i1)
+                     {
+-                        Block block = this.world.getBlockState(blockpos$mutableblockpos.setPos(k, l, i1)).getBlock();
++                        Block block = this.getBlockState(blockpos$mutableblockpos.setPos(k, l, i1)).getBlock();
+ 
+                         if (block == Blocks.IRON_BARS || block instanceof BlockBed)
+                         {

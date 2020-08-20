@@ -1,0 +1,39 @@
+--- a/net/minecraft/entity/monster/EntitySilverfish.java
++++ b/net/minecraft/entity/monster/EntitySilverfish.java
+@@ -183,7 +183,7 @@
+                     {
+                         this.facing = EnumFacing.random(random);
+                         BlockPos blockpos = (new BlockPos(this.entity.posX, this.entity.posY + 0.5D, this.entity.posZ)).offset(this.facing);
+-                        IBlockState iblockstate = this.entity.world.getBlockState(blockpos);
++                        IBlockState iblockstate = this.entity.getBlockState(blockpos);
+ 
+                         if (BlockSilverfish.canContainSilverfish(iblockstate))
+                         {
+@@ -212,7 +212,7 @@
+                 {
+                     IWorld iworld = this.entity.world;
+                     BlockPos blockpos = (new BlockPos(this.entity.posX, this.entity.posY + 0.5D, this.entity.posZ)).offset(this.facing);
+-                    IBlockState iblockstate = iworld.getBlockState(blockpos);
++                    IBlockState iblockstate = this.entity.getBlockState(blockpos);
+ 
+                     if (BlockSilverfish.canContainSilverfish(iblockstate))
+                     {
+@@ -256,6 +256,7 @@
+                     World world = this.silverfish.world;
+                     Random random = this.silverfish.getRNG();
+                     BlockPos blockpos = new BlockPos(this.silverfish);
++                    BlockPos.MutableBlockPos mutableBlockPos1 = new BlockPos.MutableBlockPos();
+ 
+                     for (int i = 0; i <= 5 && i >= -5; i = (i <= 0 ? 1 : 0) - i)
+                     {
+@@ -263,8 +264,8 @@
+                         {
+                             for (int k = 0; k <= 10 && k >= -10; k = (k <= 0 ? 1 : 0) - k)
+                             {
+-                                BlockPos blockpos1 = blockpos.add(j, i, k);
+-                                IBlockState iblockstate = world.getBlockState(blockpos1);
++                                BlockPos blockpos1 = mutableBlockPos1.setPos(blockpos.getX() + j, blockpos.getY() + i, blockpos.getZ() + k);
++                                IBlockState iblockstate = this.silverfish.getBlockState(blockpos1);
+                                 Block block = iblockstate.getBlock();
+ 
+                                 if (block instanceof BlockSilverfish)

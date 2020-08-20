@@ -1,0 +1,11 @@
+--- a/net/minecraft/entity/passive/EntityParrot.java
++++ b/net/minecraft/entity/passive/EntityParrot.java
+@@ -164,7 +164,7 @@
+     {
+         playMimicSound(this.world, this);
+ 
+-        if (this.jukeboxPosition == null || this.jukeboxPosition.distanceSq(this.posX, this.posY, this.posZ) > 12.0D || this.world.getBlockState(this.jukeboxPosition).getBlock() != Blocks.JUKEBOX)
++        if (this.jukeboxPosition == null || this.jukeboxPosition.distanceSq(this.posX, this.posY, this.posZ) > 12.0D || this.getBlockState(this.jukeboxPosition).getBlock() != Blocks.JUKEBOX)
+         {
+             this.partyParrot = false;
+             this.jukeboxPosition = null;

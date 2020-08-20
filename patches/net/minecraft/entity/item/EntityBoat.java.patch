@@ -1,0 +1,11 @@
+--- a/net/minecraft/entity/item/EntityBoat.java
++++ b/net/minecraft/entity/item/EntityBoat.java
+@@ -574,7 +574,7 @@
+                             if (j2 <= 0 || k2 != k && k2 != l - 1)
+                             {
+                                 blockpos$pooledmutableblockpos.setPos(l1, k2, i2);
+-                                IBlockState iblockstate = this.world.getBlockState(blockpos$pooledmutableblockpos);
++                                IBlockState iblockstate = this.getBlockState(blockpos$pooledmutableblockpos);
+ 
+                                 if (!(iblockstate.getBlock() instanceof BlockLilyPad) && VoxelShapes.compare(iblockstate.getCollisionShape(this.world, blockpos$pooledmutableblockpos).withOffset((double)l1, (double)k2, (double)i2), voxelshape, IBooleanFunction.AND))
+                                 {

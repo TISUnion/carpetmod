@@ -51,3 +51,33 @@
          if (this.fallTile.isAir())
          {
              this.remove();
+@@ -113,7 +137,7 @@
+             {
+                 BlockPos blockpos = new BlockPos(this);
+ 
+-                if (this.world.getBlockState(blockpos).getBlock() == block)
++                if (this.getBlockState(blockpos).getBlock() == block)
+                 {
+                     this.world.removeBlock(blockpos);
+                 }
+@@ -163,9 +187,9 @@
+                 }
+                 else
+                 {
+-                    IBlockState iblockstate = this.world.getBlockState(blockpos1);
++                    IBlockState iblockstate = this.getBlockState(blockpos1);
+ 
+-                    if (!flag1 && BlockFalling.canFallThrough(this.world.getBlockState(new BlockPos(this.posX, this.posY - (double)0.01F, this.posZ))))
++                    if (!flag1 && BlockFalling.canFallThrough(this.getBlockState(MathHelper.floor(this.posX), MathHelper.floor(this.posY - (double)0.01F), MathHelper.floor(this.posZ))))
+                     {
+                         this.onGround = false;
+                         return;
+@@ -181,7 +205,7 @@
+ 
+                         if (!this.dontSetBlock)
+                         {
+-                            if (iblockstate.getMaterial().isReplaceable() && (flag1 || !BlockFalling.canFallThrough(this.world.getBlockState(blockpos1.down()))) && this.world.setBlockState(blockpos1, this.fallTile, 3))
++                            if (iblockstate.getMaterial().isReplaceable() && (flag1 || !BlockFalling.canFallThrough(this.getBlockState(blockpos1.getX(), blockpos1.getY() -1, blockpos1.getZ()))) && this.world.setBlockState(blockpos1, this.fallTile, 3))
+                             {
+                                 if (block instanceof BlockFalling)
+                                 {

@@ -1,0 +1,11 @@
+--- a/net/minecraft/entity/passive/EntityDolphin.java
++++ b/net/minecraft/entity/passive/EntityDolphin.java
+@@ -589,7 +589,7 @@
+                     {
+                         BlockPos blockpos1 = new BlockPos(vec3d);
+ 
+-                        if (!world.getFluidState(blockpos1).isTagged(FluidTags.WATER) || !world.getBlockState(blockpos1).allowsMovement(world, blockpos1, PathType.WATER))
++                        if (!this.dolphin.getFluidState(blockpos1).isTagged(FluidTags.WATER) || !this.dolphin.getBlockState(blockpos1).allowsMovement(world, blockpos1, PathType.WATER))
+                         {
+                             vec3d = RandomPositionGenerator.findRandomTargetBlockTowards(this.dolphin, 8, 5, new Vec3d((double)blockpos.getX(), (double)blockpos.getY(), (double)blockpos.getZ()));
+                         }

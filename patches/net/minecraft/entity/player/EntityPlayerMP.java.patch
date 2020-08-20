@@ -62,3 +62,18 @@
                              return false;
                          }
                      }
+@@ -818,12 +832,12 @@
+         int j = MathHelper.floor(this.posY - (double)0.2F);
+         int k = MathHelper.floor(this.posZ);
+         BlockPos blockpos = new BlockPos(i, j, k);
+-        IBlockState iblockstate = this.world.getBlockState(blockpos);
++        IBlockState iblockstate = this.getBlockState(blockpos);
+ 
+         if (iblockstate.isAir())
+         {
+             BlockPos blockpos1 = blockpos.down();
+-            IBlockState iblockstate1 = this.world.getBlockState(blockpos1);
++            IBlockState iblockstate1 = this.getBlockState(blockpos1);
+             Block block = iblockstate1.getBlock();
+ 
+             if (block instanceof BlockFence || block instanceof BlockWall || block instanceof BlockFenceGate)

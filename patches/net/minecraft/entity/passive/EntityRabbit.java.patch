@@ -1,0 +1,11 @@
+--- a/net/minecraft/entity/passive/EntityRabbit.java
++++ b/net/minecraft/entity/passive/EntityRabbit.java
+@@ -575,7 +575,7 @@
+                 {
+                     World world = this.rabbit.world;
+                     BlockPos blockpos = this.destinationBlock.up();
+-                    IBlockState iblockstate = world.getBlockState(blockpos);
++                    IBlockState iblockstate = this.rabbit.getBlockState(blockpos);
+                     Block block = iblockstate.getBlock();
+ 
+                     if (this.canRaid && block instanceof BlockCarrot)

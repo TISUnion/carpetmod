@@ -1,0 +1,11 @@
+--- a/net/minecraft/entity/monster/EntityShulker.java
++++ b/net/minecraft/entity/monster/EntityShulker.java
+@@ -203,7 +203,7 @@
+         }
+         else if (!this.world.isRemote)
+         {
+-            IBlockState iblockstate = this.world.getBlockState(blockpos);
++            IBlockState iblockstate = this.getBlockState(blockpos);
+ 
+             if (!iblockstate.isAir())
+             {

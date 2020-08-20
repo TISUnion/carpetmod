@@ -1,0 +1,133 @@
+--- a/net/minecraft/network/datasync/EntityDataManager.java
++++ b/net/minecraft/network/datasync/EntityDataManager.java
+@@ -10,6 +10,9 @@
+ import java.util.concurrent.locks.ReadWriteLock;
+ import java.util.concurrent.locks.ReentrantReadWriteLock;
+ import javax.annotation.Nullable;
++
++import me.jellysquid.mods.lithium.config.LiConfig;
++import me.jellysquid.mods.lithium.util.lock.NullReadWriteLock;
+ import net.minecraft.crash.CrashReport;
+ import net.minecraft.crash.CrashReportCategory;
+ import net.minecraft.crash.ReportedException;
+@@ -27,13 +30,19 @@
+     private static final Map < Class <? extends Entity > , Integer > NEXT_ID_MAP = Maps.newHashMap();
+     private final Entity entity;
+     private final Map < Integer, EntityDataManager.DataEntry<? >> entries = Maps.newHashMap();
+-    private final ReadWriteLock lock = new ReentrantReadWriteLock();
++    private final ReadWriteLock lock;
+     private boolean empty = true;
+     private boolean dirty;
+ 
++    /** Lithium: use array */
++    private EntityDataManager.DataEntry<?>[] entriesArray = new EntityDataManager.DataEntry<?>[0];
++
++
+     public EntityDataManager(Entity entityIn)
+     {
+         this.entity = entityIn;
++        this.lock = (LiConfig.Entity.entityDataManagerNoLock)?
++                new NullReadWriteLock() : new ReentrantReadWriteLock();
+     }
+ 
+     public static <T> DataParameter<T> createKey(Class <? extends Entity > clazz, DataSerializer<T> serializer)
+@@ -115,6 +124,12 @@
+ 
+     private <T> void setEntry(DataParameter<T> key, T value)
+     {
++        if (LiConfig.Entity.useNewDataManager)
++        {
++            setEntry_new(key, value);
++            return;
++        }
++
+         EntityDataManager.DataEntry<T> dataentry = new EntityDataManager.DataEntry<>(key, value);
+         this.lock.writeLock().lock();
+         this.entries.put(key.getId(), dataentry);
+@@ -122,8 +137,46 @@
+         this.lock.writeLock().unlock();
+     }
+ 
++    /**
++     * We modify the call to add a tracked data to the internal map so we can add it to our own, faster map. The original
++     * map field is never mutated in-place so we can avoid expensive locking, but this might hurt for memory allocations...
++     */
++    private <T> void setEntry_new(DataParameter<T> keyObj, T value)
++    {
++        EntityDataManager.DataEntry<T> dataentry = new EntityDataManager.DataEntry<>(keyObj, value);
++        this.lock.writeLock().lock();
++
++        int key = keyObj.getId();
++
++        if (key > Byte.MAX_VALUE) {
++            throw new IllegalArgumentException("Key index too large (>127)");
++        }
++
++        EntityDataManager.DataEntry<?>[] entries = this.entriesArray;
++
++        if (entries.length <= key) {
++            EntityDataManager.DataEntry<?>[] copy = new EntityDataManager.DataEntry[key + 1];
++
++            System.arraycopy(entries, 0, copy, 0, entries.length);
++
++            this.entriesArray = entries = copy;
++        }
++
++        entries[(byte) key] = dataentry;
++
++        this.entries.put(key, dataentry);
++
++        this.empty = false;
++        this.lock.writeLock().unlock();
++    }
++
+     private <T> EntityDataManager.DataEntry<T> getEntry(DataParameter<T> key)
+     {
++        if (LiConfig.Entity.useNewDataManager)
++        {
++            return getEntry_new(key);
++        }
++
+         this.lock.readLock().lock();
+         EntityDataManager.DataEntry<T> dataentry;
+ 
+@@ -143,6 +196,39 @@
+         return dataentry;
+     }
+ 
++    /**
++     * Avoid integer boxing/unboxing and locking.
++     */
++    private <T> EntityDataManager.DataEntry<T> getEntry_new(DataParameter<T> key)
++    {
++        this.lock.readLock().lock();
++
++        try {
++            int id = key.getId();
++
++            if (id >= this.entriesArray.length) {
++                return null;
++            }
++
++            //noinspection unchecked
++            return (EntityDataManager.DataEntry<T>) this.entriesArray[id];
++        } catch (Throwable cause) {
++            // Move to another method so this function can be in-lined better
++            throw onGetException(cause, key);
++        } finally {
++            this.lock.readLock().unlock();
++        }
++    }
++
++    private static <T> ReportedException onGetException(Throwable cause, DataParameter<T> data) {
++        CrashReport report = CrashReport.makeCrashReport(cause, "Getting synced entity data");
++
++        CrashReportCategory section = report.makeCategory("Synced entity data");
++        section.addDetail("Data ID", data);
++
++        return new ReportedException(report);
++    }
++
+     public <T> T get(DataParameter<T> key)
+     {
+         return this.getEntry(key).getValue();

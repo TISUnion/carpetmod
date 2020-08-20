@@ -1,0 +1,24 @@
+--- a/net/minecraft/entity/monster/EntityIronGolem.java
++++ b/net/minecraft/entity/monster/EntityIronGolem.java
+@@ -142,7 +142,7 @@
+             int i = MathHelper.floor(this.posX);
+             int j = MathHelper.floor(this.posY - (double)0.2F);
+             int k = MathHelper.floor(this.posZ);
+-            IBlockState iblockstate = this.world.getBlockState(new BlockPos(i, j, k));
++            IBlockState iblockstate = this.getBlockState(new BlockPos(i, j, k));
+ 
+             if (!iblockstate.isAir())
+             {
+@@ -296,9 +296,9 @@
+     public boolean isNotColliding(IWorldReaderBase worldIn)
+     {
+         BlockPos blockpos = new BlockPos(this.posX, this.posY, this.posZ);
+-        IBlockState iblockstate = worldIn.getBlockState(blockpos);
+-        IBlockState iblockstate1 = worldIn.getBlockState(blockpos.down());
+-        IBlockState iblockstate2 = worldIn.getBlockState(blockpos.up());
++        IBlockState iblockstate = this.getBlockState(blockpos);
++        IBlockState iblockstate1 = this.getBlockState(blockpos.down());
++        IBlockState iblockstate2 = this.getBlockState(blockpos.up());
+         return iblockstate1.isTopSolid() && WorldEntitySpawner.isValidEmptySpawnBlock(iblockstate2, iblockstate2.getFluidState()) && WorldEntitySpawner.isValidEmptySpawnBlock(iblockstate, Fluids.EMPTY.getDefaultState()) && worldIn.isCollisionBoxesEmpty(this, this.getBoundingBox()) && worldIn.checkNoEntityCollision(this, this.getBoundingBox());
+     }
+ }

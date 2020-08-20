@@ -29,3 +29,12 @@
              this.remove();
          }
      }
+@@ -229,7 +244,7 @@
+ 
+     private void extinguishFires(BlockPos pos, EnumFacing p_184542_2_)
+     {
+-        if (this.world.getBlockState(pos).getBlock() == Blocks.FIRE)
++        if (this.getBlockState(pos).getBlock() == Blocks.FIRE)
+         {
+             this.world.extinguishFire((EntityPlayer)null, pos.offset(p_184542_2_), p_184542_2_.getOpposite());
+         }

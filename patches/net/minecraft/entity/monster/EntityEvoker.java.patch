@@ -1,0 +1,11 @@
+--- a/net/minecraft/entity/monster/EntityEvoker.java
++++ b/net/minecraft/entity/monster/EntityEvoker.java
+@@ -221,7 +221,7 @@
+                 {
+                     if (!EntityEvoker.this.world.isAirBlock(blockpos))
+                     {
+-                        IBlockState iblockstate = EntityEvoker.this.world.getBlockState(blockpos);
++                        IBlockState iblockstate = EntityEvoker.this.getBlockState(blockpos);
+                         VoxelShape voxelshape = iblockstate.getCollisionShape(EntityEvoker.this.world, blockpos);
+ 
+                         if (!voxelshape.isEmpty())

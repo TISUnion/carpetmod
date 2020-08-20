@@ -1,0 +1,11 @@
+--- a/net/minecraft/entity/monster/EntityZombie.java
++++ b/net/minecraft/entity/monster/EntityZombie.java
+@@ -362,7 +362,7 @@
+                     int j1 = j + MathHelper.nextInt(this.rand, 7, 40) * MathHelper.nextInt(this.rand, -1, 1);
+                     int k1 = k + MathHelper.nextInt(this.rand, 7, 40) * MathHelper.nextInt(this.rand, -1, 1);
+ 
+-                    if (this.world.getBlockState(new BlockPos(i1, j1 - 1, k1)).isTopSolid() && this.world.getLight(new BlockPos(i1, j1, k1)) < 10)
++                    if (this.getBlockState(i1, j1 - 1, k1).isTopSolid() && this.world.getLight(new BlockPos(i1, j1, k1)) < 10)
+                     {
+                         entityzombie.setPosition((double)i1, (double)j1, (double)k1);
+ 

@@ -1,0 +1,11 @@
+--- a/net/minecraft/entity/monster/EntitySnowman.java
++++ b/net/minecraft/entity/monster/EntitySnowman.java
+@@ -113,7 +113,7 @@
+                 k = MathHelper.floor(this.posZ + (double)((float)(l / 2 % 2 * 2 - 1) * 0.25F));
+                 BlockPos blockpos = new BlockPos(i, j, k);
+ 
+-                if (this.world.getBlockState(blockpos).isAir() && this.world.getBiome(blockpos).getTemperature(blockpos) < 0.8F && iblockstate.isValidPosition(this.world, blockpos))
++                if (this.getBlockState(blockpos).isAir() && this.world.getBiome(blockpos).getTemperature(blockpos) < 0.8F && iblockstate.isValidPosition(this.world, blockpos))
+                 {
+                     this.world.setBlockState(blockpos, iblockstate);
+                 }

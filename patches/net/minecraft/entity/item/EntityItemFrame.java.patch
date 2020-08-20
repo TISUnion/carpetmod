@@ -1,0 +1,11 @@
+--- a/net/minecraft/entity/item/EntityItemFrame.java
++++ b/net/minecraft/entity/item/EntityItemFrame.java
+@@ -119,7 +119,7 @@
+         }
+         else
+         {
+-            IBlockState iblockstate = this.world.getBlockState(this.hangingPosition.offset(this.facingDirection.getOpposite()));
++            IBlockState iblockstate = this.getBlockState(this.hangingPosition.offset(this.facingDirection.getOpposite()));
+             return iblockstate.getMaterial().isSolid() || this.facingDirection.getAxis().isHorizontal() && BlockRedstoneDiode.isDiode(iblockstate) ? this.world.getEntitiesInAABBexcluding(this, this.getBoundingBox(), IS_HANGING_ENTITY).isEmpty() : false;
+         }
+     }
