@@ -1,0 +1,71 @@
+--- a/net/minecraft/world/chunk/storage/RegionFile.java
++++ b/net/minecraft/world/chunk/storage/RegionFile.java
+@@ -11,11 +11,13 @@
+ import java.io.IOException;
+ import java.io.RandomAccessFile;
+ import java.util.List;
++import java.util.zip.Deflater;
+ import java.util.zip.DeflaterOutputStream;
+ import java.util.zip.GZIPInputStream;
+ import java.util.zip.InflaterInputStream;
+ import javax.annotation.Nullable;
+ import net.minecraft.util.Util;
++import net.minecraft.util.math.ChunkPos;
+ 
+ public class RegionFile
+ {
+@@ -28,6 +30,12 @@
+     private int sizeDelta;
+     private long lastModified;
+ 
++    /** Lithium */
++    private Deflater deflater;
++    /** Lithium */
++    private byte[] tmp;
++
++
+     public RegionFile(File fileNameIn)
+     {
+         this.fileName = fileNameIn;
+@@ -93,6 +101,12 @@
+         {
+             ioexception.printStackTrace();
+         }
++
++        //Lithium fast nbtIO setup
++        this.deflater = new Deflater();
++        this.deflater.setLevel(Deflater.BEST_SPEED);
++
++        this.tmp = new byte[8192];
+     }
+ 
+     @Nullable
+@@ -358,6 +372,28 @@
+         }
+     }
+ 
++    /** Lithium method */
++    public void write(ChunkPos pos, byte[] bytes) throws IOException {
++        this.deflater.reset();
++        this.deflater.setInput(bytes);
++        this.deflater.finish();
++
++        byte[] compressed;
++
++        try (ByteArrayOutputStream bout = new ByteArrayOutputStream(bytes.length)) {
++            while (!this.deflater.finished()) {
++                int count = this.deflater.deflate(this.tmp);
++
++                bout.write(this.tmp, 0, count);
++            }
++
++            compressed = bout.toByteArray();
++        }
++
++        this.write(pos.x, pos.z, compressed, compressed.length);
++    }
++
++
+     class ChunkBuffer extends ByteArrayOutputStream
+     {
+         private final int chunkX;

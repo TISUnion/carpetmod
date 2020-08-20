@@ -1,0 +1,29 @@
+--- a/net/minecraft/nbt/NBTTagShort.java
++++ b/net/minecraft/nbt/NBTTagShort.java
+@@ -3,6 +3,9 @@
+ import java.io.DataInput;
+ import java.io.DataOutput;
+ import java.io.IOException;
++
++import me.jellysquid.mods.lithium.common.nbt.io.NbtFastReader;
++import me.jellysquid.mods.lithium.common.nbt.io.NbtFastWriter;
+ import net.minecraft.util.text.ITextComponent;
+ import net.minecraft.util.text.TextComponentString;
+ 
+@@ -102,4 +105,16 @@
+     {
+         return this.data;
+     }
++
++    @Override
++    public void serialize(NbtFastWriter writer) {
++        writer.writeShort(this.data);
++    }
++
++    @Override
++    public void deserialize(NbtFastReader reader, int level, NBTSizeTracker positionTracker) {
++        positionTracker.read(80L);
++
++        this.data = reader.readShort();
++    }
+ }

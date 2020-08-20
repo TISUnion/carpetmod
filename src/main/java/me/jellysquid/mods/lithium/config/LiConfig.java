@@ -31,28 +31,30 @@ public class LiConfig {
         public final static boolean fastChunkPalette = true;
         public final static boolean fastChunkPalette_tweakedThresholdScaleOf3 = true;
         public final static boolean fastChunkSerialization = true;
+        public final static boolean noDebugWorldType = true;
     }
 
     /**
      * Class modified:
      * {@link net.minecraft.entity.Entity}
-     *
+     * <p>
      * {@link net.minecraft.entity.ai.EntityAIBase}
-     *
+     * <p>
      * {@link net.minecraft.entity.ai.EntityAITasks}
-     *
+     * <p>
      * {@link net.minecraft.entity.boss.EntityWither}
-     *
+     * <p>
      * {@link net.minecraft.entity.item.EntityBoat
-     *  @link net.minecraft.entity.item.EntityEnderCrystal
-     *  @link net.minecraft.entity.item.EntityEnderPearl
-     *  @link net.minecraft.entity.item.EntityFallingBlock
-     *  @link net.minecraft.entity.item.EntityItem
-     *  @link net.minecraft.entity.item.EntityItemFrame
-     *  @link net.minecraft.entity.item.EntityMinecart
-     *  @link net.minecraft.entity.item.EntityXPOrb}
      *
-     *  {@link net.minecraft.entity.monster.EntityEnderman
+     * @link net.minecraft.entity.item.EntityEnderCrystal
+     * @link net.minecraft.entity.item.EntityEnderPearl
+     * @link net.minecraft.entity.item.EntityFallingBlock
+     * @link net.minecraft.entity.item.EntityItem
+     * @link net.minecraft.entity.item.EntityItemFrame
+     * @link net.minecraft.entity.item.EntityMinecart
+     * @link net.minecraft.entity.item.EntityXPOrb}
+     * <p>
+     * {@link net.minecraft.entity.monster.EntityEnderman
      * @link net.minecraft.entity.monster.EntityEvoker
      * @link net.minecraft.entity.monster.EntityIronGolem
      * @link net.minecraft.entity.monster.EntityShulker
@@ -60,8 +62,8 @@ public class LiConfig {
      * @link net.minecraft.entity.monster.EntitySnowman
      * @link net.minecraft.entity.monster.EntityZombie
      * @link net.minecraft.entity.monster.EntityZombieVillager}
-     *
-     *  {@link net.minecraft.entity.passive.AbstractHorse
+     * <p>
+     * {@link net.minecraft.entity.passive.AbstractHorse
      * @link net.minecraft.entity.passive.EntityBat
      * @link net.minecraft.entity.passive.EntityDolphin
      * @link net.minecraft.entity.passive.EntityLlama
@@ -69,25 +71,25 @@ public class LiConfig {
      * @link net.minecraft.entity.passive.EntityRabbit
      * @link net.minecraft.entity.passive.EntitySquid
      * @link net.minecraft.entity.passive.EntityTurtle}
-     *
-     *  {@link net.minecraft.entity.player.EntityPlayer
+     * <p>
+     * {@link net.minecraft.entity.player.EntityPlayer
      * @link net.minecraft.entity.player.EntityPlayerMP}
-     *
-     *  {@link net.minecraft.entity.projectile.EntityArrow
+     * <p>
+     * {@link net.minecraft.entity.projectile.EntityArrow
      * @link net.minecraft.entity.projectile.EntityFishHook
      * @link net.minecraft.entity.projectile.EntityPotion
      * @link net.minecraft.entity.projectile.EntityThrowable}
-     *
-     *  {@link net.minecraft.entity.EntityFlying
+     * <p>
+     * {@link net.minecraft.entity.EntityFlying
      * @link net.minecraft.entity.EntityHanging
      * @link net.minecraft.entity.EntityLeashKnot}
-     *
-     *  {@link net.minecraft.network.datasync.EntityDataManager}
-     *
-     *  {@link net.minecraft.network.play.server.SPacketSpawnMob
+     * <p>
+     * {@link net.minecraft.network.datasync.EntityDataManager}
+     * <p>
+     * {@link net.minecraft.network.play.server.SPacketSpawnMob
      * @link net.minecraft.network.play.server.SPacketSpawnPlayer}
-     *
-     *  {@link net.minecraft.pathfinding.PathNavigate}
+     * <p>
+     * {@link net.minecraft.pathfinding.PathNavigate}
      */
     public static class Entity {
         public final static boolean newAITaskEntryContainer = true;
@@ -105,11 +107,20 @@ public class LiConfig {
      */
     public static class FastContainers {
         public final static boolean lithiumTickScheduler = true;
-        public final static boolean fastClassInheritanceMultiMap = true;
+
+        //TODO: Fix the issue that entity can't be found until reload the chunk.
+        public final static boolean fastClassInheritanceMultiMap = false;
     }
 
+    /**
+     * Class modified
+     * {@link net.minecraft.nbt package}
+     * {@link net.minecraft.world.chunk.storage.AnvilChunkLoader}
+     * {@link net.minecraft.world.chunk.storage.RegionFile}
+     */
     public static class NBT {
-        public final static boolean fastNBTSerialization = true;
+        //TODO: Fix the fatal error
+        public final static boolean fastNBTSerialization = false;
     }
 
     /**

@@ -1,0 +1,28 @@
+--- a/net/minecraft/nbt/INBTBase.java
++++ b/net/minecraft/nbt/INBTBase.java
+@@ -3,6 +3,9 @@
+ import java.io.DataInput;
+ import java.io.DataOutput;
+ import java.io.IOException;
++
++import me.jellysquid.mods.lithium.common.nbt.io.NbtFastReader;
++import me.jellysquid.mods.lithium.common.nbt.io.NbtFastWriter;
+ import net.minecraft.util.text.ITextComponent;
+ import net.minecraft.util.text.TextFormatting;
+ 
+@@ -107,4 +110,15 @@
+     }
+ 
+     ITextComponent toFormattedComponent(String indentation, int indentDepth);
++
++    //Lithium fast NBT serialization
++    /**
++     * Serializes the {@link net.minecraft.nbt.INBTBase} to {@param out}.
++     */
++    void serialize(NbtFastWriter writer);
++
++    /**
++     * Deserializes into the {@link net.minecraft.nbt.INBTBase} from {@param in}.
++     */
++    void deserialize(NbtFastReader reader, int level, NBTSizeTracker sizeTracker);
+ }

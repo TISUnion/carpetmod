@@ -1,0 +1,72 @@
+--- a/net/minecraft/nbt/NBTTagCompound.java
++++ b/net/minecraft/nbt/NBTTagCompound.java
+@@ -16,6 +16,9 @@
+ import java.util.UUID;
+ import java.util.regex.Pattern;
+ import javax.annotation.Nullable;
++
++import me.jellysquid.mods.lithium.common.nbt.io.NbtFastReader;
++import me.jellysquid.mods.lithium.common.nbt.io.NbtFastWriter;
+ import net.minecraft.crash.CrashReport;
+ import net.minecraft.crash.CrashReportCategory;
+ import net.minecraft.crash.ReportedException;
+@@ -630,4 +633,59 @@
+             return itextcomponent;
+         }
+     }
++
++    @Override
++    public void serialize(NbtFastWriter writer) {
++        for (String key : this.tagMap.keySet()) {
++            INBTBase tag = this.tagMap.get(key);
++
++            write(key, tag, writer);
++        }
++
++        writer.writeByte((byte) 0);
++    }
++
++    @Override
++    public void deserialize(NbtFastReader reader, int level, NBTSizeTracker positionTracker) {
++        positionTracker.read(384L);
++
++        if (level > 512) {
++            throw new RuntimeException("Tried to read NBT tag with too high complexity, depth > 512");
++        }
++
++        this.tagMap.clear();
++
++        byte type;
++
++        while((type = reader.readByte()) != 0) {
++            String name = reader.readString();
++
++            positionTracker.read(224 + 16 * name.length());
++
++            INBTBase tag = createTag(type, name, reader, level + 1, positionTracker);
++
++            if (this.tagMap.put(name, tag) != null) {
++                positionTracker.read(288L);
++            }
++        }
++    }
++
++    private static void write(String name, INBTBase tag, NbtFastWriter out) {
++        out.writeByte(tag.getId());
++
++        if (tag.getId() != 0) {
++            out.writeString(name);
++
++            tag.serialize(out);
++        }
++    }
++
++    private static INBTBase createTag(byte type, String key, NbtFastReader in, int level, NBTSizeTracker positionTracker) {
++        INBTBase tag = INBTBase.create(type);
++
++        tag.deserialize(in, level, positionTracker);
++
++        return tag;
++    }
++
+ }

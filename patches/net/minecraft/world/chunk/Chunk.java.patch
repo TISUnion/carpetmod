@@ -9,7 +9,16 @@
  import com.google.common.collect.Maps;
  import com.google.common.collect.Queues;
  import com.google.common.collect.Sets;
-@@ -55,6 +58,10 @@
+@@ -16,6 +19,8 @@
+ import java.util.concurrent.atomic.AtomicInteger;
+ import java.util.function.Predicate;
+ import javax.annotation.Nullable;
++
++import me.jellysquid.mods.lithium.config.LiConfig;
+ import net.minecraft.block.Block;
+ import net.minecraft.block.ITileEntityProvider;
+ import net.minecraft.block.state.IBlockState;
+@@ -55,6 +60,10 @@
  import org.apache.logging.log4j.LogManager;
  import org.apache.logging.log4j.Logger;
  
@@ -20,7 +29,7 @@
  public class Chunk implements IChunk
  {
      private static final Logger LOGGER = LogManager.getLogger();
-@@ -89,6 +96,19 @@
+@@ -89,6 +98,19 @@
      private int neighborCount;
      private final AtomicInteger field_205757_F = new AtomicInteger();
      private final ChunkPos field_212816_F;
@@ -40,7 +49,7 @@
  
      @OnlyIn(Dist.CLIENT)
      public Chunk(World worldIn, int cx, int cz, Biome[] biomesIn)
-@@ -212,37 +232,45 @@
+@@ -212,37 +234,45 @@
              {
                  if (this.world.dimension.hasSkyLight())
                  {
@@ -112,7 +121,7 @@
                      }
                  }
              }
-@@ -339,40 +367,52 @@
+@@ -339,40 +369,52 @@
              int j = heightmap.getHeight(x & 15, z & 15);
              int k = this.x * 16 + x;
              int l = this.z * 16 + z;
@@ -191,7 +200,7 @@
                  }
              }
  
-@@ -380,19 +420,23 @@
+@@ -380,19 +422,23 @@
              {
                  this.heightMapMinimum = j;
              }
@@ -225,7 +234,53 @@
              }
  
              this.dirty = true;
-@@ -489,9 +533,16 @@
+@@ -411,6 +457,11 @@
+ 
+     public IBlockState getBlockState(int x, int y, int z)
+     {
++        if (LiConfig.Chunk.noDebugWorldType)
++        {
++            return getBlockState_new(x, y, z);
++        }
++
+         if (this.world.getWorldType() == WorldType.DEBUG_ALL_BLOCK_STATES)
+         {
+             IBlockState iblockstate = null;
+@@ -456,6 +507,33 @@
+         }
+     }
+ 
++    private IBlockState getBlockState_new(int x, int y, int z)
++    {
++        try {
++            int chunkY = y >> 4;
++
++            if (chunkY >= 0 && chunkY < this.sections.length) {
++                ChunkSection section = this.sections[chunkY];
++
++                if (section != null) {
++                    return section.get(x & 15, y & 15, z & 15);
++                }
++            }
++
++            return Blocks.AIR.getDefaultState();
++        } catch (Throwable e) {
++            throw onGetBlockStateException(e, x, y, z);
++        }
++    }
++
++    private static ReportedException onGetBlockStateException(Throwable cause, int x, int y, int z)
++    {
++        CrashReport report = CrashReport.makeCrashReport(cause, "Getting block state");
++        CrashReportCategory section = report.makeCategory("Block being got");
++        section.addDetail("Location", () -> CrashReportCategory.getCoordinateInfo(x, y, z));
++        return new ReportedException(report);
++    }
++
+     public IFluidState getFluidState(BlockPos pos)
+     {
+         return this.getFluidState(pos.getX(), pos.getY(), pos.getZ());
+@@ -489,9 +567,16 @@
          }
      }
  
@@ -242,7 +297,7 @@
          int i = pos.getX() & 15;
          int j = pos.getY();
          int k = pos.getZ() & 15;
-@@ -517,10 +568,16 @@
+@@ -517,10 +602,16 @@
                  }
  
                  chunksection = new ChunkSection(j >> 4 << 4, this.world.dimension.hasSkyLight());
@@ -260,7 +315,7 @@
              chunksection.set(i, j & 15, k, state);
              this.heightMap.get(Heightmap.Type.MOTION_BLOCKING).update(i, j, k, state);
              this.heightMap.get(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES).update(i, j, k, state);
-@@ -551,10 +608,14 @@
+@@ -551,10 +642,14 @@
                      int i1 = state.getOpacity(this.world, pos);
                      int j1 = iblockstate.getOpacity(this.world, pos);
                      this.relightBlock(i, j, k, state);
@@ -278,7 +333,7 @@
                      }
                  }
  
-@@ -568,14 +629,26 @@
+@@ -568,14 +663,26 @@
                      }
                  }
  
@@ -307,7 +362,7 @@
  
                      if (tileentity1 == null)
                      {
-@@ -596,6 +669,9 @@
+@@ -596,6 +703,9 @@
  
      public int getLightFor(EnumLightType type, BlockPos pos)
      {
@@ -317,7 +372,7 @@
          return this.getLight(type, pos, this.world.getDimension().hasSkyLight());
      }
  
-@@ -651,10 +727,18 @@
+@@ -651,10 +761,18 @@
                  {
                      return;
                  }
@@ -338,7 +393,7 @@
              }
  
              if (light == EnumLightType.SKY)
-@@ -680,6 +764,9 @@
+@@ -680,6 +798,9 @@
  
      public int getLightSubtracted(BlockPos pos, int amount, boolean hasSkylight)
      {
@@ -348,7 +403,7 @@
          int i = pos.getX() & 15;
          int j = pos.getY();
          int k = pos.getZ() & 15;
-@@ -869,7 +956,7 @@
+@@ -869,7 +990,7 @@
          this.deferredTileEntities.put(new BlockPos(nbt.getInt("x"), nbt.getInt("y"), nbt.getInt("z")), nbt);
      }
  
@@ -357,7 +412,7 @@
      {
          if (this.loaded)
          {
-@@ -894,10 +981,24 @@
+@@ -894,10 +1015,24 @@
                  return !(p_212383_0_ instanceof EntityPlayer);
              }));
          }
@@ -382,7 +437,7 @@
          this.loaded = false;
  
          for (TileEntity tileentity : this.tileEntities.values())
-@@ -909,6 +1010,15 @@
+@@ -909,6 +1044,15 @@
          {
              this.world.unloadEntities(classinheritancemultimap);
          }
@@ -398,7 +453,7 @@
      }
  
      public void markDirty()
-@@ -997,6 +1107,9 @@
+@@ -997,6 +1141,9 @@
  
      public void tick(boolean skipRecheckGaps)
      {
@@ -408,7 +463,7 @@
          if (this.isGapLightingUpdated && this.world.dimension.hasSkyLight() && !skipRecheckGaps)
          {
              this.recheckGaps(this.world.isRemote);
-@@ -1138,9 +1251,28 @@
+@@ -1138,9 +1285,28 @@
                  this.sections[l].recalculateRefCounts();
              }
          }
@@ -439,7 +494,7 @@
          for (TileEntity tileentity : this.tileEntities.values())
          {
              tileentity.updateContainingBlockInfo();
-@@ -1497,4 +1629,52 @@
+@@ -1497,4 +1663,52 @@
          QUEUED,
          CHECK;
      }

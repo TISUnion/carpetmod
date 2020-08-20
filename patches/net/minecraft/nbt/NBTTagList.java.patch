@@ -1,0 +1,63 @@
+--- a/net/minecraft/nbt/NBTTagList.java
++++ b/net/minecraft/nbt/NBTTagList.java
+@@ -7,6 +7,9 @@
+ import java.io.IOException;
+ import java.util.List;
+ import java.util.Objects;
++
++import me.jellysquid.mods.lithium.common.nbt.io.NbtFastReader;
++import me.jellysquid.mods.lithium.common.nbt.io.NbtFastWriter;
+ import net.minecraft.util.text.ITextComponent;
+ import net.minecraft.util.text.TextComponentString;
+ import org.apache.logging.log4j.LogManager;
+@@ -370,4 +373,50 @@
+     {
+         return this.tagType;
+     }
++
++
++    @Override
++    public void serialize(NbtFastWriter writer) {
++        if (this.tagList.isEmpty()) {
++            this.tagType = 0;
++        } else {
++            this.tagType = this.tagList.get(0).getId();
++        }
++
++        writer.writeByte(this.tagType);
++        writer.writeInt(this.tagList.size());
++
++        for (INBTBase tag : this.tagList) {
++            (tag).serialize(writer);
++        }
++    }
++
++    @Override
++    public void deserialize(NbtFastReader reader, int level, NBTSizeTracker positionTracker) {
++        positionTracker.read(296L);
++
++        if (level > 512) {
++            throw new RuntimeException("Tried to read NBT tag with too high complexity, depth > 512");
++        }
++
++        this.tagType = reader.readByte();
++
++        int count = reader.readInt();
++
++        if (this.tagType == 0 && count > 0) {
++            throw new RuntimeException("Missing type on ListTag");
++        }
++
++        positionTracker.read(32L * (long)count);
++
++        this.tagList = Lists.newArrayListWithCapacity(count);
++
++        for(int i = 0; i < count; ++i) {
++            INBTBase tag = INBTBase.create(this.tagType);
++            tag.deserialize(reader, level + 1, positionTracker);
++
++            this.tagList.add(tag);
++        }
++
++    }
+ }

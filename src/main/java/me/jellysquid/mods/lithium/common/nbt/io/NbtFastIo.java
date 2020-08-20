@@ -1,6 +1,5 @@
 package me.jellysquid.mods.lithium.common.nbt.io;
 
-import me.jellysquid.mods.lithium.common.nbt.NbtFastSerializer;
 import net.minecraft.nbt.INBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagEnd;
@@ -19,7 +18,7 @@ public class NbtFastIo {
         if (tag.getId() != 0) {
             writer.writeString("");
 
-            ((NbtFastSerializer) tag).serialize(writer);
+            tag.serialize(writer);
         }
     }
 
@@ -47,7 +46,7 @@ public class NbtFastIo {
         reader.readString();
 
         INBTBase tag = INBTBase.create(type);
-        ((NbtFastSerializer) tag).deserialize(reader, level, nbtSizeTracker);
+        tag.deserialize(reader, level, nbtSizeTracker);
 
         return tag;
     }
