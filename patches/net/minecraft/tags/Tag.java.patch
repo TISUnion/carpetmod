@@ -1,0 +1,56 @@
+--- a/net/minecraft/tags/Tag.java
++++ b/net/minecraft/tags/Tag.java
+@@ -14,6 +14,8 @@
+ import java.util.function.Function;
+ import java.util.function.Predicate;
+ import javax.annotation.Nullable;
++
++import me.jellysquid.mods.lithium.config.LiConfig;
+ import net.minecraft.util.JsonUtils;
+ import net.minecraft.util.ResourceLocation;
+ 
+@@ -23,6 +25,9 @@
+     private final Set<T> taggedItems;
+     private final Collection<Tag.ITagEntry<T>> entries;
+ 
++    private T[] valuesSmallArray;
++
++
+     public Tag(ResourceLocation resourceLocationIn)
+     {
+         this.resourceLocation = resourceLocationIn;
+@@ -40,6 +45,14 @@
+         {
+             itagentry.populate(this.taggedItems);
+         }
++
++        if (LiConfig.FastContainers.smallTagArrays)
++        {
++            if (this.taggedItems.size() < 6) {
++                //noinspection unchecked
++                this.valuesSmallArray = (T[]) this.taggedItems.toArray();
++            }
++        }
+     }
+ 
+     public JsonObject serialize(Function<T, ResourceLocation> getNameForObject)
+@@ -59,6 +72,19 @@
+ 
+     public boolean contains(T itemIn)
+     {
++        if (this.valuesSmallArray != null) {
++            //Makes use of the small values array for quicker indexing if the number of elements is small.
++            //This can improve tag matching performance significantly
++            //for tags with only one or two objects.
++            for (T other : this.valuesSmallArray) {
++                if (other == itemIn) {
++                    return true;
++                }
++            }
++
++            return false;
++        }
++
+         return this.taggedItems.contains(itemIn);
+     }
+ 

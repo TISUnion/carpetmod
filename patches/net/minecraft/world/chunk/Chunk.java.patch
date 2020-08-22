@@ -9,16 +9,17 @@
  import com.google.common.collect.Maps;
  import com.google.common.collect.Queues;
  import com.google.common.collect.Sets;
-@@ -16,6 +19,8 @@
+@@ -16,6 +19,9 @@
  import java.util.concurrent.atomic.AtomicInteger;
  import java.util.function.Predicate;
  import javax.annotation.Nullable;
 +
++import me.jellysquid.mods.lithium.common.util.LithiumClassInheritanceMultiMap;
 +import me.jellysquid.mods.lithium.config.LiConfig;
  import net.minecraft.block.Block;
  import net.minecraft.block.ITileEntityProvider;
  import net.minecraft.block.state.IBlockState;
-@@ -55,6 +60,10 @@
+@@ -55,6 +61,10 @@
  import org.apache.logging.log4j.LogManager;
  import org.apache.logging.log4j.Logger;
  
@@ -29,7 +30,7 @@
  public class Chunk implements IChunk
  {
      private static final Logger LOGGER = LogManager.getLogger();
-@@ -89,6 +98,19 @@
+@@ -89,6 +99,19 @@
      private int neighborCount;
      private final AtomicInteger field_205757_F = new AtomicInteger();
      private final ChunkPos field_212816_F;
@@ -49,7 +50,23 @@
  
      @OnlyIn(Dist.CLIENT)
      public Chunk(World worldIn, int cx, int cz, Biome[] biomesIn)
-@@ -212,37 +234,45 @@
+@@ -115,7 +138,14 @@
+ 
+         for (int i = 0; i < this.entityLists.length; ++i)
+         {
+-            this.entityLists[i] = new ClassInheritanceMultiMap<>(Entity.class);
++            if (LiConfig.FastContainers.newClassInheritanceMultiMap)
++            {
++                this.entityLists[i] = new LithiumClassInheritanceMultiMap<>(Entity.class);
++            }
++            else
++            {
++                this.entityLists[i] = new ClassInheritanceMultiMap<>(Entity.class);
++            }
+         }
+ 
+         this.blockBiomeArray = biomesIn;
+@@ -212,37 +242,45 @@
              {
                  if (this.world.dimension.hasSkyLight())
                  {
@@ -121,7 +138,7 @@
                      }
                  }
              }
-@@ -339,40 +369,52 @@
+@@ -339,40 +377,52 @@
              int j = heightmap.getHeight(x & 15, z & 15);
              int k = this.x * 16 + x;
              int l = this.z * 16 + z;
@@ -200,7 +217,7 @@
                  }
              }
  
-@@ -380,19 +422,23 @@
+@@ -380,19 +430,23 @@
              {
                  this.heightMapMinimum = j;
              }
@@ -234,7 +251,7 @@
              }
  
              this.dirty = true;
-@@ -411,6 +457,11 @@
+@@ -411,6 +465,11 @@
  
      public IBlockState getBlockState(int x, int y, int z)
      {
@@ -246,7 +263,7 @@
          if (this.world.getWorldType() == WorldType.DEBUG_ALL_BLOCK_STATES)
          {
              IBlockState iblockstate = null;
-@@ -456,6 +507,33 @@
+@@ -456,6 +515,33 @@
          }
      }
  
@@ -280,7 +297,7 @@
      public IFluidState getFluidState(BlockPos pos)
      {
          return this.getFluidState(pos.getX(), pos.getY(), pos.getZ());
-@@ -489,9 +567,16 @@
+@@ -489,9 +575,16 @@
          }
      }
  
@@ -297,7 +314,7 @@
          int i = pos.getX() & 15;
          int j = pos.getY();
          int k = pos.getZ() & 15;
-@@ -517,10 +602,16 @@
+@@ -517,10 +610,16 @@
                  }
  
                  chunksection = new ChunkSection(j >> 4 << 4, this.world.dimension.hasSkyLight());
@@ -315,7 +332,7 @@
              chunksection.set(i, j & 15, k, state);
              this.heightMap.get(Heightmap.Type.MOTION_BLOCKING).update(i, j, k, state);
              this.heightMap.get(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES).update(i, j, k, state);
-@@ -551,10 +642,14 @@
+@@ -551,10 +650,14 @@
                      int i1 = state.getOpacity(this.world, pos);
                      int j1 = iblockstate.getOpacity(this.world, pos);
                      this.relightBlock(i, j, k, state);
@@ -333,7 +350,7 @@
                      }
                  }
  
-@@ -568,14 +663,26 @@
+@@ -568,14 +671,26 @@
                      }
                  }
  
@@ -362,7 +379,7 @@
  
                      if (tileentity1 == null)
                      {
-@@ -596,6 +703,9 @@
+@@ -596,6 +711,9 @@
  
      public int getLightFor(EnumLightType type, BlockPos pos)
      {
@@ -372,7 +389,7 @@
          return this.getLight(type, pos, this.world.getDimension().hasSkyLight());
      }
  
-@@ -651,10 +761,18 @@
+@@ -651,10 +769,18 @@
                  {
                      return;
                  }
@@ -393,7 +410,7 @@
              }
  
              if (light == EnumLightType.SKY)
-@@ -680,6 +798,9 @@
+@@ -680,6 +806,9 @@
  
      public int getLightSubtracted(BlockPos pos, int amount, boolean hasSkylight)
      {
@@ -403,7 +420,7 @@
          int i = pos.getX() & 15;
          int j = pos.getY();
          int k = pos.getZ() & 15;
-@@ -869,7 +990,7 @@
+@@ -869,7 +998,7 @@
          this.deferredTileEntities.put(new BlockPos(nbt.getInt("x"), nbt.getInt("y"), nbt.getInt("z")), nbt);
      }
  
@@ -412,7 +429,7 @@
      {
          if (this.loaded)
          {
-@@ -894,10 +1015,24 @@
+@@ -894,10 +1023,24 @@
                  return !(p_212383_0_ instanceof EntityPlayer);
              }));
          }
@@ -437,7 +454,7 @@
          this.loaded = false;
  
          for (TileEntity tileentity : this.tileEntities.values())
-@@ -909,6 +1044,15 @@
+@@ -909,6 +1052,15 @@
          {
              this.world.unloadEntities(classinheritancemultimap);
          }
@@ -453,7 +470,7 @@
      }
  
      public void markDirty()
-@@ -997,6 +1141,9 @@
+@@ -997,6 +1149,9 @@
  
      public void tick(boolean skipRecheckGaps)
      {
@@ -463,7 +480,7 @@
          if (this.isGapLightingUpdated && this.world.dimension.hasSkyLight() && !skipRecheckGaps)
          {
              this.recheckGaps(this.world.isRemote);
-@@ -1138,9 +1285,28 @@
+@@ -1138,9 +1293,28 @@
                  this.sections[l].recalculateRefCounts();
              }
          }
@@ -494,7 +511,7 @@
          for (TileEntity tileentity : this.tileEntities.values())
          {
              tileentity.updateContainingBlockInfo();
-@@ -1497,4 +1663,52 @@
+@@ -1497,4 +1671,52 @@
          QUEUED,
          CHECK;
      }

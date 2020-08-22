@@ -102,14 +102,14 @@ public class LiConfig {
 
     /**
      * Class modified
+     * {@link net.minecraft.world.chunk.Chunk}
      * {@link net.minecraft.world.WorldServer}
      * {@link net.minecraft.util.ClassInheritanceMultiMap}
      */
     public static class FastContainers {
         public final static boolean lithiumTickScheduler = true;
-
-        //TODO: Fix the issue that entity can't be found until reload the chunk.
-        public final static boolean fastClassInheritanceMultiMap = false;
+        public final static boolean newClassInheritanceMultiMap = true;
+        public final static boolean smallTagArrays = true;
     }
 
     /**
