@@ -25,8 +25,8 @@
  import java.util.stream.Stream;
  import javax.annotation.Nullable;
 +
-+import collections.HashedReferenceList;
-+import collections.TileEntityList;
++import me.jellysquid.mods.lithium.common.util.collections.HashedReferenceList;
++import me.jellysquid.mods.lithium.common.util.collections.TileEntityList;
  import net.minecraft.block.Block;
  import net.minecraft.block.material.Material;
  import net.minecraft.block.state.IBlockState;

@@ -1,4 +1,4 @@
-package collections;
+package me.jellysquid.mods.lithium.common.util.collections;
 
 import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
