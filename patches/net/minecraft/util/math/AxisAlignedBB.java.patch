@@ -1,0 +1,54 @@
+--- a/net/minecraft/util/math/AxisAlignedBB.java
++++ b/net/minecraft/util/math/AxisAlignedBB.java
+@@ -14,6 +14,14 @@
+     public final double maxY;
+     public final double maxZ;
+ 
++    // Lithium math.fast_util
++    static {
++        assert EnumFacing.Axis.X.ordinal() == 0;
++        assert EnumFacing.Axis.Y.ordinal() == 1;
++        assert EnumFacing.Axis.Z.ordinal() == 2;
++        assert EnumFacing.Axis.values().length == 3;
++    }
++
+     public AxisAlignedBB(double x1, double y1, double z1, double x2, double y2, double z2)
+     {
+         this.minX = Math.min(x1, x2);
+@@ -42,12 +50,34 @@
+ 
+     public double getMin(EnumFacing.Axis axis)
+     {
+-        return axis.getCoordinate(this.minX, this.minY, this.minZ);
++        // Lithium math.fast_util
++        // return axis.getCoordinate(this.minX, this.minY, this.minZ);
++        switch (axis.ordinal()) {
++            case 0: //X
++                return this.minX;
++            case 1: //Y
++                return this.minY;
++            case 2: //Z
++                return this.minZ;
++        }
++
++        throw new IllegalArgumentException();
+     }
+ 
+     public double getMax(EnumFacing.Axis axis)
+     {
+-        return axis.getCoordinate(this.maxX, this.maxY, this.maxZ);
++        // Lithium math.fast_util
++        // return axis.getCoordinate(this.maxX, this.maxY, this.maxZ);
++        switch (axis.ordinal()) {
++            case 0: //X
++                return this.maxX;
++            case 1: //Y
++                return this.maxY;
++            case 2: //Z
++                return this.maxZ;
++        }
++
++        throw new IllegalArgumentException();
+     }
+ 
+     public boolean equals(Object p_equals_1_)

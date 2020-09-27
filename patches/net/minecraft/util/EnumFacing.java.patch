@@ -39,7 +39,29 @@
          EnumFacing enumfacing = flag ? EAST : WEST;
          EnumFacing enumfacing1 = flag1 ? UP : DOWN;
          EnumFacing enumfacing2 = flag2 ? SOUTH : NORTH;
-@@ -510,4 +527,10 @@
+@@ -123,7 +140,9 @@
+ 
+     public EnumFacing getOpposite()
+     {
+-        return byIndex(this.opposite);
++        // Lithium math.fast_util
++        // return byIndex(this.opposite);
++        return VALUES[this.opposite];
+     }
+ 
+     @OnlyIn(Dist.CLIENT)
+@@ -301,7 +320,9 @@
+ 
+     public static EnumFacing random(Random rand)
+     {
+-        return values()[rand.nextInt(values().length)];
++        // Lithium math.fast_util
++        // return values()[rand.nextInt(values().length)];
++        return VALUES[rand.nextInt(values().length)];
+     }
+ 
+     public static EnumFacing getFacingFromVector(double x, double y, double z)
+@@ -510,4 +531,10 @@
              return Iterators.forArray(this.facingValues);
          }
      }
