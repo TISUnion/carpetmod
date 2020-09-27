@@ -1,0 +1,46 @@
+--- a/net/minecraft/block/BlockPistonExtension.java
++++ b/net/minecraft/block/BlockPistonExtension.java
+@@ -46,6 +46,31 @@
+     protected static final VoxelShape SHORT_EAST_ARM_AABB = Block.makeCuboidShape(0.0D, 6.0D, 6.0D, 12.0D, 10.0D, 10.0D);
+     protected static final VoxelShape SHORT_WEST_ARM_AABB = Block.makeCuboidShape(4.0D, 6.0D, 6.0D, 16.0D, 10.0D, 10.0D);
+ 
++    // Lithium block.piston_shapes
++    private static final VoxelShape[][] outlineShapes;
++    private static final int SHORT_IDX = 0, LONG_IDX = 1;
++    
++    static {
++        outlineShapes = new VoxelShape[6][];
++        outlineShapes[EnumFacing.DOWN.ordinal()] = createShape(PISTON_EXTENSION_DOWN_AABB, SHORT_DOWN_ARM_AABB, DOWN_ARM_AABB);
++        outlineShapes[EnumFacing.UP.ordinal()] = createShape(PISTON_EXTENSION_UP_AABB, SHORT_UP_ARM_AABB, UP_ARM_AABB);
++        outlineShapes[EnumFacing.NORTH.ordinal()] = createShape(PISTON_EXTENSION_NORTH_AABB, SHORT_NORTH_ARM_AABB, NORTH_ARM_AABB);
++        outlineShapes[EnumFacing.SOUTH.ordinal()] = createShape(PISTON_EXTENSION_SOUTH_AABB, SHORT_SOUTH_ARM_AABB, SOUTH_ARM_AABB);
++        outlineShapes[EnumFacing.WEST.ordinal()] = createShape(PISTON_EXTENSION_WEST_AABB, SHORT_WEST_ARM_AABB, WEST_ARM_AABB);
++        outlineShapes[EnumFacing.EAST.ordinal()] = createShape(PISTON_EXTENSION_EAST_AABB, SHORT_EAST_ARM_AABB, EAST_ARM_AABB);
++
++    }
++    
++    private static VoxelShape[] createShape(VoxelShape head, VoxelShape shortArm, VoxelShape arm) {
++        VoxelShape[] shapes = new VoxelShape[2];
++        shapes[SHORT_IDX] = VoxelShapes.or(head, shortArm);
++        shapes[LONG_IDX] = VoxelShapes.or(head, arm);
++
++        return shapes;
++    }
++
++    // Lithium block.piston_shapes ends
++    
+     public BlockPistonExtension(Block.Properties properties)
+     {
+         super(properties);
+@@ -74,7 +99,10 @@
+ 
+     public VoxelShape getShape(IBlockState state, IBlockReader worldIn, BlockPos pos)
+     {
+-        return VoxelShapes.or(this.func_196424_i(state), this.func_196425_x(state));
++        // Lithium block.piston_shapes
++        // return VoxelShapes.or(this.func_196424_i(state), this.func_196425_x(state));
++
++        return outlineShapes[state.get(FACING).ordinal()][state.get(SHORT) ? SHORT_IDX : LONG_IDX];
+     }
+ 
+     private VoxelShape func_196425_x(IBlockState p_196425_1_)
