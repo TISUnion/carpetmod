@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/World.java
 +++ b/net/minecraft/world/World.java
-@@ -1,5 +1,9 @@
+@@ -1,20 +1,23 @@
  package net.minecraft.world;
  
 +import carpet.helpers.TickSpeed;
@@ -10,7 +10,43 @@
  import com.google.common.base.MoreObjects;
  import com.google.common.collect.Lists;
  import it.unimi.dsi.fastutil.longs.LongSet;
-@@ -116,6 +120,13 @@
+ import it.unimi.dsi.fastutil.longs.LongSets;
+-import java.util.Collection;
+-import java.util.Iterator;
+-import java.util.List;
+-import java.util.Random;
+-import java.util.Set;
+-import java.util.UUID;
++
++import java.util.*;
+ import java.util.function.BooleanSupplier;
+ import java.util.function.Function;
+ import java.util.function.Predicate;
+ import java.util.stream.Stream;
+ import javax.annotation.Nullable;
++
++import collections.HashedReferenceList;
++import collections.TileEntityList;
+ import net.minecraft.block.Block;
+ import net.minecraft.block.material.Material;
+ import net.minecraft.block.state.IBlockState;
+@@ -82,9 +85,12 @@
+     private int seaLevel = 63;
+     public final List<Entity> loadedEntityList = Lists.newArrayList();
+     protected final List<Entity> unloadedEntityList = Lists.newArrayList();
+-    public final List<TileEntity> loadedTileEntityList = Lists.newArrayList();
+-    public final List<TileEntity> tickableTileEntities = Lists.newArrayList();
+-    private final List<TileEntity> addedTileEntityList = Lists.newArrayList();
++
++    // Lithium world.block_entity_ticking
++    public final TileEntityList loadedTileEntityList = new TileEntityList(Lists.newArrayList(), false);
++    public final List<TileEntity> tickableTileEntities = new HashedReferenceList<>(Lists.newArrayList());
++    private final TileEntityList addedTileEntityList = new TileEntityList(Lists.newArrayList(), true);
++
+     private final List<TileEntity> tileEntitiesToBeRemoved = Lists.newArrayList();
+     public final List<EntityPlayer> playerEntities = Lists.newArrayList();
+     public final List<Entity> weatherEffects = Lists.newArrayList();
+@@ -116,6 +122,13 @@
      private final WorldBorder worldBorder;
      int[] lightUpdateBlockList = new int['\u8000'];
  
@@ -24,7 +60,7 @@
      protected World(ISaveHandler p_i49813_1_, @Nullable WorldSavedDataStorage p_i49813_2_, WorldInfo p_i49813_3_, Dimension p_i49813_4_, Profiler p_i49813_5_, boolean p_i49813_6_)
      {
          this.saveHandler = p_i49813_1_;
-@@ -125,6 +136,8 @@
+@@ -125,6 +138,8 @@
          this.dimension = p_i49813_4_;
          this.isRemote = p_i49813_6_;
          this.worldBorder = p_i49813_4_.createWorldBorder();
@@ -33,7 +69,7 @@
      }
  
      public Biome getBiome(BlockPos pos)
-@@ -238,7 +251,7 @@
+@@ -238,7 +253,7 @@
          {
              Chunk chunk = this.getChunk(pos);
              Block block = newState.getBlock();
@@ -42,7 +78,7 @@
  
              if (iblockstate == null)
              {
-@@ -262,6 +275,13 @@
+@@ -262,6 +277,13 @@
                          this.markBlockRangeForRenderUpdate(pos, pos);
                      }
  
@@ -56,7 +92,7 @@
                      if ((flags & 2) != 0 && (!this.isRemote || (flags & 4) == 0) && chunk.isPopulated())
                      {
                          this.notifyBlockUpdate(pos, iblockstate, newState, flags);
-@@ -277,7 +297,9 @@
+@@ -277,7 +299,9 @@
                          }
                      }
  
@@ -67,7 +103,7 @@
                      {
                          int i = flags & -2;
                          iblockstate.updateDiagonalNeighbors(this, pos, i);
-@@ -372,7 +394,6 @@
+@@ -372,7 +396,6 @@
              this.eventListeners.get(i).markBlockRangeForRenderUpdate(x1, y1, z1, x2, y2, z2);
          }
      }
@@ -75,7 +111,7 @@
      public void notifyNeighborsOfStateChange(BlockPos pos, Block blockIn)
      {
          this.neighborChanged(pos.west(), blockIn, pos);
-@@ -415,9 +436,12 @@
+@@ -415,9 +438,12 @@
              this.neighborChanged(pos.south(), blockType, pos);
          }
      }
@@ -89,7 +125,7 @@
          if (!this.isRemote)
          {
              IBlockState iblockstate = this.getBlockState(pos);
-@@ -1199,6 +1223,11 @@
+@@ -1199,6 +1225,11 @@
      {
          this.profiler.startSection("entities");
          this.profiler.startSection("global");
@@ -101,7 +137,7 @@
  
          for (int i = 0; i < this.weatherEffects.size(); ++i)
          {
-@@ -1259,6 +1288,7 @@
+@@ -1259,6 +1290,7 @@
          for (int i1 = 0; i1 < this.loadedEntityList.size(); ++i1)
          {
              Entity entity2 = this.loadedEntityList.get(i1);
@@ -109,7 +145,7 @@
              Entity entity3 = entity2.getRidingEntity();
  
              if (entity3 != null)
-@@ -1273,7 +1303,8 @@
+@@ -1273,7 +1305,8 @@
  
              this.profiler.startSection("tick");
  
@@ -119,7 +155,7 @@
              {
                  try
                  {
-@@ -1304,10 +1335,14 @@
+@@ -1304,10 +1337,14 @@
                  this.loadedEntityList.remove(i1--);
                  this.onEntityRemoved(entity2);
              }
@@ -134,7 +170,7 @@
          this.profiler.endStartSection("blockEntities");
  
          if (!this.tileEntitiesToBeRemoved.isEmpty())
-@@ -1319,16 +1354,18 @@
+@@ -1319,16 +1356,18 @@
  
          this.processingLoadedTiles = true;
          Iterator<TileEntity> iterator = this.tickableTileEntities.iterator();
@@ -155,7 +191,7 @@
                  {
                      try
                      {
-@@ -1359,6 +1396,7 @@
+@@ -1359,12 +1398,17 @@
                      this.getChunk(tileentity.getPos()).removeTileEntity(tileentity.getPos());
                  }
              }
@@ -163,7 +199,18 @@
          }
  
          this.processingLoadedTiles = false;
-@@ -1389,6 +1427,7 @@
+         this.profiler.endStartSection("pendingBlockEntities");
+ 
+-        if (!this.addedTileEntityList.isEmpty())
++        // Lithium block_entity_ticking
++        // We do not want the vanilla code for adding pending block entities to be ran. We'll inject later in
++        // postBlockEntityTick to use our optimized implementation.
++        this.postBlockEntityTick$lithium();
++        if (false)
+         {
+             for (int j1 = 0; j1 < this.addedTileEntityList.size(); ++j1)
+             {
+@@ -1389,11 +1433,50 @@
  
              this.addedTileEntityList.clear();
          }
@@ -171,7 +218,50 @@
  
          this.profiler.endSection();
          this.profiler.endSection();
-@@ -1413,7 +1452,7 @@
+     }
+ 
++    private void postBlockEntityTick$lithium() {
++        Profiler profiler = this.profiler;
++        profiler.startSection("pendingBlockEntities$lithium");
++
++        // The usage of a for-index loop is invalid with our optimized implementation, so use an iterator here
++        // The overhead of this is essentially non-zero and doesn't matter in this code.
++        for (TileEntity tileEntity : this.addedTileEntityList) {
++            if (tileEntity.isRemoved()) {
++                continue;
++            }
++
++            // Try-add directly to avoid the double map lookup, helps speed things along
++            if (this.loadedTileEntityList.addIfAbsent(tileEntity)) {
++                //vanilla has an extra updateListeners(...) call on the client here, but the one below should be enough
++                if (tileEntity instanceof ITickable) {
++                    this.tickableTileEntities.add(tileEntity);
++                }
++
++                BlockPos pos = tileEntity.getPos();
++
++                // Use vanilla code instead since seems like 1.13.2 can't do that
++                // // Avoid the double chunk lookup (isLoaded followed by getChunk) by simply inlining getChunk call
++                // // pass this.isClient instead of false, so the updateListeners call is always executed on the client (like vanilla)
++                if (this.isBlockLoaded(pos))
++                {
++                    Chunk chunk = this.getChunk(pos);
++                    IBlockState iblockstate = chunk.getBlockState(pos);
++                    chunk.addTileEntity(pos, tileEntity);
++                    this.notifyBlockUpdate(pos, iblockstate, iblockstate, 3);
++                }
++            }
++        }
++
++        this.addedTileEntityList.clear();
++
++        profiler.endSection();
++    }
++
+     protected void tickPlayers()
+     {
+     }
+@@ -1413,7 +1496,7 @@
              IBlockState iblockstate = this.getBlockState(blockpos);
              this.notifyBlockUpdate(blockpos, iblockstate, iblockstate, 2);
          }
@@ -180,7 +270,7 @@
          return flag;
      }
  
-@@ -1514,7 +1553,8 @@
+@@ -1514,7 +1597,8 @@
                  this.getChunk(entityIn.chunkCoordX, entityIn.chunkCoordZ).removeEntityAtIndex(entityIn, entityIn.chunkCoordY);
              }
  
@@ -190,7 +280,73 @@
              {
                  entityIn.addedToChunk = false;
              }
-@@ -2149,6 +2189,13 @@
+@@ -1834,17 +1918,21 @@
+     @Nullable
+     private TileEntity getPendingTileEntityAt(BlockPos pos)
+     {
+-        for (int i = 0; i < this.addedTileEntityList.size(); ++i)
+-        {
+-            TileEntity tileentity = this.addedTileEntityList.get(i);
++        // Lithium block_entity_ticking
++        // Replace with direct lookup
++        return this.addedTileEntityList.getFirstNonRemovedTileEntityAtPosition(pos.toLong());
+ 
+-            if (!tileentity.isRemoved() && tileentity.getPos().equals(pos))
+-            {
+-                return tileentity;
+-            }
+-        }
+-
+-        return null;
++//        for (int i = 0; i < this.addedTileEntityList.size(); ++i)
++//        {
++//            TileEntity tileentity = this.addedTileEntityList.get(i);
++//
++//            if (!tileentity.isRemoved() && tileentity.getPos().equals(pos))
++//            {
++//                return tileentity;
++//            }
++//        }
++//
++//        return null;
+     }
+ 
+     public void setTileEntity(BlockPos pos, @Nullable TileEntity tileEntityIn)
+@@ -1856,19 +1944,22 @@
+                 if (this.processingLoadedTiles)
+                 {
+                     tileEntityIn.setPos(pos);
+-                    Iterator<TileEntity> iterator = this.addedTileEntityList.iterator();
+ 
+-                    while (iterator.hasNext())
+-                    {
+-                        TileEntity tileentity = iterator.next();
++                    // Lithium block_entity_ticking
++                    this.addedTileEntityList.markRemovedAndRemoveAllAtPosition(pos);
++//                    Iterator<TileEntity> iterator = this.addedTileEntityList.iterator();
++//
++//                    while (iterator.hasNext())
++//                    {
++//                        TileEntity tileentity = iterator.next();
++//
++//                        if (tileentity.getPos().equals(pos))
++//                        {
++//                            tileentity.remove();
++//                            iterator.remove();
++//                        }
++//                    }
+ 
+-                        if (tileentity.getPos().equals(pos))
+-                        {
+-                            tileentity.remove();
+-                            iterator.remove();
+-                        }
+-                    }
+-
+                     this.addedTileEntityList.add(tileEntityIn);
+                 }
+                 else
+@@ -2149,6 +2240,13 @@
  
      public boolean checkLightFor(EnumLightType lightType, BlockPos pos)
      {
@@ -204,7 +360,7 @@
          if (!this.isAreaLoaded(pos, 17, false))
          {
              return false;
-@@ -3204,4 +3251,17 @@
+@@ -3204,4 +3302,17 @@
      public abstract RecipeManager getRecipeManager();
  
      public abstract NetworkTagManager getTags();
