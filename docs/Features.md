@@ -411,7 +411,10 @@ Fixes for original CarpetMod
 
 Ports part of implementations of [Lithium mod](https://github.com/jellysquid3/lithium-fabric):
 
+- alloc.entity_tracker
+- alloc.enum_values
 - block.piston_shapes
+- cached_hashcode
 - math.fast_util
 - shapes.precompute_shape_arrays
 - shapes.shape_merging

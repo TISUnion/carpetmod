@@ -409,7 +409,10 @@ Categories: creative
 
 迁移了部分的 [Lithium mod](https://github.com/jellysquid3/lithium-fabric) 的实现：
 
+- alloc.entity_tracker
+- alloc.enum_values
 - block.piston_shapes
+- cached_hashcode
 - math.fast_util
 - shapes.precompute_shape_arrays
 - shapes.shape_merging
