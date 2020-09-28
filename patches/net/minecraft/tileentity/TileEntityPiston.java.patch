@@ -1,9 +1,10 @@
 --- a/net/minecraft/tileentity/TileEntityPiston.java
 +++ b/net/minecraft/tileentity/TileEntityPiston.java
-@@ -1,9 +1,12 @@
+@@ -1,9 +1,13 @@
  package net.minecraft.tileentity;
  
  import java.util.List;
++import java.util.Optional;
 +
 +import carpet.settings.CarpetSettings;
  import net.minecraft.block.Block;
@@ -13,7 +14,7 @@
  import net.minecraft.block.material.EnumPushReaction;
  import net.minecraft.block.state.IBlockState;
  import net.minecraft.entity.Entity;
-@@ -29,6 +32,8 @@
+@@ -29,6 +33,8 @@
      private EnumFacing pistonFacing;
      private boolean extending;
      private boolean shouldHeadBeRendered;
@@ -22,7 +23,52 @@
      private static final ThreadLocal<EnumFacing> MOVING_ENTITY = new ThreadLocal<EnumFacing>()
      {
          protected EnumFacing initialValue()
-@@ -178,6 +183,13 @@
+@@ -40,6 +46,9 @@
+     private float lastProgress;
+     private long lastTicked;
+ 
++    // Cache BoundingBoxList creation
++    private Optional<List<AxisAlignedBB>> voxelShapeBoundingBoxList;
++
+     public TileEntityPiston()
+     {
+         super(TileEntityType.PISTON);
+@@ -52,6 +61,9 @@
+         this.pistonFacing = pistonFacingIn;
+         this.extending = extendingIn;
+         this.shouldHeadBeRendered = shouldHeadBeRenderedIn;
++
++        // Cache BoundingBoxList creation
++        this.createVoxelShapeBoundingBoxListCache();
+     }
+ 
+     public NBTTagCompound getUpdateTag()
+@@ -112,15 +124,21 @@
+         return !this.isExtending() && this.shouldPistonHeadBeRendered() ? Blocks.PISTON_HEAD.getDefaultState().with(BlockPistonExtension.TYPE, this.pistonState.getBlock() == Blocks.STICKY_PISTON ? PistonType.STICKY : PistonType.DEFAULT).with(BlockPistonExtension.FACING, this.pistonState.get(BlockPistonBase.FACING)) : this.pistonState;
+     }
+ 
++    private void createVoxelShapeBoundingBoxListCache()
++    {
++        VoxelShape voxelshape = this.getCollisionRelatedBlockState().getCollisionShape(this.world, this.getPos());
++        this.voxelShapeBoundingBoxList = !voxelshape.isEmpty() ? Optional.of(voxelshape.toBoundingBoxList()) : Optional.empty();
++    }
++
+     private void moveCollidedEntities(float p_184322_1_)
+     {
+         EnumFacing enumfacing = this.getMotionDirection();
+         double d0 = (double)(p_184322_1_ - this.progress);
+-        VoxelShape voxelshape = this.getCollisionRelatedBlockState().getCollisionShape(this.world, this.getPos());
+ 
+-        if (!voxelshape.isEmpty())
++        // Cache BoundingBoxList creation
++        if (this.voxelShapeBoundingBoxList.isPresent())
+         {
+-            List<AxisAlignedBB> list = voxelshape.toBoundingBoxList();
++            List<AxisAlignedBB> list = this.voxelShapeBoundingBoxList.get();
+             AxisAlignedBB axisalignedbb = this.moveByPositionAndProgress(this.getMinMaxPiecesAABB(list));
+             List<Entity> list1 = this.world.getEntitiesWithinAABBExcludingEntity((Entity)null, this.getMovementArea(axisalignedbb, enumfacing, d0).union(axisalignedbb));
+ 
+@@ -178,6 +196,13 @@
                              {
                                  this.fixEntityWithinPistonBase(entity, enumfacing, d0);
                              }
@@ -36,7 +82,7 @@
                          }
                      }
                  }
-@@ -318,10 +330,26 @@
+@@ -318,10 +343,26 @@
                  {
                      iblockstate = Block.getValidBlockForPosition(this.pistonState, this.world, this.pos);
                  }
@@ -66,7 +112,7 @@
          }
      }
  
-@@ -351,8 +379,15 @@
+@@ -351,8 +392,15 @@
                          iblockstate = iblockstate.with(BlockStateProperties.WATERLOGGED, Boolean.valueOf(false));
                      }
  
@@ -84,7 +130,7 @@
                  }
              }
          }
-@@ -378,6 +413,15 @@
+@@ -378,6 +426,18 @@
          this.lastProgress = this.progress;
          this.extending = compound.getBoolean("extending");
          this.shouldHeadBeRendered = compound.getBoolean("source");
@@ -97,10 +143,13 @@
 +            if(carriedTileEntity != null) // Can actually be null, as BlockPistonMoving.createNewTileEntity(...) returns null
 +                this.carriedTileEntity.read(compound.getCompound("carriedTileEntityCM"));
 +        }
++
++        // Cache BoundingBoxList creation
++        this.createVoxelShapeBoundingBoxListCache();
      }
  
      public NBTTagCompound write(NBTTagCompound compound)
-@@ -388,6 +432,13 @@
+@@ -388,6 +448,13 @@
          compound.putFloat("progress", this.lastProgress);
          compound.putBoolean("extending", this.extending);
          compound.putBoolean("source", this.shouldHeadBeRendered);
@@ -114,7 +163,7 @@
          return compound;
      }
  
-@@ -435,4 +486,37 @@
+@@ -435,4 +502,37 @@
      {
          return this.lastTicked;
      }

@@ -121,3 +121,17 @@
          if (destination instanceof ISidedInventory && direction != null)
          {
              ISidedInventory isidedinventory = (ISidedInventory)destination;
+@@ -504,9 +583,12 @@
+         return getInventoryAtPosition(hopper.getWorld(), hopper.getXPos(), hopper.getYPos() + 1.0D, hopper.getZPos());
+     }
+ 
++    // Cache BoundingBoxList creation
++    private static final List<AxisAlignedBB> HOPPER_COLLECTION_BOX = IHopper.COLLECTION_AREA_SHAPE.toBoundingBoxList();
++
+     public static List<EntityItem> getCaptureItems(IHopper p_200115_0_)
+     {
+-        return p_200115_0_.getCollectionArea().toBoundingBoxList().stream().flatMap((p_200110_1_) ->
++        return HOPPER_COLLECTION_BOX.stream().flatMap((p_200110_1_) ->
+         {
+             return p_200115_0_.getWorld().getEntitiesWithinAABB(EntityItem.class, p_200110_1_.offset(p_200115_0_.getXPos() - 0.5D, p_200115_0_.getYPos() - 0.5D, p_200115_0_.getZPos() - 0.5D), EntitySelectors.IS_ALIVE).stream();
+         }).collect(Collectors.toList());
