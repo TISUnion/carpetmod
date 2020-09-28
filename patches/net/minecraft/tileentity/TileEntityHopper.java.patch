@@ -21,33 +21,37 @@
  import net.minecraft.item.ItemStack;
  import net.minecraft.nbt.NBTTagCompound;
  import net.minecraft.util.EntitySelectors;
-@@ -150,6 +157,25 @@
+@@ -150,6 +157,29 @@
  
                  if (flag)
                  {
 +                    if (CarpetSettings.hopperCounters && CarpetSettings.hopperCountersUnlimitedSpeed)  // TISCM hopperCountersUnlimitedSpeed
 +                    {
-+                        for (int i = 0; i < Short.MAX_VALUE; i++)
++                        EnumDyeColor wool_color = WoolTool.getWoolColorAtPosition(world, new BlockPos(this.getXPos(), this.getYPos(), this.getZPos()).offset(this.getBlockState().get(BlockHopper.FACING)));
++                        if (wool_color != null)
 +                        {
-+                            boolean working = false;
-+                            if (!this.isInventoryEmpty())
++                            for (int i = 0; i < Short.MAX_VALUE; i++)
 +                            {
-+                                working = this.transferItemsOut();
-+                            }
-+                            if (!this.isFull())
-+                            {
-+                                working |= p_200109_1_.get();
-+                            }
-+                            if (!working)
-+                            {
-+                                break;
++                                boolean working = false;
++                                if (!this.isInventoryEmpty())
++                                {
++                                    working = this.transferItemsOut();
++                                }
++                                if (!this.isFull())
++                                {
++                                    working |= p_200109_1_.get();
++                                }
++                                if (!working)
++                                {
++                                    break;
++                                }
 +                            }
 +                        }
 +                    }
                      this.setTransferCooldown(8);
                      this.markDirty();
                      return true;
-@@ -197,6 +223,29 @@
+@@ -197,6 +227,29 @@
  
      private boolean transferItemsOut()
      {
@@ -77,7 +81,7 @@
          IInventory iinventory = this.getInventoryForHopperTransfer();
  
          if (iinventory == null)
-@@ -377,6 +426,10 @@
+@@ -377,6 +430,10 @@
  
      public static boolean captureItem(IInventory p_200114_0_, EntityItem p_200114_1_)
      {
@@ -88,7 +92,7 @@
          boolean flag = false;
          ItemStack itemstack = p_200114_1_.getItem().copy();
          ItemStack itemstack1 = putStackInInventoryAllSlots((IInventory)null, p_200114_0_, itemstack, (EnumFacing)null);
-@@ -396,6 +449,28 @@
+@@ -396,6 +453,28 @@
  
      public static ItemStack putStackInInventoryAllSlots(@Nullable IInventory source, IInventory destination, ItemStack stack, @Nullable EnumFacing direction)
      {
