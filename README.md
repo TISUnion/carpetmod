@@ -6,6 +6,8 @@
 
 A fork of [gnembon's original CarpetMod for 1.13.2](https://github.com/gnembon/carpetmod). Thanks for gnembon's great tool allowing us to deal with bad performance of 1.13+.
 
+Thanks to [Lithium mod](https://github.com/jellysquid3/lithium-fabric) for some of the optimizations
+
 ## How to use:
 ------
 

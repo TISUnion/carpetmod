@@ -6,6 +6,8 @@
 
 [gnembon的1.13.2 CarpetMod](https://github.com/gnembon/carpetmod) 的分支，感谢gnembon写出了这么优秀的工具让我们能应付1.13+的菜鸡性能
 
+感谢 [Lithium mod](https://github.com/jellysquid3/lithium-fabric) 提供的一些优化
+
 ## 开始使用:
 
 ------
