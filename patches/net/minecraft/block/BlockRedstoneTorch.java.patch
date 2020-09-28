@@ -1,0 +1,20 @@
+--- a/net/minecraft/block/BlockRedstoneTorch.java
++++ b/net/minecraft/block/BlockRedstoneTorch.java
+@@ -40,7 +40,7 @@
+ 
+     public void onBlockAdded(IBlockState state, World worldIn, BlockPos pos, IBlockState oldState)
+     {
+-        for (EnumFacing enumfacing : EnumFacing.values())
++        for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+         {
+             worldIn.notifyNeighborsOfStateChange(pos.offset(enumfacing), this);
+         }
+@@ -50,7 +50,7 @@
+     {
+         if (!isMoving)
+         {
+-            for (EnumFacing enumfacing : EnumFacing.values())
++            for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+             {
+                 worldIn.notifyNeighborsOfStateChange(pos.offset(enumfacing), this);
+             }

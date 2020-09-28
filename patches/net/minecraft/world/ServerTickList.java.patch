@@ -1,14 +1,6 @@
 --- a/net/minecraft/world/ServerTickList.java
 +++ b/net/minecraft/world/ServerTickList.java
-@@ -1,5 +1,7 @@
- package net.minecraft.world;
- 
-+import carpet.logging.LoggerRegistry;
-+import carpet.logging.logHelpers.TileTickListLogHelper;
- import com.google.common.collect.Lists;
- import com.google.common.collect.Sets;
- import java.util.Collections;
-@@ -23,8 +25,7 @@
+@@ -23,8 +23,7 @@
  import net.minecraft.util.math.MutableBoundingBox;
  import net.minecraft.world.chunk.Chunk;
  
@@ -18,7 +10,7 @@
      protected final Predicate<T> filter;
      protected final Function<T, ResourceLocation> serializer;
      protected final Function<ResourceLocation, T> deserializer;
-@@ -34,8 +35,8 @@
+@@ -34,8 +33,8 @@
      private final List<NextTickListEntry<T>> pendingTickListEntriesThisTick = Lists.newArrayList();
      private final Consumer<NextTickListEntry<T>> tickFunction;
  
@@ -29,24 +21,17 @@
          this.filter = filter;
          this.serializer = serializerIn;
          this.deserializer = deserializerIn;
-@@ -43,29 +44,30 @@
+@@ -43,29 +42,22 @@
          this.tickFunction = tickFunctionIn;
      }
  
 -    public void tick()
 -    {
--        int i = this.pendingTickListEntriesTreeSet.size();
 +    public void tick() {
-+        // TISCM TileTick logger
-+        int TileTicklogger_listSize = 0;
-+        int TileTicklogger_dealt = 0;
-+        int TileTicklogger_ticked = 0;
-+        int TileTicklogger_skipped = 0;
-+        // end TISCM TileTick logger
- 
+         int i = this.pendingTickListEntriesTreeSet.size();
+-
 -        if (i != this.pendingTickListEntriesHashSet.size())
 -        {
-+        int i = this.pendingTickListEntriesTreeSet.size();
 +        if (i != this.pendingTickListEntriesHashSet.size()) {
              throw new IllegalStateException("TickNextTick list out of synch");
 -        }
@@ -55,7 +40,6 @@
 -            if (i > 65536)
 -            {
 +        } else {
-+            TileTicklogger_listSize = i; // TISCM TileTick logger
 +
 +            if (i > 65536) {
                  i = 65536;
@@ -74,7 +58,7 @@
                      break;
                  }
  
-@@ -76,46 +78,50 @@
+@@ -76,30 +68,25 @@
  
              this.world.profiler.endSection();
              this.world.profiler.startSection("ticking");
@@ -82,7 +66,6 @@
  
 -            while (iterator.hasNext())
 -            {
-+            TileTicklogger_dealt = this.pendingTickListEntriesThisTick.size(); // TISCM TileTick logger
 +            Iterator<NextTickListEntry<T>> iterator = this.pendingTickListEntriesThisTick.iterator();
 +            while (iterator.hasNext()) {
                  NextTickListEntry<T> nextticklistentry1 = iterator.next();
@@ -100,7 +83,6 @@
 -                    }
 -                    catch (Throwable throwable)
 -                    {
-+                        TileTicklogger_ticked++; // TISCM TileTick logger
 +                    } catch (Throwable throwable) {
                          CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Exception while ticking");
                          CrashReportCategory crashreportcategory = crashreport.makeCategory("Block being ticked");
@@ -114,20 +96,9 @@
 -                {
 +                } else {
                      this.scheduleTick(nextticklistentry1.position, nextticklistentry1.getTarget(), 0);
-+                    TileTicklogger_skipped++; // TISCM TileTick logger
                  }
              }
- 
-             this.world.profiler.endSection();
-             this.pendingTickListEntriesThisTick.clear();
-+
-+            // TISCM TileTick logger
-+            if (LoggerRegistry.__tileticklist)
-+            {
-+                TileTickListLogHelper.onTileTicked(this.world.getGameTime(),
-+                        TileTicklogger_listSize, TileTicklogger_dealt, TileTicklogger_ticked, TileTicklogger_skipped);
-+            }
-+            // end TISCM TileTick logger
+@@ -109,13 +96,11 @@
          }
      }
  
@@ -143,7 +114,7 @@
          ChunkPos chunkpos = p_205364_1_.getPos();
          int i = (chunkpos.x << 4) - 2;
          int j = i + 16 + 2;
-@@ -124,42 +130,33 @@
+@@ -124,42 +109,33 @@
          return this.getPending(new MutableBoundingBox(i, 0, k, j, 256, l), remove);
      }
  
@@ -196,7 +167,7 @@
                          list = Lists.newArrayList();
                      }
  
-@@ -171,83 +168,73 @@
+@@ -171,83 +147,73 @@
          return list == null ? Collections.emptyList() : list;
      }
  

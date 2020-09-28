@@ -8,7 +8,17 @@
  import com.google.common.collect.Iterators;
  import java.util.Arrays;
  import java.util.Comparator;
-@@ -63,7 +65,17 @@
+@@ -49,6 +51,9 @@
+         return new EnumFacing[p_199791_0_];
+     });
+ 
++    // Lithium alloc.enum_values extended range
++    public static final EnumFacing[] ENUM_FACING_VALUES = EnumFacing.values();
++
+     private EnumFacing(int indexIn, int oppositeIn, int horizontalIndexIn, String nameIn, EnumFacing.AxisDirection axisDirectionIn, EnumFacing.Axis axisIn, Vec3i directionVecIn)
+     {
+         this.index = indexIn;
+@@ -63,7 +68,17 @@
      public static EnumFacing[] getFacingDirections(Entity entityIn)
      {
          float f = entityIn.getPitch(1.0F) * ((float)Math.PI / 180F);
@@ -27,7 +37,7 @@
          float f2 = MathHelper.sin(f);
          float f3 = MathHelper.cos(f);
          float f4 = MathHelper.sin(f1);
-@@ -76,6 +88,11 @@
+@@ -76,6 +91,11 @@
          float f8 = flag2 ? f5 : -f5;
          float f9 = f6 * f3;
          float f10 = f8 * f3;
@@ -39,7 +49,29 @@
          EnumFacing enumfacing = flag ? EAST : WEST;
          EnumFacing enumfacing1 = flag1 ? UP : DOWN;
          EnumFacing enumfacing2 = flag2 ? SOUTH : NORTH;
-@@ -510,4 +527,10 @@
+@@ -123,7 +143,9 @@
+ 
+     public EnumFacing getOpposite()
+     {
+-        return byIndex(this.opposite);
++        // Lithium math.fast_util
++        // return byIndex(this.opposite);
++        return VALUES[this.opposite];
+     }
+ 
+     @OnlyIn(Dist.CLIENT)
+@@ -301,7 +323,9 @@
+ 
+     public static EnumFacing random(Random rand)
+     {
+-        return values()[rand.nextInt(values().length)];
++        // Lithium math.fast_util
++        // return values()[rand.nextInt(values().length)];
++        return VALUES[rand.nextInt(values().length)];
+     }
+ 
+     public static EnumFacing getFacingFromVector(double x, double y, double z)
+@@ -510,4 +534,10 @@
              return Iterators.forArray(this.facingValues);
          }
      }

@@ -1,0 +1,20 @@
+--- a/net/minecraft/client/renderer/chunk/RenderChunkCache.java
++++ b/net/minecraft/client/renderer/chunk/RenderChunkCache.java
+@@ -165,7 +165,7 @@
+         {
+             int i = 0;
+ 
+-            for (EnumFacing enumfacing : EnumFacing.values())
++            for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+             {
+                 int j = this.getLightSubtracted(pos.offset(enumfacing), amount);
+ 
+@@ -347,7 +347,7 @@
+                 {
+                     int l = 0;
+ 
+-                    for (EnumFacing enumfacing : EnumFacing.values())
++                    for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+                     {
+                         int k = RenderChunkCache.this.getLightFor(lightType, pos.offset(enumfacing));
+ 

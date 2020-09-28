@@ -1,0 +1,11 @@
+--- a/net/minecraft/fluid/LavaFluid.java
++++ b/net/minecraft/fluid/LavaFluid.java
+@@ -127,7 +127,7 @@
+ 
+     private boolean isSurroundingBlockFlammable(IWorldReaderBase worldIn, BlockPos pos)
+     {
+-        for (EnumFacing enumfacing : EnumFacing.values())
++        for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+         {
+             if (this.getCanBlockBurn(worldIn, pos.offset(enumfacing)))
+             {

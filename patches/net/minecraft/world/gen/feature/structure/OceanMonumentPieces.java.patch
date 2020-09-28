@@ -1,0 +1,11 @@
+--- a/net/minecraft/world/gen/feature/structure/OceanMonumentPieces.java
++++ b/net/minecraft/world/gen/feature/structure/OceanMonumentPieces.java
+@@ -809,7 +809,7 @@
+ 
+                             if (aoceanmonumentpieces$roomdefinition[l4] != null)
+                             {
+-                                for (EnumFacing enumfacing : EnumFacing.values())
++                                for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+                                 {
+                                     int i1 = k2 + enumfacing.getXOffset();
+                                     int j1 = i4 + enumfacing.getYOffset();

@@ -1,0 +1,11 @@
+--- a/net/minecraft/block/BlockCoralPlantBase.java
++++ b/net/minecraft/block/BlockCoralPlantBase.java
+@@ -48,7 +48,7 @@
+         }
+         else
+         {
+-            for (EnumFacing enumfacing : EnumFacing.values())
++            for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+             {
+                 if (worldIn.getFluidState(pos.offset(enumfacing)).isTagged(FluidTags.WATER))
+                 {

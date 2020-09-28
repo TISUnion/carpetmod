@@ -7,9 +7,37 @@
  import it.unimi.dsi.fastutil.doubles.DoubleList;
  import net.minecraft.util.EnumFacing;
  
-@@ -21,4 +22,14 @@
+@@ -9,16 +10,41 @@
+     private final int y;
+     private final int z;
+ 
++    // Lithium shapes.precompute_shape_arrays
++    private static final EnumFacing.Axis[] AXIS = EnumFacing.Axis.values();
++    private final DoubleList[] list;
++
++
+     public VoxelShapeInt(VoxelShapePart p_i47679_1_, int x, int y, int z)
      {
-         return new IntRangeList(this.part.getSize(axis), axis.getCoordinate(this.x, this.y, this.z));
+         super(p_i47679_1_);
+         this.x = x;
+         this.y = y;
+         this.z = z;
++
++        // Lithium shapes.precompute_shape_arrays
++        this.list = new DoubleList[AXIS.length];
++
++        for (EnumFacing.Axis axis : AXIS) {
++            this.list[axis.ordinal()] = new IntRangeList(this.part.getSize(axis), axis.getCoordinate(this.x, this.y, this.z));
++        }
+     }
+ 
+     protected DoubleList getValues(EnumFacing.Axis axis)
+     {
+-        return new IntRangeList(this.part.getSize(axis), axis.getCoordinate(this.x, this.y, this.z));
++        // return new IntRangeList(this.part.getSize(axis), axis.getCoordinate(this.x, this.y, this.z));
++
++        // Lithium shapes.precompute_shape_arrays
++        return this.list[axis.ordinal()];
      }
 +    
 +    // [CM] start

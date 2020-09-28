@@ -1,0 +1,11 @@
+--- a/net/minecraft/pathfinding/WalkAndSwimNodeProcessor.java
++++ b/net/minecraft/pathfinding/WalkAndSwimNodeProcessor.java
+@@ -294,7 +294,7 @@
+ 
+         if (pathnodetype == PathNodeType.WATER)
+         {
+-            for (EnumFacing enumfacing : EnumFacing.values())
++            for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+             {
+                 PathNodeType pathnodetype2 = this.getPathNodeTypeRaw(blockaccessIn, x + enumfacing.getXOffset(), y + enumfacing.getYOffset(), z + enumfacing.getZOffset());
+ 

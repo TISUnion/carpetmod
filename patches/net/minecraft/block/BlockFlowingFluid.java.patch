@@ -1,0 +1,11 @@
+--- a/net/minecraft/block/BlockFlowingFluid.java
++++ b/net/minecraft/block/BlockFlowingFluid.java
+@@ -152,7 +152,7 @@
+         {
+             boolean flag = false;
+ 
+-            for (EnumFacing enumfacing : EnumFacing.values())
++            for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+             {
+                 if (enumfacing != EnumFacing.DOWN && worldIn.getFluidState(pos.offset(enumfacing)).isTagged(FluidTags.WATER))
+                 {

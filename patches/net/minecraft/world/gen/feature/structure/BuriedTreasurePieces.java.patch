@@ -18,3 +18,12 @@
                  BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos(this.boundingBox.minX, i, this.boundingBox.minZ);
  
                  while (blockpos$mutableblockpos.getY() > 0)
+@@ -54,7 +56,7 @@
+                     {
+                         IBlockState iblockstate2 = !iblockstate.isAir() && !this.func_204295_a(iblockstate) ? iblockstate : Blocks.SAND.getDefaultState();
+ 
+-                        for (EnumFacing enumfacing : EnumFacing.values())
++                        for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+                         {
+                             BlockPos blockpos = blockpos$mutableblockpos.offset(enumfacing);
+                             IBlockState iblockstate3 = worldIn.getBlockState(blockpos);

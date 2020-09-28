@@ -1,0 +1,11 @@
+--- a/net/minecraft/world/lighting/BaseLightEngine.java
++++ b/net/minecraft/world/lighting/BaseLightEngine.java
+@@ -75,7 +75,7 @@
+     private EnumFacing unpackFace(int p_202661_1_)
+     {
+         int i = p_202661_1_ >> 24 & 7;
+-        return i == 7 ? null : EnumFacing.values()[p_202661_1_ >> 24 & 7];
++        return i == 7 ? null : EnumFacing.ENUM_FACING_VALUES[p_202661_1_ >> 24 & 7];
+     }
+ 
+     protected void flushQueue(IWorld worldIn, ChunkPos cPos)

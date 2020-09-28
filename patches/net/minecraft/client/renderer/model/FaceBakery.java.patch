@@ -1,0 +1,38 @@
+--- a/net/minecraft/client/renderer/model/FaceBakery.java
++++ b/net/minecraft/client/renderer/model/FaceBakery.java
+@@ -17,7 +17,7 @@
+ {
+     private static final float SCALE_ROTATION_22_5 = 1.0F / (float)Math.cos((double)((float)Math.PI / 8F)) - 1.0F;
+     private static final float SCALE_ROTATION_GENERAL = 1.0F / (float)Math.cos((double)((float)Math.PI / 4F)) - 1.0F;
+-    private static final FaceBakery.Rotation[] UV_ROTATIONS = new FaceBakery.Rotation[ModelRotation.values().length * EnumFacing.values().length];
++    private static final FaceBakery.Rotation[] UV_ROTATIONS = new FaceBakery.Rotation[ModelRotation.values().length * EnumFacing.ENUM_FACING_VALUES.length];
+     private static final FaceBakery.Rotation UV_ROTATION_0 = new FaceBakery.Rotation()
+     {
+         BlockFaceUV makeRotatedUV(float u1, float v1, float u2, float v2)
+@@ -112,7 +112,7 @@
+ 
+     private float[] getPositionsDiv16(Vector3f pos1, Vector3f pos2)
+     {
+-        float[] afloat = new float[EnumFacing.values().length];
++        float[] afloat = new float[EnumFacing.ENUM_FACING_VALUES.length];
+         afloat[EnumFaceDirection.Constants.WEST_INDEX] = pos1.getX() / 16.0F;
+         afloat[EnumFaceDirection.Constants.DOWN_INDEX] = pos1.getY() / 16.0F;
+         afloat[EnumFaceDirection.Constants.NORTH_INDEX] = pos1.getZ() / 16.0F;
+@@ -229,7 +229,7 @@
+         EnumFacing enumfacing = null;
+         float f = 0.0F;
+ 
+-        for (EnumFacing enumfacing1 : EnumFacing.values())
++        for (EnumFacing enumfacing1 : EnumFacing.ENUM_FACING_VALUES)
+         {
+             Vec3i vec3i = enumfacing1.getDirectionVec();
+             Vector3f vector3f6 = new Vector3f((float)vec3i.getX(), (float)vec3i.getY(), (float)vec3i.getZ());
+@@ -256,7 +256,7 @@
+     {
+         int[] aint = new int[p_178408_1_.length];
+         System.arraycopy(p_178408_1_, 0, aint, 0, p_178408_1_.length);
+-        float[] afloat = new float[EnumFacing.values().length];
++        float[] afloat = new float[EnumFacing.ENUM_FACING_VALUES.length];
+         afloat[EnumFaceDirection.Constants.WEST_INDEX] = 999.0F;
+         afloat[EnumFaceDirection.Constants.DOWN_INDEX] = 999.0F;
+         afloat[EnumFaceDirection.Constants.NORTH_INDEX] = 999.0F;

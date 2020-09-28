@@ -31,7 +31,6 @@ public class LoggerRegistry
     public static boolean __chunkdebug;
     public static boolean __villagecount;
     public static boolean __memory;
-    public static boolean __tileticklist;
     public static boolean __autosave;
 
     public static void initLoggers()
@@ -57,9 +56,6 @@ public class LoggerRegistry
 
         //TISCM: add memory
         registerLogger("memory", new HUDLogger("memory", null, null));
-
-        //TISCM: add tile tick list
-        registerLogger("tileticklist", new Logger("tileticklist", null, null));
 
         //TISCM: add Autosave
         registerLogger("autosave", new HUDLogger("autosave", null, null));

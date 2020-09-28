@@ -1,0 +1,20 @@
+--- a/net/minecraft/block/BlockFrostedIce.java
++++ b/net/minecraft/block/BlockFrostedIce.java
+@@ -28,7 +28,7 @@
+         {
+             try (BlockPos.PooledMutableBlockPos blockpos$pooledmutableblockpos = BlockPos.PooledMutableBlockPos.retain())
+             {
+-                for (EnumFacing enumfacing : EnumFacing.values())
++                for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+                 {
+                     blockpos$pooledmutableblockpos.setPos(pos).move(enumfacing);
+                     IBlockState iblockstate = worldIn.getBlockState(blockpos$pooledmutableblockpos);
+@@ -78,7 +78,7 @@
+ 
+         try (BlockPos.PooledMutableBlockPos blockpos$pooledmutableblockpos = BlockPos.PooledMutableBlockPos.retain())
+         {
+-            for (EnumFacing enumfacing : EnumFacing.values())
++            for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+             {
+                 blockpos$pooledmutableblockpos.setPos(pos).move(enumfacing);
+ 

@@ -151,12 +151,21 @@
 -                this.blocksNeedingUpdate.add(p_212568_2_.offset(enumfacing1));
 +                this.blocksNeedingUpdate.add(p_212568_2_);
 +
-+                for (EnumFacing enumfacing1 : EnumFacing.values()) {
++                for (EnumFacing enumfacing1 : EnumFacing.ENUM_FACING_VALUES) {
 +                    this.blocksNeedingUpdate.add(p_212568_2_.offset(enumfacing1));
 +                }
              }
          }
  
+@@ -275,7 +295,7 @@
+         {
+             worldIn.notifyNeighborsOfStateChange(pos, this);
+ 
+-            for (EnumFacing enumfacing : EnumFacing.values())
++            for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+             {
+                 worldIn.notifyNeighborsOfStateChange(pos.offset(enumfacing), this);
+             }
 @@ -286,7 +306,8 @@
      {
          if (oldState.getBlock() != state.getBlock() && !worldIn.isRemote)
@@ -167,7 +176,13 @@
  
              for (EnumFacing enumfacing : EnumFacing.Plane.VERTICAL)
              {
-@@ -327,7 +348,8 @@
+@@ -322,12 +343,13 @@
+ 
+             if (!worldIn.isRemote)
+             {
+-                for (EnumFacing enumfacing : EnumFacing.values())
++                for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+                 {
                      worldIn.notifyNeighborsOfStateChange(pos.offset(enumfacing), this);
                  }
  

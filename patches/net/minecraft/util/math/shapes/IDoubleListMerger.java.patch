@@ -1,0 +1,12 @@
+--- a/net/minecraft/util/math/shapes/IDoubleListMerger.java
++++ b/net/minecraft/util/math/shapes/IDoubleListMerger.java
+@@ -2,7 +2,8 @@
+ 
+ import it.unimi.dsi.fastutil.doubles.DoubleList;
+ 
+-interface IDoubleListMerger
++// Lithium shapes.shape_merging make public
++public interface IDoubleListMerger
+ {
+     DoubleList func_212435_a();
+ 
