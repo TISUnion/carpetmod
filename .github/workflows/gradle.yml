@@ -3,11 +3,7 @@
 
 name: Java CI with Gradle
 
-on:
-  push:
-    branches: [ TIS-Server ]
-  pull_request:
-    branches: [ TIS-Server ]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -26,3 +22,7 @@ jobs:
       run: ./gradlew setup
     - name: Create Release
       run: ./gradlew createRelease
+    - uses: actions/upload-artifact@v2
+      with:
+        name: distributions 
+        path: build/distributions/*
