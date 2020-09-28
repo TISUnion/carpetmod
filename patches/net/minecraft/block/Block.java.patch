@@ -13,3 +13,32 @@
      }
  
      @Deprecated
+@@ -1764,11 +1768,17 @@
+             private final IBlockState adjacentState;
+             private final EnumFacing side;
+ 
++            // Lithium cached_hashcode
++            private final int hash;
++
+             public RenderSideCacheKey(IBlockState state, IBlockState adjacentState, EnumFacing side)
+             {
+                 this.state = state;
+                 this.adjacentState = adjacentState;
+                 this.side = side;
++
++                // Lithium cached_hashcode
++                this.hash = Objects.hash(this.state, this.adjacentState, this.side);
+             }
+ 
+             public boolean equals(Object p_equals_1_)
+@@ -1790,7 +1800,9 @@
+ 
+             public int hashCode()
+             {
+-                return Objects.hash(this.state, this.adjacentState, this.side);
++                // Lithium cached_hashcode
++                // return Objects.hash(this.state, this.adjacentState, this.side);
++                return this.hash;
+             }
+         }
+ }
