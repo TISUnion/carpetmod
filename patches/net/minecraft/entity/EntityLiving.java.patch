@@ -30,7 +30,17 @@
      private EntityLivingBase attackTarget;
      private final EntitySenses senses;
      private final NonNullList<ItemStack> inventoryHands = NonNullList.withSize(2, ItemStack.EMPTY);
-@@ -110,6 +118,13 @@
+@@ -90,6 +98,9 @@
+     private Entity leashHolder;
+     private NBTTagCompound leashNBTTag;
+ 
++    // Lithium alloc.enum_values
++    private static final EntityEquipmentSlot[] SLOTS = EntityEquipmentSlot.values();
++
+     protected EntityLiving(EntityType<?> type, World worldIn)
+     {
+         super(type, worldIn);
+@@ -110,6 +121,13 @@
          }
      }
  
@@ -44,7 +54,7 @@
      protected void initEntityAI()
      {
      }
-@@ -423,6 +438,11 @@
+@@ -423,6 +441,11 @@
  
              compound.put("Leash", nbttagcompound2);
          }
@@ -56,7 +66,37 @@
  
          compound.putBoolean("LeftHanded", this.isLeftHanded());
  
-@@ -1447,10 +1467,16 @@
+@@ -912,7 +935,8 @@
+ 
+     protected void dropEquipment(boolean wasRecentlyHit, int lootingModifier)
+     {
+-        for (EntityEquipmentSlot entityequipmentslot : EntityEquipmentSlot.values())
++        // Lithium alloc.enum_values
++        for (EntityEquipmentSlot entityequipmentslot :SLOTS)
+         {
+             ItemStack itemstack = this.getItemStackFromSlot(entityequipmentslot);
+             float f = this.getDropChance(entityequipmentslot);
+@@ -973,7 +997,8 @@
+ 
+             boolean flag = true;
+ 
+-            for (EntityEquipmentSlot entityequipmentslot : EntityEquipmentSlot.values())
++            // Lithium alloc.enum_values
++            for (EntityEquipmentSlot entityequipmentslot :SLOTS)
+             {
+                 if (entityequipmentslot.getSlotType() == EntityEquipmentSlot.Type.ARMOR)
+                 {
+@@ -1136,7 +1161,8 @@
+             this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, EnchantmentHelper.addRandomEnchantment(this.rand, this.getHeldItemMainhand(), (int)(5.0F + f * (float)this.rand.nextInt(18)), false));
+         }
+ 
+-        for (EntityEquipmentSlot entityequipmentslot : EntityEquipmentSlot.values())
++        // Lithium alloc.enum_values
++        for (EntityEquipmentSlot entityequipmentslot :SLOTS)
+         {
+             if (entityequipmentslot.getSlotType() == EntityEquipmentSlot.Type.ARMOR)
+             {
+@@ -1447,10 +1473,16 @@
          float f = (float)this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getValue();
          int i = 0;
  
