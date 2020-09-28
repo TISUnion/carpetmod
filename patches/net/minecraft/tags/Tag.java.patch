@@ -1,0 +1,41 @@
+--- a/net/minecraft/tags/Tag.java
++++ b/net/minecraft/tags/Tag.java
+@@ -14,13 +14,15 @@
+ import java.util.function.Function;
+ import java.util.function.Predicate;
+ import javax.annotation.Nullable;
++
++import it.unimi.dsi.fastutil.objects.ReferenceArraySet;
+ import net.minecraft.util.JsonUtils;
+ import net.minecraft.util.ResourceLocation;
+ 
+ public class Tag<T>
+ {
+     private final ResourceLocation resourceLocation;
+-    private final Set<T> taggedItems;
++    private Set<T> taggedItems;  // Lithium tag remove final
+     private final Collection<Tag.ITagEntry<T>> entries;
+ 
+     public Tag(ResourceLocation resourceLocationIn)
+@@ -40,6 +42,21 @@
+         {
+             itagentry.populate(this.taggedItems);
+         }
++
++        // Lithium tag
++        /*
++         * If the number of elements in a tag is very small (<=3), it can be significantly faster to use simple linear scanning
++         * across an array to check if an element is contained by the tag. We mix into the implementation type for Tag
++         * and try replacing the type of set after the constructor has ran. If the set is too large, we still replace it
++         * with a faster set type which has reference equality semantics.
++         *
++         * @reason Use specialized implementations
++         * @author JellySquid
++         */
++        if (this.taggedItems.size() <= 3)
++        {
++            this.taggedItems = new ReferenceArraySet<>(this.taggedItems);
++        }
+     }
+ 
+     public JsonObject serialize(Function<T, ResourceLocation> getNameForObject)
