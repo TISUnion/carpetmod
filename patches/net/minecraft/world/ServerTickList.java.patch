@@ -268,7 +268,7 @@
 -    private void addEntry(BlockPos p_205370_1_, T p_205370_2_, int p_205370_3_, TickPriority p_205370_4_)
 -    {
 -        NextTickListEntry<T> nextticklistentry = new NextTickListEntry<>(p_205370_1_, p_205370_2_, (long)p_205370_3_ + this.world.getGameTime(), p_205370_4_);
-+    private void addEntry(BlockPos p_205370_1_, T p_205370_2_, int p_205370_3_, TickPriority p_205370_4_) {
++    protected void addEntry(BlockPos p_205370_1_, T p_205370_2_, int p_205370_3_, TickPriority p_205370_4_) {
 +        NextTickListEntry<T> nextticklistentry = new NextTickListEntry<>(p_205370_1_, p_205370_2_,
 +                (long) p_205370_3_ + this.world.getGameTime(), p_205370_4_);
  

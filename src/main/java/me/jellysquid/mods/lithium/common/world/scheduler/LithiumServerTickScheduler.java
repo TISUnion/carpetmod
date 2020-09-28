@@ -120,9 +120,31 @@ public class LithiumServerTickScheduler<T> extends ServerTickList<T> {
 
     @Override
     public void scheduleTick(BlockPos pos, T obj, int delay, TickPriority priority) {
+        // An extra isBlockLoaded check is needed in 1.13
+        if (this.world.isBlockLoaded(pos)) {
+            this.scheduleUpdateNoLoadedCheck(pos, obj, delay, priority);
+        }
+    }
+
+    /**
+     * Method that only exists in 1.13
+     * It is used to add TileTick events from the disk
+     * @author Fallen_Breath
+     */
+    @Override
+    protected void scheduleUpdateNoLoadedCheck(BlockPos pos, T obj, int delay, TickPriority priority) {
         if (!this.invalidObjPredicate.test(obj)) {
             this.addScheduledTick(new NextTickListEntry<>(pos, obj, (long) delay + this.world.getGameTime(), priority));
         }
+    }
+
+    /**
+     * It should never invoke this
+     * @author Fallen_Breath
+     */
+    @Override
+    protected void addEntry(BlockPos p_205370_1_, T p_205370_2_, int p_205370_3_, TickPriority p_205370_4_) {
+        throw new UnsupportedOperationException();
     }
 
     /**
