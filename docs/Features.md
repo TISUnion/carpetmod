@@ -418,6 +418,7 @@ Ports and enable part of implementations of [Lithium mod](https://github.com/jel
 - math.fast_util
 - shapes.precompute_shape_arrays
 - shapes.shape_merging
+- tag
 - world.block_entity_ticking
 - world.explosions
 - world.tick_scheduler

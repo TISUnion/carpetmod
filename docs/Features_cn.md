@@ -416,6 +416,7 @@ Categories: creative
 - math.fast_util
 - shapes.precompute_shape_arrays
 - shapes.shape_merging
+- tag
 - world.block_entity_ticking
 - world.explosions
 - world.tick_scheduler
