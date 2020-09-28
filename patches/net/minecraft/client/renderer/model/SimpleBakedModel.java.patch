@@ -1,0 +1,20 @@
+--- a/net/minecraft/client/renderer/model/SimpleBakedModel.java
++++ b/net/minecraft/client/renderer/model/SimpleBakedModel.java
+@@ -90,7 +90,7 @@
+                 this(p_i48189_2_.isAmbientOcclusion(), p_i48189_2_.isGui3d(), p_i48189_2_.getItemCameraTransforms(), p_i48189_2_.getOverrides());
+                 this.builderTexture = p_i48189_2_.getParticleTexture();
+ 
+-                for (EnumFacing enumfacing : EnumFacing.values())
++                for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+                 {
+                     p_i48189_4_.setSeed(p_i48189_5_);
+ 
+@@ -110,7 +110,7 @@
+ 
+             private Builder(boolean ambientOcclusion, boolean gui3d, ItemCameraTransforms transforms, ItemOverrideList overrides)
+             {
+-                for (EnumFacing enumfacing : EnumFacing.values())
++                for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+                 {
+                     this.builderFaceQuads.put(enumfacing, Lists.newArrayList());
+                 }

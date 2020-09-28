@@ -1,0 +1,29 @@
+--- a/net/minecraft/world/chunk/UpgradeData.java
++++ b/net/minecraft/world/chunk/UpgradeData.java
+@@ -107,7 +107,7 @@
+             int l = (p_196991_0_.x << 4) + (!flag4 || !flag3 && !flag2 ? (flag1 ? 0 : 15) : 14);
+             int i1 = (p_196991_0_.z << 4) + (!flag4 || !flag && !flag1 ? (flag3 ? 0 : 15) : 1);
+             int j1 = (p_196991_0_.z << 4) + (!flag4 || !flag && !flag1 ? (flag3 ? 0 : 15) : 14);
+-            EnumFacing[] aenumfacing = EnumFacing.values();
++            EnumFacing[] aenumfacing = EnumFacing.ENUM_FACING_VALUES;
+             BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+ 
+             for (BlockPos.MutableBlockPos blockpos$mutableblockpos1 : BlockPos.getAllInBoxMutable(k, 0, i1, l, world.getHeight() - 1, j1))
+@@ -148,7 +148,7 @@
+ 
+                 if (chunksection != null && aint != null && aint.length > 0)
+                 {
+-                    EnumFacing[] aenumfacing = EnumFacing.values();
++                    EnumFacing[] aenumfacing = EnumFacing.ENUM_FACING_VALUES;
+                     BlockStateContainer<IBlockState> blockstatecontainer = chunksection.getData();
+ 
+                     for (int j : aint)
+@@ -362,7 +362,7 @@
+             }
+         };
+ 
+-        public static final EnumFacing[] field_208827_f = EnumFacing.values();
++        public static final EnumFacing[] field_208827_f = EnumFacing.ENUM_FACING_VALUES;
+ 
+         private BlockFixers(Block... p_i47847_3_)
+         {

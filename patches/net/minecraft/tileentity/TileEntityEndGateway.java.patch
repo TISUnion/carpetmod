@@ -1,0 +1,11 @@
+--- a/net/minecraft/tileentity/TileEntityEndGateway.java
++++ b/net/minecraft/tileentity/TileEntityEndGateway.java
+@@ -320,7 +320,7 @@
+     {
+         int i = 0;
+ 
+-        for (EnumFacing enumfacing : EnumFacing.values())
++        for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+         {
+             i += this.shouldRenderFace(enumfacing) ? 1 : 0;
+         }

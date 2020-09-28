@@ -1,0 +1,20 @@
+--- a/net/minecraft/world/gen/feature/BlueIceFeature.java
++++ b/net/minecraft/world/gen/feature/BlueIceFeature.java
+@@ -27,7 +27,7 @@
+         {
+             boolean flag = false;
+ 
+-            for (EnumFacing enumfacing : EnumFacing.values())
++            for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+             {
+                 if (enumfacing != EnumFacing.DOWN && worldIn.getBlockState(pos.offset(enumfacing)).getBlock() == Blocks.PACKED_ICE)
+                 {
+@@ -62,7 +62,7 @@
+ 
+                         if (iblockstate.getMaterial() == Material.AIR || block == Blocks.WATER || block == Blocks.PACKED_ICE || block == Blocks.ICE)
+                         {
+-                            for (EnumFacing enumfacing1 : EnumFacing.values())
++                            for (EnumFacing enumfacing1 : EnumFacing.ENUM_FACING_VALUES)
+                             {
+                                 Block block1 = worldIn.getBlockState(blockpos.offset(enumfacing1)).getBlock();
+ 

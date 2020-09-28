@@ -1,0 +1,24 @@
+--- a/net/minecraft/client/renderer/chunk/SetVisibility.java
++++ b/net/minecraft/client/renderer/chunk/SetVisibility.java
+@@ -44,18 +44,18 @@
+         StringBuilder stringbuilder = new StringBuilder();
+         stringbuilder.append(' ');
+ 
+-        for (EnumFacing enumfacing : EnumFacing.values())
++        for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+         {
+             stringbuilder.append(' ').append(enumfacing.toString().toUpperCase().charAt(0));
+         }
+ 
+         stringbuilder.append('\n');
+ 
+-        for (EnumFacing enumfacing2 : EnumFacing.values())
++        for (EnumFacing enumfacing2 : EnumFacing.ENUM_FACING_VALUES)
+         {
+             stringbuilder.append(enumfacing2.toString().toUpperCase().charAt(0));
+ 
+-            for (EnumFacing enumfacing1 : EnumFacing.values())
++            for (EnumFacing enumfacing1 : EnumFacing.ENUM_FACING_VALUES)
+             {
+                 if (enumfacing2 == enumfacing1)
+                 {

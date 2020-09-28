@@ -8,3 +8,12 @@
  import net.minecraft.block.state.BlockFaceShape;
  import net.minecraft.block.state.IBlockState;
  import net.minecraft.entity.EntityLivingBase;
+@@ -94,7 +95,7 @@
+             state.dropBlockAsItem(worldIn, pos, 0);
+             worldIn.removeBlock(pos);
+ 
+-            for (EnumFacing enumfacing : EnumFacing.values())
++            for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+             {
+                 worldIn.notifyNeighborsOfStateChange(pos.offset(enumfacing), this);
+             }

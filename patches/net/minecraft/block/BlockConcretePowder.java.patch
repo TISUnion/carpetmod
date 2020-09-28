@@ -1,0 +1,11 @@
+--- a/net/minecraft/block/BlockConcretePowder.java
++++ b/net/minecraft/block/BlockConcretePowder.java
+@@ -39,7 +39,7 @@
+         boolean flag = false;
+         BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos(p_196441_1_);
+ 
+-        for (EnumFacing enumfacing : EnumFacing.values())
++        for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+         {
+             IBlockState iblockstate = p_196441_0_.getBlockState(blockpos$mutableblockpos);
+ 

@@ -1,0 +1,11 @@
+--- a/net/minecraft/block/BlockSponge.java
++++ b/net/minecraft/block/BlockSponge.java
+@@ -55,7 +55,7 @@
+             BlockPos blockpos = tuple.getA();
+             int j = tuple.getB();
+ 
+-            for (EnumFacing enumfacing : EnumFacing.values())
++            for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+             {
+                 BlockPos blockpos1 = blockpos.offset(enumfacing);
+                 IBlockState iblockstate = worldIn.getBlockState(blockpos1);

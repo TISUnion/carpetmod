@@ -1,0 +1,52 @@
+--- a/net/minecraft/client/renderer/BlockModelRenderer.java
++++ b/net/minecraft/client/renderer/BlockModelRenderer.java
+@@ -71,11 +71,11 @@
+     public boolean renderModelSmooth(IWorldReader worldIn, IBakedModel modelIn, IBlockState stateIn, BlockPos posIn, BufferBuilder buffer, boolean checkSides, Random randomIn, long rand)
+     {
+         boolean flag = false;
+-        float[] afloat = new float[EnumFacing.values().length * 2];
++        float[] afloat = new float[EnumFacing.ENUM_FACING_VALUES.length * 2];
+         BitSet bitset = new BitSet(3);
+         BlockModelRenderer.AmbientOcclusionFace blockmodelrenderer$ambientocclusionface = new BlockModelRenderer.AmbientOcclusionFace();
+ 
+-        for (EnumFacing enumfacing : EnumFacing.values())
++        for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+         {
+             randomIn.setSeed(rand);
+             List<BakedQuad> list = modelIn.getQuads(stateIn, enumfacing, randomIn);
+@@ -104,7 +104,7 @@
+         boolean flag = false;
+         BitSet bitset = new BitSet(3);
+ 
+-        for (EnumFacing enumfacing : EnumFacing.values())
++        for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+         {
+             randomIn.setSeed(rand);
+             List<BakedQuad> list = modelIn.getQuads(stateIn, enumfacing, randomIn);
+@@ -198,7 +198,7 @@
+             quadBounds[EnumFacing.UP.getIndex()] = f4;
+             quadBounds[EnumFacing.NORTH.getIndex()] = f2;
+             quadBounds[EnumFacing.SOUTH.getIndex()] = f5;
+-            int j = EnumFacing.values().length;
++            int j = EnumFacing.ENUM_FACING_VALUES.length;
+             quadBounds[EnumFacing.WEST.getIndex() + j] = 1.0F - f;
+             quadBounds[EnumFacing.EAST.getIndex() + j] = 1.0F - f3;
+             quadBounds[EnumFacing.DOWN.getIndex() + j] = 1.0F - f1;
+@@ -286,7 +286,7 @@
+         Random random = new Random();
+         long i = 42L;
+ 
+-        for (EnumFacing enumfacing : EnumFacing.values())
++        for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+         {
+             random.setSeed(42L);
+             this.renderModelBrightnessColorQuads(brightness, red, green, blue, modelIn.getQuads(state, enumfacing, random));
+@@ -624,7 +624,7 @@
+ 
+         private Orientation(EnumFacing facingIn, boolean flip)
+         {
+-            this.shape = facingIn.getIndex() + (flip ? EnumFacing.values().length : 0);
++            this.shape = facingIn.getIndex() + (flip ? EnumFacing.ENUM_FACING_VALUES.length : 0);
+         }
+     }
+ 
