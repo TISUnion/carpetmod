@@ -409,7 +409,7 @@ Fixes for original CarpetMod
 
 # Lithium mod porting
 
-Ports part of implementations of [Lithium mod](https://github.com/jellysquid3/lithium-fabric):
+Ports and enable part of implementations of [Lithium mod](https://github.com/jellysquid3/lithium-fabric):
 
 - alloc.entity_tracker
 - alloc.enum_values

@@ -407,7 +407,7 @@ Categories: creative
 
 # Lithium mod 移植
 
-迁移了部分的 [Lithium mod](https://github.com/jellysquid3/lithium-fabric) 的实现：
+移植并启用了部分的 [Lithium mod](https://github.com/jellysquid3/lithium-fabric) 的实现：
 
 - alloc.entity_tracker
 - alloc.enum_values
