@@ -1,0 +1,11 @@
+--- a/net/minecraft/block/BlockRedstoneOre.java
++++ b/net/minecraft/block/BlockRedstoneOre.java
+@@ -107,7 +107,7 @@
+         double d0 = 0.5625D;
+         Random random = p_180691_0_.rand;
+ 
+-        for (EnumFacing enumfacing : EnumFacing.values())
++        for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+         {
+             BlockPos blockpos = worldIn.offset(enumfacing);
+ 

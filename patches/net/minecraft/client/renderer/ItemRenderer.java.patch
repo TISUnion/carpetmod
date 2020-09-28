@@ -1,0 +1,11 @@
+--- a/net/minecraft/client/renderer/ItemRenderer.java
++++ b/net/minecraft/client/renderer/ItemRenderer.java
+@@ -88,7 +88,7 @@
+         Random random = new Random();
+         long i = 42L;
+ 
+-        for (EnumFacing enumfacing : EnumFacing.values())
++        for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+         {
+             random.setSeed(42L);
+             this.renderQuads(bufferbuilder, model.getQuads((IBlockState)null, enumfacing, random), color, stack);

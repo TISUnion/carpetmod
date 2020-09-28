@@ -1,0 +1,44 @@
+--- a/net/minecraft/util/AxisRotation.java
++++ b/net/minecraft/util/AxisRotation.java
+@@ -26,7 +26,19 @@
+ 
+         public EnumFacing.Axis rotate(EnumFacing.Axis axisIn)
+         {
+-            return AXES[Math.floorMod(axisIn.ordinal() + 1, 3)];
++            // Lithium math.fast_util
++            // return AXES[Math.floorMod(axisIn.ordinal() + 1, 3)];
++
++            switch (axisIn.ordinal()) {
++                case 0: //X
++                    return EnumFacing.Axis.Y;
++                case 1: //Y
++                    return EnumFacing.Axis.Z;
++                case 2: //Z
++                    return EnumFacing.Axis.X;
++            }
++
++            throw new IllegalArgumentException();
+         }
+ 
+         public AxisRotation reverse()
+@@ -42,7 +54,19 @@
+ 
+         public EnumFacing.Axis rotate(EnumFacing.Axis axisIn)
+         {
+-            return AXES[Math.floorMod(axisIn.ordinal() - 1, 3)];
++            // Lithium math.fast_util
++            // return AXES[Math.floorMod(axisIn.ordinal() - 1, 3)];
++
++            switch (axisIn.ordinal()) {
++                case 0: //X
++                    return EnumFacing.Axis.Z;
++                case 1: //Y
++                    return EnumFacing.Axis.X;
++                case 2: //Z
++                    return EnumFacing.Axis.Y;
++            }
++
++            throw new IllegalArgumentException();
+         }
+ 
+         public AxisRotation reverse()

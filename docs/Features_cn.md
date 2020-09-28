@@ -174,19 +174,6 @@
 
 分类: creative
 
-## optimizedExplosion
-
-优化爆炸
-
-- 在 `doExplosionA` 中缓存方块与流体状态
-- 在爆炸无法破坏其发生点所在方块时提前终止 `doExplosionA` 中的循环
-
-默认值: `false`
-
-选项: `false`, `true`
-
-分类: experimental, optimization
-
 ## elytraDeploymentFix
 
 优化鞘翅的展开
@@ -256,6 +243,29 @@
 
 分类: creative
 
+## opPlayerNoCheat
+
+禁用部分指令以避免op玩家意外地作弊
+
+影响的指令列表：`/gamemode`, `/tp`, `/teleport`, `/give`, `/setblock`, `/summon`
+
+默认值: `false`
+
+选项: `false`, `true`
+
+选项: survival
+
+## hopperCountersUnlimitedSpeed
+
+当漏斗指向羊毛方块时，漏斗将拥有无限的物品吸取以及传输速度
+
+仅当hopperCounters开启时有效
+
+Default: `false`
+
+Options: `false`, `true`
+
+Categories: creative
 
 ## YEET
 
@@ -333,12 +343,6 @@
 
 选项：无
 
-## tileticklist
-
-TileTick(NTE) 列表记录器，有助于制作 TileTick EMP
-
-选项：无
-
 ## tileentitylist
 
 **仅在分支 `MicroTick-Logger` 中**
@@ -398,3 +402,20 @@ TileTick(NTE) 列表记录器，有助于制作 TileTick EMP
 
 - 修复了使用 `/player` 指令时没有限制名字长度的问题（过长的名字会使所有人都不能进入服务器）
 - 移除仙人掌扳手修改拉杆的功能
+
+-----
+
+# Lithium mod 移植
+
+移植并启用了部分的 [Lithium mod](https://github.com/jellysquid3/lithium-fabric) 的实现：
+
+- alloc.entity_tracker
+- alloc.enum_values
+- block.piston_shapes
+- cached_hashcode
+- math.fast_util
+- shapes.precompute_shape_arrays
+- shapes.shape_merging
+- world.block_entity_ticking
+- world.explosions
+- world.tick_scheduler

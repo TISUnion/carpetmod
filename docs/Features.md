@@ -178,19 +178,6 @@ Options: `0`, `1`, `8`, `32`
 
 Categories: creative
 
-## optimizedExplosion
-
-Optimizes explosion
-
-- Caching block or liquid states in `doExplosionA`
-- Abort the looping in `doExplosionA` if the explosion cannot break through the first block
-
-Default: `false`
-
-Options: `false`, `true`
-
-Categories: experimental, optimization
-
 ## elytraDeploymentFix
 
 Optimized Elytra deployment
@@ -256,6 +243,30 @@ This might also affects the fuse duration of TNT ignited in explosion
 Default: `80`
 
 Options: `0`, `80`, `32767`
+
+Categories: creative
+
+## opPlayerNoCheat
+
+Disable some command to prevent accidentally cheating
+
+Affects command list: `/gamemode`, `/tp`, `/teleport`, `/give`, `/setblock`, `/summon`
+
+Default: `false`
+
+Options: `false`, `true`
+
+Categories: survival
+
+## hopperCountersUnlimitedSpeed
+
+Make hopper pointing towards wool has infinity speed to suck in or transfer items
+
+Only works when hopperCounters option in Carpet Mod is on
+
+Default: `false`
+
+Options: `false`, `true`
 
 Categories: creative
 
@@ -333,12 +344,6 @@ log village count on tab list
 
 Options: none
 
-## tileticklist
-
-log tile tick list for making tiletick EMP
-
-Options: none
-
 ## tileentitylist
 
 **Only in `MicroTick-Logger` branch**
@@ -399,3 +404,20 @@ Fixes for original CarpetMod
 
 - fix no username length limit with `/player` command (long name will make everyone cannot enter the server) 
 - remove lever modification ability from flippinCactus
+
+-----
+
+# Lithium mod porting
+
+Ports and enable part of implementations of [Lithium mod](https://github.com/jellysquid3/lithium-fabric):
+
+- alloc.entity_tracker
+- alloc.enum_values
+- block.piston_shapes
+- cached_hashcode
+- math.fast_util
+- shapes.precompute_shape_arrays
+- shapes.shape_merging
+- world.block_entity_ticking
+- world.explosions
+- world.tick_scheduler

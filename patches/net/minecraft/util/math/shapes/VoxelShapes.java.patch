@@ -7,7 +7,16 @@
  import com.google.common.annotations.VisibleForTesting;
  import com.google.common.math.DoubleMath;
  import com.google.common.math.IntMath;
-@@ -18,12 +19,31 @@
+@@ -8,6 +9,8 @@
+ import java.util.Iterator;
+ import java.util.Objects;
+ import java.util.stream.Stream;
++
++import me.jellysquid.mods.lithium.common.shapes.pairs.LithiumDoublePairList;
+ import net.minecraft.util.AxisRotation;
+ import net.minecraft.util.EnumFacing;
+ import net.minecraft.util.Util;
+@@ -18,12 +21,31 @@
  public final class VoxelShapes
  {
      private static final VoxelShape EMPTY = new VoxelShapeArray(new VoxelShapePartBitSet(0, 0, 0), (DoubleList)(new DoubleArrayList(new double[] {0.0D})), (DoubleList)(new DoubleArrayList(new double[] {0.0D})), (DoubleList)(new DoubleArrayList(new double[] {0.0D})));
@@ -40,7 +49,7 @@
  
      public static VoxelShape empty()
      {
-@@ -81,7 +101,9 @@
+@@ -81,7 +103,9 @@
          }
          else
          {
@@ -48,6 +57,17 @@
 +            return !CarpetSettings.optimizeVoxelCode ?
 +                    new VoxelShapeArray(FULL_CUBE.part, new double[] {aabb.minX, aabb.maxX}, new double[] {aabb.minY, aabb.maxY}, new double[] {aabb.minZ, aabb.maxZ}) :
 +                    new ocd.mcoptimizations.voxel.VoxelShapeAABB.Cached(aabb);
+         }
+     }
+ 
+@@ -312,7 +336,9 @@
+         }
+         else
+         {
+-            return new IndirectMerger(list1, list2, p_199410_3_, p_199410_4_);
++            // Lithium shapes.shape_merging
++            // return new IndirectMerger(list1, list2, p_199410_3_, p_199410_4_);
++            return new LithiumDoublePairList(list1, list2, p_199410_3_, p_199410_4_);
          }
      }
  

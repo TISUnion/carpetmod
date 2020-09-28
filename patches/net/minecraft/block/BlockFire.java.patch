@@ -1,0 +1,29 @@
+--- a/net/minecraft/block/BlockFire.java
++++ b/net/minecraft/block/BlockFire.java
+@@ -76,7 +76,7 @@
+         {
+             IBlockState iblockstate1 = this.getDefaultState();
+ 
+-            for (EnumFacing enumfacing : EnumFacing.values())
++            for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+             {
+                 BooleanProperty booleanproperty = FACING_TO_PROPERTY_MAP.get(enumfacing);
+ 
+@@ -257,7 +257,7 @@
+ 
+     private boolean areNeighborsFlammable(IBlockReader worldIn, BlockPos pos)
+     {
+-        for (EnumFacing enumfacing : EnumFacing.values())
++        for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+         {
+             if (this.canBurn(worldIn.getBlockState(pos.offset(enumfacing))))
+             {
+@@ -278,7 +278,7 @@
+         {
+             int i = 0;
+ 
+-            for (EnumFacing enumfacing : EnumFacing.values())
++            for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+             {
+                 i = Math.max(this.getEncouragement(worldIn.getBlockState(pos.offset(enumfacing)).getBlock()), i);
+             }

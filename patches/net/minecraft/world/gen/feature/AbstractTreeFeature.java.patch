@@ -1,0 +1,20 @@
+--- a/net/minecraft/world/gen/feature/AbstractTreeFeature.java
++++ b/net/minecraft/world/gen/feature/AbstractTreeFeature.java
+@@ -82,7 +82,7 @@
+             {
+                 for (BlockPos blockpos : Lists.newArrayList(set))
+                 {
+-                    for (EnumFacing enumfacing : EnumFacing.values())
++                    for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+                     {
+                         blockpos$pooledmutableblockpos.setPos(blockpos).move(enumfacing);
+ 
+@@ -107,7 +107,7 @@
+ 
+                 for (BlockPos blockpos1 : set1)
+                 {
+-                    for (EnumFacing enumfacing1 : EnumFacing.values())
++                    for (EnumFacing enumfacing1 : EnumFacing.ENUM_FACING_VALUES)
+                     {
+                         blockpos$pooledmutableblockpos.setPos(blockpos1).move(enumfacing1);
+ 

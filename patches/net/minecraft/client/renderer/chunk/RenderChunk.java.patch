@@ -1,0 +1,11 @@
+--- a/net/minecraft/client/renderer/chunk/RenderChunk.java
++++ b/net/minecraft/client/renderer/chunk/RenderChunk.java
+@@ -103,7 +103,7 @@
+             this.position.setPos(x, y, z);
+             this.boundingBox = new AxisAlignedBB((double)x, (double)y, (double)z, (double)(x + 16), (double)(y + 16), (double)(z + 16));
+ 
+-            for (EnumFacing enumfacing : EnumFacing.values())
++            for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+             {
+                 this.mapEnumFacing[enumfacing.ordinal()].setPos(this.position).move(enumfacing, 16);
+             }

@@ -1,0 +1,11 @@
+--- a/net/minecraft/world/gen/feature/GlowstoneFeature.java
++++ b/net/minecraft/world/gen/feature/GlowstoneFeature.java
+@@ -32,7 +32,7 @@
+                 {
+                     int j = 0;
+ 
+-                    for (EnumFacing enumfacing : EnumFacing.values())
++                    for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
+                     {
+                         if (worldIn.getBlockState(blockpos.offset(enumfacing)).getBlock() == Blocks.GLOWSTONE)
+                         {

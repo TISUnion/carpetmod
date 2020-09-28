@@ -214,16 +214,6 @@ public class CarpetSettings
     }
 
     @Rule(
-            desc = "Optimizes explosion",
-            extra = {
-                    "Caching block or liquid states in doExplosionA",
-                    "Abort the looping in doExplosionA if the explosion cannot break through the first block"
-            },
-            category = {EXPERIMENTAL, OPTIMIZATION}
-    )
-    public static boolean optimizedExplosion = false;
-
-    @Rule(
             desc = "Optimized Elytra deployment",
             extra = "Code from 1.15. Fixes MC-111444",
             category = {EXPERIMENTAL, BUGFIX}
@@ -303,7 +293,7 @@ public class CarpetSettings
     public static int HUDLoggerUpdateInterval = 20;
 
     @Rule(
-            desc = "Disable some command to prevent accidently cheating",
+            desc = "Disable some command to prevent accidentally cheating",
             extra = "Affects command list: /gamemode, /tp, /teleport, /give, /setblock, /summon",
             category = SURVIVAL
     )
