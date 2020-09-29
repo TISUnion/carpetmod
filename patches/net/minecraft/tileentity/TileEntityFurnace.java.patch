@@ -1,0 +1,120 @@
+--- a/net/minecraft/tileentity/TileEntityFurnace.java
++++ b/net/minecraft/tileentity/TileEntityFurnace.java
+@@ -66,61 +66,66 @@
+         map.put(itemProvider.asItem(), time);
+     }
+ 
++    // Permanently store item burn times to avoid costly map generating each time
++    private static final Map<Item, Integer> BURN_TIMES = Maps.newLinkedHashMap();
+     public static Map<Item, Integer> getBurnTimes()
+     {
+-        Map<Item, Integer> map = Maps.newLinkedHashMap();
+-        setBurnTime(map, Items.LAVA_BUCKET, 20000);
+-        setBurnTime(map, Blocks.COAL_BLOCK, 16000);
+-        setBurnTime(map, Items.BLAZE_ROD, 2400);
+-        setBurnTime(map, Items.COAL, 1600);
+-        setBurnTime(map, Items.CHARCOAL, 1600);
+-        setBurnTime(map, ItemTags.LOGS, 300);
+-        setBurnTime(map, ItemTags.PLANKS, 300);
+-        setBurnTime(map, ItemTags.WOODEN_STAIRS, 300);
+-        setBurnTime(map, ItemTags.WOODEN_SLABS, 150);
+-        setBurnTime(map, ItemTags.WOODEN_TRAPDOORS, 300);
+-        setBurnTime(map, ItemTags.WOODEN_PRESSURE_PLATES, 300);
+-        setBurnTime(map, Blocks.OAK_FENCE, 300);
+-        setBurnTime(map, Blocks.BIRCH_FENCE, 300);
+-        setBurnTime(map, Blocks.SPRUCE_FENCE, 300);
+-        setBurnTime(map, Blocks.JUNGLE_FENCE, 300);
+-        setBurnTime(map, Blocks.DARK_OAK_FENCE, 300);
+-        setBurnTime(map, Blocks.ACACIA_FENCE, 300);
+-        setBurnTime(map, Blocks.OAK_FENCE_GATE, 300);
+-        setBurnTime(map, Blocks.BIRCH_FENCE_GATE, 300);
+-        setBurnTime(map, Blocks.SPRUCE_FENCE_GATE, 300);
+-        setBurnTime(map, Blocks.JUNGLE_FENCE_GATE, 300);
+-        setBurnTime(map, Blocks.DARK_OAK_FENCE_GATE, 300);
+-        setBurnTime(map, Blocks.ACACIA_FENCE_GATE, 300);
+-        setBurnTime(map, Blocks.NOTE_BLOCK, 300);
+-        setBurnTime(map, Blocks.BOOKSHELF, 300);
+-        setBurnTime(map, Blocks.JUKEBOX, 300);
+-        setBurnTime(map, Blocks.CHEST, 300);
+-        setBurnTime(map, Blocks.TRAPPED_CHEST, 300);
+-        setBurnTime(map, Blocks.CRAFTING_TABLE, 300);
+-        setBurnTime(map, Blocks.DAYLIGHT_DETECTOR, 300);
+-        setBurnTime(map, ItemTags.BANNERS, 300);
+-        setBurnTime(map, Items.BOW, 300);
+-        setBurnTime(map, Items.FISHING_ROD, 300);
+-        setBurnTime(map, Blocks.LADDER, 300);
+-        setBurnTime(map, Items.SIGN, 200);
+-        setBurnTime(map, Items.WOODEN_SHOVEL, 200);
+-        setBurnTime(map, Items.WOODEN_SWORD, 200);
+-        setBurnTime(map, Items.WOODEN_HOE, 200);
+-        setBurnTime(map, Items.WOODEN_AXE, 200);
+-        setBurnTime(map, Items.WOODEN_PICKAXE, 200);
+-        setBurnTime(map, ItemTags.WOODEN_DOORS, 200);
+-        setBurnTime(map, ItemTags.BOATS, 200);
+-        setBurnTime(map, ItemTags.WOOL, 100);
+-        setBurnTime(map, ItemTags.WOODEN_BUTTONS, 100);
+-        setBurnTime(map, Items.STICK, 100);
+-        setBurnTime(map, ItemTags.SAPLINGS, 100);
+-        setBurnTime(map, Items.BOWL, 100);
+-        setBurnTime(map, ItemTags.CARPETS, 67);
+-        setBurnTime(map, Blocks.DRIED_KELP_BLOCK, 4001);
+-        return map;
++        return BURN_TIMES;
+     }
+ 
++    static
++    {
++        setBurnTime(BURN_TIMES, Items.LAVA_BUCKET, 20000);
++        setBurnTime(BURN_TIMES, Blocks.COAL_BLOCK, 16000);
++        setBurnTime(BURN_TIMES, Items.BLAZE_ROD, 2400);
++        setBurnTime(BURN_TIMES, Items.COAL, 1600);
++        setBurnTime(BURN_TIMES, Items.CHARCOAL, 1600);
++        setBurnTime(BURN_TIMES, ItemTags.LOGS, 300);
++        setBurnTime(BURN_TIMES, ItemTags.PLANKS, 300);
++        setBurnTime(BURN_TIMES, ItemTags.WOODEN_STAIRS, 300);
++        setBurnTime(BURN_TIMES, ItemTags.WOODEN_SLABS, 150);
++        setBurnTime(BURN_TIMES, ItemTags.WOODEN_TRAPDOORS, 300);
++        setBurnTime(BURN_TIMES, ItemTags.WOODEN_PRESSURE_PLATES, 300);
++        setBurnTime(BURN_TIMES, Blocks.OAK_FENCE, 300);
++        setBurnTime(BURN_TIMES, Blocks.BIRCH_FENCE, 300);
++        setBurnTime(BURN_TIMES, Blocks.SPRUCE_FENCE, 300);
++        setBurnTime(BURN_TIMES, Blocks.JUNGLE_FENCE, 300);
++        setBurnTime(BURN_TIMES, Blocks.DARK_OAK_FENCE, 300);
++        setBurnTime(BURN_TIMES, Blocks.ACACIA_FENCE, 300);
++        setBurnTime(BURN_TIMES, Blocks.OAK_FENCE_GATE, 300);
++        setBurnTime(BURN_TIMES, Blocks.BIRCH_FENCE_GATE, 300);
++        setBurnTime(BURN_TIMES, Blocks.SPRUCE_FENCE_GATE, 300);
++        setBurnTime(BURN_TIMES, Blocks.JUNGLE_FENCE_GATE, 300);
++        setBurnTime(BURN_TIMES, Blocks.DARK_OAK_FENCE_GATE, 300);
++        setBurnTime(BURN_TIMES, Blocks.ACACIA_FENCE_GATE, 300);
++        setBurnTime(BURN_TIMES, Blocks.NOTE_BLOCK, 300);
++        setBurnTime(BURN_TIMES, Blocks.BOOKSHELF, 300);
++        setBurnTime(BURN_TIMES, Blocks.JUKEBOX, 300);
++        setBurnTime(BURN_TIMES, Blocks.CHEST, 300);
++        setBurnTime(BURN_TIMES, Blocks.TRAPPED_CHEST, 300);
++        setBurnTime(BURN_TIMES, Blocks.CRAFTING_TABLE, 300);
++        setBurnTime(BURN_TIMES, Blocks.DAYLIGHT_DETECTOR, 300);
++        setBurnTime(BURN_TIMES, ItemTags.BANNERS, 300);
++        setBurnTime(BURN_TIMES, Items.BOW, 300);
++        setBurnTime(BURN_TIMES, Items.FISHING_ROD, 300);
++        setBurnTime(BURN_TIMES, Blocks.LADDER, 300);
++        setBurnTime(BURN_TIMES, Items.SIGN, 200);
++        setBurnTime(BURN_TIMES, Items.WOODEN_SHOVEL, 200);
++        setBurnTime(BURN_TIMES, Items.WOODEN_SWORD, 200);
++        setBurnTime(BURN_TIMES, Items.WOODEN_HOE, 200);
++        setBurnTime(BURN_TIMES, Items.WOODEN_AXE, 200);
++        setBurnTime(BURN_TIMES, Items.WOODEN_PICKAXE, 200);
++        setBurnTime(BURN_TIMES, ItemTags.WOODEN_DOORS, 200);
++        setBurnTime(BURN_TIMES, ItemTags.BOATS, 200);
++        setBurnTime(BURN_TIMES, ItemTags.WOOL, 100);
++        setBurnTime(BURN_TIMES, ItemTags.WOODEN_BUTTONS, 100);
++        setBurnTime(BURN_TIMES, Items.STICK, 100);
++        setBurnTime(BURN_TIMES, ItemTags.SAPLINGS, 100);
++        setBurnTime(BURN_TIMES, Items.BOWL, 100);
++        setBurnTime(BURN_TIMES, ItemTags.CARPETS, 67);
++        setBurnTime(BURN_TIMES, Blocks.DRIED_KELP_BLOCK, 4001);
++    }
++
+     public TileEntityFurnace()
+     {
+         super(TileEntityType.FURNACE);
