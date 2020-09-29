@@ -407,7 +407,11 @@ Fixes for original CarpetMod
 
 -----
 
-# Lithium mod porting
+# Optimizations
+
+There are some optimizations in TISCM. It's not suitable to make this optimizations switchable, so they're all hardcoded to be enabled
+
+## Lithium mod porting
 
 Ports and enable part of implementations of [Lithium mod](https://github.com/jellysquid3/lithium-fabric):
 
@@ -422,3 +426,12 @@ Ports and enable part of implementations of [Lithium mod](https://github.com/jel
 - world.block_entity_ticking
 - world.explosions
 - world.tick_scheduler
+
+## Custom Optimizations
+
+There are also a few optimizations which is not from lithium mod:
+
+- Cache `EnumFacing.values()` like Lithium alloc.enum_values but in everywhere
+- Cache BoundingBoxList creation in TileEntityHopper and TileEntityPiston
+- Pre-allocate 256 size in hashsets/hashmaps to avoid constantly rehash when the amount of TileEntity is small
+- Permanently store item burn times in `TileEntityFurnace` to avoid costly map generating each time

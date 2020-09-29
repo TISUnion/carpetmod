@@ -405,7 +405,11 @@ Categories: creative
 
 -----
 
-# Lithium mod 移植
+# 优化
+
+TISCM 中包含着一些对游戏的优化。这些优化都不太适合做成可开关式的，因此在 TISCM 中这些优化将会被常开起着
+
+## Lithium mod 移植
 
 移植并启用了部分的 [Lithium mod](https://github.com/jellysquid3/lithium-fabric) 的实现：
 
@@ -420,3 +424,13 @@ Categories: creative
 - world.block_entity_ticking
 - world.explosions
 - world.tick_scheduler
+
+## 定制的优化
+
+TISCM 中也有一些在 lithium mod 不包含的优化：
+
+- 像 Lithium alloc.enum_values 一样缓存 `EnumFacing.values()`，不过作用在了所有调用之处
+- 在 `TileEntityHopper` 以及 `TileEntityPiston` 中缓存 BoundingBoxList 的创建结果
+- 在 `TileEntityList` 中给 hashset/hashmap 预先分配 256 大小的空间以防止在方块实体数量较小时频繁重建容器
+- 在 `TileEntityFurnace` 中永久性地储存物品的燃烧时间以避免每次调用都重复创建时间表
+
