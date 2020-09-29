@@ -13,6 +13,9 @@ public class TileEntityList implements List<TileEntity> {
     //TileEntityList does not support double-add of the same object. But it does support multiple at the same position.
     //This collection behaves like a set with insertion order. It also provides a position->TileEntity lookup.
 
+    // pre-allocate 256 volume in hashsets/hashmaps to avoid constantly rehash when the amount of TileEntity is small
+    private final int COLLECTION_DEFAULT_SIZE = 256;
+
     private final ReferenceLinkedOpenHashSet<TileEntity> allBlockEntities;
 
     //When there is only 1 TileEntity at a position, it is stored in posMap.
@@ -21,15 +24,15 @@ public class TileEntityList implements List<TileEntity> {
     private final Long2ReferenceOpenHashMap<TileEntity> posMap;
     private final Long2ReferenceOpenHashMap<List<TileEntity>> posMapMulti;
     public TileEntityList(List<TileEntity> list, boolean hasPositionLookup) {
-        this.posMap = hasPositionLookup ? new Long2ReferenceOpenHashMap<>() : null;
-        this.posMapMulti = hasPositionLookup ? new Long2ReferenceOpenHashMap<>() : null;
+        this.posMap = hasPositionLookup ? new Long2ReferenceOpenHashMap<>(COLLECTION_DEFAULT_SIZE) : null;
+        this.posMapMulti = hasPositionLookup ? new Long2ReferenceOpenHashMap<>(COLLECTION_DEFAULT_SIZE) : null;
 
         if (this.posMap != null) {
             this.posMap.defaultReturnValue(null);
             this.posMapMulti.defaultReturnValue(null);
         }
 
-        this.allBlockEntities = new ReferenceLinkedOpenHashSet<>();
+        this.allBlockEntities = new ReferenceLinkedOpenHashSet<>(COLLECTION_DEFAULT_SIZE);
         this.addAll(list);
     }
 
