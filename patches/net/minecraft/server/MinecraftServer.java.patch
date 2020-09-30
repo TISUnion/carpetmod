@@ -161,7 +161,7 @@
          this.profiler.startSection("jobs");
          FutureTask<?> futuretask;
  
-+        MicroTickLoggerManager.setTickStage("FutureTask"); // TISCM Micro Tick logger
++        MicroTickLoggerManager.setTickStage("PlayerActions"); // TISCM Micro Tick logger
          while ((futuretask = this.futureTaskQueue.poll()) != null)
          {
              Util.runTask(futuretask, LOGGER);
