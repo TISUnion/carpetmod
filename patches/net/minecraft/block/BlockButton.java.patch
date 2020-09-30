@@ -5,7 +5,7 @@
  import java.util.Random;
  import javax.annotation.Nullable;
 +
-+import carpet.logging.logHelpers.MicroTickLogHelper;
++import carpet.microtick.MicroTickLoggerManager;
  import net.minecraft.block.state.BlockFaceShape;
  import net.minecraft.block.state.IBlockState;
  import net.minecraft.entity.Entity;
@@ -13,11 +13,11 @@
          else
          {
              worldIn.setBlockState(pos, state.with(POWERED, Boolean.valueOf(true)), 3);
-+            MicroTickLogHelper.onComponentPowered(worldIn, pos, true); // TISCM Micro Tick logger
++            MicroTickLoggerManager.onComponentPowered(worldIn, pos, true); // TISCM Micro Tick logger
              this.playSound(player, worldIn, pos, true);
              this.updateNeighbors(state, worldIn, pos);
              worldIn.getPendingBlockTicks().scheduleTick(pos, this, this.tickRate(worldIn));
-+            MicroTickLogHelper.onComponentAddToTileTickList(worldIn, pos, this.tickRate(worldIn)); // TISCM Micro Tick logger
++            MicroTickLoggerManager.onComponentAddToTileTickList(worldIn, pos, this.tickRate(worldIn)); // TISCM Micro Tick logger
              return true;
          }
      }
@@ -25,7 +25,7 @@
              else
              {
                  worldIn.setBlockState(pos, state.with(POWERED, Boolean.valueOf(false)), 3);
-+                MicroTickLogHelper.onComponentPowered(worldIn, pos, false); // TISCM Micro Tick logger
++                MicroTickLoggerManager.onComponentPowered(worldIn, pos, false); // TISCM Micro Tick logger
                  this.updateNeighbors(state, worldIn, pos);
                  this.playSound((EntityPlayer)null, worldIn, pos, false);
              }
@@ -33,7 +33,7 @@
          if (flag != flag1)
          {
              worldIn.setBlockState(pos, state.with(POWERED, Boolean.valueOf(flag)), 3);
-+            MicroTickLogHelper.onComponentPowered(worldIn, pos, flag); // TISCM Micro Tick logger
++            MicroTickLoggerManager.onComponentPowered(worldIn, pos, flag); // TISCM Micro Tick logger
              this.updateNeighbors(state, worldIn, pos);
              this.playSound((EntityPlayer)null, worldIn, pos, flag);
          }
@@ -41,7 +41,7 @@
          if (flag)
          {
              worldIn.getPendingBlockTicks().scheduleTick(new BlockPos(pos), this, this.tickRate(worldIn));
-+            MicroTickLogHelper.onComponentAddToTileTickList(worldIn, pos, this.tickRate(worldIn)); // TISCM Micro Tick logger
++            MicroTickLoggerManager.onComponentAddToTileTickList(worldIn, pos, this.tickRate(worldIn)); // TISCM Micro Tick logger
          }
      }
  

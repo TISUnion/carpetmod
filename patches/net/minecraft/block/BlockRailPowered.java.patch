@@ -1,18 +1,14 @@
 --- a/net/minecraft/block/BlockRailPowered.java
 +++ b/net/minecraft/block/BlockRailPowered.java
-@@ -1,6 +1,11 @@
+@@ -1,5 +1,7 @@
  package net.minecraft.block;
  
-+import carpet.logging.LoggerRegistry;
-+import carpet.logging.logHelpers.MicroTickLogHelper;
++import carpet.microtick.MicroTickLoggerManager;
 +import carpet.settings.CarpetSettings;
-+import carpet.utils.WoolTool;
  import net.minecraft.block.state.IBlockState;
-+import net.minecraft.item.EnumDyeColor;
  import net.minecraft.state.BooleanProperty;
  import net.minecraft.state.EnumProperty;
- import net.minecraft.state.IProperty;
-@@ -25,7 +30,8 @@
+@@ -25,7 +27,8 @@
  
      protected boolean findPoweredRailSignal(World worldIn, BlockPos pos, IBlockState state, boolean p_176566_4_, int p_176566_5_)
      {
@@ -22,11 +18,11 @@
          {
              return false;
          }
-@@ -180,6 +186,7 @@
+@@ -180,6 +183,7 @@
          if (flag1 != flag)
          {
              worldIn.setBlockState(pos, state.with(POWERED, Boolean.valueOf(flag1)), 3);
-+            MicroTickLogHelper.onComponentPowered(worldIn, pos, flag1); // TISCM Micro Tick logger
++            MicroTickLoggerManager.onComponentPowered(worldIn, pos, flag1); // TISCM Micro Tick logger
              worldIn.notifyNeighborsOfStateChange(pos.down(), this);
  
              if (state.get(SHAPE).isAscending())

@@ -1,13 +1,25 @@
 --- a/net/minecraft/block/Block.java
 +++ b/net/minecraft/block/Block.java
-@@ -1,5 +1,6 @@
+@@ -1,5 +1,8 @@
  package net.minecraft.block;
  
-+import carpet.logging.logHelpers.MicroTickLogHelper;
++import carpet.microtick.MicroTickLoggerManager;
++import carpet.microtick.enums.ActionRelation;
++import carpet.microtick.enums.BlockUpdateType;
  import it.unimi.dsi.fastutil.objects.Object2ByteLinkedOpenHashMap;
  import java.util.List;
  import java.util.Objects;
-@@ -175,7 +176,11 @@
+@@ -79,7 +82,8 @@
+ {
+     protected static final Logger LOGGER = LogManager.getLogger();
+     public static final ObjectIntIdentityMap<IBlockState> BLOCK_STATE_IDS = new ObjectIntIdentityMap<>();
+-    private static final EnumFacing[] UPDATE_ORDER = new EnumFacing[] {EnumFacing.WEST, EnumFacing.EAST, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.DOWN, EnumFacing.UP};
++    // TISCM MicroTickLogger makes public
++    public static final EnumFacing[] UPDATE_ORDER = new EnumFacing[] {EnumFacing.WEST, EnumFacing.EAST, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.DOWN, EnumFacing.UP};
+     protected final int lightValue;
+     protected final float blockHardness;
+     protected final float blockResistance;
+@@ -175,7 +179,11 @@
      @Deprecated
      public MaterialColor getMaterialColor(IBlockState state, IBlockReader worldIn, BlockPos pos)
      {
@@ -20,26 +32,26 @@
      }
  
      @Deprecated
-@@ -183,6 +188,11 @@
+@@ -183,6 +191,11 @@
      {
          try (BlockPos.PooledMutableBlockPos blockpos$pooledmutableblockpos = BlockPos.PooledMutableBlockPos.retain())
          {
 +            // TISCM Micro Tick logger
-+            if (MicroTickLogHelper.loggerActivated())
++            if (MicroTickLoggerManager.isLoggerActivated())
 +            {
-+                MicroTickLogHelper.onBlockUpdate(worldIn.getWorld(), pos, 0, "PostPlacement", MicroTickLogHelper.getUpdateOrderList(UPDATE_ORDER)); // TISCM Micro Tick logger); // TISCM Micro Tick logger
++                MicroTickLoggerManager.onBlockUpdate(worldIn.getWorld(), pos, worldIn.getBlockState(pos).getBlock(), ActionRelation.PRE_ACTION, BlockUpdateType.POST_PLACEMENT);
 +            }
              for (EnumFacing enumfacing : UPDATE_ORDER)
              {
                  blockpos$pooledmutableblockpos.setPos(pos).move(enumfacing);
-@@ -190,6 +200,11 @@
+@@ -190,6 +203,11 @@
                  IBlockState iblockstate1 = iblockstate.updatePostPlacement(enumfacing.getOpposite(), stateIn, worldIn, blockpos$pooledmutableblockpos, pos);
                  replaceBlock(iblockstate, iblockstate1, worldIn, blockpos$pooledmutableblockpos, flags);
              }
 +            // TISCM Micro Tick logger
-+            if (MicroTickLogHelper.loggerActivated())
++            if (MicroTickLoggerManager.isLoggerActivated())
 +            {
-+                MicroTickLogHelper.onBlockUpdate(worldIn.getWorld(), pos, 1, "PostPlacement", MicroTickLogHelper.getUpdateOrderList(UPDATE_ORDER)); // TISCM Micro Tick logger
++                MicroTickLoggerManager.onBlockUpdate(worldIn.getWorld(), pos, worldIn.getBlockState(pos).getBlock(), ActionRelation.POST_ACTION, BlockUpdateType.POST_PLACEMENT);
 +            }
          }
      }

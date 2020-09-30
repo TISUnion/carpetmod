@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import carpet.microtick.MicroTickLoggerManager;
+import carpet.microtick.MicroTickUtil;
 import com.google.common.collect.Lists;
 
 import carpet.logging.LoggerRegistry;
@@ -11,30 +13,32 @@ import carpet.utils.Messenger;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.World;
 
 public class TileEntityListLogHelper {
-    private static List<ITextComponent> messages = Lists.newArrayList();
+    private static final List<ITextComponent> messages = Lists.newArrayList();
     
-    public static void log(long gameTime, int dimensionID, String msg, BlockPos pos)
+    public static void log(World world, int dimensionID, String msg, BlockPos pos)
     {
         if (!LoggerRegistry.__tileentitylist)
         {
             return;
         }
         TileEntityListLogHelper.messages.add(Messenger.c(
-                "g [" + gameTime + "] ",
+                "g [" + world.getGameTime() + "] ",
                 "w " + "TE" + " ",
                 "t " + msg + " ",
                 Messenger.tp("w", pos),
                 "g  at ", 
-                "y " + MicroTickLogHelper.getTickStage() + " ",
+                "y " + MicroTickLoggerManager.getTickStage(world) + " ",
                 "g in ",
-                "e " + MicroTickLogHelper.getDimension(dimensionID)
-                ));
+                MicroTickUtil.getDimensionNameText(dimensionID).applyTextStyle(TextFormatting.DARK_GREEN)
+        ));
     }
-    public static void log(long gameTime, int dimensionID, String msg, TileEntity te)
+    public static void log(World world, int dimensionID, String msg, TileEntity te)
     {
-        TileEntityListLogHelper.log(gameTime, dimensionID, msg, te.getPos());
+        TileEntityListLogHelper.log(world, dimensionID, msg, te.getPos());
     }
         
     public static void flush()
