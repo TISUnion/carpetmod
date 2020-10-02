@@ -1,6 +1,7 @@
 package carpet.commands;
 
 import carpet.CarpetServer;
+import carpet.microtick.MicroTickUtil;
 import carpet.settings.CarpetSettings;
 import carpet.utils.BlockInfo;
 import carpet.utils.EntityInfo;
@@ -13,9 +14,7 @@ import net.minecraft.command.arguments.EntityArgument;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -56,29 +55,10 @@ public class InfoCommand
                                                         EntityArgument.getEntities(c,"entity selector"),
                                                         getString(c, "regexp"))))))).
                 then(literal("world").
-                        then(literal("ticking_order").
+                        then(literal("tickorder").
                                 executes((c) -> showWorldTickOrder(c.getSource()))));
 
         dispatcher.register(command);
-    }
-
-    private static ITextComponent getDimensionNameText(DimensionType dim)
-    {
-        String key = null;
-        if (dim == DimensionType.OVERWORLD)
-        {
-            key = "createWorld.customize.preset.overworld";
-        }
-        else if (dim == DimensionType.NETHER)
-        {
-            key = "advancements.nether.root.title";
-        }
-        else if (dim == DimensionType.THE_END)
-        {
-            key = "advancements.end.root.title";
-        }
-        assert key != null;
-        return new TextComponentTranslation(key);
     }
 
     private static int showWorldTickOrder(CommandSource source)
@@ -89,7 +69,7 @@ public class InfoCommand
             order++;
             Messenger.m(source, Messenger.c(
                     "g " + order + ". ",
-                    getDimensionNameText(world.getDimension().getType())
+                    MicroTickUtil.getDimensionNameText(world.getDimension().getType())
             ));
         }
         return 1;
