@@ -139,7 +139,7 @@ public class CarpetSettings
             extra = {
                     "Display actions of redstone components and blockupdates with wool block",
                     "Use /log microtick to start logging",
-                    "Might increase server mspt for 1 ~ 4%",
+                    "Might increase server mspt for up to 30% in redstone contraptions when it's on",
                     "endrods will detect block updates and redstone components will show their actions",
                     "observer, piston, endrod: pointing towards wool",
                     "repeater, comparator, rail, button, etc.: placed on wool"
