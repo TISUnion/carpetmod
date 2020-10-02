@@ -278,9 +278,24 @@ public class CarpetSettings
 
     @Rule(
             desc = "HUD Logger update interval",
+            options = {"2", "5", "20", "100", "1200"},
+            validate = ValidateHUDLoggerUpdateInterval.class,
             category = FEATURE
     )
     public static int HUDLoggerUpdateInterval = 20;
+
+    private static class ValidateHUDLoggerUpdateInterval extends Validator<Integer>
+    {
+        @Override
+        public Integer validate(CommandSource source, ParsedRule<Integer> currentRule, Integer newValue, String string)
+        {
+            return 1 <= newValue && newValue <= 1200 ? newValue : null;
+        }
+        public String description()
+        {
+            return "You must choose a integer from 1 to 1200";
+        }
+    }
 
     @Rule(
             desc = "Disable some command to prevent accidentally cheating",
