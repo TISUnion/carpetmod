@@ -123,7 +123,7 @@ public class MicroTickUtil
 		return WoolTool.getWoolColorAtPosition(world.getWorld(), woolPos);
 	}
 
-	static ITextComponent getTranslatedName(Block block)
+	public static ITextComponent getTranslatedName(Block block)
 	{
 		ITextComponent name = new TextComponentTranslation(block.getTranslationKey());
 		name.getStyle().setColor(TextFormatting.WHITE);
@@ -134,20 +134,6 @@ public class MicroTickUtil
 	{
 		return String.format("^w eventID: %d (%s)\neventParam: %d (%s)",
 				eventID, PistonBlockEventType.getById(eventID), eventParam, EnumFacing.byIndex(eventParam));
-	}
-
-	public static String getTileTickStageExtra(int order, NextTickListEntry<?> event)
-	{
-		return String.format(
-				"Order: %d\nPriority: %d (%s)\nPosition: [%d, %d, %d]\nscheduledTime: %d",
-				order,
-				event.priority.getPriority(),
-				event.priority,
-				event.position.getX(),
-				event.position.getY(),
-				event.position.getZ(),
-				event.scheduledTime
-		);
 	}
 
 	// Debug things

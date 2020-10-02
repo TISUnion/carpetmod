@@ -1,6 +1,8 @@
 package carpet.microtick;
 
+import carpet.microtick.tickstages.TickStage;
 import carpet.utils.Messenger;
+import com.google.common.collect.Lists;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
@@ -8,23 +10,28 @@ import net.minecraft.util.text.event.HoverEvent;
 import net.minecraft.world.dimension.DimensionType;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class MicroTickMessage
 {
-	int dimensionID;
-	BlockPos pos;
-	EnumDyeColor color;
-	String stage, stageDetail, stageExtra;
-	StackTraceElement[] stackTrace;
-	Object [] texts;
+	public final int dimensionID;
+	public final BlockPos pos;
+	public final EnumDyeColor color;
+	public final String stage, stageDetail;
+	public final TickStage stageExtra;
+	public final StackTraceElement[] stackTrace;
+	public final Object [] texts;
 
-	MicroTickMessage(int dimensionID, BlockPos pos, EnumDyeColor color, Object[] texts)
+	MicroTickMessage(MicroTickLogger logger, int dimensionID, BlockPos pos, EnumDyeColor color, Object[] texts)
 	{
 		this.dimensionID = dimensionID;
 		this.pos = pos.toImmutable();
 		this.color = color;
 		this.texts = texts;
-		this.stage = this.stageDetail = this.stageExtra = null;
+		this.stage = logger.getTickStage();
+		this.stageDetail = logger.getTickStageDetail();
+		this.stageExtra = logger.getTickStageExtra();
+		this.stackTrace = (new Exception(logger.getClass().getName())).getStackTrace();
 	}
 
 	public boolean equals(Object obj)
@@ -77,15 +84,21 @@ public class MicroTickMessage
 
 	ITextComponent getStage()
 	{
-		ITextComponent text = Messenger.c(
-				"g at ",
-				"y " + this.stage + this.stageDetail
-		);
+		List<Object> comps = Lists.newLinkedList();
+		comps.add("g at ");
+		comps.add("y " + this.stage);
+		if (this.stageDetail != null)
+		{
+			comps.add("y ." + this.stageDetail);
+		}
+		ITextComponent tickStageExtraText = this.stageExtra != null ? Messenger.c(this.stageExtra.toText(), "w \n"): Messenger.s("");
+		ITextComponent text = Messenger.c(comps.toArray(new Object[0]));
 		text.getStyle().setHoverEvent(
 				new HoverEvent(
 						HoverEvent.Action.SHOW_TEXT,
 						Messenger.c(
-								String.format("w %sWorld: ", this.stageExtra),
+								tickStageExtraText,
+								"w World: ",
 								MicroTickUtil.getDimensionNameText(this.dimensionID)
 						)
 				)

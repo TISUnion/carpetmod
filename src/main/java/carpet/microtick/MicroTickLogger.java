@@ -4,6 +4,7 @@ import carpet.logging.LoggerRegistry;
 import carpet.microtick.enums.ActionRelation;
 import carpet.microtick.enums.BlockUpdateType;
 import carpet.microtick.enums.PistonBlockEventType;
+import carpet.microtick.tickstages.TickStage;
 import carpet.utils.Messenger;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -27,7 +28,7 @@ public class MicroTickLogger
 	private static final EnumFacing[] ENUM_FACING_VALUES = EnumFacing.values();
 	private String stage;
 	private String stageDetail;
-	private String stageExtra;
+	private TickStage stageExtra;
 	private final World world;
 	public final List<MicroTickMessage> messages = Lists.newLinkedList();
 	private final LongOpenHashSet pistonBlockEventSuccessPosition = new LongOpenHashSet();
@@ -55,11 +56,11 @@ public class MicroTickLogger
 	{
 		return this.stageDetail;
 	}
-	public void setTickStageExtra(String extra)
+	public void setTickStageExtra(TickStage extra)
 	{
 		this.stageExtra = extra;
 	}
-	public String getTickStageExtra()
+	public TickStage getTickStageExtra()
 	{
 		return this.stageExtra;
 	}
@@ -165,12 +166,7 @@ public class MicroTickLogger
 	// #(color, pos) texts[] at stage(detail, extra, dimension)
 	public void addMessage(EnumDyeColor color, BlockPos pos, int dimensionID, Object [] texts)
 	{
-		MicroTickMessage message = new MicroTickMessage(dimensionID, pos, color, texts);
-		message.stage = this.getTickStage();
-		message.stageDetail = this.getTickStageDetail();
-		message.stageExtra = this.getTickStageExtra();
-		message.stackTrace = (new Exception(this.getClass().getName())).getStackTrace();
-		message.texts = texts;
+		MicroTickMessage message = new MicroTickMessage(this, dimensionID, pos, color, texts);
 		this.messages.add(message);
 	}
 	public void addMessage(EnumDyeColor color, BlockPos pos, World world, Object [] texts)
@@ -210,19 +206,6 @@ public class MicroTickLogger
 				}
 				if (flag)
 				{
-					if (message.stageExtra == null)
-					{
-						message.stageExtra = "";
-					}
-					else
-					{
-						message.stageExtra += "\n";
-					}
-					if (message.stageDetail == null)
-					{
-						message.stageDetail = "";
-					}
-
 					List<Object> line = Lists.newLinkedList();
 					line.add(message.getHashTag());
 					for (Object text: message.texts)

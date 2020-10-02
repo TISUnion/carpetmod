@@ -4,6 +4,7 @@ import carpet.CarpetServer;
 import carpet.logging.LoggerRegistry;
 import carpet.microtick.enums.ActionRelation;
 import carpet.microtick.enums.BlockUpdateType;
+import carpet.microtick.tickstages.TickStage;
 import carpet.settings.CarpetSettings;
 import com.google.common.collect.Maps;
 import net.minecraft.block.*;
@@ -122,14 +123,14 @@ public class MicroTickLoggerManager
         }
     }
 
-    public static void setTickStageExtra(World world, String extra)
-    {
-        getWorldLogger(world).setTickStageExtra(extra);
-    }
-
     public static void setTickStageDetail(World world, String detail)
     {
         getWorldLogger(world).setTickStageDetail(detail);
+    }
+
+    public static void setTickStageExtra(World world, TickStage stage)
+    {
+        getWorldLogger(world).setTickStageExtra(stage);
     }
 
     public static String getTickStage(World world)
