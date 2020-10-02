@@ -55,7 +55,7 @@ public class InfoCommand
                                                         EntityArgument.getEntities(c,"entity selector"),
                                                         getString(c, "regexp"))))))).
                 then(literal("world").
-                        then(literal("tickorder").
+                        then(literal("ticking_order").
                                 executes((c) -> showWorldTickOrder(c.getSource()))));
 
         dispatcher.register(command);
