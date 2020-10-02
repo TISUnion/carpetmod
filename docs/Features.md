@@ -122,8 +122,6 @@ Categories: experimental, optimization
 
 ## microtick
 
-**Only in `MicroTick-Logger` branch, [build152](https://github.com/TISUnion/TISCarpet113/releases/tag/build152) is the latestet release with it**
-
 Enable the function of `/log micirotick`
 
 Display actions of redstone components and blockupdates with wool block
@@ -344,17 +342,7 @@ log village count on tab list
 
 Options: none
 
-## tileentitylist
-
-**Only in `MicroTick-Logger` branch**
-
-log when a tile entity is added to or removed from `World`'s `loadedTileEntityList`
-
-Options: none
-
 ## microtick
-
-**Only in `MicroTick-Logger` branch**
 
 Display actions of redstone components and blockupdates with wool block. Type `/carpet microTick` for more detail
 

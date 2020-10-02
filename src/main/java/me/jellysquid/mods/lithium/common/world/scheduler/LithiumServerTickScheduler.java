@@ -1,5 +1,7 @@
 package me.jellysquid.mods.lithium.common.world.scheduler;
 
+import carpet.microtick.MicroTickLoggerManager;
+import carpet.microtick.tickstages.TileTickTickStageExtra;
 import it.unimi.dsi.fastutil.longs.Long2ObjectAVLTreeMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectSortedMap;
@@ -240,9 +242,17 @@ public class LithiumServerTickScheduler<T> extends ServerTickList<T> {
     }
 
     public void executeTicks(Consumer<NextTickListEntry<T>> consumer) {
+        // TISCM Micro Tick logger
+        int eventCounter = 0;
+
         // Mark and execute all executing ticks
         for (TickEntry<T> tick : this.executingTicks) {
             try {
+                // TISCM Micro Tick logger
+                MicroTickLoggerManager.setTickStageDetail(this.world, String.valueOf(tick.priority.getPriority()));
+                MicroTickLoggerManager.setTickStageExtra(this.world, new TileTickTickStageExtra(tick, eventCounter++));
+                // end TISCM Micro Tick logger
+
                 // Mark as consumed before execution per vanilla behaviour
                 tick.executing = false;
 
@@ -261,6 +271,9 @@ public class LithiumServerTickScheduler<T> extends ServerTickList<T> {
                 throw new ReportedException(crash);
             }
         }
+
+        MicroTickLoggerManager.setTickStageDetail(this.world, null); // TISCM Micro Tick logger
+        MicroTickLoggerManager.setTickStageExtra(this.world, null); // TISCM Micro Tick logger
 
 
         // We finished executing those ticks, so empty the list.

@@ -112,7 +112,10 @@ public class MicroTickLoggerManager
 
     public static void setTickStage(World world, String stage)
     {
-        getWorldLogger(world).setTickStage(stage);
+        MicroTickLogger logger = getWorldLogger(world);
+        logger.setTickStage(stage);
+        logger.setTickStageDetail(null);
+        logger.setTickStageExtra(null);
     }
 
     public static void setTickStage(String stage)

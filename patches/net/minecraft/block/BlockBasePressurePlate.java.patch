@@ -1,10 +1,27 @@
 --- a/net/minecraft/block/BlockBasePressurePlate.java
 +++ b/net/minecraft/block/BlockBasePressurePlate.java
-@@ -1,6 +1,7 @@
+@@ -1,6 +1,8 @@
  package net.minecraft.block;
  
  import java.util.Random;
 +
++import carpet.microtick.MicroTickLoggerManager;
  import net.minecraft.block.material.EnumPushReaction;
  import net.minecraft.block.state.BlockFaceShape;
  import net.minecraft.block.state.IBlockState;
+@@ -93,6 +95,7 @@
+         {
+             state = this.setRedstoneStrength(state, i);
+             worldIn.setBlockState(pos, state, 2);
++            MicroTickLoggerManager.onComponentPowered(worldIn, pos, flag1); // TISCM Micro Tick logger
+             this.updateNeighbors(worldIn, pos);
+             worldIn.markBlockRangeForRenderUpdate(pos, pos);
+         }
+@@ -109,6 +112,7 @@
+         if (flag1)
+         {
+             worldIn.getPendingBlockTicks().scheduleTick(new BlockPos(pos), this, this.tickRate(worldIn));
++            MicroTickLoggerManager.onComponentAddToTileTickList(worldIn, pos, this.tickRate(worldIn)); // TISCM Micro Tick logger
+         }
+     }
+ 

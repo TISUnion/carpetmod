@@ -31,6 +31,7 @@ public class LoggerRegistry
     public static boolean __chunkdebug;
     public static boolean __villagecount;
     public static boolean __memory;
+    public static boolean __microtick;
     public static boolean __autosave;
 
     public static void initLoggers()
@@ -56,6 +57,9 @@ public class LoggerRegistry
 
         //TISCM: add memory
         registerLogger("memory", new HUDLogger("memory", null, null));
+
+        //TISCM: add micro tick
+        registerLogger("microtick", new Logger("microtick", "all", new String[]{"all", "unique"}));
 
         //TISCM: add Autosave
         registerLogger("autosave", new HUDLogger("autosave", null, null));

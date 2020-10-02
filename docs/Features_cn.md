@@ -118,8 +118,6 @@
 
 ## microtick
 
-**仅在分支 `MicroTick-Logger` 中，[build152](https://github.com/TISUnion/TISCarpet113/releases/tag/build152) 是最后的具有其的构建**
-
 启用 `/log microtick` 的功能
 
 使用羊毛块来输出红石元件的动作与方块更新
@@ -343,17 +341,7 @@ Categories: creative
 
 选项：无
 
-## tileentitylist
-
-**仅在分支 `MicroTick-Logger` 中**
-
-方块实体列表记录器，记录方块实体从 `World` 的 `loadedTileEntityList` 中添加或删除
-
-选项：无
-
 ## microtick
-
-**仅在分支 `MicroTick-Logger` 中**
 
 使用羊毛方块来记录红石元件的动作以及方块更新。输入 `/carpet microTick` 以获得更多信息
 

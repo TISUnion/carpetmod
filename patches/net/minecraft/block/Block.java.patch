@@ -1,6 +1,25 @@
 --- a/net/minecraft/block/Block.java
 +++ b/net/minecraft/block/Block.java
-@@ -175,7 +175,11 @@
+@@ -1,5 +1,8 @@
+ package net.minecraft.block;
+ 
++import carpet.microtick.MicroTickLoggerManager;
++import carpet.microtick.enums.ActionRelation;
++import carpet.microtick.enums.BlockUpdateType;
+ import it.unimi.dsi.fastutil.objects.Object2ByteLinkedOpenHashMap;
+ import java.util.List;
+ import java.util.Objects;
+@@ -79,7 +82,8 @@
+ {
+     protected static final Logger LOGGER = LogManager.getLogger();
+     public static final ObjectIntIdentityMap<IBlockState> BLOCK_STATE_IDS = new ObjectIntIdentityMap<>();
+-    private static final EnumFacing[] UPDATE_ORDER = new EnumFacing[] {EnumFacing.WEST, EnumFacing.EAST, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.DOWN, EnumFacing.UP};
++    // TISCM Micro Tick logger makes public
++    public static final EnumFacing[] UPDATE_ORDER = new EnumFacing[] {EnumFacing.WEST, EnumFacing.EAST, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.DOWN, EnumFacing.UP};
+     protected final int lightValue;
+     protected final float blockHardness;
+     protected final float blockResistance;
+@@ -175,7 +179,11 @@
      @Deprecated
      public MaterialColor getMaterialColor(IBlockState state, IBlockReader worldIn, BlockPos pos)
      {
@@ -13,7 +32,30 @@
      }
  
      @Deprecated
-@@ -1764,11 +1768,17 @@
+@@ -185,10 +193,22 @@
+         {
+             for (EnumFacing enumfacing : UPDATE_ORDER)
+             {
++                // TISCM Micro Tick logger
++                if (MicroTickLoggerManager.isLoggerActivated())
++                {
++                    MicroTickLoggerManager.onBlockUpdate(worldIn.getWorld(), pos, worldIn.getBlockState(pos).getBlock(), ActionRelation.PRE_ACTION, BlockUpdateType.POST_PLACEMENT);
++                }
++
+                 blockpos$pooledmutableblockpos.setPos(pos).move(enumfacing);
+                 IBlockState iblockstate = worldIn.getBlockState(blockpos$pooledmutableblockpos);
+                 IBlockState iblockstate1 = iblockstate.updatePostPlacement(enumfacing.getOpposite(), stateIn, worldIn, blockpos$pooledmutableblockpos, pos);
+                 replaceBlock(iblockstate, iblockstate1, worldIn, blockpos$pooledmutableblockpos, flags);
++
++                // TISCM Micro Tick logger
++                if (MicroTickLoggerManager.isLoggerActivated())
++                {
++                    MicroTickLoggerManager.onBlockUpdate(worldIn.getWorld(), pos, worldIn.getBlockState(pos).getBlock(), ActionRelation.POST_ACTION, BlockUpdateType.POST_PLACEMENT);
++                }
+             }
+         }
+     }
+@@ -1764,11 +1784,17 @@
              private final IBlockState adjacentState;
              private final EnumFacing side;
  
@@ -31,7 +73,7 @@
              }
  
              public boolean equals(Object p_equals_1_)
-@@ -1790,7 +1800,9 @@
+@@ -1790,7 +1816,9 @@
  
              public int hashCode()
              {
