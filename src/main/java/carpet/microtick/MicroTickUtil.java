@@ -48,7 +48,7 @@ public class MicroTickUtil
 		COLOR_STYLE.put(EnumDyeColor.LIGHT_GRAY, "g");
 		COLOR_STYLE.put(EnumDyeColor.CYAN, "q");
 		COLOR_STYLE.put(EnumDyeColor.PURPLE, "p");
-		COLOR_STYLE.put(EnumDyeColor.BLUE, "b");
+		COLOR_STYLE.put(EnumDyeColor.BLUE, "v");
 		COLOR_STYLE.put(EnumDyeColor.BROWN, "n");
 		COLOR_STYLE.put(EnumDyeColor.GREEN, "e");
 		COLOR_STYLE.put(EnumDyeColor.RED, "r");
