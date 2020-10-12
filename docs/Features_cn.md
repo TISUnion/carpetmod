@@ -206,6 +206,16 @@
 
 分类: creative
 
+## visualizeProjectileLoggerEnabled
+
+启用投掷物可视化记录器
+
+默认值: `false`
+
+选项: `false`, `true`
+
+分类: survival
+
 ## commandEPSTest
 
 启用用于性能测试的 `/epsTest`

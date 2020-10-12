@@ -210,6 +210,16 @@ Options: `false`, `true`
 
 Categories: creative
 
+## visualizeProjectileLoggerEnabled
+
+Enable visualize projectile logger
+
+Default: `false`
+
+Options: `false`, `true`
+
+Categories: survival
+
 ## commandEPSTest
 
 Enables `/epsTest` for performance tests
