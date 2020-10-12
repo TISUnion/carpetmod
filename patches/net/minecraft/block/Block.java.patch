@@ -32,29 +32,32 @@
      }
  
      @Deprecated
-@@ -185,10 +193,22 @@
+@@ -183,13 +191,25 @@
+     {
+         try (BlockPos.PooledMutableBlockPos blockpos$pooledmutableblockpos = BlockPos.PooledMutableBlockPos.retain())
          {
++            // TISCM Micro Tick logger
++            if (MicroTickLoggerManager.isLoggerActivated())
++            {
++                MicroTickLoggerManager.onBlockUpdate(worldIn.getWorld(), pos, worldIn.getBlockState(pos).getBlock(), ActionRelation.PRE_ACTION, BlockUpdateType.POST_PLACEMENT);
++            }
              for (EnumFacing enumfacing : UPDATE_ORDER)
              {
-+                // TISCM Micro Tick logger
-+                if (MicroTickLoggerManager.isLoggerActivated())
-+                {
-+                    MicroTickLoggerManager.onBlockUpdate(worldIn.getWorld(), pos, worldIn.getBlockState(pos).getBlock(), ActionRelation.PRE_ACTION, BlockUpdateType.POST_PLACEMENT);
-+                }
 +
                  blockpos$pooledmutableblockpos.setPos(pos).move(enumfacing);
                  IBlockState iblockstate = worldIn.getBlockState(blockpos$pooledmutableblockpos);
                  IBlockState iblockstate1 = iblockstate.updatePostPlacement(enumfacing.getOpposite(), stateIn, worldIn, blockpos$pooledmutableblockpos, pos);
                  replaceBlock(iblockstate, iblockstate1, worldIn, blockpos$pooledmutableblockpos, flags);
 +
-+                // TISCM Micro Tick logger
-+                if (MicroTickLoggerManager.isLoggerActivated())
-+                {
-+                    MicroTickLoggerManager.onBlockUpdate(worldIn.getWorld(), pos, worldIn.getBlockState(pos).getBlock(), ActionRelation.POST_ACTION, BlockUpdateType.POST_PLACEMENT);
-+                }
              }
++            // TISCM Micro Tick logger
++            if (MicroTickLoggerManager.isLoggerActivated())
++            {
++                MicroTickLoggerManager.onBlockUpdate(worldIn.getWorld(), pos, worldIn.getBlockState(pos).getBlock(), ActionRelation.POST_ACTION, BlockUpdateType.POST_PLACEMENT);
++            }
          }
      }
+ 
 @@ -1764,11 +1784,17 @@
              private final IBlockState adjacentState;
              private final EnumFacing side;
