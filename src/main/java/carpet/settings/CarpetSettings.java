@@ -313,6 +313,13 @@ public class CarpetSettings
     )
     public static boolean hopperCountersUnlimitedSpeed = false;
 
+    @Rule(
+            desc = "Make command blocks on redstone ores execute command instantly instead of scheduling a 1gt delay TileTick event for execution",
+            extra = "Only affects normal command blocks",
+            category = CREATIVE
+    )
+    public static boolean instantCommandBlock = false;
+
 
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$

@@ -275,6 +275,18 @@ Options: `false`, `true`
 
 Categories: creative
 
+## instantCommandBlock
+
+令位于红石矿上的命令方块瞬间执行命令，而不是添加一个1gt的计划刻事件用于执行
+
+仅影响普通命令方块
+
+Default: `false`
+
+Options: `false`, `true`
+
+Categories: creative
+
 ## YEET
 
 **Warn**: all yeet options will change vanilla behaviour, they WILL NOT behave like vanilla

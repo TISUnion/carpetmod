@@ -278,6 +278,18 @@ Options: `false`, `true`
 
 Categories: creative
 
+## instantCommandBlock
+
+Make command blocks on redstone ores execute command instantly instead of scheduling a 1gt delay TileTick event for execution
+
+Only affects normal command blocks
+
+Default: `false`
+
+Options: `false`, `true`
+
+Categories: creative
+
 ## YEET
 
 **Warn**: all yeet options will change vanilla behaviour, they WILL NOT behave like vanilla
