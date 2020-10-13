@@ -163,7 +163,7 @@
      public void updateTimeLightAndEntities(BooleanSupplier hasTimeLeft)
      {
          this.profiler.startSection("jobs");
-+        MicroTickLoggerManager.setTickStage("PlayerActions"); // TISCM Micro Tick logger
++        MicroTickLoggerManager.setTickStage("PlayerAction"); // TISCM Micro Tick logger
          FutureTask<?> futuretask;
  
          while ((futuretask = this.futureTaskQueue.poll()) != null)
@@ -171,11 +171,11 @@
          }
  
          this.profiler.endStartSection("commandFunctions");
-+        MicroTickLoggerManager.setTickStage("CommandFunctions"); // TISCM Micro Tick logger
++        MicroTickLoggerManager.setTickStage("CommandFunction"); // TISCM Micro Tick logger
          this.getFunctionManager().tick();
          this.profiler.endStartSection("levels");
  
-@@ -905,11 +961,15 @@
+@@ -905,10 +961,13 @@
              }))[this.tickCounter % 100] = Util.nanoTime() - i;
          }
  
@@ -187,11 +187,9 @@
          this.playerList.tick();
 +        CarpetProfiler.end_current_section();
          this.profiler.endStartSection("tickables");
-+        MicroTickLoggerManager.setTickStage("Tickables"); // TISCM Micro Tick logger
  
          for (int j = 0; j < this.tickables.size(); ++j)
-         {
-@@ -1605,6 +1665,12 @@
+@@ -1605,6 +1664,12 @@
      {
          return this.serverTime;
      }
@@ -204,7 +202,7 @@
  
      public Thread getServerThread()
      {
-@@ -1825,4 +1891,12 @@
+@@ -1825,4 +1890,12 @@
              return 0;
          }
      }

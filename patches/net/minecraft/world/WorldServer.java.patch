@@ -108,7 +108,7 @@
 +        { // CM extra indent to skip processing of entities
          this.profiler.endStartSection("village");
 +        CarpetProfiler.start_section(world_name, "Villages");
-+        MicroTickLoggerManager.setTickStage(this, "Villages"); // TISCM Micro Tick logger
++        MicroTickLoggerManager.setTickStage(this, "Village"); // TISCM Micro Tick logger
          this.villageCollection.tick();
          this.villageSiege.tick();
 +        CarpetProfiler.end_current_section();
