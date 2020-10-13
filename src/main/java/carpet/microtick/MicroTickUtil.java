@@ -135,14 +135,4 @@ public class MicroTickUtil
 		return String.format("^w eventID: %d (%s)\neventParam: %d (%s)",
 				eventID, PistonBlockEventType.getById(eventID), eventParam, EnumFacing.byIndex(eventParam));
 	}
-
-	// Debug things
-
-	public static void printAllDimensionGameTime()
-	{
-		for (World world : CarpetServer.minecraft_server.getWorlds())
-		{
-			System.err.println("    " + world.getDimension().getType() + " " + world.getGameTime() + " " + world.getWorldInfo());
-		}
-	}
 }

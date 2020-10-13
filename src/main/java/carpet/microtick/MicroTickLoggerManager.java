@@ -70,11 +70,11 @@ public class MicroTickLoggerManager
         onComponentAddToTileTickList(world, pos, delay, TickPriority.NORMAL);
     }
 
-    public static void onPistonAddBlockEvent(World world, BlockPos pos, int eventID, int eventParam)
+    public static void onPistonAddBlockEvent(World world, BlockPos pos, Block block, int eventID, int eventParam)
     {
         if (isLoggerActivated() && 0 <= eventID && eventID <= 2)
         {
-            getWorldLogger(world).onPistonAddBlockEvent(world, pos, eventID, eventParam);
+            getWorldLogger(world).onPistonAddBlockEvent(world, pos, block, eventID, eventParam);
         }
     }
 

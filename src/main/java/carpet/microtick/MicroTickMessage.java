@@ -2,6 +2,7 @@ package carpet.microtick;
 
 import carpet.microtick.tickstages.TickStage;
 import carpet.utils.Messenger;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.math.BlockPos;
@@ -46,8 +47,7 @@ public class MicroTickMessage
 		}
 
 		MicroTickMessage o = (MicroTickMessage) obj;
-		boolean ret = this.dimensionID == o.dimensionID && this.pos.equals(o.pos) && this.color.equals(o.color) && this.stage.equals(o.stage);
-		ret |= this.texts.length == o.texts.length;
+		boolean ret = this.dimensionID == o.dimensionID && this.pos.equals(o.pos) && this.color.equals(o.color) && this.stage.equals(o.stage) && this.texts.length == o.texts.length;
 		if (!ret)
 		{
 			return ret;
@@ -110,7 +110,7 @@ public class MicroTickMessage
 	{
 		return Messenger.c(
 				"f $",
-				"^w " + Arrays.toString(this.stackTrace)
+				"^w " + Joiner.on("\n").join(this.stackTrace)
 		);
 	}
 }

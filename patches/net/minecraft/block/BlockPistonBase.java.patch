@@ -30,7 +30,7 @@
              if ((new BlockPistonStructureHelper(worldIn, pos, enumfacing, true)).canMove())
              {
                  worldIn.addBlockEvent(pos, this, 0, enumfacing.getIndex());
-+                MicroTickLoggerManager.onPistonAddBlockEvent(worldIn, pos, 0, enumfacing.getIndex()); // TISCM Micro Tick logger
++                MicroTickLoggerManager.onPistonAddBlockEvent(worldIn, pos, this, 0, enumfacing.getIndex()); // TISCM Micro Tick logger
              }
          }
          else if (!flag && state.get(EXTENDED))
@@ -38,7 +38,7 @@
              }
  
              worldIn.addBlockEvent(pos, this, i, enumfacing.getIndex());
-+            MicroTickLoggerManager.onPistonAddBlockEvent(worldIn, pos, i, enumfacing.getIndex()); // TISCM Micro Tick logger
++            MicroTickLoggerManager.onPistonAddBlockEvent(worldIn, pos, this, i, enumfacing.getIndex()); // TISCM Micro Tick logger
          }
      }
  

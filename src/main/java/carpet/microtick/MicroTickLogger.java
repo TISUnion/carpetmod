@@ -91,7 +91,6 @@ public class MicroTickLogger
 		EnumDyeColor color = MicroTickUtil.getWoolColor(world, pos);
 		if (color != null)
 		{
-			System.err.println(world.getGameTime() + " " + delay);
 			this.addMessage(color, pos, world, new Object[]{
 					MicroTickUtil.getTranslatedName(world.getBlockState(pos).getBlock()),
 					"q  Scheduled",
@@ -101,13 +100,13 @@ public class MicroTickLogger
 		}
 	}
 
-	public void onPistonAddBlockEvent(World world, BlockPos pos, int eventID, int eventParam)
+	public void onPistonAddBlockEvent(World world, BlockPos pos, Block block, int eventID, int eventParam)
 	{
 		EnumDyeColor color = MicroTickUtil.getWoolColor(world, pos);
 		if (color != null)
 		{
 			this.addMessage(color, pos, world, new Object[]{
-					MicroTickUtil.getTranslatedName(world.getBlockState(pos).getBlock()),
+					MicroTickUtil.getTranslatedName(block),
 					"q  Scheduled",
 					"c  BlockEvent",
 					MicroTickUtil.getBlockEventMessageExtra(eventID, eventParam)
