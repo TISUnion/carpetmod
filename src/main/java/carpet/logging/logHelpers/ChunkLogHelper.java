@@ -8,20 +8,23 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
+import java.util.Optional;
+
 public class ChunkLogHelper
 {
     public static void onChunkNewState(World worldIn, int x, int z, String state)
     {
-        LoggerRegistry.getLogger("chunkdebug").log( () -> new ITextComponent[]{
+        Optional<String> tickStage = MicroTickLoggerManager.getTickStage(worldIn);
+        tickStage.ifPresent(stage -> LoggerRegistry.getLogger("chunkdebug").log(() -> new ITextComponent[]{
                 Messenger.c(
                         "g [" + worldIn.getGameTime() + "] ",
                         "w X:" + x + " ",
                         "w Z:" + z + " ",
                         state + " ",
                         "g at ",
-                        "y " + MicroTickLoggerManager.getTickStage(worldIn),
+                        "y " + stage,
                         "g  in ",
                         MicroTickUtil.getDimensionNameText(worldIn.getDimension().getType()).applyTextStyle(TextFormatting.DARK_GREEN)
-                )});
+                )}));
     }
 }

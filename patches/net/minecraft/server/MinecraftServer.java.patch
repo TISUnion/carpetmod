@@ -30,7 +30,15 @@
      }
  
      public abstract boolean init() throws IOException;
-@@ -642,31 +652,53 @@
+@@ -571,6 +581,7 @@
+     public void stopServer()
+     {
+         LOGGER.info("Stopping server");
++        CarpetServer.onServerClosed(this);
+ 
+         if (this.getNetworkSystem() != null)
+         {
+@@ -642,31 +653,53 @@
              if (this.init())
              {
                  this.serverTime = Util.milliTime();
@@ -102,7 +110,7 @@
                  }
              }
              else
-@@ -782,6 +814,12 @@
+@@ -782,6 +815,12 @@
      {
          long i = Util.nanoTime();
          ++this.tickCounter;
@@ -115,7 +123,7 @@
  
          if (this.startProfiling)
          {
-@@ -790,6 +828,9 @@
+@@ -790,6 +829,9 @@
          }
  
          this.profiler.startSection("root");
@@ -125,7 +133,7 @@
          this.updateTimeLightAndEntities(hasTimeLeft);
  
          if (i - this.nanoTimeSinceStatusRefresh >= 5000000000L)
-@@ -810,10 +851,16 @@
+@@ -810,10 +852,16 @@
  
          if (this.tickCounter % 900 == 0)
          {
@@ -142,7 +150,7 @@
          }
  
          this.profiler.startSection("snooper");
-@@ -829,16 +876,24 @@
+@@ -829,16 +877,24 @@
          }
  
          this.profiler.endSection();
@@ -167,7 +175,7 @@
          FutureTask<?> futuretask;
  
          while ((futuretask = this.futureTaskQueue.poll()) != null)
-@@ -847,6 +902,7 @@
+@@ -847,6 +903,7 @@
          }
  
          this.profiler.endStartSection("commandFunctions");
@@ -175,7 +183,7 @@
          this.getFunctionManager().tick();
          this.profiler.endStartSection("levels");
  
-@@ -905,10 +961,13 @@
+@@ -905,10 +962,13 @@
              }))[this.tickCounter % 100] = Util.nanoTime() - i;
          }
  
@@ -189,7 +197,7 @@
          this.profiler.endStartSection("tickables");
  
          for (int j = 0; j < this.tickables.size(); ++j)
-@@ -1605,6 +1664,12 @@
+@@ -1605,6 +1665,12 @@
      {
          return this.serverTime;
      }
@@ -202,7 +210,7 @@
  
      public Thread getServerThread()
      {
-@@ -1825,4 +1890,12 @@
+@@ -1825,4 +1891,12 @@
              return 0;
          }
      }

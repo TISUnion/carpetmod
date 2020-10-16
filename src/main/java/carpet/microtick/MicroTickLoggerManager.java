@@ -7,18 +7,19 @@ import carpet.microtick.enums.BlockUpdateType;
 import carpet.microtick.tickstages.TickStage;
 import carpet.settings.CarpetSettings;
 import com.google.common.collect.Maps;
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.TickPriority;
 import net.minecraft.world.World;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Optional;
 
 public class MicroTickLoggerManager
 {
-    public static MicroTickLoggerManager instance = new MicroTickLoggerManager(CarpetServer.minecraft_server);
+    public static MicroTickLoggerManager instance = null;
     private final Map<World, MicroTickLogger> loggers = Maps.newHashMap();
 
     public MicroTickLoggerManager(MinecraftServer mcServer)
@@ -31,25 +32,38 @@ public class MicroTickLoggerManager
 
     public static boolean isLoggerActivated()
     {
-        return CarpetSettings.microTick && LoggerRegistry.__microtick;
+        return CarpetSettings.microTick && LoggerRegistry.__microtick && instance != null;
+    }
+
+    public static void attachServer(MinecraftServer minecraftServer)
+    {
+        instance = new MicroTickLoggerManager(minecraftServer);
+        CarpetServer.LOGGER.debug("Attached MicroTick loggers to " + instance.loggers.size() + " worlds");
+    }
+
+    public static void detachServer()
+    {
+        instance = null;
+        CarpetServer.LOGGER.debug("Detached MicroTick loggers");
     }
 
     // called before action is done
     // [stage][detail]^[extra]
 
-    public static MicroTickLogger getWorldLogger(World world)
+    public static Optional<MicroTickLogger> getWorldLogger(World world)
     {
-        return instance.loggers.get(world);
+        if (isLoggerActivated())
+        {
+            return Optional.ofNullable(instance.loggers.get(world));
+        }
+        return Optional.empty();
     }
 
     // called before an action is executed or done
 
     public static void onBlockUpdate(World world, BlockPos pos, Block fromBlock, ActionRelation actionType, BlockUpdateType updateType, EnumFacing exceptSide)
     {
-        if (isLoggerActivated())
-        {
-            getWorldLogger(world).onBlockUpdate(world, pos, fromBlock, actionType, updateType, updateType.getUpdateOrderList(exceptSide));
-        }
+        getWorldLogger(world).ifPresent(logger -> logger.onBlockUpdate(world, pos, fromBlock, actionType, updateType, updateType.getUpdateOrderList(exceptSide)));
     }
     public static void onBlockUpdate(World world, BlockPos pos, Block fromBlock, ActionRelation actionType, BlockUpdateType updateType)
     {
@@ -60,10 +74,7 @@ public class MicroTickLoggerManager
 
     public static void onComponentAddToTileTickList(World world, BlockPos pos, int delay, TickPriority priority)
     {
-        if (isLoggerActivated())
-        {
-            getWorldLogger(world).onComponentAddToTileTickList(world, pos, delay, priority);
-        }
+        getWorldLogger(world).ifPresent(logger -> logger.onComponentAddToTileTickList(world, pos, delay, priority));
     }
     public static void onComponentAddToTileTickList(World world, BlockPos pos, int delay)
     {
@@ -72,50 +83,41 @@ public class MicroTickLoggerManager
 
     public static void onPistonAddBlockEvent(World world, BlockPos pos, Block block, int eventID, int eventParam)
     {
-        if (isLoggerActivated() && 0 <= eventID && eventID <= 2)
+        if ( 0 <= eventID && eventID <= 2)
         {
-            getWorldLogger(world).onPistonAddBlockEvent(world, pos, block, eventID, eventParam);
+            getWorldLogger(world).ifPresent(logger -> logger.onPistonAddBlockEvent(world, pos, block, eventID, eventParam));
         }
     }
 
     public static void onPistonExecuteBlockEvent(World world, BlockPos pos, Block block, int eventID, int eventParam, boolean success) // "block" only overwrites displayed name
     {
-        if (isLoggerActivated())
-        {
-            getWorldLogger(world).onPistonExecuteBlockEvent(world, pos, block, eventID, eventParam, success);
-        }
+        getWorldLogger(world).ifPresent(logger -> logger.onPistonExecuteBlockEvent(world, pos, block, eventID, eventParam, success));
     }
 
     public static void onComponentPowered(World world, BlockPos pos, boolean poweredState)
     {
-        if (isLoggerActivated())
-        {
-            getWorldLogger(world).onComponentPowered(world, pos, poweredState);
-        }
+        getWorldLogger(world).ifPresent(logger -> logger.onComponentPowered(world, pos, poweredState));
     }
 
     public static void onRedstoneTorchLit(World world, BlockPos pos, boolean litState)
     {
-        if (isLoggerActivated())
-        {
-            getWorldLogger(world).onRedstoneTorchLit(world, pos, litState);
-        }
+        getWorldLogger(world).ifPresent(logger -> logger.onRedstoneTorchLit(world, pos, litState));
     }
 
     public static void flushMessages() // needs to call at the end of a gt
     {
-        for (MicroTickLogger logger : instance.loggers.values())
+        if (isLoggerActivated())
         {
-            logger.flushMessages();
+            for (MicroTickLogger logger : instance.loggers.values())
+            {
+                logger.flushMessages();
+            }
         }
     }
 
     public static void setTickStage(World world, String stage)
     {
-        MicroTickLogger logger = getWorldLogger(world);
-        logger.setTickStage(stage);
-        logger.setTickStageDetail(null);
-        logger.setTickStageExtra(null);
+        getWorldLogger(world).ifPresent(logger -> logger.setTickStage(stage));
     }
 
     public static void setTickStage(String stage)
@@ -128,16 +130,16 @@ public class MicroTickLoggerManager
 
     public static void setTickStageDetail(World world, String detail)
     {
-        getWorldLogger(world).setTickStageDetail(detail);
+        getWorldLogger(world).ifPresent(logger -> logger.setTickStageDetail(detail));
     }
 
     public static void setTickStageExtra(World world, TickStage stage)
     {
-        getWorldLogger(world).setTickStageExtra(stage);
+        getWorldLogger(world).ifPresent(logger -> logger.setTickStageExtra(stage));
     }
 
-    public static String getTickStage(World world)
+    public static Optional<String> getTickStage(World world)
     {
-        return getWorldLogger(world).getTickStage();
+        return getWorldLogger(world).map(MicroTickLogger::getTickStage);
     }
 }

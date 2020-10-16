@@ -21,7 +21,9 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.TickPriority;
 import net.minecraft.world.World;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 public class MicroTickLogger
 {
@@ -43,6 +45,8 @@ public class MicroTickLogger
 	public void setTickStage(String stage)
 	{
 		this.stage = stage;
+		this.stageDetail = null;
+		this.stageExtra = null;
 	}
 	public String getTickStage()
 	{
