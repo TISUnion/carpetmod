@@ -26,6 +26,7 @@ cp 7za.exe output-win
 cp win_install_server.cmd output-win
 cp win_install_singleplayer.cmd output-win
 cp README.txt output-win
+cp 1.13.2-carpet.json output-win
 
 echo "Zipping ..."
 [[ -f carpet_package_win.zip ]] && rm -f carpet_package_win.zip

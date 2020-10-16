@@ -25,6 +25,7 @@ cp ../build/distributions/carpetmod_1.13.2_Server.zip output-ux
 cp unix_install_server.sh output-ux
 cp unix_install_singleplayer.sh output-ux
 cp README.txt output-ux
+cp 1.13.2-carpet.json output-ux
 
 echo "Zipping ..."
 [[ -f carpet_package_ux.zip ]] && rm -f carpet_package_ux.zip
