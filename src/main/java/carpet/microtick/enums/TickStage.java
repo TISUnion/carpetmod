@@ -6,7 +6,6 @@ public enum TickStage
 {
 	SPAWNING("Spawning", true),
 	CHUNK_UNLOADING("ChunkUnloading", true),
-	SPAWNING_SPECIAL("SpawningSpecial", true),
 	WORLD_BORDER("WorldBorder", true),
 	TILE_TICK("TileTick", true),
 	PLAYER_CHUNK_MAP("PlayerChunkMap", true),
