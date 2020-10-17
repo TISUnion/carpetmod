@@ -6,6 +6,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectAVLTreeMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectSortedMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import net.minecraft.block.Block;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.crash.ReportedException;
@@ -122,9 +123,17 @@ public class LithiumServerTickScheduler<T> extends ServerTickList<T> {
 
     @Override
     public void scheduleTick(BlockPos pos, T obj, int delay, TickPriority priority) {
+        int oldListSize = this.scheduledTicks.size();  // TISCM Micro Tick logger
+
         // An extra isBlockLoaded check is needed in 1.13
         if (this.world.isBlockLoaded(pos)) {
             this.scheduleUpdateNoLoadedCheck(pos, obj, delay, priority);
+        }
+
+        // TISCM Micro Tick logger
+        if (obj instanceof Block)
+        {
+            MicroTickLoggerManager.onScheduleTileTickEvent(this.world, (Block)obj, pos, delay, priority, this.scheduledTicks.size() > oldListSize);
         }
     }
 
@@ -250,7 +259,7 @@ public class LithiumServerTickScheduler<T> extends ServerTickList<T> {
             try {
                 // TISCM Micro Tick logger
                 MicroTickLoggerManager.setTickStageDetail(this.world, String.valueOf(tick.priority.getPriority()));
-                MicroTickLoggerManager.setTickStageExtra(this.world, new TileTickTickStageExtra(tick, eventCounter++));
+                MicroTickLoggerManager.setTickStageExtra(this.world, new TileTickTickStageExtra(this.world, tick, eventCounter++));
                 // end TISCM Micro Tick logger
 
                 // Mark as consumed before execution per vanilla behaviour

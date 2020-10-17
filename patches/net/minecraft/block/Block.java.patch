@@ -4,8 +4,8 @@
  package net.minecraft.block;
  
 +import carpet.microtick.MicroTickLoggerManager;
-+import carpet.microtick.enums.ActionRelation;
 +import carpet.microtick.enums.BlockUpdateType;
++import carpet.microtick.enums.EventType;
  import it.unimi.dsi.fastutil.objects.Object2ByteLinkedOpenHashMap;
  import java.util.List;
  import java.util.Objects;
@@ -39,7 +39,7 @@
 +            // TISCM Micro Tick logger
 +            if (MicroTickLoggerManager.isLoggerActivated())
 +            {
-+                MicroTickLoggerManager.onBlockUpdate(worldIn.getWorld(), pos, worldIn.getBlockState(pos).getBlock(), ActionRelation.PRE_ACTION, BlockUpdateType.POST_PLACEMENT);
++                MicroTickLoggerManager.onBlockUpdate(worldIn.getWorld(), pos, worldIn.getBlockState(pos).getBlock(), BlockUpdateType.STATE_UPDATE, null, EventType.ACTION_START);
 +            }
              for (EnumFacing enumfacing : UPDATE_ORDER)
              {
@@ -53,7 +53,7 @@
 +            // TISCM Micro Tick logger
 +            if (MicroTickLoggerManager.isLoggerActivated())
 +            {
-+                MicroTickLoggerManager.onBlockUpdate(worldIn.getWorld(), pos, worldIn.getBlockState(pos).getBlock(), ActionRelation.POST_ACTION, BlockUpdateType.POST_PLACEMENT);
++                MicroTickLoggerManager.onBlockUpdate(worldIn.getWorld(), pos, worldIn.getBlockState(pos).getBlock(), BlockUpdateType.STATE_UPDATE, null, EventType.ACTION_END);
 +            }
          }
      }

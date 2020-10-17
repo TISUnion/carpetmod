@@ -1,43 +1,25 @@
 --- a/net/minecraft/block/BlockObserver.java
 +++ b/net/minecraft/block/BlockObserver.java
-@@ -1,6 +1,8 @@
+@@ -1,6 +1,9 @@
  package net.minecraft.block;
  
  import java.util.Random;
 +
 +import carpet.microtick.MicroTickLoggerManager;
++import carpet.microtick.enums.EventType;
  import net.minecraft.block.state.IBlockState;
  import net.minecraft.item.BlockItemUseContext;
  import net.minecraft.state.BooleanProperty;
-@@ -44,11 +46,14 @@
-         if (state.get(POWERED))
-         {
-             worldIn.setBlockState(pos, state.with(POWERED, Boolean.valueOf(false)), 2);
-+            MicroTickLoggerManager.onComponentPowered(worldIn, pos, false); // TISCM Micro Tick logger
-         }
-         else
-         {
-             worldIn.setBlockState(pos, state.with(POWERED, Boolean.valueOf(true)), 2);
-+            MicroTickLoggerManager.onComponentPowered(worldIn, pos, true); // TISCM Micro Tick logger
-             worldIn.getPendingBlockTicks().scheduleTick(pos, this, 2);
-+            MicroTickLoggerManager.onComponentAddToTileTickList(worldIn, pos, 2); // TISCM Micro Tick logger
-         }
+@@ -74,10 +77,12 @@
  
-         this.updateNeighborsInFront(worldIn, pos, state);
-@@ -60,7 +65,7 @@
-         {
-             this.startSignal(worldIn, currentPos);
-         }
--
-+        
-         return super.updatePostPlacement(stateIn, facing, facingState, worldIn, currentPos, facingPos);
+     protected void updateNeighborsInFront(World worldIn, BlockPos pos, IBlockState state)
+     {
++        MicroTickLoggerManager.onEmitBlockUpdate(worldIn, this, pos, EventType.ACTION_START, "updateNeighborsInFront");  // TISCM Micro Tick logger
+         EnumFacing enumfacing = state.get(FACING);
+         BlockPos blockpos = pos.offset(enumfacing.getOpposite());
+         worldIn.neighborChanged(blockpos, this, pos);
+         worldIn.notifyNeighborsOfStateExcept(blockpos, this, enumfacing);
++        MicroTickLoggerManager.onEmitBlockUpdate(worldIn, this, pos, EventType.ACTION_END, "updateNeighborsInFront");  // TISCM Micro Tick logger
      }
  
-@@ -69,6 +74,7 @@
-         if (!worldIn.isRemote() && !worldIn.getPendingBlockTicks().isTickScheduled(pos, this))
-         {
-             worldIn.getPendingBlockTicks().scheduleTick(pos, this, 2);
-+            MicroTickLoggerManager.onComponentAddToTileTickList((World)worldIn, pos, 2); // TISCM Micro Tick logger
-         }
-     }
- 
+     public boolean canProvidePower(IBlockState state)

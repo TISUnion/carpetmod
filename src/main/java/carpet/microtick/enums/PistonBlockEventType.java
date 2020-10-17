@@ -1,5 +1,7 @@
 package carpet.microtick.enums;
 
+import carpet.microtick.MicroTickLoggerManager;
+
 public enum PistonBlockEventType
 {
 	PUSH("Push"),
@@ -17,11 +19,11 @@ public enum PistonBlockEventType
 	@Override
 	public String toString()
 	{
-		return this.name;
+		return MicroTickLoggerManager.tr("piston_block_event_type." + this.name, this.name);
 	}
 
-	public static PistonBlockEventType getById(int id)
+	public static PistonBlockEventType byId(int id)
 	{
-		return VALUES[id];
+		return VALUES[Math.abs(id % VALUES.length)];
 	}
 }

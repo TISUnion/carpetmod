@@ -1,233 +1,246 @@
 package carpet.microtick;
 
 import carpet.logging.LoggerRegistry;
-import carpet.microtick.enums.ActionRelation;
 import carpet.microtick.enums.BlockUpdateType;
-import carpet.microtick.enums.PistonBlockEventType;
-import carpet.microtick.tickstages.TickStage;
+import carpet.microtick.enums.EventType;
+import carpet.microtick.enums.TickStage;
+import carpet.microtick.events.*;
+import carpet.microtick.message.IndentedMessage;
+import carpet.microtick.message.MessageList;
+import carpet.microtick.message.MicroTickMessage;
+import carpet.microtick.tickstages.TickStageExtraBase;
+import carpet.microtick.utils.MicroTickUtil;
+import carpet.microtick.utils.TranslatableBase;
 import carpet.utils.Messenger;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
+import it.unimi.dsi.fastutil.objects.ReferenceArraySet;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockEventData;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
+import net.minecraft.state.IProperty;
 import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.NextTickListEntry;
 import net.minecraft.world.TickPriority;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 
-public class MicroTickLogger
+public class MicroTickLogger extends TranslatableBase
 {
-	private static final EnumFacing[] ENUM_FACING_VALUES = EnumFacing.values();
-	private String stage;
+	// [stage][detail]^[extra]
+
+	private TickStage stage;
 	private String stageDetail;
-	private TickStage stageExtra;
-	private final World world;
-	public final List<MicroTickMessage> messages = Lists.newLinkedList();
-	private final LongOpenHashSet pistonBlockEventSuccessPosition = new LongOpenHashSet();
+	private TickStageExtraBase stageExtra;
+	private final WorldServer world;
+	public final MessageList messageList = new MessageList();
 	private final ITextComponent dimensionDisplayTextGray;
 
-	public MicroTickLogger(World world)
+	public MicroTickLogger(WorldServer world)
 	{
 		this.world = world;
-		this.dimensionDisplayTextGray = MicroTickUtil.getDimensionNameText(this.world.getDimension().getType()).deepCopy().applyTextStyle(TextFormatting.GRAY);
+		if (world != null)
+		{
+			this.dimensionDisplayTextGray = MicroTickUtil.getDimensionNameText(this.world.getDimension().getType());
+			this.dimensionDisplayTextGray.getStyle().setColor(TextFormatting.GRAY);
+		}
+		else
+		{
+			this.dimensionDisplayTextGray = null;
+		}
 	}
 	
-	public void setTickStage(String stage)
+	public void setTickStage(TickStage stage)
 	{
 		this.stage = stage;
 		this.stageDetail = null;
 		this.stageExtra = null;
 	}
-	public String getTickStage()
+	public TickStage getTickStage()
 	{
 		return this.stage;
 	}
-	public void setTickStageDetail(String stage)
+	public void setTickStageDetail(String stageDetail)
 	{
-		this.stageDetail = stage;
+		this.stageDetail = stageDetail;
 	}
 	public String getTickStageDetail()
 	{
 		return this.stageDetail;
 	}
-	public void setTickStageExtra(TickStage extra)
+	public void setTickStageExtra(TickStageExtraBase extra)
 	{
 		this.stageExtra = extra;
 	}
-	public TickStage getTickStageExtra()
+	public TickStageExtraBase getTickStageExtra()
 	{
 		return this.stageExtra;
 	}
 
-	public void onBlockUpdate(World world, BlockPos pos, Block fromBlock, ActionRelation actionType, BlockUpdateType updateType, String updateTypeExtra)
+	/*
+	 * --------------
+	 *  Block Update
+	 * --------------
+	 */
+
+	public void onBlockUpdate(World world, BlockPos pos, Block fromBlock, BlockUpdateType updateType, Supplier<String> updateTypeExtra, EventType eventType)
 	{
-		for (EnumFacing facing: ENUM_FACING_VALUES)
+		Optional<EnumDyeColor> color = MicroTickUtil.getEndRodWoolColor(world, pos);
+		color.ifPresent(dyeColor -> this.addMessage(dyeColor, pos, world, new DetectBlockUpdateEvent(eventType, fromBlock, updateType, updateTypeExtra.get())));
+	}
+
+	private final static Set<IProperty<?>> INTEREST_PROPERTIES = new ReferenceArraySet<>();
+	static
+	{
+		INTEREST_PROPERTIES.add(BlockStateProperties.POWERED);
+		INTEREST_PROPERTIES.add(BlockStateProperties.LIT);
+	}
+
+	public void onSetBlockState(World world, BlockPos pos, IBlockState oldState, IBlockState newState, Boolean returnValue, EventType eventType)
+	{
+		// lazy loading
+		EnumDyeColor color = null;
+		BlockStateChangeEvent event = new BlockStateChangeEvent(eventType, returnValue, newState.getBlock());
+
+		for (IProperty<?> property: newState.getProperties())
 		{
-			BlockPos blockEndRodPos = pos.offset(facing);
-			IBlockState iBlockState = world.getBlockState(blockEndRodPos);
-			if (iBlockState.getBlock() == Blocks.END_ROD && iBlockState.get(BlockStateProperties.FACING).getOpposite() == facing)
+			if (INTEREST_PROPERTIES.contains(property))
 			{
-				EnumDyeColor color = MicroTickUtil.getWoolColor(world, blockEndRodPos);
-				if (color != null)
+				if (color == null)
 				{
-					this.addMessage(color, pos, world, new Object[]{
-							MicroTickUtil.getTranslatedName(fromBlock),
-							String.format("q  %s", actionType),
-							String.format("c  %s", updateType),
-							String.format("^w %s", updateTypeExtra)
-					});
-				}
-			}
-		}
-	}
-	public void onComponentAddToTileTickList(World world, BlockPos pos, int delay, TickPriority priority)
-	{
-		EnumDyeColor color = MicroTickUtil.getWoolColor(world, pos);
-		if (color != null)
-		{
-			this.addMessage(color, pos, world, new Object[]{
-					MicroTickUtil.getTranslatedName(world.getBlockState(pos).getBlock()),
-					"q  Scheduled",
-					"c  TileTick",
-					String.format("^w Delay: %dgt\nPriority: %d (%s)", delay, priority.getPriority(), priority)
-			});
-		}
-	}
-
-	public void onPistonAddBlockEvent(World world, BlockPos pos, Block block, int eventID, int eventParam)
-	{
-		EnumDyeColor color = MicroTickUtil.getWoolColor(world, pos);
-		if (color != null)
-		{
-			this.addMessage(color, pos, world, new Object[]{
-					MicroTickUtil.getTranslatedName(block),
-					"q  Scheduled",
-					"c  BlockEvent",
-					MicroTickUtil.getBlockEventMessageExtra(eventID, eventParam)
-			});
-		}
-	}
-
-	// "block" only overwrites displayed name
-	public void onPistonExecuteBlockEvent(World world, BlockPos pos, Block block, int eventID, int eventParam, boolean success)
-	{
-		EnumDyeColor color = MicroTickUtil.getWoolColor(world, pos);
-		if (color != null)
-		{
-			if (success)
-			{
-				this.pistonBlockEventSuccessPosition.add(pos.toLong());
-			}
-			else if (pistonBlockEventSuccessPosition.contains(pos.toLong())) // ignore failure after a success blockevent of piston in the same gt
-			{
-				return;
-			}
-			addMessage(color, pos, world, new Object[]{
-					MicroTickUtil.getTranslatedName(block),
-					"q  Executed",
-					String.format("c  %s", PistonBlockEventType.getById(eventID)),
-					MicroTickUtil.getBlockEventMessageExtra(eventID, eventParam),
-					String.format("%s  %s", MicroTickUtil.getBooleanColor(success), success ? "Succeed" : "Failed")
-			});
-		}
-	}
-
-	public void onComponentPowered(World world, BlockPos pos, boolean poweredState)
-	{
-		EnumDyeColor color = MicroTickUtil.getWoolColor(world, pos);
-		if (color != null)
-		{
-			this.addMessage(color, pos, world, new Object[]{
-					MicroTickUtil.getTranslatedName(world.getBlockState(pos).getBlock()),
-					String.format("c  %s", poweredState ? "Powered" : "Depowered")
-			});
-		}
-	}
-
-	public void onRedstoneTorchLit(World world, BlockPos pos, boolean litState)
-	{
-		EnumDyeColor color = MicroTickUtil.getWoolColor(world, pos);
-		if (color != null)
-		{
-			this.addMessage(color, pos, world, new Object[]{
-					MicroTickUtil.getTranslatedName(world.getBlockState(pos).getBlock()),
-					String.format("c  %s", litState ? "Lit" : "Unlit")
-			});
-		}
-	}
-
-	// #(color, pos) texts[] at stage(detail, extra, dimension)
-	public void addMessage(EnumDyeColor color, BlockPos pos, int dimensionID, Object [] texts)
-	{
-		MicroTickMessage message = new MicroTickMessage(this, dimensionID, pos, color, texts);
-		this.messages.add(message);
-	}
-	public void addMessage(EnumDyeColor color, BlockPos pos, World world, Object [] texts)
-	{
-		this.addMessage(color, pos, world.getDimension().getType().getId(), texts);
-	}
-
-	void flushMessages()
-	{
-		if (this.messages.isEmpty())
-		{
-			return;
-		}
-		LoggerRegistry.getLogger("microtick").log( (option) ->
-		{
-			boolean uniqueOnly = option.equals("unique");
-			List<ITextComponent> msg = Lists.newLinkedList();
-			Set<MicroTickMessage> messageHashSet = Sets.newHashSet();
-			Iterator<MicroTickMessage> iterator = this.messages.iterator();
-			msg.add(Messenger.s(" "));
-			msg.add(Messenger.c(
-					"f [GameTime ",
-					"g " + this.world.getGameTime(),
-					"f  @ ",
-					this.dimensionDisplayTextGray,
-					"f ] ------------"
-			));
-			while (iterator.hasNext())
-			{
-				MicroTickMessage message = iterator.next();
-
-				boolean flag = !uniqueOnly;
-				if (!messageHashSet.contains(message))
-				{
-					messageHashSet.add(message);
-					flag = true;
-				}
-				if (flag)
-				{
-					List<Object> line = Lists.newLinkedList();
-					line.add(message.getHashTag());
-					for (Object text: message.texts)
+					Optional<EnumDyeColor> optionalDyeColor = MicroTickUtil.getWoolOrEndRodWoolColor(world, pos);
+					if (!optionalDyeColor.isPresent())
 					{
-						if (text instanceof ITextComponent || text instanceof String)
-						{
-							line.add(text);
-						}
+						break;
 					}
-					line.add("w  ");
-					line.add(message.getStage());
-					line.add("w  ");
-					line.add(message.getStackTrace());
-					msg.add(Messenger.c(line.toArray(new Object[0])));
+					color = optionalDyeColor.get();
 				}
+				event.addChanges(property.getName(), oldState.get(property), newState.get(property));
 			}
-			return msg.toArray(new ITextComponent[0]);
-		});
-		this.messages.clear();
-		this.pistonBlockEventSuccessPosition.clear();
+		}
+		if (event.hasChanges())
+		{
+			this.addMessage(color, pos, world, event);
+		}
+	}
+
+	/*
+	 * -----------
+	 *  Tile Tick
+	 * -----------
+	 */
+
+	public void onExecuteTileTick(World world, NextTickListEntry<Block> event, EventType eventType)
+	{
+		Optional<EnumDyeColor> color = MicroTickUtil.getWoolOrEndRodWoolColor(world, event.position);
+		color.ifPresent(dyeColor -> this.addMessage(dyeColor, event.position, world, new ExecuteTileTickEvent(eventType, event)));
+	}
+
+	public void onScheduleTileTick(World world, Block block, BlockPos pos, int delay, TickPriority priority, Boolean success)
+	{
+		Optional<EnumDyeColor> color = MicroTickUtil.getWoolOrEndRodWoolColor(world, pos);
+		color.ifPresent(dyeColor -> this.addMessage(dyeColor, pos, world, new ScheduleTileTickEvent(block, pos, delay, priority, success)));
+	}
+
+	/*
+	 * -------------
+	 *  Block Event
+	 * -------------
+	 */
+
+	public void onExecuteBlockEvent(World world, BlockEventData blockAction, Boolean returnValue, EventType eventType)
+	{
+		Optional<EnumDyeColor> color = MicroTickUtil.getWoolOrEndRodWoolColor(world, blockAction.getPosition());
+		color.ifPresent(dyeColor -> this.addMessage(dyeColor, blockAction.getPosition(), world, new ExecuteBlockEventEvent(eventType, blockAction, returnValue)));
+	}
+
+	public void onScheduleBlockEvent(World world, BlockEventData blockAction)
+	{
+		Optional<EnumDyeColor> color = MicroTickUtil.getWoolOrEndRodWoolColor(world, blockAction.getPosition());
+		color.ifPresent(dyeColor -> this.addMessage(dyeColor, blockAction.getPosition(), world, new ScheduleBlockEventEvent(blockAction)));
+	}
+
+	/*
+	 * ------------------
+	 *  Component things
+	 * ------------------
+	 */
+
+	public void onEmitBlockUpdate(World world, Block block, BlockPos pos, EventType eventType, String methodName)
+	{
+		Optional<EnumDyeColor> color = MicroTickUtil.getWoolOrEndRodWoolColor(world, pos);
+		color.ifPresent(dyeColor -> this.addMessage(dyeColor, pos, world, new EmitBlockUpdateEvent(eventType, block, methodName)));
+	}
+
+	/*
+	 * -----------------------
+	 *  Component things ends
+	 * -----------------------
+	 */
+
+	public void addMessage(EnumDyeColor color, BlockPos pos, World world, BaseEvent event)
+	{
+		MicroTickMessage message = new MicroTickMessage(this, world.getDimension().getType(), pos, color, event);
+		if (message.getEvent().getEventType() != EventType.ACTION_END)
+		{
+			this.messageList.addMessageAndIndent(message);
+		}
+		else
+		{
+			this.messageList.addMessageAndUnIndent(message);
+		}
+	}
+
+	private ITextComponent[] getTrimmedMessages(List<IndentedMessage> flushedMessages, boolean uniqueOnly)
+	{
+		List<ITextComponent> msg = Lists.newArrayList();
+		Set<MicroTickMessage> messageHashSet = Sets.newHashSet();
+		msg.add(Messenger.s(" "));
+		msg.add(Messenger.c(
+				String.format("f [%s ", this.tr("GameTime")),
+				"g " + this.world.getGameTime(),
+				"f  @ ",
+				this.dimensionDisplayTextGray,
+				"f ] ------------"
+		));
+		for (IndentedMessage message : flushedMessages)
+		{
+			boolean showThisMessage = !uniqueOnly || messageHashSet.add(message.getMessage());
+			if (showThisMessage)
+			{
+				msg.add(message.toText());
+			}
+		}
+		return msg.toArray(new ITextComponent[0]);
+	}
+
+	public void flushMessages()
+	{
+		if (!this.messageList.isEmpty())
+		{
+			List<IndentedMessage> flushedMessages = this.messageList.flush();
+			if (!flushedMessages.isEmpty())
+			{
+				Map<Boolean, ITextComponent[]> flushedTrimmedMessages = new Reference2ObjectArrayMap<>();
+				flushedTrimmedMessages.put(false, getTrimmedMessages(flushedMessages, false));
+				flushedTrimmedMessages.put(true, getTrimmedMessages(flushedMessages, true));
+				LoggerRegistry.getLogger("microtick").log((option) ->
+				{
+					boolean uniqueOnly = option.equals("unique");
+					return flushedTrimmedMessages.get(uniqueOnly);
+				});
+			}
+		}
 	}
 }

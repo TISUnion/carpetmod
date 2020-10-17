@@ -1,21 +1,28 @@
 package carpet.microtick.tickstages;
 
-import carpet.microtick.MicroTickUtil;
+import carpet.microtick.MicroTickLoggerManager;
+import carpet.microtick.utils.MicroTickUtil;
 import carpet.utils.Messenger;
+import com.google.common.collect.Lists;
 import net.minecraft.block.Block;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.world.NextTickListEntry;
 import net.minecraft.world.TickPriority;
+import net.minecraft.world.World;
 
-public class TileTickTickStageExtra implements TickStage
+import java.util.List;
+
+public class TileTickTickStageExtra extends TickStageExtraBase
 {
+	private final World world;
 	private final NextTickListEntry<?> nextTickListEntry;
 	private final int order;
 
-	public TileTickTickStageExtra(NextTickListEntry<?> nextTickListEntry, int order)
+	public TileTickTickStageExtra(World world, NextTickListEntry<?> nextTickListEntry, int order)
 	{
+		this.world = world;
 		this.nextTickListEntry = nextTickListEntry;
 		this.order = order;
 	}
@@ -26,20 +33,22 @@ public class TileTickTickStageExtra implements TickStage
 		BlockPos pos = this.nextTickListEntry.position;
 		TickPriority priority = this.nextTickListEntry.priority;
 		Object target = this.nextTickListEntry.getTarget();
-		ITextComponent text = Messenger.c(
-				String.format("w Order: %d\n", this.order),
-				String.format("w Priority: %d (%s)\n", priority.getPriority(), priority),
-				String.format("w Position: [%d, %d, %d]", pos.getX(), pos.getY(), pos.getZ())
-		);
+		List<Object> list = Lists.newArrayList();
 		if (target instanceof Block)
 		{
-			text = Messenger.c(
-					"w Block: ",
-					MicroTickUtil.getTranslatedName((Block)target),
-					"w \n",
-					text
-			);
+			list.add(String.format("w %s: ", MicroTickLoggerManager.tr("Block")));
+			list.add(MicroTickUtil.getTranslatedText((Block)target));
+			list.add("w \n");
 		}
-		return text;
+		list.add(String.format("w %s: %d\n", MicroTickLoggerManager.tr("Order"), this.order));
+		list.add(String.format("w %s: %d (%s)\n", MicroTickLoggerManager.tr("Priority"), priority.getPriority(), priority));
+		list.add(String.format("w %s: [%d, %d, %d]", MicroTickLoggerManager.tr("Position"), pos.getX(), pos.getY(), pos.getZ()));
+		return Messenger.c(list.toArray(new Object[0]));
+	}
+
+	@Override
+	public ClickEvent getClickEvent()
+	{
+		return new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, MicroTickUtil.getTeleportCommand(this.nextTickListEntry.position, this.world.getDimension().getType()));
 	}
 }

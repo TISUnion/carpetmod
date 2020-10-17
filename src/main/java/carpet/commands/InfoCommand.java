@@ -1,7 +1,7 @@
 package carpet.commands;
 
 import carpet.CarpetServer;
-import carpet.microtick.MicroTickUtil;
+import carpet.microtick.utils.MicroTickUtil;
 import carpet.settings.CarpetSettings;
 import carpet.utils.BlockInfo;
 import carpet.utils.EntityInfo;

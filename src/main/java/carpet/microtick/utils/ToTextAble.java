@@ -1,8 +1,8 @@
-package carpet.microtick.tickstages;
+package carpet.microtick.utils;
 
 import net.minecraft.util.text.ITextComponent;
 
-public interface TickStage
+public interface ToTextAble
 {
 	ITextComponent toText();
 }

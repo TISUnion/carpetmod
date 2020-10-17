@@ -90,7 +90,7 @@
 +                    try {
 +                        // TISCM Micro Tick logger
 +                        MicroTickLoggerManager.setTickStageDetail(this.world, String.valueOf(nextticklistentry1.priority.getPriority()));
-+                        MicroTickLoggerManager.setTickStageExtra(this.world, new TileTickTickStageExtra(nextticklistentry1, eventCount++));
++                        MicroTickLoggerManager.setTickStageExtra(this.world, new TileTickTickStageExtra(this.world, nextticklistentry1, eventCount++));
 +                        // end TISCM Micro Tick logger
                          this.tickFunction.accept(nextticklistentry1);
 -                    }

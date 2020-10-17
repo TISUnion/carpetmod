@@ -120,19 +120,24 @@ Options: `false`, `true`
 
 Categories: experimental, optimization
 
-## microtick
+## microTick
 
-Enable the function of `/log micirotick`
+Enable the function of [MicroTick logger](#microTick-1)
 
-Display actions of redstone components and blockupdates with wool block
+Display redstone components actions, blockupdates and stacktrace with a wool block
 
 Use `/log microtick` to start logging
 
-endrods will detect block updates and redstone components will show their actions
+Might impact the server performance when it's on
 
-- observer, piston, endrod: pointing towards wool
+EndRods will detect block updates and redstone components will show their actions
 
-- repeater, comparator, rail, button, etc.: placed on wool
+| Block Type                               | How to log actions    |
+| ---------------------------------------- | --------------------- |
+| Observer, Piston, EndRod                 | pointing towards wool |
+| Repeater, Comparator, Rail, Button, etc. | placed on wool        |
+
+Beside that, blocks pointed by EndRod on wool block will also show their actions
 
 Default: `false`
 
@@ -366,7 +371,15 @@ Options: none
 
 ## microtick
 
-Display actions of redstone components and blockupdates with wool block. Type `/carpet microTick` for more detail
+`/log microtick <type>`
+
+Log micro timings of redstone components. The ticket of the chunk the component is in needs to be at least lazy-processing (ticket level 32)
+
+Check rule [microTick](#microTick) for detail. Remember to use `/carpet microTick true` to enable logger functionality
+
+Available options: 
+- `all`: Log all events
+- `unique`: Log the first unique event in every gametick
 
 Options: `all`, `unique`
 
