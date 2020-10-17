@@ -151,7 +151,7 @@ public class MicroTickUtil
 			return Optional.empty();
 		}
 
-		return Optional.ofNullable(WoolTool.getWoolColorAtPosition(world.getWorld(), woolPos));
+		return Optional.ofNullable(WoolTool.getWoolColorAtPosition(world, woolPos));
 	}
 
 	public static Optional<EnumDyeColor> getEndRodWoolColor(World world, BlockPos pos)
@@ -167,7 +167,7 @@ public class MicroTickUtil
 			if (iBlockState.getBlock() == Blocks.END_ROD && iBlockState.get(BlockStateProperties.FACING).getOpposite() == facing)
 			{
 				BlockPos woolPos = blockEndRodPos.offset(facing);
-				EnumDyeColor color = WoolTool.getWoolColorAtPosition(world.getWorld(), woolPos);
+				EnumDyeColor color = WoolTool.getWoolColorAtPosition(world, woolPos);
 				if (color != null)
 				{
 					return Optional.of(color);
