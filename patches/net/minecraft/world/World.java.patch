@@ -75,7 +75,7 @@
      }
  
      public Biome getBiome(BlockPos pos)
-@@ -224,8 +245,26 @@
+@@ -224,8 +245,25 @@
          }
      }
  
@@ -91,7 +91,6 @@
 +        boolean returnValue = this._setBlockState(pos, newState, flags);
 +        if (MicroTickLoggerManager.isLoggerActivated() && oldState != null)
 +        {
-+            oldState = this.getBlockState(pos);
 +            MicroTickLoggerManager.onSetBlockState(this, pos, oldState, newState, returnValue, EventType.ACTION_END);
 +        }
 +        return returnValue;
@@ -102,7 +101,7 @@
          if (isOutsideBuildHeight(pos))
          {
              return false;
-@@ -238,7 +277,7 @@
+@@ -238,7 +276,7 @@
          {
              Chunk chunk = this.getChunk(pos);
              Block block = newState.getBlock();
@@ -111,7 +110,7 @@
  
              if (iblockstate == null)
              {
-@@ -262,6 +301,13 @@
+@@ -262,6 +300,13 @@
                          this.markBlockRangeForRenderUpdate(pos, pos);
                      }
  
@@ -125,7 +124,7 @@
                      if ((flags & 2) != 0 && (!this.isRemote || (flags & 4) == 0) && chunk.isPopulated())
                      {
                          this.notifyBlockUpdate(pos, iblockstate, newState, flags);
-@@ -277,7 +323,9 @@
+@@ -277,7 +322,9 @@
                          }
                      }
  
@@ -136,7 +135,7 @@
                      {
                          int i = flags & -2;
                          iblockstate.updateDiagonalNeighbors(this, pos, i);
-@@ -372,19 +420,22 @@
+@@ -372,19 +419,22 @@
              this.eventListeners.get(i).markBlockRangeForRenderUpdate(x1, y1, z1, x2, y2, z2);
          }
      }
@@ -160,7 +159,7 @@
          if (skipSide != EnumFacing.WEST)
          {
              this.neighborChanged(pos.west(), blockType, pos);
-@@ -414,10 +465,15 @@
+@@ -414,10 +464,15 @@
          {
              this.neighborChanged(pos.south(), blockType, pos);
          }
@@ -177,7 +176,7 @@
          if (!this.isRemote)
          {
              IBlockState iblockstate = this.getBlockState(pos);
-@@ -1199,7 +1255,14 @@
+@@ -1199,7 +1254,14 @@
      {
          this.profiler.startSection("entities");
          this.profiler.startSection("global");
@@ -192,7 +191,7 @@
          for (int i = 0; i < this.weatherEffects.size(); ++i)
          {
              Entity entity = this.weatherEffects.get(i);
-@@ -1233,6 +1296,7 @@
+@@ -1233,6 +1295,7 @@
          }
  
          this.profiler.endStartSection("remove");
@@ -200,7 +199,7 @@
          this.loadedEntityList.removeAll(this.unloadedEntityList);
  
          for (int k = 0; k < this.unloadedEntityList.size(); ++k)
-@@ -1253,12 +1317,15 @@
+@@ -1253,12 +1316,15 @@
          }
  
          this.unloadedEntityList.clear();
@@ -216,7 +215,7 @@
              Entity entity3 = entity2.getRidingEntity();
  
              if (entity3 != null)
-@@ -1273,7 +1340,8 @@
+@@ -1273,7 +1339,8 @@
  
              this.profiler.startSection("tick");
  
@@ -226,7 +225,7 @@
              {
                  try
                  {
-@@ -1304,11 +1372,17 @@
+@@ -1304,11 +1371,17 @@
                  this.loadedEntityList.remove(i1--);
                  this.onEntityRemoved(entity2);
              }
@@ -244,7 +243,7 @@
  
          if (!this.tileEntitiesToBeRemoved.isEmpty())
          {
-@@ -1316,19 +1390,22 @@
+@@ -1316,19 +1389,22 @@
              this.loadedTileEntityList.removeAll(this.tileEntitiesToBeRemoved);
              this.tileEntitiesToBeRemoved.clear();
          }
@@ -269,7 +268,7 @@
                  {
                      try
                      {
-@@ -1336,6 +1413,7 @@
+@@ -1336,6 +1412,7 @@
                          {
                              return String.valueOf((Object)TileEntityType.getId(tileentity.getType()));
                          });
@@ -277,7 +276,7 @@
                          ((ITickable)tileentity).tick();
                          this.profiler.endSection();
                      }
-@@ -1359,12 +1437,18 @@
+@@ -1359,12 +1436,18 @@
                      this.getChunk(tileentity.getPos()).removeTileEntity(tileentity.getPos());
                  }
              }
@@ -297,7 +296,7 @@
          {
              for (int j1 = 0; j1 < this.addedTileEntityList.size(); ++j1)
              {
-@@ -1389,11 +1473,52 @@
+@@ -1389,11 +1472,52 @@
  
              this.addedTileEntityList.clear();
          }
@@ -350,7 +349,7 @@
      protected void tickPlayers()
      {
      }
-@@ -1413,7 +1538,7 @@
+@@ -1413,7 +1537,7 @@
              IBlockState iblockstate = this.getBlockState(blockpos);
              this.notifyBlockUpdate(blockpos, iblockstate, iblockstate, 2);
          }
@@ -359,7 +358,7 @@
          return flag;
      }
  
-@@ -1514,7 +1639,8 @@
+@@ -1514,7 +1638,8 @@
                  this.getChunk(entityIn.chunkCoordX, entityIn.chunkCoordZ).removeEntityAtIndex(entityIn, entityIn.chunkCoordY);
              }
  
@@ -369,7 +368,7 @@
              {
                  entityIn.addedToChunk = false;
              }
-@@ -1834,17 +1960,21 @@
+@@ -1834,17 +1959,21 @@
      @Nullable
      private TileEntity getPendingTileEntityAt(BlockPos pos)
      {
@@ -401,7 +400,7 @@
      }
  
      public void setTileEntity(BlockPos pos, @Nullable TileEntity tileEntityIn)
-@@ -1856,19 +1986,22 @@
+@@ -1856,19 +1985,22 @@
                  if (this.processingLoadedTiles)
                  {
                      tileEntityIn.setPos(pos);
@@ -435,7 +434,7 @@
                      this.addedTileEntityList.add(tileEntityIn);
                  }
                  else
-@@ -2149,6 +2282,13 @@
+@@ -2149,6 +2281,13 @@
  
      public boolean checkLightFor(EnumLightType lightType, BlockPos pos)
      {
@@ -449,7 +448,7 @@
          if (!this.isAreaLoaded(pos, 17, false))
          {
              return false;
-@@ -3204,4 +3344,17 @@
+@@ -3204,4 +3343,17 @@
      public abstract RecipeManager getRecipeManager();
  
      public abstract NetworkTagManager getTags();
