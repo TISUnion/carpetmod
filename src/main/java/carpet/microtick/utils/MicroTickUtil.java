@@ -82,11 +82,15 @@ public class MicroTickUtil
 		return text;
 	}
 
-	public static ITextComponent getSuccessText(boolean bool, boolean showReturnValue)
+	public static ITextComponent getSuccessText(boolean bool, boolean showReturnValue, ITextComponent hoverExtra)
 	{
 		ITextComponent hintText = bool ?
 				Messenger.c("e " + MicroTickLoggerManager.tr("Successful")) :
 				Messenger.c("r " + MicroTickLoggerManager.tr("Failed"));
+		if (hoverExtra != null)
+		{
+			hintText.appendSibling(Messenger.c("w \n", hoverExtra));
+		}
 		if (showReturnValue)
 		{
 			hintText.appendSibling(Messenger.c(
@@ -97,6 +101,10 @@ public class MicroTickUtil
 		return bool ?
 				MicroTickUtil.getFancyText("e", Messenger.s("√"), hintText, null) :
 				MicroTickUtil.getFancyText("r", Messenger.s("×"), hintText, null);
+	}
+	public static ITextComponent getSuccessText(boolean bool, boolean showReturnValue)
+	{
+		return getSuccessText(bool, showReturnValue, null);
 	}
 
 	private static boolean isPositionAvailable(World world, BlockPos pos)

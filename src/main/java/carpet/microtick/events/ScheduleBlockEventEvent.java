@@ -11,11 +11,13 @@ import java.util.Objects;
 public class ScheduleBlockEventEvent extends BaseEvent
 {
 	private final BlockEventData blockAction;
+	private final boolean success;
 
-	public ScheduleBlockEventEvent(BlockEventData blockAction)
+	public ScheduleBlockEventEvent(BlockEventData blockAction, boolean success)
 	{
 		super(EventType.EVENT, "schedule_block_event");
 		this.blockAction = blockAction;
+		this.success = success;
 	}
 
 	@Override
@@ -26,7 +28,9 @@ public class ScheduleBlockEventEvent extends BaseEvent
 				COLOR_ACTION + this.tr("Scheduled"),
 				MicroTickUtil.getSpaceText(),
 				COLOR_TARGET + this.tr("BlockEvent"),
-				ExecuteBlockEventEvent.getMessageExtraMessengerHoverText(blockAction)
+				ExecuteBlockEventEvent.getMessageExtraMessengerHoverText(blockAction),
+				MicroTickUtil.getSpaceText(),
+				MicroTickUtil.getSuccessText(this.success, false)
 		);
 	}
 

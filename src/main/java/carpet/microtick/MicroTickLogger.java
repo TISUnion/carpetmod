@@ -159,16 +159,16 @@ public class MicroTickLogger extends TranslatableBase
 	 * -------------
 	 */
 
-	public void onExecuteBlockEvent(World world, BlockEventData blockAction, Boolean returnValue, EventType eventType)
+	public void onExecuteBlockEvent(World world, BlockEventData blockAction, Boolean returnValue, ExecuteBlockEventEvent.FailInfo failInfo, EventType eventType)
 	{
 		Optional<EnumDyeColor> color = MicroTickUtil.getWoolOrEndRodWoolColor(world, blockAction.getPosition());
-		color.ifPresent(dyeColor -> this.addMessage(dyeColor, blockAction.getPosition(), world, new ExecuteBlockEventEvent(eventType, blockAction, returnValue)));
+		color.ifPresent(dyeColor -> this.addMessage(dyeColor, blockAction.getPosition(), world, new ExecuteBlockEventEvent(eventType, blockAction, returnValue, failInfo)));
 	}
 
-	public void onScheduleBlockEvent(World world, BlockEventData blockAction)
+	public void onScheduleBlockEvent(World world, BlockEventData blockAction, boolean success)
 	{
 		Optional<EnumDyeColor> color = MicroTickUtil.getWoolOrEndRodWoolColor(world, blockAction.getPosition());
-		color.ifPresent(dyeColor -> this.addMessage(dyeColor, blockAction.getPosition(), world, new ScheduleBlockEventEvent(blockAction)));
+		color.ifPresent(dyeColor -> this.addMessage(dyeColor, blockAction.getPosition(), world, new ScheduleBlockEventEvent(blockAction, success)));
 	}
 
 	/*
