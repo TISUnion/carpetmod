@@ -3,9 +3,9 @@
 @@ -1,5 +1,8 @@
  package net.minecraft.block;
  
-+import carpet.microtick.MicroTickLoggerManager;
-+import carpet.microtick.enums.BlockUpdateType;
-+import carpet.microtick.enums.EventType;
++import carpet.microtiming.MicroTimingLoggerManager;
++import carpet.microtiming.enums.BlockUpdateType;
++import carpet.microtiming.enums.EventType;
  import it.unimi.dsi.fastutil.objects.Object2ByteLinkedOpenHashMap;
  import java.util.List;
  import java.util.Objects;
@@ -14,7 +14,7 @@
      protected static final Logger LOGGER = LogManager.getLogger();
      public static final ObjectIntIdentityMap<IBlockState> BLOCK_STATE_IDS = new ObjectIntIdentityMap<>();
 -    private static final EnumFacing[] UPDATE_ORDER = new EnumFacing[] {EnumFacing.WEST, EnumFacing.EAST, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.DOWN, EnumFacing.UP};
-+    // TISCM Micro Tick logger makes public
++    // TISCM Micro Timing logger makes public
 +    public static final EnumFacing[] UPDATE_ORDER = new EnumFacing[] {EnumFacing.WEST, EnumFacing.EAST, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.DOWN, EnumFacing.UP};
      protected final int lightValue;
      protected final float blockHardness;
@@ -36,10 +36,10 @@
      {
          try (BlockPos.PooledMutableBlockPos blockpos$pooledmutableblockpos = BlockPos.PooledMutableBlockPos.retain())
          {
-+            // TISCM Micro Tick logger
-+            if (MicroTickLoggerManager.isLoggerActivated())
++            // TISCM Micro Timing logger
++            if (MicroTimingLoggerManager.isLoggerActivated())
 +            {
-+                MicroTickLoggerManager.onBlockUpdate(worldIn.getWorld(), pos, worldIn.getBlockState(pos).getBlock(), BlockUpdateType.STATE_UPDATE, null, EventType.ACTION_START);
++                MicroTimingLoggerManager.onBlockUpdate(worldIn.getWorld(), pos, worldIn.getBlockState(pos).getBlock(), BlockUpdateType.STATE_UPDATE, null, EventType.ACTION_START);
 +            }
              for (EnumFacing enumfacing : UPDATE_ORDER)
              {
@@ -50,10 +50,10 @@
                  replaceBlock(iblockstate, iblockstate1, worldIn, blockpos$pooledmutableblockpos, flags);
 +
              }
-+            // TISCM Micro Tick logger
-+            if (MicroTickLoggerManager.isLoggerActivated())
++            // TISCM Micro Timing logger
++            if (MicroTimingLoggerManager.isLoggerActivated())
 +            {
-+                MicroTickLoggerManager.onBlockUpdate(worldIn.getWorld(), pos, worldIn.getBlockState(pos).getBlock(), BlockUpdateType.STATE_UPDATE, null, EventType.ACTION_END);
++                MicroTimingLoggerManager.onBlockUpdate(worldIn.getWorld(), pos, worldIn.getBlockState(pos).getBlock(), BlockUpdateType.STATE_UPDATE, null, EventType.ACTION_END);
 +            }
          }
      }

@@ -3,8 +3,8 @@
 @@ -1,5 +1,8 @@
  package net.minecraft.block;
  
-+import carpet.microtick.MicroTickLoggerManager;
-+import carpet.microtick.enums.EventType;
++import carpet.microtiming.MicroTimingLoggerManager;
++import carpet.microtiming.enums.EventType;
 +import carpet.settings.CarpetSettings;
  import net.minecraft.block.state.IBlockState;
  import net.minecraft.state.BooleanProperty;
@@ -23,14 +23,14 @@
          if (flag1 != flag)
          {
              worldIn.setBlockState(pos, state.with(POWERED, Boolean.valueOf(flag1)), 3);
-+            MicroTickLoggerManager.onEmitBlockUpdate(worldIn, this, pos, EventType.ACTION_START, "updateState");  // TISCM Micro Tick logger
++            MicroTimingLoggerManager.onEmitBlockUpdate(worldIn, this, pos, EventType.ACTION_START, "updateState");  // TISCM Micro Timing logger
              worldIn.notifyNeighborsOfStateChange(pos.down(), this);
  
              if (state.get(SHAPE).isAscending())
              {
                  worldIn.notifyNeighborsOfStateChange(pos.up(), this);
              }
-+            MicroTickLoggerManager.onEmitBlockUpdate(worldIn, this, pos, EventType.ACTION_END, "updateState");  // TISCM Micro Tick logger
++            MicroTimingLoggerManager.onEmitBlockUpdate(worldIn, this, pos, EventType.ACTION_END, "updateState");  // TISCM Micro Timing logger
          }
      }
  

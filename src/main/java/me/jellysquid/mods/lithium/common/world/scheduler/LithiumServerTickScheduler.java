@@ -1,7 +1,7 @@
 package me.jellysquid.mods.lithium.common.world.scheduler;
 
-import carpet.microtick.MicroTickLoggerManager;
-import carpet.microtick.tickstages.TileTickTickStageExtra;
+import carpet.microtiming.MicroTimingLoggerManager;
+import carpet.microtiming.tickstages.TileTickTickStageExtra;
 import it.unimi.dsi.fastutil.longs.Long2ObjectAVLTreeMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectSortedMap;
@@ -123,17 +123,17 @@ public class LithiumServerTickScheduler<T> extends ServerTickList<T> {
 
     @Override
     public void scheduleTick(BlockPos pos, T obj, int delay, TickPriority priority) {
-        int oldListSize = this.scheduledTicks.size();  // TISCM Micro Tick logger
+        int oldListSize = this.scheduledTicks.size();  // TISCM Micro Timing logger
 
         // An extra isBlockLoaded check is needed in 1.13
         if (this.world.isBlockLoaded(pos)) {
             this.scheduleUpdateNoLoadedCheck(pos, obj, delay, priority);
         }
 
-        // TISCM Micro Tick logger
+        // TISCM Micro Timing logger
         if (obj instanceof Block)
         {
-            MicroTickLoggerManager.onScheduleTileTickEvent(this.world, (Block)obj, pos, delay, priority, this.scheduledTicks.size() > oldListSize);
+            MicroTimingLoggerManager.onScheduleTileTickEvent(this.world, (Block)obj, pos, delay, priority, this.scheduledTicks.size() > oldListSize);
         }
     }
 
@@ -251,16 +251,16 @@ public class LithiumServerTickScheduler<T> extends ServerTickList<T> {
     }
 
     public void executeTicks(Consumer<NextTickListEntry<T>> consumer) {
-        // TISCM Micro Tick logger
+        // TISCM Micro Timing logger
         int eventCounter = 0;
 
         // Mark and execute all executing ticks
         for (TickEntry<T> tick : this.executingTicks) {
             try {
-                // TISCM Micro Tick logger
-                MicroTickLoggerManager.setTickStageDetail(this.world, String.valueOf(tick.priority.getPriority()));
-                MicroTickLoggerManager.setTickStageExtra(this.world, new TileTickTickStageExtra(this.world, tick, eventCounter++));
-                // end TISCM Micro Tick logger
+                // TISCM Micro Timing logger
+                MicroTimingLoggerManager.setTickStageDetail(this.world, String.valueOf(tick.priority.getPriority()));
+                MicroTimingLoggerManager.setTickStageExtra(this.world, new TileTickTickStageExtra(this.world, tick, eventCounter++));
+                // end TISCM Micro Timing logger
 
                 // Mark as consumed before execution per vanilla behaviour
                 tick.executing = false;
@@ -281,8 +281,8 @@ public class LithiumServerTickScheduler<T> extends ServerTickList<T> {
             }
         }
 
-        MicroTickLoggerManager.setTickStageDetail(this.world, null); // TISCM Micro Tick logger
-        MicroTickLoggerManager.setTickStageExtra(this.world, null); // TISCM Micro Tick logger
+        MicroTimingLoggerManager.setTickStageDetail(this.world, null); // TISCM Micro Timing logger
+        MicroTimingLoggerManager.setTickStageExtra(this.world, null); // TISCM Micro Timing logger
 
 
         // We finished executing those ticks, so empty the list.

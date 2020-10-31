@@ -4,12 +4,12 @@
  package net.minecraft.world;
  
 +import carpet.helpers.TickSpeed;
-+import carpet.microtick.MicroTickLogger;
-+import carpet.microtick.MicroTickLoggerManager;
-+import carpet.microtick.enums.EventType;
-+import carpet.microtick.enums.TickStage;
-+import carpet.microtick.events.ExecuteBlockEventEvent;
-+import carpet.microtick.tickstages.BlockEventTickStageExtra;
++import carpet.microtiming.MicroTimingLogger;
++import carpet.microtiming.MicroTimingLoggerManager;
++import carpet.microtiming.enums.EventType;
++import carpet.microtiming.enums.TickStage;
++import carpet.microtiming.events.ExecuteBlockEventEvent;
++import carpet.microtiming.tickstages.BlockEventTickStageExtra;
 +import carpet.settings.CarpetSettings;
 +import carpet.utils.CarpetProfiler;
  import com.google.common.collect.Lists;
@@ -28,7 +28,7 @@
      private final EntityTracker entityTracker;
      private final PlayerChunkMap playerChunkMap;
      private final Map<UUID, Entity> entitiesByUuid = Maps.newHashMap();
-+    private final MicroTickLogger microTickLogger;  // TISCM Micro Tick logger
++    private final MicroTimingLogger microTimingLogger;  // TISCM Micro Timing logger
      public boolean disableLevelSaving;
      private boolean allPlayersSleeping;
      private int updateEntityTick;
@@ -55,12 +55,12 @@
          this.calculateInitialWeather();
          this.getWorldBorder().setSize(server.getMaxWorldSize());
 +
-+        this.microTickLogger = new MicroTickLogger(this);  // TISCM Micro Tick logger
++        this.microTimingLogger = new MicroTimingLogger(this);  // TISCM Micro Timing logger
      }
  
-+    public MicroTickLogger getMicroTickLogger()  // TISCM Micro Tick logger
++    public MicroTimingLogger getMicroTickLogger()  // TISCM Micro Timing logger
 +    {
-+        return microTickLogger;
++        return microTimingLogger;
 +    }
 +
      public WorldServer init()
@@ -79,7 +79,7 @@
 +        { // [CM] extra indent to skip processing of entities
          this.profiler.startSection("spawner");
 +        CarpetProfiler.start_section(world_name, "Spawning");
-+        MicroTickLoggerManager.setTickStage(this, TickStage.SPAWNING); // TISCM Micro Tick logger
++        MicroTimingLoggerManager.setTickStage(this, TickStage.SPAWNING); // TISCM Micro Timing logger
  
          if (this.getGameRules().getBoolean("doMobSpawning") && this.worldInfo.getGenerator() != WorldType.DEBUG_ALL_BLOCK_STATES)
          {
@@ -91,7 +91,7 @@
 +        // [CM] end extra indent
  
          this.profiler.endStartSection("chunkSource");
-+        MicroTickLoggerManager.setTickStage(this, TickStage.CHUNK_UNLOADING); // TISCM Micro Tick logger
++        MicroTimingLoggerManager.setTickStage(this, TickStage.CHUNK_UNLOADING); // TISCM Micro Timing logger
          this.chunkProvider.tick(hasTimeLeft);
          int j = this.calculateSkylightSubtracted(1.0F);
  
@@ -103,11 +103,11 @@
 +        if (TickSpeed.process_entities)
 +        { // CM extra indent to skip processing of entities
  
-+        // TISCM Micro Tick logger
++        // TISCM Micro Timing logger
 +        // Flushes messages right before overworld gametime increases
 +        if (this.getDimension().getType() == DimensionType.OVERWORLD)
 +        {
-+            MicroTickLoggerManager.flushMessages(this.getGameTime());
++            MicroTimingLoggerManager.flushMessages(this.getGameTime());
 +        }
 +
 +        this.worldInfo.setGameTime(this.worldInfo.getGameTime() + 1L);
@@ -118,7 +118,7 @@
  
          this.profiler.endStartSection("tickPending");
 +        CarpetProfiler.start_section(world_name, "Blocks");
-+        MicroTickLoggerManager.setTickStage(this, TickStage.TILE_TICK); // TISCM Micro Tick logger
++        MicroTimingLoggerManager.setTickStage(this, TickStage.TILE_TICK); // TISCM Micro Timing logger
          this.tickPending();
 +        CarpetProfiler.end_current_section();
 +        } // end extra indent
@@ -126,7 +126,7 @@
 +        CarpetProfiler.start_section(world_name, "Blocks");
          this.tickBlocks();
 +        CarpetProfiler.end_current_section();
-+        MicroTickLoggerManager.setTickStage(this, TickStage.PLAYER_CHUNK_MAP); // TISCM Micro Tick logger
++        MicroTimingLoggerManager.setTickStage(this, TickStage.PLAYER_CHUNK_MAP); // TISCM Micro Timing logger
          this.profiler.endStartSection("chunkMap");
          this.playerChunkMap.tick();
 +
@@ -134,23 +134,23 @@
 +        { // CM extra indent to skip processing of entities
          this.profiler.endStartSection("village");
 +        CarpetProfiler.start_section(world_name, "Villages");
-+        MicroTickLoggerManager.setTickStage(this, TickStage.VILLAGE); // TISCM Micro Tick logger
++        MicroTimingLoggerManager.setTickStage(this, TickStage.VILLAGE); // TISCM Micro Timing logger
          this.villageCollection.tick();
          this.villageSiege.tick();
 +        CarpetProfiler.end_current_section();
          this.profiler.endStartSection("portalForcer");
-+        MicroTickLoggerManager.setTickStage(this, TickStage.PORTAL_FORCER); // TISCM Micro Tick logger
++        MicroTimingLoggerManager.setTickStage(this, TickStage.PORTAL_FORCER); // TISCM Micro Timing logger
          this.worldTeleporter.tick(this.getGameTime());
 +        }
 +        // [TISCM] Newlight
 +        if (CarpetSettings.newLight)
 +        {
 +            this.profiler.endStartSection("lighting");
-+            MicroTickLoggerManager.setTickStage(this, TickStage.NEW_LIGHT); // TISCM Micro Tick logger
++            MicroTimingLoggerManager.setTickStage(this, TickStage.NEW_LIGHT); // TISCM Micro Timing logger
 +            this.getLightingEngine().procLightUpdates();
 +        }
          this.profiler.endSection();
-+        MicroTickLoggerManager.setTickStage(this, TickStage.BLOCK_EVENT); // TISCM Micro Tick logger
++        MicroTimingLoggerManager.setTickStage(this, TickStage.BLOCK_EVENT); // TISCM Micro Timing logger
          this.sendQueuedBlockEvents();
          this.insideTick = false;
      }
@@ -181,11 +181,11 @@
              boolean flag1 = this.isThundering();
              this.profiler.startSection("pollingChunks");
  
-+            MicroTickLoggerManager.setTickStage(this, TickStage.RANDOMTICK_CLIMATE); // TISCM Micro Tick logger
++            MicroTimingLoggerManager.setTickStage(this, TickStage.RANDOMTICK_CLIMATE); // TISCM Micro Timing logger
              for (Iterator<Chunk> iterator = this.playerChunkMap.getChunkIterator(); iterator.hasNext(); this.profiler.endSection())
              {
                  this.profiler.startSection("getChunk");
-+                MicroTickLoggerManager.setTickStageDetail(this, "TickChunk"); // TISCM Micro Tick logger
++                MicroTimingLoggerManager.setTickStageDetail(this, "TickChunk"); // TISCM Micro Timing logger
                  Chunk chunk = iterator.next();
                  int j = chunk.x * 16;
                  int k = chunk.z * 16;
@@ -201,7 +201,7 @@
 +                }
 +
                  this.profiler.endStartSection("thunder");
-+                MicroTickLoggerManager.setTickStageDetail(this, "Thunder"); // TISCM Micro Tick logger
++                MicroTimingLoggerManager.setTickStageDetail(this, "Thunder"); // TISCM Micro Timing logger
  
                  if (flag && flag1 && this.rand.nextInt(100000) == 0)
                  {
@@ -209,7 +209,7 @@
                  }
  
                  this.profiler.endStartSection("iceandsnow");
-+                MicroTickLoggerManager.setTickStageDetail(this, "Ice&Snow"); // TISCM Micro Tick logger
++                MicroTimingLoggerManager.setTickStageDetail(this, "Ice&Snow"); // TISCM Micro Timing logger
  
                  if (this.rand.nextInt(16) == 0)
                  {
@@ -217,7 +217,7 @@
                  }
  
                  this.profiler.endStartSection("tickBlocks");
-+                MicroTickLoggerManager.setTickStageDetail(this, "RandomTick"); // TISCM Micro Tick logger
++                MicroTimingLoggerManager.setTickStageDetail(this, "RandomTick"); // TISCM Micro Timing logger
  
                  if (i > 0)
                  {
@@ -226,10 +226,10 @@
  
              this.profiler.endSection();
 +
-+            // TISCM Micro Tick logger
-+            MicroTickLoggerManager.setTickStageDetail(this, null);
-+            MicroTickLoggerManager.setTickStageExtra(this, null);
-+            // end TISCM Micro Tick logger
++            // TISCM Micro Timing logger
++            MicroTimingLoggerManager.setTickStageDetail(this, null);
++            MicroTimingLoggerManager.setTickStageExtra(this, null);
++            // end TISCM Micro Timing logger
          }
      }
  
@@ -242,7 +242,7 @@
  
      private void tickBlock(NextTickListEntry<Block> blockTickEntry)
      {
-+        MicroTickLoggerManager.onExecuteTileTickEvent(this, blockTickEntry, EventType.ACTION_START);  // TISCM Micro Tick logger
++        MicroTimingLoggerManager.onExecuteTileTickEvent(this, blockTickEntry, EventType.ACTION_START);  // TISCM Micro Timing logger
 +
          IBlockState iblockstate = this.getBlockState(blockTickEntry.position);
  
@@ -251,7 +251,7 @@
              iblockstate.tick(this, blockTickEntry.position, this.rand);
          }
 +
-+        MicroTickLoggerManager.onExecuteTileTickEvent(this, blockTickEntry, EventType.ACTION_END);  // TISCM Micro Tick logger
++        MicroTimingLoggerManager.onExecuteTileTickEvent(this, blockTickEntry, EventType.ACTION_END);  // TISCM Micro Timing logger
      }
  
      public void tickEntity(Entity entityIn, boolean forceUpdate)
@@ -260,27 +260,27 @@
      public void addBlockEvent(BlockPos pos, Block blockIn, int eventID, int eventParam)
      {
 -        this.blockEventQueue.add(new BlockEventData(pos, blockIn, eventID, eventParam));
-+        // TISCM Micro Tick logger
++        // TISCM Micro Timing logger
 +        BlockEventData blockEventData = new BlockEventData(pos, blockIn, eventID, eventParam);
 +        boolean success = this.blockEventQueue.add(blockEventData);
-+        MicroTickLoggerManager.onScheduleBlockEvent(this, blockEventData, success);
++        MicroTimingLoggerManager.onScheduleBlockEvent(this, blockEventData, success);
      }
  
      private void sendQueuedBlockEvents()
      {
-+        // TISCM Micro Tick logger
++        // TISCM Micro Timing logger
 +        int depth = 0, depthSize = this.blockEventQueue.size();
 +        int eventCounter = 0, indexInCurrentDepth = 0;
-+        // end TISCM Micro Tick logger
++        // end TISCM Micro Timing logger
 +
          while (!this.blockEventQueue.isEmpty())
          {
              BlockEventData blockeventdata = this.blockEventQueue.removeFirst();
  
-+            // TISCM Micro Tick logger
-+            MicroTickLoggerManager.setTickStageDetail(this, String.valueOf(depth));
-+            MicroTickLoggerManager.setTickStageExtra(this, new BlockEventTickStageExtra(this, blockeventdata, eventCounter++, depth));
-+            // end TISCM Micro Tick logger
++            // TISCM Micro Timing logger
++            MicroTimingLoggerManager.setTickStageDetail(this, String.valueOf(depth));
++            MicroTimingLoggerManager.setTickStageExtra(this, new BlockEventTickStageExtra(this, blockeventdata, eventCounter++, depth));
++            // end TISCM Micro Timing logger
 +
              if (this.fireBlockEvent(blockeventdata))
              {
@@ -288,7 +288,7 @@
 +                this.server.getPlayerList().sendToAllNearExcept((EntityPlayer)null, (double)blockeventdata.getPosition().getX(), (double)blockeventdata.getPosition().getY(), (double)blockeventdata.getPosition().getZ(), CarpetSettings.blockEventPacketRange, this.dimension.getType(), new SPacketBlockAction(blockeventdata.getPosition(), blockeventdata.getBlock(), blockeventdata.getEventID(), blockeventdata.getEventParameter()));
              }
 +
-+            // TISCM Micro Tick logger
++            // TISCM Micro Timing logger
 +            indexInCurrentDepth++;
 +            if (indexInCurrentDepth == depthSize)
 +            {
@@ -296,19 +296,19 @@
 +                depthSize = this.blockEventQueue.size();
 +                indexInCurrentDepth = 0;
 +            }
-+            // end TISCM Micro Tick logger
++            // end TISCM Micro Timing logger
          }
      }
  
      private boolean fireBlockEvent(BlockEventData event)
      {
-+        MicroTickLoggerManager.onExecuteBlockEvent(this, event, null, null, EventType.ACTION_START);  // TISCM Micro Tick logger
++        MicroTimingLoggerManager.onExecuteBlockEvent(this, event, null, null, EventType.ACTION_START);  // TISCM Micro Timing logger
 +
          IBlockState iblockstate = this.getBlockState(event.getPosition());
 -        return iblockstate.getBlock() == event.getBlock() ? iblockstate.onBlockEventReceived(this, event.getPosition(), event.getEventID(), event.getEventParameter()) : false;
 +        boolean returnValue = iblockstate.getBlock() == event.getBlock() ? iblockstate.onBlockEventReceived(this, event.getPosition(), event.getEventID(), event.getEventParameter()) : false;
 +
-+        MicroTickLoggerManager.onExecuteBlockEvent(this, event, returnValue, new ExecuteBlockEventEvent.FailInfo(iblockstate.getBlock() != event.getBlock() ? ExecuteBlockEventEvent.FailReason.BLOCK_CHANGED : ExecuteBlockEventEvent.FailReason.EVENT_FAIL, iblockstate.getBlock()), EventType.ACTION_END);
++        MicroTimingLoggerManager.onExecuteBlockEvent(this, event, returnValue, new ExecuteBlockEventEvent.FailInfo(iblockstate.getBlock() != event.getBlock() ? ExecuteBlockEventEvent.FailReason.BLOCK_CHANGED : ExecuteBlockEventEvent.FailReason.EVENT_FAIL, iblockstate.getBlock()), EventType.ACTION_END);
 +        return returnValue;
      }
  

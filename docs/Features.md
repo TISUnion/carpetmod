@@ -120,13 +120,13 @@ Options: `false`, `true`
 
 Categories: experimental, optimization
 
-## microTick
+## microTiming
 
-Enable the function of [MicroTick logger](#microTick-1)
+Enable the function of [MicroTiming logger](#microTiming-1)
 
 Display redstone components actions, blockupdates and stacktrace with a wool block
 
-Use `/log microtick` to start logging
+Use `/log microTiming` to start logging
 
 Might impact the server performance when it's on
 
@@ -369,13 +369,13 @@ log village count on tab list
 
 Options: none
 
-## microtick
+## microTiming
 
-`/log microtick <type>`
+`/log microTiming <type>`
 
 Log micro timings of redstone components. The ticket of the chunk the component is in needs to be at least lazy-processing (ticket level 32)
 
-Check rule [microTick](#microTick) for detail. Remember to use `/carpet microTick true` to enable logger functionality
+Check rule [microTiming](#microTiming) for detail. Remember to use `/carpet microTiming true` to enable logger functionality
 
 Available options: 
 - `all`: Log all events

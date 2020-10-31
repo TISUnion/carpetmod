@@ -1,21 +1,20 @@
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1,5 +1,14 @@
+@@ -1,5 +1,13 @@
  package net.minecraft.server;
  
 +import carpet.CarpetServer;
 +import carpet.commands.EpsCommand;
 +import carpet.helpers.TickSpeed;
-+import carpet.logging.logHelpers.AutoSaveLogHelper;
-+import carpet.microtick.MicroTickLoggerManager;
-+import carpet.microtick.enums.TickStage;
-+import carpet.microtick.tickstages.StringTickStageExtra;
++import carpet.microtiming.MicroTimingLoggerManager;
++import carpet.microtiming.enums.TickStage;
++import carpet.microtiming.tickstages.StringTickStageExtra;
 +import carpet.settings.CarpetSettings;
 +import carpet.utils.CarpetProfiler;
  import com.google.common.base.Stopwatch;
  import com.google.common.collect.Lists;
  import com.google.common.collect.Maps;
-@@ -178,6 +187,7 @@
+@@ -178,6 +186,7 @@
      public final Queue < FutureTask<? >> futureTaskQueue = Queues.newConcurrentLinkedQueue();
      private Thread serverThread;
      private long serverTime = Util.milliTime();
@@ -23,7 +22,7 @@
      @OnlyIn(Dist.CLIENT)
      private boolean worldIconSet;
      private final IReloadableResourceManager resourceManager = new SimpleReloadableResourceManager(ResourcePackType.SERVER_DATA);
-@@ -212,6 +222,8 @@
+@@ -212,6 +221,8 @@
          this.resourceManager.addReloadListener(this.lootTableManager);
          this.resourceManager.addReloadListener(this.functionManager);
          this.resourceManager.addReloadListener(this.advancementManager);
@@ -32,7 +31,7 @@
      }
  
      public abstract boolean init() throws IOException;
-@@ -571,6 +583,7 @@
+@@ -571,6 +582,7 @@
      public void stopServer()
      {
          LOGGER.info("Stopping server");
@@ -40,7 +39,7 @@
  
          if (this.getNetworkSystem() != null)
          {
-@@ -642,31 +655,53 @@
+@@ -642,31 +654,53 @@
              if (this.init())
              {
                  this.serverTime = Util.milliTime();
@@ -112,7 +111,7 @@
                  }
              }
              else
-@@ -782,6 +817,12 @@
+@@ -782,6 +816,12 @@
      {
          long i = Util.nanoTime();
          ++this.tickCounter;
@@ -125,7 +124,7 @@
  
          if (this.startProfiling)
          {
-@@ -790,6 +831,9 @@
+@@ -790,6 +830,9 @@
          }
  
          this.profiler.startSection("root");
@@ -135,12 +134,12 @@
          this.updateTimeLightAndEntities(hasTimeLeft);
  
          if (i - this.nanoTimeSinceStatusRefresh >= 5000000000L)
-@@ -810,10 +854,16 @@
+@@ -810,10 +853,16 @@
  
          if (this.tickCounter % 900 == 0)
          {
 +            CarpetProfiler.start_section(null, "Autosave");
-+            MicroTickLoggerManager.setTickStage(TickStage.AUTO_SAVE); // TISCM Micro Tick logger
++            MicroTimingLoggerManager.setTickStage(TickStage.AUTO_SAVE); // TISCM Micro Timing logger
              this.profiler.startSection("save");
              this.playerList.saveAllPlayerData();
              this.saveAllWorlds(true);
@@ -152,7 +151,7 @@
          }
  
          this.profiler.startSection("snooper");
-@@ -829,16 +879,25 @@
+@@ -829,16 +878,25 @@
          }
  
          this.profiler.endSection();
@@ -173,25 +172,25 @@
      public void updateTimeLightAndEntities(BooleanSupplier hasTimeLeft)
      {
          this.profiler.startSection("jobs");
-+        MicroTickLoggerManager.setTickStage(TickStage.PLAYER_ACTION);  // TISCM Micro Tick logger
-+        MicroTickLoggerManager.setTickStageExtra(StringTickStageExtra.SYNC_TASKS);  // TISCM Micro Tick logger
++        MicroTimingLoggerManager.setTickStage(TickStage.PLAYER_ACTION);  // TISCM Micro Timing logger
++        MicroTimingLoggerManager.setTickStageExtra(StringTickStageExtra.SYNC_TASKS);  // TISCM Micro Timing logger
          FutureTask<?> futuretask;
  
          while ((futuretask = this.futureTaskQueue.poll()) != null)
-@@ -847,6 +906,7 @@
+@@ -847,6 +905,7 @@
          }
  
          this.profiler.endStartSection("commandFunctions");
-+        MicroTickLoggerManager.setTickStage(TickStage.COMMAND_FUNCTION); // TISCM Micro Tick logger
++        MicroTimingLoggerManager.setTickStage(TickStage.COMMAND_FUNCTION); // TISCM Micro Timing logger
          this.getFunctionManager().tick();
          this.profiler.endStartSection("levels");
  
-@@ -905,10 +965,13 @@
+@@ -905,10 +964,13 @@
              }))[this.tickCounter % 100] = Util.nanoTime() - i;
          }
  
 +        CarpetProfiler.start_section(null, "Network");
-+        MicroTickLoggerManager.setTickStage(TickStage.NETWORK); // TISCM Micro Tick logger
++        MicroTimingLoggerManager.setTickStage(TickStage.NETWORK); // TISCM Micro Timing logger
          this.profiler.endStartSection("connection");
          this.getNetworkSystem().tick();
          this.profiler.endStartSection("players");
@@ -200,7 +199,7 @@
          this.profiler.endStartSection("tickables");
  
          for (int j = 0; j < this.tickables.size(); ++j)
-@@ -1605,6 +1668,12 @@
+@@ -1605,6 +1667,12 @@
      {
          return this.serverTime;
      }
@@ -213,7 +212,7 @@
  
      public Thread getServerThread()
      {
-@@ -1825,4 +1894,12 @@
+@@ -1825,4 +1893,12 @@
              return 0;
          }
      }

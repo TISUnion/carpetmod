@@ -3,7 +3,7 @@ package carpet;
 import carpet.commands.*;
 import carpet.helpers.TickSpeed;
 import carpet.logging.LoggerRegistry;
-import carpet.microtick.MicroTickLoggerManager;
+import carpet.microtiming.MicroTimingLoggerManager;
 import carpet.script.CarpetScriptServer;
 import carpet.settings.CarpetSettings;
 import carpet.settings.SettingsManager;
@@ -36,7 +36,7 @@ public class CarpetServer // static for now - easier to handle all around the co
     {
         settingsManager = new SettingsManager(server);
         scriptServer = new CarpetScriptServer();
-        MicroTickLoggerManager.attachServer(server);
+        MicroTimingLoggerManager.attachServer(server);
         //ExpressionInspector.CarpetExpression_resetExpressionEngine();
     }
     // Separate from onServerLoaded, because a server can be loaded multiple times in singleplayer
@@ -46,7 +46,7 @@ public class CarpetServer // static for now - easier to handle all around the co
 
     public static void onServerClosed(MinecraftServer server)
     {
-        MicroTickLoggerManager.detachServer();
+        MicroTimingLoggerManager.detachServer();
     }
 
     public static void tick(MinecraftServer server)

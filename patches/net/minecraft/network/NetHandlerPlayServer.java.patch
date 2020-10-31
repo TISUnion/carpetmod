@@ -1,15 +1,26 @@
 --- a/net/minecraft/network/NetHandlerPlayServer.java
 +++ b/net/minecraft/network/NetHandlerPlayServer.java
-@@ -1,5 +1,8 @@
+@@ -1,5 +1,10 @@
  package net.minecraft.network;
  
 +import carpet.CarpetServer;
 +import carpet.helpers.TickSpeed;
++import carpet.microtiming.MicroTimingLoggerManager;
++import carpet.microtiming.tickstages.PlayerEntityTickStageExtra;
 +import carpet.settings.CarpetSettings;
  import com.google.common.primitives.Doubles;
  import com.google.common.primitives.Floats;
  import com.google.common.util.concurrent.Futures;
-@@ -185,7 +188,7 @@
+@@ -177,6 +182,8 @@
+ 
+     public void tick()
+     {
++        MicroTimingLoggerManager.setTickStageExtra(new PlayerEntityTickStageExtra(this.player));  // TISCM Micro Timing logger
++
+         this.captureCurrentPosition();
+         this.player.playerTick();
+         this.player.setPositionAndRotation(this.firstGoodX, this.firstGoodY, this.firstGoodZ, this.player.rotationYaw, this.player.rotationPitch);
+@@ -185,7 +192,7 @@
  
          if (this.floating)
          {
@@ -18,7 +29,7 @@
              {
                  LOGGER.warn("{} was kicked for floating too long!", (Object)this.player.getName().getString());
                  this.disconnect(new TextComponentTranslation("multiplayer.disconnect.flying"));
-@@ -211,7 +214,7 @@
+@@ -211,7 +218,7 @@
  
              if (this.vehicleFloating && this.player.getLowestRidingEntity().getControllingPassenger() == this.player)
              {
@@ -27,7 +38,16 @@
                  {
                      LOGGER.warn("{} was kicked for floating a vehicle too long!", (Object)this.player.getName().getString());
                      this.disconnect(new TextComponentTranslation("multiplayer.disconnect.flying"));
-@@ -296,6 +299,12 @@
+@@ -265,6 +272,8 @@
+         {
+             this.disconnect(new TextComponentTranslation("multiplayer.disconnect.idling"));
+         }
++
++        MicroTimingLoggerManager.setTickStageExtra(null);  // TISCM Micro Timing logger
+     }
+ 
+     public void captureCurrentPosition()
+@@ -296,6 +305,12 @@
      {
          PacketThreadUtil.checkThreadAndEnqueue(packetIn, this, this.player.getServerWorld());
          this.player.setEntityActionState(packetIn.getStrafeSpeed(), packetIn.getForwardSpeed(), packetIn.isJumping(), packetIn.isSneaking());
@@ -40,7 +60,7 @@
      }
  
      private static boolean isMovePlayerPacketInvalid(CPacketPlayer packetIn)
-@@ -344,7 +353,7 @@
+@@ -344,7 +359,7 @@
                  double d9 = entity.motionX * entity.motionX + entity.motionY * entity.motionY + entity.motionZ * entity.motionZ;
                  double d10 = d6 * d6 + d7 * d7 + d8 * d8;
  
@@ -49,7 +69,7 @@
                  {
                      LOGGER.warn("{} (vehicle of {}) moved too quickly! {},{},{}", entity.getName().getString(), this.player.getName().getString(), d6, d7, d8);
                      this.netManager.sendPacket(new SPacketMoveVehicle(entity));
-@@ -831,6 +840,12 @@
+@@ -831,6 +846,12 @@
                          double d10 = this.player.motionX * this.player.motionX + this.player.motionY * this.player.motionY + this.player.motionZ * this.player.motionZ;
                          double d11 = d7 * d7 + d8 * d8 + d9 * d9;
  
@@ -62,7 +82,7 @@
                          if (this.player.isPlayerSleeping())
                          {
                              if (d11 > 1.0D)
-@@ -849,7 +864,8 @@
+@@ -849,7 +870,8 @@
                                  i = 1;
                              }
  
@@ -72,7 +92,7 @@
                              {
                                  float f2 = this.player.isElytraFlying() ? 300.0F : 100.0F;
  
-@@ -869,6 +885,8 @@
+@@ -869,6 +891,8 @@
                              if (this.player.onGround && !packetIn.isOnGround() && d8 > 0.0D)
                              {
                                  this.player.jump();
@@ -81,7 +101,7 @@
                              }
  
                              this.player.move(MoverType.PLAYER, d7, d8, d9);
-@@ -1006,6 +1024,9 @@
+@@ -1006,6 +1030,9 @@
                      {
                          if (!this.server.isBlockProtected(worldserver, blockpos, this.player) && worldserver.getWorldBorder().contains(blockpos))
                          {
@@ -91,7 +111,7 @@
                              this.player.interactionManager.startDestroyBlock(blockpos, packetIn.getFacing());
                          }
                          else
-@@ -1052,6 +1073,8 @@
+@@ -1052,6 +1079,8 @@
          {
              if (this.targetPos == null && this.player.getDistanceSq((double)blockpos.getX() + 0.5D, (double)blockpos.getY() + 0.5D, (double)blockpos.getZ() + 0.5D) < 64.0D && !this.server.isBlockProtected(worldserver, blockpos, this.player) && worldserver.getWorldBorder().contains(blockpos))
              {
@@ -100,7 +120,7 @@
                  this.player.interactionManager.processRightClickBlock(this.player, worldserver, itemstack, enumhand, blockpos, enumfacing, packetIn.getFacingX(), packetIn.getFacingY(), packetIn.getFacingZ());
              }
          }
-@@ -1073,6 +1096,9 @@
+@@ -1073,6 +1102,9 @@
          ItemStack itemstack = this.player.getHeldItem(enumhand);
          this.player.markPlayerActive();
  
@@ -110,7 +130,7 @@
          if (!itemstack.isEmpty())
          {
              this.player.interactionManager.processRightClick(this.player, worldserver, itemstack, enumhand);
-@@ -1223,7 +1249,7 @@
+@@ -1223,7 +1255,7 @@
  
              this.chatSpamThresholdCount += 20;
  
@@ -119,7 +139,7 @@
              {
                  this.disconnect(new TextComponentTranslation("disconnect.spam"));
              }
-@@ -1250,19 +1276,25 @@
+@@ -1250,19 +1282,25 @@
          switch (packetIn.getAction())
          {
              case START_SNEAKING:
@@ -145,7 +165,7 @@
                  if (this.player.isPlayerSleeping())
                  {
                      this.player.wakeUpPlayer(false, true, true);
-@@ -1303,7 +1335,10 @@
+@@ -1303,7 +1341,10 @@
                  break;
              case START_FALL_FLYING:
  
@@ -157,7 +177,7 @@
                  {
                      ItemStack itemstack = this.player.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
  
-@@ -1345,6 +1380,9 @@
+@@ -1345,6 +1386,9 @@
                  if (packetIn.getAction() == CPacketUseEntity.Action.INTERACT)
                  {
                      EnumHand enumhand = packetIn.getHand();
@@ -167,7 +187,7 @@
                      this.player.interactOn(entity, enumhand);
                  }
                  else if (packetIn.getAction() == CPacketUseEntity.Action.INTERACT_AT)
-@@ -1360,6 +1398,8 @@
+@@ -1360,6 +1404,8 @@
                          this.server.logWarning("Player " + this.player.getName().getString() + " tried to attack an invalid entity");
                          return;
                      }

@@ -1,7 +1,7 @@
 package carpet.commands;
 
 import carpet.CarpetServer;
-import carpet.microtick.utils.MicroTickUtil;
+import carpet.microtiming.utils.MicroTimingUtil;
 import carpet.settings.CarpetSettings;
 import carpet.utils.BlockInfo;
 import carpet.utils.EntityInfo;
@@ -69,7 +69,7 @@ public class InfoCommand
             order++;
             Messenger.m(source, Messenger.c(
                     "g " + order + ". ",
-                    MicroTickUtil.getDimensionNameText(world.getDimension().getType())
+                    MicroTimingUtil.getDimensionNameText(world.getDimension().getType())
             ));
         }
         return 1;

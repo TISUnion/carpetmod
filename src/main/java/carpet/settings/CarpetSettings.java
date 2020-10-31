@@ -135,10 +135,10 @@ public class CarpetSettings
     public static boolean portalSuperCache = false;
 
     @Rule(
-            desc = "Enable the function of MicroTick logger",
+            desc = "Enable the function of MicroTiming logger",
             extra = {
                     "Display redstone components actions, blockupdates and stacktrace with a wool block",
-                    "Use /log microtick to start logging",
+                    "Use /log microTiming to start logging",
                     "Might impact the server performance when it's on",
                     "EndRods will detect block updates and redstone components will show their actions",
                     "- Observer, Piston, EndRod: pointing towards wool",
@@ -147,7 +147,7 @@ public class CarpetSettings
             },
             category = {COMMAND, CREATIVE}
     )
-    public static boolean microTick = false;
+    public static boolean microTiming = false;
 
     @Rule(
             desc = "Overwrite the size limit of structure block",

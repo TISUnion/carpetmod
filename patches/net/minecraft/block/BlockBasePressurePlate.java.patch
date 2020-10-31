@@ -5,8 +5,8 @@
  
  import java.util.Random;
 +
-+import carpet.microtick.MicroTickLoggerManager;
-+import carpet.microtick.enums.EventType;
++import carpet.microtiming.MicroTimingLoggerManager;
++import carpet.microtiming.enums.EventType;
  import net.minecraft.block.material.EnumPushReaction;
  import net.minecraft.block.state.BlockFaceShape;
  import net.minecraft.block.state.IBlockState;
@@ -14,10 +14,10 @@
  
      protected void updateNeighbors(World worldIn, BlockPos pos)
      {
-+        MicroTickLoggerManager.onEmitBlockUpdate(worldIn, this, pos, EventType.ACTION_START, "updateNeighbors");  // TISCM Micro Tick logger
++        MicroTimingLoggerManager.onEmitBlockUpdate(worldIn, this, pos, EventType.ACTION_START, "updateNeighbors");  // TISCM Micro Timing logger
          worldIn.notifyNeighborsOfStateChange(pos, this);
          worldIn.notifyNeighborsOfStateChange(pos.down(), this);
-+        MicroTickLoggerManager.onEmitBlockUpdate(worldIn, this, pos, EventType.ACTION_END, "updateNeighbors");  // TISCM Micro Tick logger
++        MicroTimingLoggerManager.onEmitBlockUpdate(worldIn, this, pos, EventType.ACTION_END, "updateNeighbors");  // TISCM Micro Timing logger
      }
  
      public int getWeakPower(IBlockState blockState, IBlockReader blockAccess, BlockPos pos, EnumFacing side)

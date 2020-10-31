@@ -4,8 +4,8 @@
  package net.minecraft.block;
  
 -import java.util.Random;
-+import carpet.microtick.MicroTickLoggerManager;
-+import carpet.microtick.enums.EventType;
++import carpet.microtiming.MicroTimingLoggerManager;
++import carpet.microtiming.enums.EventType;
  import net.minecraft.block.state.BlockFaceShape;
  import net.minecraft.block.state.IBlockState;
  import net.minecraft.entity.EntityLivingBase;
@@ -31,12 +31,12 @@
  
      protected void notifyNeighbors(World worldIn, BlockPos pos, IBlockState state)
      {
-+        MicroTickLoggerManager.onEmitBlockUpdate(worldIn, this, pos, EventType.ACTION_START, "notifyNeighbors");  // TISCM Micro Tick logger
++        MicroTimingLoggerManager.onEmitBlockUpdate(worldIn, this, pos, EventType.ACTION_START, "notifyNeighbors");  // TISCM Micro Timing logger
          EnumFacing enumfacing = state.get(HORIZONTAL_FACING);
          BlockPos blockpos = pos.offset(enumfacing.getOpposite());
          worldIn.neighborChanged(blockpos, this, pos);
          worldIn.notifyNeighborsOfStateExcept(blockpos, this, enumfacing);
-+        MicroTickLoggerManager.onEmitBlockUpdate(worldIn, this, pos, EventType.ACTION_END, "notifyNeighbors");  // TISCM Micro Tick logger
++        MicroTimingLoggerManager.onEmitBlockUpdate(worldIn, this, pos, EventType.ACTION_END, "notifyNeighbors");  // TISCM Micro Timing logger
      }
  
      protected boolean isAlternateInput(IBlockState state)

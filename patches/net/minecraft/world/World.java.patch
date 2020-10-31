@@ -4,12 +4,12 @@
  package net.minecraft.world;
  
 +import carpet.helpers.TickSpeed;
-+import carpet.microtick.MicroTickLoggerManager;
-+import carpet.microtick.enums.EventType;
-+import carpet.microtick.enums.BlockUpdateType;
-+import carpet.microtick.enums.TickStage;
-+import carpet.microtick.tickstages.StringTickStageExtra;
-+import carpet.microtick.tickstages.TileEntityTickStageExtra;
++import carpet.microtiming.MicroTimingLoggerManager;
++import carpet.microtiming.enums.EventType;
++import carpet.microtiming.enums.BlockUpdateType;
++import carpet.microtiming.enums.TickStage;
++import carpet.microtiming.tickstages.StringTickStageExtra;
++import carpet.microtiming.tickstages.TileEntityTickStageExtra;
 +import carpet.settings.CarpetSettings;
 +import carpet.utils.CarpetProfiler;
 +import carpet.utils.LightingEngine;
@@ -79,19 +79,19 @@
          }
      }
  
-+    // TISCM Micro Tick logger wrapped method
++    // TISCM Micro Timing logger wrapped method
      public boolean setBlockState(BlockPos pos, IBlockState newState, int flags)
      {
 +        IBlockState oldState = null;
-+        if (MicroTickLoggerManager.isLoggerActivated())
++        if (MicroTimingLoggerManager.isLoggerActivated())
 +        {
 +            oldState = this.getBlockState(pos);
-+            MicroTickLoggerManager.onSetBlockState(this, pos, oldState, newState, null, EventType.ACTION_START);
++            MicroTimingLoggerManager.onSetBlockState(this, pos, oldState, newState, null, EventType.ACTION_START);
 +        }
 +        boolean returnValue = this._setBlockState(pos, newState, flags);
-+        if (MicroTickLoggerManager.isLoggerActivated() && oldState != null)
++        if (MicroTimingLoggerManager.isLoggerActivated() && oldState != null)
 +        {
-+            MicroTickLoggerManager.onSetBlockState(this, pos, oldState, newState, returnValue, EventType.ACTION_END);
++            MicroTimingLoggerManager.onSetBlockState(this, pos, oldState, newState, returnValue, EventType.ACTION_END);
 +        }
 +        return returnValue;
 +    }
@@ -142,19 +142,19 @@
 -
      public void notifyNeighborsOfStateChange(BlockPos pos, Block blockIn)
      {
-+        MicroTickLoggerManager.onBlockUpdate(this, pos, blockIn, BlockUpdateType.BLOCK_UPDATE, null, EventType.ACTION_START); // TISCM Micro Tick logger
++        MicroTimingLoggerManager.onBlockUpdate(this, pos, blockIn, BlockUpdateType.BLOCK_UPDATE, null, EventType.ACTION_START); // TISCM Micro Timing logger
          this.neighborChanged(pos.west(), blockIn, pos);
          this.neighborChanged(pos.east(), blockIn, pos);
          this.neighborChanged(pos.down(), blockIn, pos);
          this.neighborChanged(pos.up(), blockIn, pos);
          this.neighborChanged(pos.north(), blockIn, pos);
          this.neighborChanged(pos.south(), blockIn, pos);
-+        MicroTickLoggerManager.onBlockUpdate(this, pos, blockIn, BlockUpdateType.BLOCK_UPDATE, null, EventType.ACTION_END); // TISCM Micro Tick logger
++        MicroTimingLoggerManager.onBlockUpdate(this, pos, blockIn, BlockUpdateType.BLOCK_UPDATE, null, EventType.ACTION_END); // TISCM Micro Timing logger
      }
  
      public void notifyNeighborsOfStateExcept(BlockPos pos, Block blockType, EnumFacing skipSide)
      {
-+        MicroTickLoggerManager.onBlockUpdate(this, pos, blockType, BlockUpdateType.BLOCK_UPDATE_EXCEPT, skipSide, EventType.ACTION_START); // TISCM Micro Tick logger
++        MicroTimingLoggerManager.onBlockUpdate(this, pos, blockType, BlockUpdateType.BLOCK_UPDATE_EXCEPT, skipSide, EventType.ACTION_START); // TISCM Micro Timing logger
 +
          if (skipSide != EnumFacing.WEST)
          {
@@ -165,7 +165,7 @@
          }
 -    }
  
-+        MicroTickLoggerManager.onBlockUpdate(this, pos, blockType, BlockUpdateType.BLOCK_UPDATE_EXCEPT, skipSide, EventType.ACTION_END); // TISCM Micro Tick logger
++        MicroTimingLoggerManager.onBlockUpdate(this, pos, blockType, BlockUpdateType.BLOCK_UPDATE_EXCEPT, skipSide, EventType.ACTION_END); // TISCM Micro Timing logger
 +    }
      public void neighborChanged(BlockPos pos, Block blockIn, BlockPos fromPos)
      {
@@ -186,8 +186,8 @@
 +        CarpetProfiler.ProfilerToken tok_entities = CarpetProfiler.start_section_concurrent(world_name, "Entities", this.isRemote);
 +        // end
  
-+        MicroTickLoggerManager.setTickStage(this, TickStage.ENTITY); // TISCM Micro Tick logger
-+        MicroTickLoggerManager.setTickStageExtra(this, StringTickStageExtra.ENTITY_WEATHER_EFFECT); // TISCM Micro
++        MicroTimingLoggerManager.setTickStage(this, TickStage.ENTITY); // TISCM Micro Timing logger
++        MicroTimingLoggerManager.setTickStageExtra(this, StringTickStageExtra.ENTITY_WEATHER_EFFECT); // TISCM Micro
          for (int i = 0; i < this.weatherEffects.size(); ++i)
          {
              Entity entity = this.weatherEffects.get(i);
@@ -195,7 +195,7 @@
          }
  
          this.profiler.endStartSection("remove");
-+        MicroTickLoggerManager.setTickStageExtra(this, StringTickStageExtra.ENTITY_REMOVING); // TISCM Micro Tick logger
++        MicroTimingLoggerManager.setTickStageExtra(this, StringTickStageExtra.ENTITY_REMOVING); // TISCM Micro Timing logger
          this.loadedEntityList.removeAll(this.unloadedEntityList);
  
          for (int k = 0; k < this.unloadedEntityList.size(); ++k)
@@ -203,10 +203,10 @@
          }
  
          this.unloadedEntityList.clear();
-+        MicroTickLoggerManager.setTickStageExtra(this, StringTickStageExtra.ENTITY_PLAYER); // TISCM Micro Tick logger
++        MicroTimingLoggerManager.setTickStageExtra(this, StringTickStageExtra.ENTITY_PLAYER); // TISCM Micro Timing logger
          this.tickPlayers();
          this.profiler.endStartSection("regular");
-+        MicroTickLoggerManager.setTickStageExtra(this, StringTickStageExtra.ENTITY_REGULAR); // TISCM Micro Tick logger
++        MicroTimingLoggerManager.setTickStageExtra(this, StringTickStageExtra.ENTITY_REGULAR); // TISCM Micro Timing logger
  
          for (int i1 = 0; i1 < this.loadedEntityList.size(); ++i1)
          {
@@ -238,8 +238,8 @@
  
 +
          this.profiler.endStartSection("blockEntities");
-+        MicroTickLoggerManager.setTickStageExtra(this, null); // TISCM Micro Tick logger
-+        MicroTickLoggerManager.setTickStage(this, TickStage.TILE_ENTITY); // TISCM Micro Tick logger
++        MicroTimingLoggerManager.setTickStageExtra(this, null); // TISCM Micro Timing logger
++        MicroTimingLoggerManager.setTickStage(this, TickStage.TILE_ENTITY); // TISCM Micro Timing logger
  
          if (!this.tileEntitiesToBeRemoved.isEmpty())
          {
@@ -247,7 +247,7 @@
              this.loadedTileEntityList.removeAll(this.tileEntitiesToBeRemoved);
              this.tileEntitiesToBeRemoved.clear();
          }
-+        int tickCounter = 0;  // TISCM Micro Tick logger
++        int tickCounter = 0;  // TISCM Micro Timing logger
  
          this.processingLoadedTiles = true;
          Iterator<TileEntity> iterator = this.tickableTileEntities.iterator();
@@ -272,7 +272,7 @@
                          {
                              return String.valueOf((Object)TileEntityType.getId(tileentity.getType()));
                          });
-+                        MicroTickLoggerManager.setTickStageExtra(this, new TileEntityTickStageExtra(tileentity, tickCounter++));  // TISCM Micro Tick logger
++                        MicroTimingLoggerManager.setTickStageExtra(this, new TileEntityTickStageExtra(tileentity, tickCounter++));  // TISCM Micro Timing logger
                          ((ITickable)tileentity).tick();
                          this.profiler.endSection();
                      }
@@ -285,7 +285,7 @@
  
          this.processingLoadedTiles = false;
          this.profiler.endStartSection("pendingBlockEntities");
-+        MicroTickLoggerManager.setTickStageExtra(this, StringTickStageExtra.ADD_PENDING_BLOCK_ENTITIES); // TISCM Micro Tick logger
++        MicroTimingLoggerManager.setTickStageExtra(this, StringTickStageExtra.ADD_PENDING_BLOCK_ENTITIES); // TISCM Micro Timing logger
  
 -        if (!this.addedTileEntityList.isEmpty())
 +        // Lithium block_entity_ticking
@@ -305,7 +305,7 @@
          this.profiler.endSection();
          this.profiler.endSection();
 +
-+        MicroTickLoggerManager.setTickStageExtra(this, null); // TISCM Micro Tick logger
++        MicroTimingLoggerManager.setTickStageExtra(this, null); // TISCM Micro Timing logger
      }
  
 +    private void postBlockEntityTick$lithium() {

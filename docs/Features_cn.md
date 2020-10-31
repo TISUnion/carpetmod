@@ -116,13 +116,13 @@
 
 分类：experimental, optimization
 
-## microtick
+## microTiming
 
-启用 [MicroTick logger](#microTick-1) 的功能
+启用 [MicroTiming logger](#microTiming-1) 的功能
 
 使用羊毛块来输出红石元件的动作、方块更新与堆栈跟踪
 
-使用 `/log microtick` 来开始监视
+使用 `/log microTiming` 来开始监视
 
 开启时服务端性能将受到一定影响
 
@@ -368,13 +368,13 @@ Categories: creative
 
 选项：无
 
-## microtick
+## microTiming
 
-`/log microtick <类型>`
+`/log microTiming <类型>`
 
 记录元件的微时序，元件所在区块的加载票等级需至少为弱加载 (加载票等级 32)
 
-见规则 [microTick](#microTick) 以获得详细信息，记得使用 `/carpet microTick true` 启用监视器功能
+见规则 [microTiming](#microTiming) 以获得详细信息，记得使用 `/carpet microTiming true` 启用监视器功能
 
 可用的类型选项: 
 - `all`: 默认值，输出所有事件
