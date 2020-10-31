@@ -1,13 +1,68 @@
 --- a/net/minecraft/entity/projectile/EntitySnowball.java
 +++ b/net/minecraft/entity/projectile/EntitySnowball.java
-@@ -1,5 +1,6 @@
+@@ -1,7 +1,10 @@
  package net.minecraft.entity.projectile;
  
 +import carpet.logging.LoggerRegistry;
++import carpet.logging.logHelpers.TrajectoryLogHelper;
  import net.minecraft.entity.EntityLivingBase;
  import net.minecraft.entity.EntityType;
++import net.minecraft.entity.MoverType;
  import net.minecraft.entity.monster.EntityBlaze;
-@@ -56,7 +57,32 @@
+ import net.minecraft.init.Particles;
+ import net.minecraft.util.DamageSource;
+@@ -39,6 +42,50 @@
+         }
+     }
+ 
++    // TISCM visualize projectile logger
++    public boolean isVisProjLogger()
++    {
++        return this.getTags().contains(TrajectoryLogHelper.TISCM_VISPROJ_LOGGER);
++    }
++
++    @Override
++    public void move(MoverType type, double x, double y, double z)
++    {
++        if (this.isVisProjLogger())
++        {
++            return;
++        }
++        super.move(type, x, y, z);
++    }
++
++    @Override
++    public void move_new(MoverType type, double x, double y, double z)
++    {
++        if (this.isVisProjLogger())
++        {
++            return;
++        }
++        super.move_new(type, x, y, z);
++    }
++
++    @Override
++    public void tick()
++    {
++        if (this.isVisProjLogger())
++        {
++            this.motionX = 0.0D;
++            this.motionY = 0.0D;
++            this.motionZ = 0.0D;
++            TrajectoryLogHelper.VISUALIZE_SNOWBALLS.add(this);
++        }
++        if (this.getTags().contains(TrajectoryLogHelper.TISCM_VISPROJ_LOGGER))
++        {
++            return;
++        }
++        super.tick();
++    }
++    // TISCM visualize projectile logger ends
++
+     protected void onImpact(RayTraceResult result)
+     {
+         if (result.entity != null)
+@@ -56,7 +103,32 @@
          if (!this.world.isRemote)
          {
              this.world.setEntityState(this, (byte)3);
