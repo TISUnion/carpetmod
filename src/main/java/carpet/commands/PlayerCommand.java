@@ -2,6 +2,7 @@ package carpet.commands;
 
 import carpet.patches.EntityPlayerMPFake;
 import carpet.settings.CarpetSettings;
+import carpet.settings.SettingsManager;
 import carpet.utils.Messenger;
 import com.google.common.collect.Sets;
 import com.mojang.brigadier.CommandDispatcher;
@@ -35,7 +36,7 @@ public class PlayerCommand
     public static void register(CommandDispatcher<CommandSource> dispatcher)
     {
         LiteralArgumentBuilder<CommandSource> literalargumentbuilder = literal("player").
-                requires((player) -> CarpetSettings.commandPlayer).
+                requires((player) -> SettingsManager.canUseCommand(player, CarpetSettings.commandPlayer)).
                 then(argument("player", word()).
                         suggests( (c, b) -> ISuggestionProvider.suggest(getPlayers(c.getSource()), b)).
                         then(literal("stop").

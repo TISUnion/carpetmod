@@ -2,6 +2,7 @@ package carpet.utils;
 
 import carpet.helpers.HopperCounter;
 import carpet.settings.CarpetSettings;
+import carpet.settings.SettingsManager;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.block.state.IBlockState;
@@ -37,16 +38,16 @@ public class WoolTool
         switch (color)
         {
             case PINK:
-                if (CarpetSettings.commandSpawn)
+                if (!"false".equals(CarpetSettings.commandSpawn))
                     Messenger.send(placer, SpawnReporter.report(pos, worldIn));
 
                 break;
             case BLACK:
-                if (CarpetSettings.commandSpawn)
+                if (!"false".equals(CarpetSettings.commandSpawn))
                     Messenger.send(placer, SpawnReporter.show_mobcaps(pos, worldIn));
                 break;
             case BROWN:
-                if (CarpetSettings.commandDistance)
+                if (!"false".equals(CarpetSettings.commandDistance))
                 {
                     CommandSource source = placer.getCommandSource();
                     if (!DistanceCalculator.hasStartingPoint(source) || placer.isSneaking()) {
@@ -58,7 +59,7 @@ public class WoolTool
                 }
                 break;
             case GRAY:
-                if (CarpetSettings.commandInfo)
+                if (!"false".equals(CarpetSettings.commandInfo))
                     Messenger.send(placer, BlockInfo.blockInfo(pos.down(), worldIn));
                 break;
 			case GREEN:

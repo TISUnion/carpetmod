@@ -1,6 +1,7 @@
 package carpet.commands;
 
 import carpet.settings.CarpetSettings;
+import carpet.settings.SettingsManager;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
@@ -23,7 +24,7 @@ public class EpsCommand
     public static void register(CommandDispatcher<CommandSource> dispatcher)
     {
         LiteralArgumentBuilder<CommandSource> command = literal("epsTest").
-                requires( (player) -> CarpetSettings.commandEPSTest).
+                requires( (player) -> SettingsManager.canUseCommand(player, CarpetSettings.commandEPSTest)).
                 executes( (c) -> prepareTest(c.getSource(), epsTestTimeSecondDefault)).
                 then(argument("seconds", integer(1, 3600)).
                         suggests( (c, b) -> ISuggestionProvider.suggest(new String[]{"10", "120"}, b)).

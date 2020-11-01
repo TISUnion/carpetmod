@@ -3,6 +3,7 @@ package carpet.commands;
 import carpet.helpers.HopperCounter;
 import carpet.helpers.TickSpeed;
 import carpet.settings.CarpetSettings;
+import carpet.settings.SettingsManager;
 import carpet.utils.Messenger;
 import carpet.utils.SpawnReporter;
 import com.mojang.brigadier.CommandDispatcher;
@@ -37,7 +38,7 @@ public class SpawnCommand
     public static void register(CommandDispatcher<CommandSource> dispatcher)
     {
         LiteralArgumentBuilder<CommandSource> literalargumentbuilder = literal("spawn").
-                requires((player) -> CarpetSettings.commandSpawn);
+                requires((player) -> SettingsManager.canUseCommand(player, CarpetSettings.commandSpawn));
 
         literalargumentbuilder.
                 then(literal("list").

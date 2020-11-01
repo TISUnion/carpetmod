@@ -52,13 +52,13 @@ public class CarpetSettings
             desc = "Enables /epsTest for performance tests",
             category = COMMAND
     )
-    public static boolean commandEPSTest = false;
+    public static String commandEPSTest = "false";
     
     @Rule(
             desc = "Enables /ping command to see your ping",
             category = COMMAND
     )
-    public static boolean commandPing = true;
+    public static String commandPing = "true";
 
     @Rule(
             desc = "enable visualize projectile logger",
@@ -368,11 +368,21 @@ public class CarpetSettings
     public static boolean invisibilityFix = false;
 
     @Rule(
-            desc = "Portals won't let a creative player go through instantly",
-            extra = "Holding obsidian in either hand won't let you through at all",
-            category = CREATIVE
+            desc = "Amount of delay ticks to use a nether portal in creative",
+            options = {"1", "40", "80", "72000"},
+            category = CREATIVE,
+            validate = OneHourMaxDelayLimit.class
     )
-    public static boolean portalCreativeDelay = false;
+    public static int portalCreativeDelay = 1;
+
+    private static class OneHourMaxDelayLimit extends Validator<Integer> {
+        @Override
+        public Integer validate(CommandSource source, ParsedRule<Integer> currentRule, Integer newValue, String string) {
+            return (newValue > 0 && newValue <= 72000) ? newValue : null;
+        }
+        @Override
+        public String description() { return "You must choose a value from 1 to 72000";}
+    }
 
     @Rule(desc = "Dropping entire stacks works also from on the crafting UI result slot", category = {BUGFIX, SURVIVAL})
     public static boolean ctrlQCraftingFix = false;
@@ -486,20 +496,20 @@ public class CarpetSettings
     public static boolean summonNaturalLightning = false;
 
     @Rule(desc = "Enables /spawn command for spawn tracking", category = COMMAND)
-    public static boolean commandSpawn = "true";
+    public static String commandSpawn = "true";
 
     @Rule(desc = "Enables /tick command to control game clocks", category = COMMAND)
-    public static boolean commandTick = "true";
+    public static String commandTick = "true";
 
     @Rule(desc = "Enables /log command to monitor events in the game via chat and overlays", category = COMMAND)
-    public static boolean commandLog = "true";
+    public static String commandLog = "true";
 
     @Rule(
             desc = "Enables /distance command to measure in game distance between points",
             extra = "Also enables brown carpet placement action if 'carpets' rule is turned on as well",
             category = COMMAND
     )
-    public static boolean commandDistance = true;
+    public static String commandDistance = "true";
 
     @Rule(
             desc = "Enables /info command for blocks",
@@ -509,30 +519,30 @@ public class CarpetSettings
             },
             category = COMMAND
     )
-    public static boolean commandInfo = true;
+    public static String commandInfo = "true";
 
     @Rule(
             desc = "Enables /c and /s commands to quickly switch between camera and survival modes",
             extra = "/c and /s commands are available to all players regardless of their permission levels",
             category = COMMAND
     )
-    public static boolean commandCameramode = true;
+    public static String commandCameramode = "true";
 
     @Rule(
             desc = "Enables /perimeterinfo command",
             extra = "... that scans the area around the block for potential spawnable spots",
             category = COMMAND
     )
-    public static boolean commandPerimeterInfo = true;
+    public static String commandPerimeterInfo = "true";
 
     @Rule(desc = "Enables /draw commands", extra = "... allows for drawing simple shapes", category = COMMAND)
-    public static boolean commandDraw = true;
+    public static String commandDraw = "true";
 
     @Rule(desc = "Enables /script command", extra = "An in-game scripting API for Scarpet programming language", category = COMMAND)
-    public static boolean commandScript = true;
+    public static String commandScript = "true";
 
     @Rule(desc = "Enables /player command to control/spawn players", category = COMMAND)
-    public static boolean commandPlayer = true;
+    public static String commandPlayer = "true";
 
     @Rule(desc = "Placing carpets may issue carpet commands for non-op players", category = SURVIVAL)
     public static boolean carpets = false;

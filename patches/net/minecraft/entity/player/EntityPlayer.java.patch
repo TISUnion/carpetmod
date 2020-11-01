@@ -24,26 +24,18 @@
          {
              this.onGround = false;
          }
-@@ -436,7 +442,17 @@
+@@ -436,7 +442,9 @@
  
      public int getMaxInPortalTime()
      {
 -        return this.abilities.disableDamage ? 1 : 80;
 +        //return this.abilities.disableDamage ? 1 : 80;
 +        if (!this.abilities.disableDamage) return 80;
-+        if (CarpetSettings.portalCreativeDelay)
-+        {
-+            if ( PortalHelper.player_holds_obsidian(this))
-+            {
-+                return 72000;
-+            }
-+            return 80;
-+        }
-+        return 1;
++        return CarpetSettings.portalCreativeDelay;
      }
  
      protected SoundEvent getSwimSound()
-@@ -608,7 +624,7 @@
+@@ -608,7 +616,7 @@
          this.cameraYaw += (f - this.cameraYaw) * 0.4F;
          this.cameraPitch += (f1 - this.cameraPitch) * 0.8F;
  
@@ -52,7 +44,7 @@
          {
              AxisAlignedBB axisalignedbb;
  
-@@ -637,8 +653,9 @@
+@@ -637,8 +645,9 @@
          this.playShoulderEntityAmbientSound(this.getLeftShoulderEntity());
          this.playShoulderEntityAmbientSound(this.getRightShoulderEntity());
  
@@ -64,7 +56,7 @@
              this.spawnShoulderEntities();
          }
      }
-@@ -991,10 +1008,23 @@
+@@ -991,10 +1000,23 @@
                      this.wakeUpPlayer(true, true, false);
                  }
  
@@ -89,7 +81,7 @@
                      if (this.world.getDifficulty() == EnumDifficulty.PEACEFUL)
                      {
                          amount = 0.0F;
-@@ -1009,6 +1039,8 @@
+@@ -1009,6 +1031,8 @@
                      {
                          amount = amount * 3.0F / 2.0F;
                      }
@@ -98,7 +90,7 @@
                  }
  
                  return amount == 0.0F ? false : super.attackEntityFrom(source, amount);
-@@ -1091,11 +1123,19 @@
+@@ -1091,11 +1115,19 @@
      {
          if (!this.isInvulnerableTo(damageSrc))
          {
@@ -118,7 +110,7 @@
              float f1 = f - damageAmount;
  
              if (f1 > 0.0F && f1 < 3.4028235E37F)
-@@ -1107,6 +1147,7 @@
+@@ -1107,6 +1139,7 @@
              {
                  this.addExhaustion(damageSrc.getHungerDamage());
                  float f2 = this.getHealth();
@@ -126,7 +118,7 @@
                  this.setHealth(this.getHealth() - damageAmount);
                  this.getCombatTracker().trackDamage(damageSrc, f2, damageAmount);
  
-@@ -1116,6 +1157,12 @@
+@@ -1116,6 +1149,12 @@
                  }
              }
          }
@@ -139,7 +131,7 @@
      }
  
      public void openSignEditor(TileEntitySign signTile)
-@@ -1316,18 +1363,34 @@
+@@ -1316,18 +1355,34 @@
                          {
                              float f3 = 1.0F + EnchantmentHelper.getSweepingDamageRatio(this) * f;
  
@@ -174,7 +166,7 @@
  
                          if (targetEntity instanceof EntityPlayerMP && targetEntity.velocityChanged)
                          {
-@@ -1422,6 +1485,13 @@
+@@ -1422,6 +1477,13 @@
                      }
                  }
              }
@@ -188,7 +180,7 @@
          }
      }
  
-@@ -2241,6 +2311,20 @@
+@@ -2241,6 +2303,20 @@
          this.setRightShoulderEntity(new NBTTagCompound());
      }
  

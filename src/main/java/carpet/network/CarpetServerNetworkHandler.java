@@ -60,7 +60,6 @@ public class CarpetServerNetworkHandler
 
     public static void onHello(EntityPlayerMP playerEntity, PacketBuffer packetData)
     {
-
         validCarpetPlayers.add(playerEntity);
         String clientVersion = packetData.readString(64);
         remoteCarpetPlayers.put(playerEntity, clientVersion);
@@ -245,7 +244,5 @@ public class CarpetServerNetworkHandler
             packetBuf.writeCompoundTag(tag);
             return packetBuf;
         }
-
-
     }
 }

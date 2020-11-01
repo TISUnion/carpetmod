@@ -9,6 +9,7 @@ import carpet.script.ScriptHost;
 import carpet.script.Tokenizer;
 import carpet.script.exception.CarpetExpressionException;
 import carpet.settings.CarpetSettings;
+import carpet.settings.SettingsManager;
 import carpet.utils.Messenger;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -253,10 +254,10 @@ public class ScriptCommand
 
 
         dispatcher.register(literal("script").
-                requires((player) -> CarpetSettings.commandScript).
+                requires((player) -> SettingsManager.canUseCommand(player, CarpetSettings.commandScript)).
                 then(b).then(u).then(o).then(l).then(s).then(c).then(h).then(i).then(e).then(t).then(a).then(f).then(q));
         dispatcher.register(literal("script").
-                requires((player) -> CarpetSettings.commandScript).
+                requires((player) -> SettingsManager.canUseCommand(player, CarpetSettings.commandScript)).
                 then(literal("in").
                         then(argument("package", StringArgumentType.word()).
                                 suggests( (cc, bb) -> suggest(CarpetServer.scriptServer.modules.keySet(), bb)).

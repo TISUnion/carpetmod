@@ -3,6 +3,7 @@ package carpet.commands;
 import carpet.CarpetServer;
 import carpet.microtiming.utils.MicroTimingUtil;
 import carpet.settings.CarpetSettings;
+import carpet.settings.SettingsManager;
 import carpet.utils.BlockInfo;
 import carpet.utils.EntityInfo;
 import carpet.utils.Messenger;
@@ -32,7 +33,7 @@ public class InfoCommand
     public static void register(CommandDispatcher<CommandSource> dispatcher)
     {
         LiteralArgumentBuilder<CommandSource> command = literal("info").
-                requires((player) -> CarpetSettings.commandInfo).
+                requires((player) -> SettingsManager.canUseCommand(player, CarpetSettings.commandInfo)).
                 then(literal("block").
                         then(argument("block position", BlockPosArgument.blockPos()).
                                 executes( (c) -> infoBlock(

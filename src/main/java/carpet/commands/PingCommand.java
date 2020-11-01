@@ -1,6 +1,7 @@
 package carpet.commands;
 
 import carpet.settings.CarpetSettings;
+import carpet.settings.SettingsManager;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
@@ -14,7 +15,7 @@ public class PingCommand
     public static void register(CommandDispatcher<CommandSource> dispatcher)
     {
         LiteralArgumentBuilder<CommandSource> command = literal("ping").
-                requires( (player) -> CarpetSettings.commandPing).
+                requires( (player) -> SettingsManager.canUseCommand(player, CarpetSettings.commandPing)).
                         executes( (c) ->
                         {
                             EntityPlayerMP player = c.getSource().asPlayer();
