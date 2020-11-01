@@ -266,7 +266,7 @@
 
 选项: `false`, `true`
 
-选项: survival
+分类: survival
 
 ## hopperCountersUnlimitedSpeed
 
@@ -274,11 +274,11 @@
 
 仅当hopperCounters开启时有效
 
-Default: `false`
+默认值: `false`
 
-Options: `false`, `true`
+选项: `false`, `true`
 
-Categories: creative
+分类: creative
 
 ## instantCommandBlock
 
@@ -286,11 +286,34 @@ Categories: creative
 
 仅影响普通命令方块
 
-Default: `false`
+默认值: `false`
 
-Options: `false`, `true`
+选项: `false`, `true`
 
-Categories: creative
+分类: creative
+
+## 禁用反刷屏监测 (antiSpamDisabled)
+
+禁用玩家身上的刷屏检测，包括：聊天信息发送冷却、创造模式扔物品冷却
+
+默认值: `false`
+
+选项: `false`, `true`
+
+分类: creative, survival
+
+## 方块放置忽略实体 (blockPlacementIgnoreEntity)
+
+方块可放置时无视实体碰撞检测，也就是你可以将方块放在实体内
+
+仅对创造模式玩家有效
+
+默认值: `false`
+
+选项: `false`, `true`
+
+分类: creative
+
 
 ## YEET
 
@@ -321,16 +344,6 @@ Categories: creative
 ### yeetVillagerAi
 
 去掉部分村民ai使14k刷铁塔堆叠更快
-
-默认值： `false`
-
-选项：`false`, `true`
-
-分类：yeet
-
-### yeetKickedForSpam
-
-去掉当玩家发送消息过快时，玩家被因滥发消息而踢出游戏的特性
 
 默认值： `false`
 

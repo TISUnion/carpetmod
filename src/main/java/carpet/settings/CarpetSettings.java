@@ -321,6 +321,21 @@ public class CarpetSettings
     )
     public static boolean instantCommandBlock = false;
 
+    @Rule(
+            desc = "Disable spamming checks on players, including: chat message cooldown, creative item drop cooldown",
+            category = {CREATIVE, SURVIVAL}
+    )
+    public static boolean antiSpamDisabled = false;
+
+    @Rule(
+            desc = "Disable entity collision check before block placement, aka you can place blocks inside entities",
+            extra = {
+                    "Works with creative mode players only"
+            },
+            category = {CREATIVE}
+    )
+    public static boolean blockPlacementIgnoreEntity = false;
+
 
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$
@@ -735,10 +750,4 @@ public class CarpetSettings
             category = YEET
     )
     public static boolean yeetVillagerAi = false;
-
-    @Rule(
-            desc = "yeet kicking players from the server from spamming messages",
-            category = YEET
-    )
-    public static boolean yeetKickedForSpam = false;
 }

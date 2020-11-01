@@ -295,6 +295,30 @@ Options: `false`, `true`
 
 Categories: creative
 
+## antiSpamDisabled
+
+Disable spamming checks on players, including: chat message cooldown, creative item drop cooldown
+
+Default: `false`
+
+Options: `false`, `true`
+
+Categories: creative, survival
+
+
+## blockPlacementIgnoreEntity
+
+Disable entity collision check before block placement, aka you can place blocks inside entities
+
+Works with creative mode players only
+
+Default: `false`
+
+Options: `false`, `true`
+
+Categories: creative
+
+
 ## YEET
 
 **Warn**: all yeet options will change vanilla behaviour, they WILL NOT behave like vanilla
@@ -322,16 +346,6 @@ Categories: yeet
 ### yeetVillagerAi
 
 yeet villager ai for faster stacking at 14k iron farm test
-
-Default: `false`
-
-Options: `false`, `true`
-
-Categories: yeet
-
-### yeetKickedForSpam
-
-yeet kicking players from the server from spamming messages
 
 Default: `false`
 

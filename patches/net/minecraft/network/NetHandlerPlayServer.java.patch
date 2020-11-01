@@ -130,16 +130,19 @@
          if (!itemstack.isEmpty())
          {
              this.player.interactionManager.processRightClick(this.player, worldserver, itemstack, enumhand);
-@@ -1223,7 +1255,7 @@
+@@ -1223,6 +1255,11 @@
  
              this.chatSpamThresholdCount += 20;
  
--            if (this.chatSpamThresholdCount > 200 && !this.server.getPlayerList().canSendCommands(this.player.getGameProfile()))
-+            if (!CarpetSettings.yeetKickedForSpam && this.chatSpamThresholdCount > 200 && !this.server.getPlayerList().canSendCommands(this.player.getGameProfile()))
++            if (CarpetSettings.antiSpamDisabled)  // TISCM antiSpamDisabled
++            {
++                this.chatSpamThresholdCount = 0;
++            }
++
+             if (this.chatSpamThresholdCount > 200 && !this.server.getPlayerList().canSendCommands(this.player.getGameProfile()))
              {
                  this.disconnect(new TextComponentTranslation("disconnect.spam"));
-             }
-@@ -1250,19 +1282,25 @@
+@@ -1250,19 +1287,25 @@
          switch (packetIn.getAction())
          {
              case START_SNEAKING:
@@ -165,7 +168,7 @@
                  if (this.player.isPlayerSleeping())
                  {
                      this.player.wakeUpPlayer(false, true, true);
-@@ -1303,7 +1341,10 @@
+@@ -1303,7 +1346,10 @@
                  break;
              case START_FALL_FLYING:
  
@@ -177,7 +180,7 @@
                  {
                      ItemStack itemstack = this.player.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
  
-@@ -1345,6 +1386,9 @@
+@@ -1345,6 +1391,9 @@
                  if (packetIn.getAction() == CPacketUseEntity.Action.INTERACT)
                  {
                      EnumHand enumhand = packetIn.getHand();
@@ -187,7 +190,7 @@
                      this.player.interactOn(entity, enumhand);
                  }
                  else if (packetIn.getAction() == CPacketUseEntity.Action.INTERACT_AT)
-@@ -1360,6 +1404,8 @@
+@@ -1360,6 +1409,8 @@
                          this.server.logWarning("Player " + this.player.getName().getString() + " tried to attack an invalid entity");
                          return;
                      }
@@ -196,3 +199,16 @@
  
                      this.player.attackTargetEntityWithCurrentItem(entity);
                  }
+@@ -1536,6 +1587,12 @@
+             else if (flag && flag2 && this.itemDropThreshold < 200)
+             {
+                 this.itemDropThreshold += 20;
++
++                if (CarpetSettings.antiSpamDisabled)  // TISCM antiSpamDisabled
++                {
++                    this.itemDropThreshold = 0;
++                }
++
+                 EntityItem entityitem = this.player.dropItem(itemstack, true);
+ 
+                 if (entityitem != null)

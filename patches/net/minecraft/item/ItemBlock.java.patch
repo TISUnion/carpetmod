@@ -1,0 +1,30 @@
+--- a/net/minecraft/item/ItemBlock.java
++++ b/net/minecraft/item/ItemBlock.java
+@@ -3,6 +3,8 @@
+ import java.util.List;
+ import java.util.Map;
+ import javax.annotation.Nullable;
++
++import carpet.settings.CarpetSettings;
+ import net.minecraft.advancements.CriteriaTriggers;
+ import net.minecraft.block.Block;
+ import net.minecraft.block.SoundType;
+@@ -98,7 +100,17 @@
+ 
+     protected boolean canPlace(BlockItemUseContext p_195944_1_, IBlockState p_195944_2_)
+     {
+-        return p_195944_2_.isValidPosition(p_195944_1_.getWorld(), p_195944_1_.getPos()) && p_195944_1_.getWorld().checkNoEntityCollision(p_195944_2_, p_195944_1_.getPos());
++        // TISCM blockPlacementIgnoreEntity
++        boolean disableCollisionCheck = false;
++        if (CarpetSettings.blockPlacementIgnoreEntity)
++        {
++            EntityPlayer player = p_195944_1_.player;
++            if (player != null && player.isCreative())
++            {
++                disableCollisionCheck = true;
++            }
++        }
++        return p_195944_2_.isValidPosition(p_195944_1_.getWorld(), p_195944_1_.getPos()) && (disableCollisionCheck || p_195944_1_.getWorld().checkNoEntityCollision(p_195944_2_, p_195944_1_.getPos()));
+     }
+ 
+     protected boolean placeBlock(BlockItemUseContext context, IBlockState state)
