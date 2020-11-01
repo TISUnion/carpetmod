@@ -1,14 +1,16 @@
 --- a/net/minecraft/block/BlockRedstoneWire.java
 +++ b/net/minecraft/block/BlockRedstoneWire.java
-@@ -1,5 +1,7 @@
+@@ -1,5 +1,9 @@
  package net.minecraft.block;
  
 +import carpet.helpers.RedstoneWireTurbo;
++import carpet.microtiming.MicroTimingLoggerManager;
++import carpet.microtiming.enums.EventType;
 +import carpet.settings.CarpetSettings;
  import com.google.common.collect.ImmutableMap;
  import com.google.common.collect.Lists;
  import com.google.common.collect.Maps;
-@@ -44,8 +46,13 @@
+@@ -44,8 +48,13 @@
      public static final Map<EnumFacing, EnumProperty<RedstoneSide>> FACING_PROPERTY_MAP = Maps.newEnumMap(ImmutableMap.of(EnumFacing.NORTH, NORTH, EnumFacing.EAST, EAST, EnumFacing.SOUTH, SOUTH, EnumFacing.WEST, WEST));
      protected static final VoxelShape[] SHAPES = new VoxelShape[] {Block.makeCuboidShape(3.0D, 0.0D, 3.0D, 13.0D, 1.0D, 13.0D), Block.makeCuboidShape(3.0D, 0.0D, 3.0D, 13.0D, 1.0D, 16.0D), Block.makeCuboidShape(0.0D, 0.0D, 3.0D, 13.0D, 1.0D, 13.0D), Block.makeCuboidShape(0.0D, 0.0D, 3.0D, 13.0D, 1.0D, 16.0D), Block.makeCuboidShape(3.0D, 0.0D, 0.0D, 13.0D, 1.0D, 13.0D), Block.makeCuboidShape(3.0D, 0.0D, 0.0D, 13.0D, 1.0D, 16.0D), Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 13.0D, 1.0D, 13.0D), Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 13.0D, 1.0D, 16.0D), Block.makeCuboidShape(3.0D, 0.0D, 3.0D, 16.0D, 1.0D, 13.0D), Block.makeCuboidShape(3.0D, 0.0D, 3.0D, 16.0D, 1.0D, 16.0D), Block.makeCuboidShape(0.0D, 0.0D, 3.0D, 16.0D, 1.0D, 13.0D), Block.makeCuboidShape(0.0D, 0.0D, 3.0D, 16.0D, 1.0D, 16.0D), Block.makeCuboidShape(3.0D, 0.0D, 0.0D, 16.0D, 1.0D, 13.0D), Block.makeCuboidShape(3.0D, 0.0D, 0.0D, 16.0D, 1.0D, 16.0D), Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 1.0D, 13.0D), Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 1.0D, 16.0D)};
      private boolean canProvidePower = true;
@@ -22,7 +24,7 @@
      public BlockRedstoneWire(Block.Properties properties)
      {
          super(properties);
-@@ -176,8 +183,13 @@
+@@ -176,10 +185,18 @@
          return iblockstate.isTopSolid() || iblockstate.getBlock() == Blocks.GLOWSTONE;
      }
  
@@ -36,8 +38,18 @@
 +
          state = this.func_212568_b(worldIn, pos, state);
          List<BlockPos> list = Lists.newArrayList(this.blocksNeedingUpdate);
++
++        MicroTimingLoggerManager.onEmitBlockUpdateRedstoneDust(worldIn, this, pos, EventType.ACTION_START, "updateSurroundingRedstone", list);  // TISCM Micro Timing logger
++
          this.blocksNeedingUpdate.clear();
-@@ -190,7 +202,8 @@
+ 
+         for (BlockPos blockpos : list)
+@@ -187,10 +204,13 @@
+             worldIn.notifyNeighborsOfStateChange(blockpos, this);
+         }
+ 
++        MicroTimingLoggerManager.onEmitBlockUpdateRedstoneDust(worldIn, this, pos, EventType.ACTION_END, "updateSurroundingRedstone", null);  // TISCM Micro Timing logger
++
          return state;
      }
  
@@ -47,7 +59,7 @@
      {
          IBlockState iblockstate = p_212568_3_;
          int i = p_212568_3_.get(POWER);
-@@ -200,55 +213,59 @@
+@@ -200,55 +220,59 @@
          int k = p_212568_1_.getRedstonePowerFromNeighbors(p_212568_2_);
          this.canProvidePower = true;
  
@@ -138,7 +150,7 @@
          if (i != j)
          {
              p_212568_3_ = p_212568_3_.with(POWER, Integer.valueOf(j));
-@@ -258,11 +275,14 @@
+@@ -258,11 +282,14 @@
                  p_212568_1_.setBlockState(p_212568_2_, p_212568_3_, 2);
              }
  
@@ -157,7 +169,7 @@
              }
          }
  
-@@ -275,7 +295,7 @@
+@@ -275,7 +302,7 @@
          {
              worldIn.notifyNeighborsOfStateChange(pos, this);
  
@@ -166,7 +178,7 @@
              {
                  worldIn.notifyNeighborsOfStateChange(pos.offset(enumfacing), this);
              }
-@@ -286,7 +306,8 @@
+@@ -286,7 +313,8 @@
      {
          if (oldState.getBlock() != state.getBlock() && !worldIn.isRemote)
          {
@@ -176,7 +188,7 @@
  
              for (EnumFacing enumfacing : EnumFacing.Plane.VERTICAL)
              {
-@@ -322,12 +343,13 @@
+@@ -322,12 +350,13 @@
  
              if (!worldIn.isRemote)
              {
@@ -192,7 +204,7 @@
  
                  for (EnumFacing enumfacing1 : EnumFacing.Plane.HORIZONTAL)
                  {
-@@ -370,7 +392,8 @@
+@@ -370,7 +399,8 @@
          {
              if (state.isValidPosition(worldIn, pos))
              {
