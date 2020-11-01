@@ -642,7 +642,7 @@ public class CarpetSettings
     {
         @Override public Integer validate(CommandSource source, ParsedRule<Integer> currentRule, Integer newValue, String string)
         {
-            if (currentRule.get().equals(newValue))
+            if (currentRule.get().equals(newValue) || source == null)
             {
                 return newValue;
             }
@@ -681,6 +681,7 @@ public class CarpetSettings
     private static class DisableSpawnChunksValidator extends Validator<Boolean>
     {
         @Override public Boolean validate(CommandSource source, ParsedRule<Boolean> currentRule, Boolean newValue, String string) {
+            if (source == null) return newValue;
             if (!newValue)
                 Messenger.m(source, "w Spawn chunks re-enabled. Visit spawn to load them?");
             return newValue;
