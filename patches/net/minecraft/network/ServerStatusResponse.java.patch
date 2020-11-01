@@ -1,0 +1,28 @@
+--- a/net/minecraft/network/ServerStatusResponse.java
++++ b/net/minecraft/network/ServerStatusResponse.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.network;
+ 
++import carpet.settings.CarpetSettings;
+ import com.google.gson.JsonArray;
+ import com.google.gson.JsonDeserializationContext;
+ import com.google.gson.JsonDeserializer;
+@@ -13,6 +14,7 @@
+ import java.util.UUID;
+ import net.minecraft.util.JsonUtils;
+ import net.minecraft.util.text.ITextComponent;
++import net.minecraft.util.text.TextComponentString;
+ 
+ public class ServerStatusResponse
+ {
+@@ -23,6 +25,10 @@
+ 
+     public ITextComponent getServerDescription()
+     {
++        if (!CarpetSettings.customMOTD.equals("_"))
++        {
++            return new TextComponentString(CarpetSettings.customMOTD);
++        }
+         return this.description;
+     }
+ 

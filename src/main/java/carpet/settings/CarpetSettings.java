@@ -627,20 +627,11 @@ public class CarpetSettings
     @Rule(desc = "One player is required on the server to cause night to pass", category = SURVIVAL)
     public static boolean onePlayerSleeping = false;
 
-    private static class SetMotd extends Validator<String>
-    {
-        @Override public String validate(CommandSource source, ParsedRule<String> currentRule, String newValue, String string) {
-            customMOTD = newValue; // accelerate a smidge
-            CarpetServer.minecraft_server.checkMOTD();
-            return newValue;
-        }
-    }
     @Rule(
             desc = "Sets a different motd message on client trying to connect to the server",
             extra = "use '_' to use the startup setting from server.properties",
             options = "_",
-            category = CREATIVE,
-            validate = SetMotd.class
+            category = CREATIVE
     )
     public static String customMOTD = "_";
     
