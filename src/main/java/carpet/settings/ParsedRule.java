@@ -77,34 +77,42 @@ public final class ParsedRule<T> implements Comparable<ParsedRule> {
     {
         if (CarpetServer.settingsManager != null && CarpetServer.settingsManager.locked)
             return null;
-        if (type == String.class)
+        try
         {
-            return set(source, (T) value, value);
+            if (type == String.class)
+            {
+                return set(source, (T) value, value);
+            }
+            else if (type == boolean.class)
+            {
+                return set(source, (T) (Object) Boolean.parseBoolean(value), value);
+            }
+            else if (type == int.class)
+            {
+                return set(source, (T) (Object) Integer.parseInt(value), value);
+            }
+            else if (type == float.class)
+            {
+                return set(source, (T) (Object) Float.parseFloat(value), value);
+            }
+            else if (type == double.class)
+            {
+                return set(source, (T) (Object) Double.parseDouble(value), value);
+            }
+            else if (type.isEnum())
+            {
+                String ucValue = value.toUpperCase(Locale.ROOT);
+                return set(source, (T) (Object) Enum.valueOf((Class<? extends Enum>) type, ucValue), value);
+            }
+            else
+            {
+                Messenger.m(source, "r Unknown type " + type.getSimpleName());
+                return null;
+            }
         }
-        else if (type == boolean.class)
+        catch (Exception e)
         {
-            return set(source, (T) (Object) Boolean.parseBoolean(value), value);
-        }
-        else if (type == int.class)
-        {
-            return set(source, (T) (Object) Integer.parseInt(value), value);
-        }
-        else if (type == float.class)
-        {
-            return set(source, (T) (Object) Float.parseFloat(value), value);
-        }
-        else if (type == double.class)
-        {
-            return set(source, (T) (Object) Double.parseDouble(value), value);
-        }
-        else if (type.isEnum())
-        {
-            String ucValue = value.toUpperCase(Locale.ROOT);
-            return set(source, (T) (Object) Enum.valueOf((Class<? extends Enum>) type, ucValue), value);
-        }
-        else
-        {
-            Messenger.m(source, "r Unknown type " + type.getSimpleName());
+            CarpetServer.LOGGER.warn(String.format("Fail to parse rule %s for value %s: %s", this.name, value, e));
             return null;
         }
     }
