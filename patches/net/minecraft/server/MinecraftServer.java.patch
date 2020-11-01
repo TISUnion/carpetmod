@@ -82,7 +82,7 @@
 +                        if (i > 2000L && this.serverTime - this.timeOfLastWarning >= 15000L) {
 +                            long j = (long)(i / TickSpeed.mspt);//50L;
 +                            LOGGER.warn("Can't keep up! Is the server overloaded? Running {}ms or {} ticks behind", i, j);
-+                            this.serverTime += j * TickSpeed.mspt;//50L;
++                            this.serverTime += (long)(j * TickSpeed.mspt);//50L;
 +                            this.timeOfLastWarning = this.serverTime;
 +                        }
  
@@ -95,7 +95,7 @@
 +                        // only corrected if it falls behind more than 2000 and manages to catch the warning
 +                        // which releases accrued time it falls behind, not 1 tick, but MULTIPLE ticks
 +                        this.actualServerTime = Util.milliTime();
-+                        this.serverTime += TickSpeed.mspt;//50L;
++                        this.serverTime += (long)TickSpeed.mspt;//50L;
  
 -                    this.serverIsRunning = true;
 +                        while (this.isAheadOfTime()) {

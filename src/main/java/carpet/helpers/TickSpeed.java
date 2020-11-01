@@ -58,7 +58,7 @@ public class TickSpeed
     public static void tickrate(float rate, boolean update)
     {
         tickrate = rate;
-        long mspt = (long)(1000.0 / tickrate);
+        long mspt = (long)(1000.0f / tickrate);
         if (mspt <= 0L)
         {
             mspt = 1L;
