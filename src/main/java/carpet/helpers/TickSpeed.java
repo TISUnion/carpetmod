@@ -1,6 +1,7 @@
 package carpet.helpers;
 
 import carpet.CarpetServer;
+import carpet.network.CarpetServerNetworkHandler;
 import carpet.utils.Messenger;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
@@ -12,7 +13,7 @@ public class TickSpeed
 {
     public static final int PLAYER_GRACE = 2;
     public static float tickrate = 20.0f;
-    public static long mspt = 50l;
+    public static float mspt = 50.0f;
     public static long time_bias = 0;
     public static long time_warp_start_time = 0;
     public static long time_warp_scheduled_ticks = 0;
@@ -32,19 +33,43 @@ public class TickSpeed
         }
     }
 
+    public static void reset()
+    {
+        tickrate = 20.0f;
+        mspt = 50.0f;
+        time_bias = 0;
+        time_warp_start_time = 0;
+        time_warp_scheduled_ticks = 0;
+        time_advancerer = null;
+        tick_warp_callback = null;
+        tick_warp_sender = null;
+        player_active_timeout = 0;
+        process_entities = true;
+        is_paused = false;
+        is_superHot = false;
+    }
+
     public static void add_ticks_to_run_in_pause(int ticks)
     {
         player_active_timeout = PLAYER_GRACE+ticks;
     }
 
-    public static void tickrate(float rate)
+    public static void tickrate(float rate) {tickrate(rate, true);}
+    public static void tickrate(float rate, boolean update)
     {
         tickrate = rate;
-        mspt = (long)(1000.0/tickrate);
-        if (mspt <=0)
+        long mspt = (long)(1000.0 / tickrate);
+        if (mspt <= 0L)
         {
-            mspt = 1l;
+            mspt = 1L;
             tickrate = 1000.0f;
+        }
+
+        TickSpeed.mspt = (float)mspt;
+
+        if (update)
+        {
+            CarpetServerNetworkHandler.updateTickSpeedToConnectedPlayers();
         }
     }
 

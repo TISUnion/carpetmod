@@ -1,0 +1,18 @@
+--- a/net/minecraft/client/renderer/GameRenderer.java
++++ b/net/minecraft/client/renderer/GameRenderer.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.client.renderer;
+ 
++import carpet.helpers.CreativeNoClipHelper;
+ import com.google.gson.JsonSyntaxException;
+ import java.io.IOException;
+ import java.util.List;
+@@ -965,7 +966,7 @@
+         this.mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+         RenderHelper.disableStandardItemLighting();
+         this.mc.profiler.endStartSection("terrain_setup");
+-        worldrenderer.setupTerrain(entity, partialTicks, icamera, this.frameCount++, this.mc.player.isSpectator());
++        worldrenderer.setupTerrain(entity, partialTicks, icamera, this.frameCount++, this.mc.player.isSpectator() || CreativeNoClipHelper.canEntityIgnoreClip(this.mc.player));  // Carpet creativeNoClip
+         this.mc.profiler.endStartSection("updatechunks");
+         this.mc.worldRenderer.updateChunks(nanoTime);
+         this.mc.profiler.endStartSection("terrain");

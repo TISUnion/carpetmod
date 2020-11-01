@@ -80,7 +80,7 @@
 -                    this.tick(this::isAheadOfTime);
 -                    this.serverTime += 50L;
 +                        if (i > 2000L && this.serverTime - this.timeOfLastWarning >= 15000L) {
-+                            long j = i / TickSpeed.mspt;//50L;
++                            long j = (long)(i / TickSpeed.mspt);//50L;
 +                            LOGGER.warn("Can't keep up! Is the server overloaded? Running {}ms or {} ticks behind", i, j);
 +                            this.serverTime += j * TickSpeed.mspt;//50L;
 +                            this.timeOfLastWarning = this.serverTime;

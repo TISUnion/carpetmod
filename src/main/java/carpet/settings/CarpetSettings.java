@@ -486,13 +486,13 @@ public class CarpetSettings
     public static boolean summonNaturalLightning = false;
 
     @Rule(desc = "Enables /spawn command for spawn tracking", category = COMMAND)
-    public static boolean commandSpawn = true;
+    public static boolean commandSpawn = "true";
 
     @Rule(desc = "Enables /tick command to control game clocks", category = COMMAND)
-    public static boolean commandTick = true;
+    public static boolean commandTick = "true";
 
     @Rule(desc = "Enables /log command to monitor events in the game via chat and overlays", category = COMMAND)
-    public static boolean commandLog = true;
+    public static boolean commandLog = "true";
 
     @Rule(
             desc = "Enables /distance command to measure in game distance between points",
@@ -720,6 +720,28 @@ public class CarpetSettings
             category = BUGFIX
     )
     public static boolean leadFix = false;
+
+    @Rule(
+            desc = "smooth client animations with low tps settings",
+            extra = "works only in SP, and will slow down players",
+            category = {CREATIVE, SURVIVAL}
+    )
+    public static boolean smoothClientAnimations = false;
+
+    @Rule(
+            desc = "Creative No Clip",
+            extra = {
+                    "On servers it needs to be set on both ",
+                    "client and server to function properly.",
+                    "Has no effect when set on the server only",
+                    "Can allow to phase through walls",
+                    "if only set on the carpet client side",
+                    "but requires some trapdoor magic to",
+                    "allow the player to enter blocks"
+            },
+            category = {CREATIVE}
+    )
+    public static boolean creativeNoClip = false;
 
     // /$$     /$$/$$$$$$$$ /$$$$$$$$/$$$$$$$$
     //|  $$   /$$/ $$_____/| $$_____/__  $$__/

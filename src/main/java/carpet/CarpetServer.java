@@ -4,12 +4,14 @@ import carpet.commands.*;
 import carpet.helpers.TickSpeed;
 import carpet.logging.LoggerRegistry;
 import carpet.microtiming.MicroTimingLoggerManager;
+import carpet.network.CarpetServerNetworkHandler;
 import carpet.script.CarpetScriptServer;
 import carpet.settings.CarpetSettings;
 import carpet.settings.SettingsManager;
 import carpet.utils.HUDController;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.command.CommandSource;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -47,6 +49,7 @@ public class CarpetServer // static for now - easier to handle all around the co
     public static void onServerClosed(MinecraftServer server)
     {
         MicroTimingLoggerManager.detachServer();
+        disconnect();
     }
 
     public static void tick(MinecraftServer server)
@@ -76,6 +79,19 @@ public class CarpetServer // static for now - easier to handle all around the co
         EpsCommand.register(dispatcher);
 
         //TestCommand.register(dispatcher);
+    }
+
+    public static void disconnect()
+    {
+        // this for whatever reason gets called multiple times even when joining;
+        TickSpeed.reset();
+        settingsManager.detachServer();
+    }
+
+    public static void onPlayerLoggedIn(EntityPlayerMP player)
+    {
+        CarpetServerNetworkHandler.onPlayerJoin(player);
+        LoggerRegistry.playerConnected(player);
     }
 }
 

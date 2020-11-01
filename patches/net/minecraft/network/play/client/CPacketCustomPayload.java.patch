@@ -1,0 +1,17 @@
+--- a/net/minecraft/network/play/client/CPacketCustomPayload.java
++++ b/net/minecraft/network/play/client/CPacketCustomPayload.java
+@@ -56,4 +56,14 @@
+             this.data.release();
+         }
+     }
++
++    public PacketBuffer getData()
++    {
++        return data;
++    }
++
++    public ResourceLocation getChannel()
++    {
++        return channel;
++    }
+ }
