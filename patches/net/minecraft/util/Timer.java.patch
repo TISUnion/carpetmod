@@ -1,0 +1,26 @@
+--- a/net/minecraft/util/Timer.java
++++ b/net/minecraft/util/Timer.java
+@@ -1,5 +1,7 @@
+ package net.minecraft.util;
+ 
++import carpet.helpers.TickSpeed;
++import carpet.settings.CarpetSettings;
+ import net.minecraftforge.api.distmarker.Dist;
+ import net.minecraftforge.api.distmarker.OnlyIn;
+ 
+@@ -20,7 +22,14 @@
+ 
+     public void updateTimer(long p_74275_1_)
+     {
+-        this.elapsedPartialTicks = (float)(p_74275_1_ - this.lastSyncSysClock) / this.tickLength;
++        // Carpet smoothClientAnimations
++        float tickLength = this.tickLength;
++        if (CarpetSettings.smoothClientAnimations && TickSpeed.process_entities)
++        {
++            tickLength = Math.max(tickLength, TickSpeed.mspt);
++        }
++
++        this.elapsedPartialTicks = (float)(p_74275_1_ - this.lastSyncSysClock) / tickLength;
+         this.lastSyncSysClock = p_74275_1_;
+         this.renderPartialTicks += this.elapsedPartialTicks;
+         this.elapsedTicks = (int)this.renderPartialTicks;
