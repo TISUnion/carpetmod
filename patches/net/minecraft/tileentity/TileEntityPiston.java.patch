@@ -123,14 +123,12 @@
              }
          }
      }
-@@ -318,10 +351,26 @@
-                 {
+@@ -319,9 +352,38 @@
                      iblockstate = Block.getValidBlockForPosition(this.pistonState, this.world, this.pos);
                  }
--
+ 
 -                this.world.setBlockState(this.pos, iblockstate, 3);
 -                this.world.neighborChanged(this.pos, iblockstate.getBlock(), this.pos);
-+    
 +                // [CM] Movable TE's CARPET-DeadlyMC
 +                if (!CarpetSettings.movableTileEntities)
 +                {
@@ -139,21 +137,34 @@
 +                }
 +                else
 +                {
-+                    this.placeBlock();
++                    this.placeBlock(iblockstate);
 +                }
              }
 +            // [CM] Movable TE's CARPET-DeadlyMC
++            // comment from fabric-carpet:
++            //     Handle TNT Explosions or other ways the moving Block is broken
++            //     Also /setblock will cause this to be called, and drop e.g. a moving chest's contents.
++            //     This is MC-40380 (BlockEntities that aren't Inventories drop stuff when setblock is called )
 +            else if (CarpetSettings.movableTileEntities)
 +            {
++                IBlockState iblockstate;
++                if (this.shouldHeadBeRendered)
++                {
++                    iblockstate = Blocks.AIR.getDefaultState();
++                }
++                else
++                {
++                    iblockstate = Block.getValidBlockForPosition(this.pistonState, this.world, this.pos);
++                }
 +                if (this.carriedTileEntity != null && this.world.getBlockState(this.pos).getBlock() == Blocks.AIR) {
-+                    this.placeBlock();
++                    this.placeBlock(iblockstate);  // qwq
 +                    this.world.removeBlock(this.pos);
 +                }
 +            }
          }
      }
  
-@@ -351,8 +400,15 @@
+@@ -351,8 +413,15 @@
                          iblockstate = iblockstate.with(BlockStateProperties.WATERLOGGED, Boolean.valueOf(false));
                      }
  
@@ -166,12 +177,12 @@
 +                    }
 +                    else
 +                    {
-+                        this.placeBlock();
++                        this.placeBlock(iblockstate);
 +                    }
                  }
              }
          }
-@@ -378,6 +434,18 @@
+@@ -378,6 +447,18 @@
          this.lastProgress = this.progress;
          this.extending = compound.getBoolean("extending");
          this.shouldHeadBeRendered = compound.getBoolean("source");
@@ -190,7 +201,7 @@
      }
  
      public NBTTagCompound write(NBTTagCompound compound)
-@@ -388,6 +456,13 @@
+@@ -388,6 +469,13 @@
          compound.putFloat("progress", this.lastProgress);
          compound.putBoolean("extending", this.extending);
          compound.putBoolean("source", this.shouldHeadBeRendered);
@@ -204,7 +215,7 @@
          return compound;
      }
  
-@@ -435,4 +510,37 @@
+@@ -435,4 +523,37 @@
      {
          return this.lastTicked;
      }
@@ -216,9 +227,9 @@
 +    }
 +    
 +    // [CM] Movable TE's - helper method
-+    private void placeBlock()
++    private void placeBlock(IBlockState targetState)
 +    {
-+        this.world.setBlockState(this.pos, this.pistonState, 18); //Flag 18 => No block updates, TileEntity has to be placed first
++        this.world.setBlockState(this.pos, targetState, 18); //Flag 18 => No block updates, TileEntity has to be placed first
 +        
 +        if(!this.world.isRemote)
 +        {
@@ -233,12 +244,12 @@
 +            //This should not change piston behavior for vanilla-pushable blocks at all
 +            
 +            this.world.notifyNeighbors(pos, Blocks.MOVING_PISTON);
-+            if (this.pistonState.hasComparatorInputOverride())
++            if (targetState.hasComparatorInputOverride())
 +            {
-+                this.world.updateComparatorOutputLevel(pos, this.pistonState.getBlock());
++                this.world.updateComparatorOutputLevel(pos, targetState.getBlock());
 +            }
-+            this.world.notifyNeighborsOfStateChange(pos, this.pistonState.getBlock());
++            this.world.notifyNeighborsOfStateChange(pos, targetState.getBlock());
 +        }
-+        this.world.neighborChanged(this.pos, this.pistonState.getBlock(), this.pos);
++        this.world.neighborChanged(this.pos, targetState.getBlock(), this.pos);
 +    }
  }
