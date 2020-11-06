@@ -16,13 +16,31 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
+
+    - name: Cache gradle files
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('*.gradle') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Setup
       run: ./gradlew setup
     - name: Create Release
       run: ./gradlew createRelease
+    - name: Create Installers
+      run: |
+        cd installer
+        ./create_installer_unix.sh
+        ./create_installer_win.sh
+        cd ..
+
     - uses: actions/upload-artifact@v2
       with:
-        name: distributions 
-        path: build/distributions/*
+        name: installers for ${{ github.sha }}
+        path: installer/carpet_package_*
