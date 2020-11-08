@@ -23,6 +23,7 @@ jobs:
         path: |
           ~/.gradle/caches
           ~/.gradle/wrapper
+          ./projects/mcp
         key: ${{ runner.os }}-gradle-${{ hashFiles('*.gradle') }}
         restore-keys: |
           ${{ runner.os }}-gradle-
