@@ -29,6 +29,8 @@ jobs:
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+    - name: Setup
+      run: ./gradlew setup
     - name: Create Release
       run: ./gradlew createRelease
     - name: Create Installers
@@ -40,5 +42,5 @@ jobs:
 
     - uses: actions/upload-artifact@v2
       with:
-        name: installers for ${{ github.sha }}
+        name: TISCarpet dev installers for ${{ github.sha }}
         path: installer/carpet_package_*
