@@ -23,6 +23,7 @@ jobs:
         path: |
           ~/.gradle/caches
           ~/.gradle/wrapper
+          ./projects/mcp
         key: ${{ runner.os }}-gradle-${{ hashFiles('*.gradle') }}
         restore-keys: |
           ${{ runner.os }}-gradle-
@@ -42,5 +43,5 @@ jobs:
 
     - uses: actions/upload-artifact@v2
       with:
-        name: installers for ${{ github.sha }}
+        name: TISCarpet dev installers for ${{ github.sha }}
         path: installer/carpet_package_*
