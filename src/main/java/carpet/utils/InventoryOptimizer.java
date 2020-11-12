@@ -97,7 +97,7 @@ public class InventoryOptimizer
             return 0;
         long hash = HashCommon.mix((long) stack.getItem().hashCode());
         hash ^= HashCommon.mix((long) stack.getDamage());
-        hash ^= HashCommon.mix((long) Objects.hashCode(stack.getTag()));
+    //    hash ^= HashCommon.mix((long) Objects.hashCode(stack.getTag()));  yeeted by TISCM to reduce overhead
         return hash == 0 ? 1 : hash;
     }
     
