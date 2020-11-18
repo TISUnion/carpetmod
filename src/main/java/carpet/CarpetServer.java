@@ -20,6 +20,7 @@ import java.util.Random;
 
 public class CarpetServer // static for now - easier to handle all around the code, its one anyways
 {
+    public static final String MINECRAFT_BRAND = "tis-carpet";
     public static final Logger LOGGER = LogManager.getLogger();
     public static final Random rand = new Random((int)((2>>16)*Math.random()));
     public static MinecraftServer minecraft_server;

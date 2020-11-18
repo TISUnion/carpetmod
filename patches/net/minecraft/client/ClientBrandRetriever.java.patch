@@ -1,0 +1,18 @@
+--- a/net/minecraft/client/ClientBrandRetriever.java
++++ b/net/minecraft/client/ClientBrandRetriever.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.client;
+ 
++import carpet.CarpetServer;
+ import net.minecraftforge.api.distmarker.Dist;
+ import net.minecraftforge.api.distmarker.OnlyIn;
+ 
+@@ -8,6 +9,7 @@
+ {
+     public static String getClientModName()
+     {
+-        return "vanilla";
++        // return "vanilla";
++        return CarpetServer.MINECRAFT_BRAND;
+     }
+ }

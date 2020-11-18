@@ -199,7 +199,17 @@
          this.profiler.endStartSection("tickables");
  
          for (int j = 0; j < this.tickables.size(); ++j)
-@@ -1605,6 +1667,12 @@
+@@ -1142,7 +1204,8 @@
+ 
+     public String getServerModName()
+     {
+-        return "vanilla";
++        // return "vanilla";
++        return CarpetServer.MINECRAFT_BRAND;
+     }
+ 
+     public CrashReport addServerInfoToCrashReport(CrashReport report)
+@@ -1605,6 +1668,12 @@
      {
          return this.serverTime;
      }
@@ -212,7 +222,7 @@
  
      public Thread getServerThread()
      {
-@@ -1825,4 +1893,12 @@
+@@ -1825,4 +1894,12 @@
              return 0;
          }
      }
