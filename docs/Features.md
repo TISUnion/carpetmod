@@ -456,6 +456,7 @@ Ports and enable part of implementations of [Lithium mod](https://github.com/jel
 - alloc.enum_values
 - block.piston_shapes
 - cached_hashcode
+- entity.data_tracker.use_arrays
 - math.fast_util
 - shapes.precompute_shape_arrays
 - shapes.shape_merging

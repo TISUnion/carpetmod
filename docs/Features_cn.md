@@ -453,6 +453,7 @@ TISCM 中包含着一些对游戏的优化。这些优化都不太适合做成�
 - alloc.enum_values
 - block.piston_shapes
 - cached_hashcode
+- entity.data_tracker.use_arrays
 - math.fast_util
 - shapes.precompute_shape_arrays
 - shapes.shape_merging
