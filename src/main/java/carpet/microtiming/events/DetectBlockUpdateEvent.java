@@ -4,6 +4,7 @@ import carpet.microtiming.MicroTimingLoggerManager;
 import carpet.microtiming.enums.BlockUpdateType;
 import carpet.microtiming.enums.EventType;
 import carpet.microtiming.utils.MicroTimingUtil;
+import carpet.microtiming.utils.TextUtil;
 import carpet.utils.Messenger;
 import com.google.common.collect.Lists;
 import net.minecraft.block.Block;
@@ -44,10 +45,10 @@ public class DetectBlockUpdateEvent extends BaseEvent
 		List<Object> list = Lists.newArrayList();
 		list.add(this.getEnclosedTranslatedBlockNameHeaderText(this.fromBlock));
 		list.add(COLOR_ACTION + MicroTimingLoggerManager.tr("Emit"));
-		list.add(MicroTimingUtil.getSpaceText());
+		list.add(TextUtil.getSpaceText());
 		list.add(COLOR_TARGET + this.updateType);
 		list.add("^w " + this.getUpdateTypeExtraMessage());
-		list.add(MicroTimingUtil.getSpaceText());
+		list.add(TextUtil.getSpaceText());
 		switch (this.getEventType())
 		{
 			case ACTION_START:

@@ -2,6 +2,7 @@ package carpet.commands;
 
 import carpet.CarpetServer;
 import carpet.microtiming.utils.MicroTimingUtil;
+import carpet.microtiming.utils.TextUtil;
 import carpet.settings.CarpetSettings;
 import carpet.settings.SettingsManager;
 import carpet.utils.BlockInfo;
@@ -70,7 +71,7 @@ public class InfoCommand
             order++;
             Messenger.m(source, Messenger.c(
                     "g " + order + ". ",
-                    MicroTimingUtil.getDimensionNameText(world.getDimension().getType())
+                    TextUtil.getDimensionNameText(world.getDimension().getType())
             ));
         }
         return 1;

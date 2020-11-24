@@ -1,26 +1,23 @@
 package carpet.microtiming.utils;
 
 import carpet.microtiming.MicroTimingLoggerManager;
+import carpet.microtiming.enums.MicroTimingTarget;
+import carpet.settings.CarpetSettings;
 import carpet.utils.Messenger;
 import carpet.utils.WoolTool;
 import com.google.common.collect.Maps;
 import net.minecraft.block.*;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.state.properties.AttachFace;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.event.ClickEvent;
-import net.minecraft.util.text.event.HoverEvent;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 
 import java.util.Map;
 import java.util.Optional;
@@ -47,21 +44,6 @@ public class MicroTimingUtil
 		COLOR_STYLE.put(EnumDyeColor.GREEN, "e");
 		COLOR_STYLE.put(EnumDyeColor.RED, "r");
 		COLOR_STYLE.put(EnumDyeColor.BLACK, "k");
-	}
-
-	public static ITextComponent getFancyText(String style, ITextComponent displayText, ITextComponent hoverText, ClickEvent clickEvent)
-	{
-		ITextComponent text = (ITextComponent)displayText.deepCopy();
-		if (style != null)
-		{
-			text.setStyle(Messenger.c(style + "  ").getSiblings().get(0).getStyle());
-		}
-		text.getStyle().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverText));
-		if (clickEvent != null)
-		{
-			text.getStyle().setClickEvent(clickEvent);
-		}
-		return text;
 	}
 
 	public static String getColorStyle(EnumDyeColor color)
@@ -109,8 +91,8 @@ public class MicroTimingUtil
 			));
 		}
 		return bool ?
-				MicroTimingUtil.getFancyText("e", Messenger.s("√"), hintText, null) :
-				MicroTimingUtil.getFancyText("r", Messenger.s("×"), hintText, null);
+				TextUtil.getFancyText("e", Messenger.s("√"), hintText, null) :
+				TextUtil.getFancyText("r", Messenger.s("×"), hintText, null);
 	}
 	public static ITextComponent getSuccessText(boolean bool, boolean showReturnValue)
 	{
@@ -130,7 +112,7 @@ public class MicroTimingUtil
 		}
 		IBlockState state = world.getBlockState(pos);
 		Block block = state.getBlock();
-		BlockPos woolPos = pos;
+		BlockPos woolPos;
 
 		if (block instanceof BlockObserver || block instanceof BlockEndRod ||
 				block instanceof BlockPistonBase || block instanceof BlockPistonMoving)
@@ -205,6 +187,27 @@ public class MicroTimingUtil
 		{
 			optionalDyeColor = getEndRodWoolColor(world, pos);
 		}
+		if (!optionalDyeColor.isPresent())
+		{
+			boolean useBackup;
+			switch (CarpetSettings.microTimingTarget)
+			{
+				case IN_RANGE:
+					useBackup = world.getClosestPlayer(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, MicroTimingTarget.IN_RANGE_RADIUS, player -> true) != null;
+					break;
+				case ALL:
+					useBackup = true;
+					break;
+				case LABELLED:
+				default:
+					useBackup = false;
+					break;
+			}
+			if (useBackup)
+			{
+				optionalDyeColor = Optional.of(EnumDyeColor.LIGHT_GRAY);
+			}
+		}
 		return optionalDyeColor;
 	}
 
@@ -221,38 +224,5 @@ public class MicroTimingUtil
 		String translatedName = MicroTimingLoggerManager.tr("direction." + name, name);
 		char sign = direction.getAxisDirection().getOffset() > 0 ? '+' : '-';
 		return String.format("%s (%c%s)", translatedName, sign, direction.getAxis());
-	}
-
-	// from carpettisaddition/utils/Util.java
-	private static final Map<DimensionType, ITextComponent> DIMENSION_NAME = Maps.newHashMap();
-	static
-	{
-		DIMENSION_NAME.put(DimensionType.OVERWORLD, new TextComponentTranslation("createWorld.customize.preset.overworld"));
-		DIMENSION_NAME.put(DimensionType.NETHER, new TextComponentTranslation("advancements.nether.root.title"));
-		DIMENSION_NAME.put(DimensionType.THE_END, new TextComponentTranslation("advancements.end.root.title"));
-	}
-
-	public static ITextComponent getDimensionNameText(DimensionType dim)
-	{
-		return DIMENSION_NAME.getOrDefault(dim, Messenger.s(dim.toString())).deepCopy();
-	}
-
-	public static String getSpace()
-	{
-		return " ";
-	}
-	public static ITextComponent getSpaceText()
-	{
-		return Messenger.s(getSpace());
-	}
-
-	public static String getTeleportCommand(Vec3i pos, DimensionType dimensionType)
-	{
-		return String.format("/execute in %s run tp %d %d %d", dimensionType, pos.getX(), pos.getY(), pos.getZ());
-	}
-	public static String getTeleportCommand(EntityPlayerMP player)
-	{
-		String name = player.getGameProfile().getName();
-		return String.format("/execute at %1$s run tp %1$s", name);
 	}
 }

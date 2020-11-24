@@ -4,6 +4,7 @@ import carpet.logging.LoggerRegistry;
 import carpet.microtiming.MicroTimingLoggerManager;
 import carpet.microtiming.enums.TickStage;
 import carpet.microtiming.utils.MicroTimingUtil;
+import carpet.microtiming.utils.TextUtil;
 import carpet.utils.Messenger;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -25,7 +26,7 @@ public class ChunkLogHelper
                         "g at ",
                         "y " + stage,
                         "g  in ",
-                        MicroTimingUtil.getDimensionNameText(worldIn.getDimension().getType()).applyTextStyle(TextFormatting.DARK_GREEN)
+                        TextUtil.getDimensionNameText(worldIn.getDimension().getType()).applyTextStyle(TextFormatting.DARK_GREEN)
                 )}));
     }
 }

@@ -3,6 +3,7 @@ package carpet.microtiming.events;
 import carpet.microtiming.MicroTimingLoggerManager;
 import carpet.microtiming.enums.EventType;
 import carpet.microtiming.utils.MicroTimingUtil;
+import carpet.microtiming.utils.TextUtil;
 import carpet.utils.Messenger;
 import com.google.common.collect.Lists;
 import net.minecraft.block.Block;
@@ -27,11 +28,11 @@ public class ExecuteTileTickEvent extends BaseEvent
 		List<Object> list = Lists.newArrayList();
 		list.add(this.getEnclosedTranslatedBlockNameHeaderText(this.tileTickEntry.getTarget()));
 		list.add(COLOR_ACTION + this.tr("Execute"));
-		list.add(MicroTimingUtil.getSpaceText());
+		list.add(TextUtil.getSpaceText());
 		list.add(COLOR_TARGET + this.tr("TileTick Event"));
 		if (this.getEventType() == EventType.ACTION_END)
 		{
-			list.add(MicroTimingUtil.getSpaceText());
+			list.add(TextUtil.getSpaceText());
 			list.add(COLOR_RESULT + MicroTimingLoggerManager.tr("ended"));
 		}
 		list.add(String.format("^w %s: %d (%s)", MicroTimingLoggerManager.tr("Priority"), this.tileTickEntry.priority.getPriority(), this.tileTickEntry.priority));

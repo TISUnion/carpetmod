@@ -1,8 +1,10 @@
 package carpet.microtiming.events;
 
+import carpet.microtiming.MicroTimingLoggerManager;
 import carpet.microtiming.enums.EventType;
 import carpet.microtiming.enums.PistonBlockEventType;
 import carpet.microtiming.utils.MicroTimingUtil;
+import carpet.microtiming.utils.TextUtil;
 import carpet.microtiming.utils.ToTextAble;
 import carpet.utils.Messenger;
 import com.google.common.collect.Lists;
@@ -59,16 +61,21 @@ public class ExecuteBlockEventEvent extends BaseEvent
 		list.add(COLOR_ACTION + this.tr("Execute"));
 		if (this.blockAction.getBlock() instanceof BlockPistonBase)
 		{
-			list.add(MicroTimingUtil.getSpaceText());
+			list.add(TextUtil.getSpaceText());
 			list.add(COLOR_TARGET + PistonBlockEventType.byId(blockAction.getEventID()));
 		}
 		else
 		{
-			list.add(MicroTimingUtil.getSpaceText());
+			list.add(TextUtil.getSpaceText());
 			list.add(COLOR_TARGET + this.tr("BlockEvent"));
 		}
-		list.add(getMessageExtraMessengerHoverText(blockAction));
-		if (returnValue != null)
+		list.add(getMessageExtraMessengerHoverText(this.blockAction));
+		if (this.getEventType() == EventType.ACTION_END)
+		{
+			list.add(TextUtil.getSpaceText());
+			list.add(COLOR_RESULT + MicroTimingLoggerManager.tr("ended"));
+		}
+		if (this.returnValue != null)
 		{
 			list.add("w  ");
 			list.add(MicroTimingUtil.getSuccessText(this.returnValue, true, this.failInfo != null && !this.returnValue ? this.failInfo.toText() : null));
@@ -96,9 +103,9 @@ public class ExecuteBlockEventEvent extends BaseEvent
 	@Override
 	public void mergeQuitEvent(BaseEvent quitEvent)
 	{
+		super.mergeQuitEvent(quitEvent);
 		if (quitEvent instanceof ExecuteBlockEventEvent)
 		{
-			super.mergeQuitEvent(quitEvent);
 			this.returnValue = ((ExecuteBlockEventEvent)quitEvent).returnValue;
 			this.failInfo = ((ExecuteBlockEventEvent)quitEvent).failInfo;
 		}

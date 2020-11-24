@@ -1,6 +1,7 @@
 package carpet.settings;
 
 import carpet.CarpetServer;
+import carpet.microtiming.enums.MicroTimingTarget;
 import carpet.utils.Messenger;
 import net.minecraft.command.CommandSource;
 import net.minecraft.server.MinecraftServer;
@@ -145,9 +146,20 @@ public class CarpetSettings
                     "- Repeater, Comparator, Rail, Button, etc.: placed on wool",
                     "Beside that, blocks pointed by EndRod on wool block will also show their actions"
             },
-            category = {COMMAND, CREATIVE}
+            category = {CREATIVE}
     )
     public static boolean microTiming = false;
+
+    @Rule(
+            desc = "Modify the way to specify events to be logged in microTiming logger",
+            extra = {
+                    "labelled: Logs events labelled with wool",
+                    "in_range: Logs events within 32m of any player",
+                    "all: Logs every event. Use with caution"
+            },
+            category = {CREATIVE}
+    )
+    public static MicroTimingTarget microTimingTarget = MicroTimingTarget.LABELLED;
 
     @Rule(
             desc = "Overwrite the size limit of structure block",

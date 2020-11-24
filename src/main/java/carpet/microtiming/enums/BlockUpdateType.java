@@ -2,6 +2,7 @@ package carpet.microtiming.enums;
 
 import carpet.microtiming.MicroTimingLoggerManager;
 import carpet.microtiming.utils.MicroTimingUtil;
+import carpet.microtiming.utils.TextUtil;
 import com.google.common.base.Joiner;
 import net.minecraft.util.EnumFacing;
 
@@ -38,7 +39,7 @@ public enum BlockUpdateType
 		int counter = 0;
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append(tr("aka"));
-		stringBuilder.append(MicroTimingUtil.getSpace());
+		stringBuilder.append(TextUtil.getSpace());
 		stringBuilder.append(Joiner.on(", ").join(this.aka));
 		stringBuilder.append('\n');
 		for (EnumFacing direction : this.updateOrder)

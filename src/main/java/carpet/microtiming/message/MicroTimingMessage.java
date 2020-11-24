@@ -8,6 +8,7 @@ import carpet.microtiming.events.BaseEvent;
 import carpet.microtiming.tickstages.TickStageExtraBase;
 import carpet.microtiming.utils.MicroTimingUtil;
 import carpet.microtiming.utils.StackTraceDeobfuscator;
+import carpet.microtiming.utils.TextUtil;
 import carpet.utils.Messenger;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -105,7 +106,7 @@ public class MicroTimingMessage
 		{
 			ret = Messenger.c(
 					text,
-					"?" + MicroTimingUtil.getTeleportCommand(pos, this.dimensionType),
+					"?" + TextUtil.getTeleportCommand(pos, this.dimensionType),
 					String.format("^w [ %d, %d, %d ]", this.pos.getX(), this.pos.getY(), this.pos.getZ())
 			);
 		}
@@ -127,10 +128,10 @@ public class MicroTimingMessage
 		List<Object> hoverTextList = Lists.newArrayList();
 		hoverTextList.add(this.stageExtra != null ? Messenger.c(this.stageExtra.toText(), "w \n"): Messenger.s(""));
 		hoverTextList.add(String.format("w %s: ", MicroTimingLoggerManager.tr("Dimension")));
-		hoverTextList.add(this.stage.isInsideWorld() ? MicroTimingUtil.getDimensionNameText(this.dimensionType) : "w N/A");
+		hoverTextList.add(this.stage.isInsideWorld() ? TextUtil.getDimensionNameText(this.dimensionType) : "w N/A");
 		return Messenger.c(
 				"g  @",
-				MicroTimingUtil.getFancyText(
+				TextUtil.getFancyText(
 						null,
 						Messenger.c(stageText.toArray(new Object[0])),
 						Messenger.c(hoverTextList.toArray(new Object[0])),

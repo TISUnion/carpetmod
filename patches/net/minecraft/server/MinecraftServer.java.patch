@@ -8,7 +8,7 @@
 +import carpet.helpers.TickSpeed;
 +import carpet.microtiming.MicroTimingLoggerManager;
 +import carpet.microtiming.enums.TickStage;
-+import carpet.microtiming.tickstages.StringTickStageExtra;
++import carpet.microtiming.tickstages.LiteralTickStageExtra;
 +import carpet.settings.CarpetSettings;
 +import carpet.utils.CarpetProfiler;
  import com.google.common.base.Stopwatch;
@@ -173,7 +173,7 @@
      {
          this.profiler.startSection("jobs");
 +        MicroTimingLoggerManager.setTickStage(TickStage.PLAYER_ACTION);  // TISCM Micro Timing logger
-+        MicroTimingLoggerManager.setTickStageExtra(StringTickStageExtra.SYNC_TASKS);  // TISCM Micro Timing logger
++        MicroTimingLoggerManager.setTickStageExtra(LiteralTickStageExtra.SYNC_TASKS);  // TISCM Micro Timing logger
          FutureTask<?> futuretask;
  
          while ((futuretask = this.futureTaskQueue.poll()) != null)

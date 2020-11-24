@@ -181,7 +181,7 @@
              boolean flag1 = this.isThundering();
              this.profiler.startSection("pollingChunks");
  
-+            MicroTimingLoggerManager.setTickStage(this, TickStage.RANDOMTICK_CLIMATE); // TISCM Micro Timing logger
++            MicroTimingLoggerManager.setTickStage(this, TickStage.CHUNK_TICK); // TISCM Micro Timing logger
              for (Iterator<Chunk> iterator = this.playerChunkMap.getChunkIterator(); iterator.hasNext(); this.profiler.endSection())
              {
                  this.profiler.startSection("getChunk");

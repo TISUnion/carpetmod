@@ -2,6 +2,7 @@ package carpet.microtiming.tickstages;
 
 import carpet.microtiming.MicroTimingLoggerManager;
 import carpet.microtiming.utils.MicroTimingUtil;
+import carpet.microtiming.utils.TextUtil;
 import carpet.utils.Messenger;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.text.ITextComponent;
@@ -27,6 +28,6 @@ public abstract class PlayerRelatedTickStageExtra extends TickStageExtraBase
 	@Override
 	public ClickEvent getClickEvent()
 	{
-		return new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, MicroTimingUtil.getTeleportCommand(this.player));
+		return new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, TextUtil.getTeleportCommand(this.player));
 	}
 }

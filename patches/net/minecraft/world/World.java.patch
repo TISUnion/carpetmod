@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/World.java
 +++ b/net/minecraft/world/World.java
-@@ -1,20 +1,29 @@
+@@ -1,20 +1,30 @@
  package net.minecraft.world;
  
 +import carpet.helpers.TickSpeed;
@@ -8,7 +8,8 @@
 +import carpet.microtiming.enums.EventType;
 +import carpet.microtiming.enums.BlockUpdateType;
 +import carpet.microtiming.enums.TickStage;
-+import carpet.microtiming.tickstages.StringTickStageExtra;
++import carpet.microtiming.tickstages.EntityTickStageExtra;
++import carpet.microtiming.tickstages.LiteralTickStageExtra;
 +import carpet.microtiming.tickstages.TileEntityTickStageExtra;
 +import carpet.settings.CarpetSettings;
 +import carpet.utils.CarpetProfiler;
@@ -36,7 +37,7 @@
  import net.minecraft.block.Block;
  import net.minecraft.block.material.Material;
  import net.minecraft.block.state.IBlockState;
-@@ -82,9 +91,12 @@
+@@ -82,9 +92,12 @@
      private int seaLevel = 63;
      public final List<Entity> loadedEntityList = Lists.newArrayList();
      protected final List<Entity> unloadedEntityList = Lists.newArrayList();
@@ -52,7 +53,7 @@
      private final List<TileEntity> tileEntitiesToBeRemoved = Lists.newArrayList();
      public final List<EntityPlayer> playerEntities = Lists.newArrayList();
      public final List<Entity> weatherEffects = Lists.newArrayList();
-@@ -116,6 +128,13 @@
+@@ -116,6 +129,13 @@
      private final WorldBorder worldBorder;
      int[] lightUpdateBlockList = new int['\u8000'];
  
@@ -66,7 +67,7 @@
      protected World(ISaveHandler p_i49813_1_, @Nullable WorldSavedDataStorage p_i49813_2_, WorldInfo p_i49813_3_, Dimension p_i49813_4_, Profiler p_i49813_5_, boolean p_i49813_6_)
      {
          this.saveHandler = p_i49813_1_;
-@@ -125,6 +144,8 @@
+@@ -125,6 +145,8 @@
          this.dimension = p_i49813_4_;
          this.isRemote = p_i49813_6_;
          this.worldBorder = p_i49813_4_.createWorldBorder();
@@ -75,7 +76,7 @@
      }
  
      public Biome getBiome(BlockPos pos)
-@@ -224,8 +245,25 @@
+@@ -224,8 +246,25 @@
          }
      }
  
@@ -86,12 +87,12 @@
 +        if (MicroTimingLoggerManager.isLoggerActivated())
 +        {
 +            oldState = this.getBlockState(pos);
-+            MicroTimingLoggerManager.onSetBlockState(this, pos, oldState, newState, null, EventType.ACTION_START);
++            MicroTimingLoggerManager.onSetBlockState(this, pos, oldState, newState, null, flags, EventType.ACTION_START);
 +        }
 +        boolean returnValue = this._setBlockState(pos, newState, flags);
 +        if (MicroTimingLoggerManager.isLoggerActivated() && oldState != null)
 +        {
-+            MicroTimingLoggerManager.onSetBlockState(this, pos, oldState, newState, returnValue, EventType.ACTION_END);
++            MicroTimingLoggerManager.onSetBlockState(this, pos, oldState, newState, returnValue, flags, EventType.ACTION_END);
 +        }
 +        return returnValue;
 +    }
@@ -101,7 +102,7 @@
          if (isOutsideBuildHeight(pos))
          {
              return false;
-@@ -238,7 +276,7 @@
+@@ -238,7 +277,7 @@
          {
              Chunk chunk = this.getChunk(pos);
              Block block = newState.getBlock();
@@ -110,7 +111,7 @@
  
              if (iblockstate == null)
              {
-@@ -262,6 +300,13 @@
+@@ -262,6 +301,13 @@
                          this.markBlockRangeForRenderUpdate(pos, pos);
                      }
  
@@ -124,7 +125,7 @@
                      if ((flags & 2) != 0 && (!this.isRemote || (flags & 4) == 0) && chunk.isPopulated())
                      {
                          this.notifyBlockUpdate(pos, iblockstate, newState, flags);
-@@ -277,7 +322,9 @@
+@@ -277,7 +323,9 @@
                          }
                      }
  
@@ -135,7 +136,7 @@
                      {
                          int i = flags & -2;
                          iblockstate.updateDiagonalNeighbors(this, pos, i);
-@@ -372,19 +419,22 @@
+@@ -372,19 +420,22 @@
              this.eventListeners.get(i).markBlockRangeForRenderUpdate(x1, y1, z1, x2, y2, z2);
          }
      }
@@ -159,7 +160,7 @@
          if (skipSide != EnumFacing.WEST)
          {
              this.neighborChanged(pos.west(), blockType, pos);
-@@ -414,10 +464,15 @@
+@@ -414,10 +465,15 @@
          {
              this.neighborChanged(pos.south(), blockType, pos);
          }
@@ -176,7 +177,7 @@
          if (!this.isRemote)
          {
              IBlockState iblockstate = this.getBlockState(pos);
-@@ -1199,7 +1254,14 @@
+@@ -1199,13 +1255,22 @@
      {
          this.profiler.startSection("entities");
          this.profiler.startSection("global");
@@ -187,26 +188,33 @@
 +        // end
  
 +        MicroTimingLoggerManager.setTickStage(this, TickStage.ENTITY); // TISCM Micro Timing logger
-+        MicroTimingLoggerManager.setTickStageExtra(this, StringTickStageExtra.ENTITY_WEATHER_EFFECT); // TISCM Micro
++        int entityOrderCounter = 0;  // TISCM Micro Timing logger
++
          for (int i = 0; i < this.weatherEffects.size(); ++i)
          {
              Entity entity = this.weatherEffects.get(i);
-@@ -1233,6 +1295,7 @@
+ 
+             try
+             {
++                MicroTimingLoggerManager.setTickStageExtra(this, new EntityTickStageExtra(entity, entityOrderCounter++));  // TISCM Micro Timing logger
+                 ++entity.ticksExisted;
+                 entity.tick();
+             }
+@@ -1233,6 +1298,7 @@
          }
  
          this.profiler.endStartSection("remove");
-+        MicroTimingLoggerManager.setTickStageExtra(this, StringTickStageExtra.ENTITY_REMOVING); // TISCM Micro Timing logger
++        MicroTimingLoggerManager.setTickStageExtra(this, LiteralTickStageExtra.ENTITY_REMOVING); // TISCM Micro Timing logger
          this.loadedEntityList.removeAll(this.unloadedEntityList);
  
          for (int k = 0; k < this.unloadedEntityList.size(); ++k)
-@@ -1253,12 +1316,15 @@
+@@ -1253,12 +1319,14 @@
          }
  
          this.unloadedEntityList.clear();
-+        MicroTimingLoggerManager.setTickStageExtra(this, StringTickStageExtra.ENTITY_PLAYER); // TISCM Micro Timing logger
++        MicroTimingLoggerManager.setTickStageExtra(this, LiteralTickStageExtra.ENTITY_PLAYER);  // TISCM Micro Timing logger
          this.tickPlayers();
          this.profiler.endStartSection("regular");
-+        MicroTimingLoggerManager.setTickStageExtra(this, StringTickStageExtra.ENTITY_REGULAR); // TISCM Micro Timing logger
  
          for (int i1 = 0; i1 < this.loadedEntityList.size(); ++i1)
          {
@@ -215,7 +223,7 @@
              Entity entity3 = entity2.getRidingEntity();
  
              if (entity3 != null)
-@@ -1273,7 +1339,8 @@
+@@ -1273,8 +1341,10 @@
  
              this.profiler.startSection("tick");
  
@@ -223,9 +231,11 @@
 +            // [CM] Tick Freeze
 +            if (!entity2.removed && !(entity2 instanceof EntityPlayerMP) && (TickSpeed.process_entities || entity2 instanceof EntityPlayer))
              {
++                MicroTimingLoggerManager.setTickStageExtra(this, new EntityTickStageExtra(entity2, entityOrderCounter++));  // TISCM Micro Timing logger
                  try
                  {
-@@ -1304,11 +1371,17 @@
+                     this.tickEntity(entity2);
+@@ -1304,11 +1374,17 @@
                  this.loadedEntityList.remove(i1--);
                  this.onEntityRemoved(entity2);
              }
@@ -243,7 +253,7 @@
  
          if (!this.tileEntitiesToBeRemoved.isEmpty())
          {
-@@ -1316,19 +1389,22 @@
+@@ -1316,19 +1392,22 @@
              this.loadedTileEntityList.removeAll(this.tileEntitiesToBeRemoved);
              this.tileEntitiesToBeRemoved.clear();
          }
@@ -268,7 +278,7 @@
                  {
                      try
                      {
-@@ -1336,6 +1412,7 @@
+@@ -1336,6 +1415,7 @@
                          {
                              return String.valueOf((Object)TileEntityType.getId(tileentity.getType()));
                          });
@@ -276,7 +286,7 @@
                          ((ITickable)tileentity).tick();
                          this.profiler.endSection();
                      }
-@@ -1359,12 +1436,18 @@
+@@ -1359,12 +1439,18 @@
                      this.getChunk(tileentity.getPos()).removeTileEntity(tileentity.getPos());
                  }
              }
@@ -285,7 +295,7 @@
  
          this.processingLoadedTiles = false;
          this.profiler.endStartSection("pendingBlockEntities");
-+        MicroTimingLoggerManager.setTickStageExtra(this, StringTickStageExtra.ADD_PENDING_BLOCK_ENTITIES); // TISCM Micro Timing logger
++        MicroTimingLoggerManager.setTickStageExtra(this, LiteralTickStageExtra.ADD_PENDING_BLOCK_ENTITIES); // TISCM Micro Timing logger
  
 -        if (!this.addedTileEntityList.isEmpty())
 +        // Lithium block_entity_ticking
@@ -296,7 +306,7 @@
          {
              for (int j1 = 0; j1 < this.addedTileEntityList.size(); ++j1)
              {
-@@ -1389,11 +1472,52 @@
+@@ -1389,11 +1475,52 @@
  
              this.addedTileEntityList.clear();
          }
@@ -349,7 +359,7 @@
      protected void tickPlayers()
      {
      }
-@@ -1413,7 +1537,7 @@
+@@ -1413,7 +1540,7 @@
              IBlockState iblockstate = this.getBlockState(blockpos);
              this.notifyBlockUpdate(blockpos, iblockstate, iblockstate, 2);
          }
@@ -358,7 +368,7 @@
          return flag;
      }
  
-@@ -1514,7 +1638,8 @@
+@@ -1514,7 +1641,8 @@
                  this.getChunk(entityIn.chunkCoordX, entityIn.chunkCoordZ).removeEntityAtIndex(entityIn, entityIn.chunkCoordY);
              }
  
@@ -368,7 +378,7 @@
              {
                  entityIn.addedToChunk = false;
              }
-@@ -1834,17 +1959,21 @@
+@@ -1834,17 +1962,21 @@
      @Nullable
      private TileEntity getPendingTileEntityAt(BlockPos pos)
      {
@@ -400,7 +410,7 @@
      }
  
      public void setTileEntity(BlockPos pos, @Nullable TileEntity tileEntityIn)
-@@ -1856,19 +1985,22 @@
+@@ -1856,19 +1988,22 @@
                  if (this.processingLoadedTiles)
                  {
                      tileEntityIn.setPos(pos);
@@ -434,7 +444,7 @@
                      this.addedTileEntityList.add(tileEntityIn);
                  }
                  else
-@@ -2149,6 +2281,13 @@
+@@ -2149,6 +2284,13 @@
  
      public boolean checkLightFor(EnumLightType lightType, BlockPos pos)
      {
@@ -448,7 +458,7 @@
          if (!this.isAreaLoaded(pos, 17, false))
          {
              return false;
-@@ -3204,4 +3343,17 @@
+@@ -3204,4 +3346,17 @@
      public abstract RecipeManager getRecipeManager();
  
      public abstract NetworkTagManager getTags();

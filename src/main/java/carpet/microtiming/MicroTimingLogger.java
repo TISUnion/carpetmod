@@ -1,5 +1,6 @@
 package carpet.microtiming;
 
+import carpet.logging.AbstractLogger;
 import carpet.logging.LoggerRegistry;
 import carpet.microtiming.enums.EventType;
 import carpet.microtiming.enums.TickStage;
@@ -11,6 +12,7 @@ import carpet.microtiming.message.MessageType;
 import carpet.microtiming.message.MicroTimingMessage;
 import carpet.microtiming.tickstages.TickStageExtraBase;
 import carpet.microtiming.utils.MicroTimingUtil;
+import carpet.microtiming.utils.TextUtil;
 import carpet.microtiming.utils.TranslatableBase;
 import carpet.utils.Messenger;
 import com.google.common.collect.Lists;
@@ -29,33 +31,21 @@ import net.minecraft.world.WorldServer;
 import java.util.*;
 import java.util.function.BiFunction;
 
-public class MicroTimingLogger extends TranslatableBase
+public class MicroTimingLogger extends AbstractLogger
 {
 	// [stage][detail]^[extra]
+	public static final String NAME = "microTiming";
 
 	private TickStage stage;
 	private String stageDetail;
 	private TickStageExtraBase stageExtra;
 	private final WorldServer world;
 	public final MessageList messageList = new MessageList();
-	private final ITextComponent dimensionDisplayTextGray;
 
 	public MicroTimingLogger(WorldServer world)
 	{
+		super(NAME);
 		this.world = world;
-		if (world != null)
-		{
-			this.dimensionDisplayTextGray = MicroTimingUtil.getFancyText(
-					"g",
-					MicroTimingUtil.getDimensionNameText(this.world.getDimension().getType()),
-					Messenger.s(this.world.getDimension().getType().toString()),
-					null
-			);
-		}
-		else
-		{
-			this.dimensionDisplayTextGray = null;
-		}
 	}
 	
 	public void setTickStage(TickStage stage)
@@ -98,16 +88,17 @@ public class MicroTimingLogger extends TranslatableBase
 	private final static Set<IProperty<?>> INTEREST_PROPERTIES = new ReferenceArraySet<>();
 	static
 	{
-		INTEREST_PROPERTIES.add(BlockStateProperties.POWERED);
-		INTEREST_PROPERTIES.add(BlockStateProperties.LIT);
-		INTEREST_PROPERTIES.add(BlockStateProperties.POWER_0_15);
+		INTEREST_PROPERTIES.add(BlockStateProperties.POWERED);  // redstone repeater, observer, etc.
+		INTEREST_PROPERTIES.add(BlockStateProperties.LIT);  // redstone torch, redstone lamp
+		INTEREST_PROPERTIES.add(BlockStateProperties.POWER_0_15);  // redstone dust, weighted pressure plates, etc.
+		INTEREST_PROPERTIES.add(BlockStateProperties.LOCKED);  // redstone repeater
 	}
 
-	public void onSetBlockState(World world, BlockPos pos, IBlockState oldState, IBlockState newState, Boolean returnValue, EventType eventType)
+	public void onSetBlockState(World world, BlockPos pos, IBlockState oldState, IBlockState newState, Boolean returnValue, int flags, EventType eventType)
 	{
 		// lazy loading
 		EnumDyeColor color = null;
-		BlockStateChangeEvent event = new BlockStateChangeEvent(eventType, returnValue, newState.getBlock());
+		BlockStateChangeEvent event = new BlockStateChangeEvent(eventType, returnValue, newState.getBlock(), flags);
 
 		for (IProperty<?> IProperty: newState.getProperties())
 		{
@@ -159,7 +150,15 @@ public class MicroTimingLogger extends TranslatableBase
 	{
 		return Messenger.c(
 				MicroTimingMessage.getIndentationText(previousMessage.getIndentation()),
-				MicroTimingUtil.getFancyText("f", Messenger.s(String.format("  +%dx", count)), previousMessage.getMessage().toText(0, true), null)
+				TextUtil.getFancyText(
+						"g",
+						Messenger.s(String.format("  +%dx", count)),
+						Messenger.c(
+								String.format("w %s\n", String.format(this.tr("merged_message", "Merged %d more same message" + (count > 1 ? "s" : "")), count)),
+								previousMessage.getMessage().toText(0, true)
+						),
+						null
+				)
 		);
 	}
 
@@ -174,7 +173,12 @@ public class MicroTimingLogger extends TranslatableBase
 				"^w world.getGameTime()",
 				"g  " + this.world.getGameTime(),
 				"f  @ ",
-				this.dimensionDisplayTextGray,
+				TextUtil.getFancyText(
+						"g",
+						TextUtil.getDimensionNameText(this.world.getDimension().getType()),
+						Messenger.s(this.world.getDimension().getType().toString()),
+						null
+				),
 				"f ] ------------"
 		));
 		int skipCount = 0;
@@ -226,7 +230,7 @@ public class MicroTimingLogger extends TranslatableBase
 				{
 					flushedTrimmedMessages.put(option, getTrimmedMessages(flushedMessages, option));
 				}
-				LoggerRegistry.getLogger("microTiming").log((option) -> flushedTrimmedMessages.get(LoggingOption.ofString(option)));
+				LoggerRegistry.getLogger(NAME).log((option) -> flushedTrimmedMessages.get(LoggingOption.getOrDefault(option)));
 			}
 		}
 	}
@@ -237,21 +241,20 @@ public class MicroTimingLogger extends TranslatableBase
 		ALL,
 		UNIQUE;
 
-		public static final LoggingOption DEFAULT = LoggingOption.MERGED;
-		private static final Map<String, LoggingOption> OPTION_MAP = new Object2ObjectArrayMap<>();
+		public static final LoggingOption DEFAULT = MERGED;
 
-		static
+		public static LoggingOption getOrDefault(String option)
 		{
-			for (LoggingOption option : LoggingOption.values())
+			LoggingOption loggingOption;
+			try
 			{
-				OPTION_MAP.put(option.name(), option);
-				OPTION_MAP.put(option.name().toLowerCase(), option);
+				loggingOption = LoggingOption.valueOf(option.toUpperCase());
 			}
-		}
-
-		public static LoggingOption ofString(String str)
-		{
-			return OPTION_MAP.getOrDefault(str, DEFAULT);
+			catch (IllegalArgumentException e)
+			{
+				loggingOption = LoggingOption.DEFAULT;
+			}
+			return loggingOption;
 		}
 	}
 }

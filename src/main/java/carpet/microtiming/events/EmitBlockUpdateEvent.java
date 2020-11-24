@@ -3,6 +3,7 @@ package carpet.microtiming.events;
 import carpet.microtiming.MicroTimingLoggerManager;
 import carpet.microtiming.enums.EventType;
 import carpet.microtiming.utils.MicroTimingUtil;
+import carpet.microtiming.utils.TextUtil;
 import carpet.utils.Messenger;
 import com.google.common.collect.Lists;
 import net.minecraft.block.Block;
@@ -42,7 +43,7 @@ public class EmitBlockUpdateEvent extends BaseEvent
 		list.add(this.getEnclosedTranslatedBlockNameHeaderText(this.block));
 		ITextComponent updatesText = Messenger.c(
 				COLOR_ACTION + this.tr("Emit"),
-				MicroTimingUtil.getSpaceText(),
+				TextUtil.getSpaceText(),
 				COLOR_TARGET + this.tr("Updates")
 		);
 		if (this.methodName != null)
@@ -53,11 +54,11 @@ public class EmitBlockUpdateEvent extends BaseEvent
 		switch (this.getEventType())
 		{
 			case ACTION_START:
-				list.add(MicroTimingUtil.getSpaceText());
+				list.add(TextUtil.getSpaceText());
 				list.add(COLOR_RESULT + MicroTimingLoggerManager.tr("started"));
 				break;
 			case ACTION_END:
-				list.add(MicroTimingUtil.getSpaceText());
+				list.add(TextUtil.getSpaceText());
 				list.add(COLOR_RESULT + MicroTimingLoggerManager.tr("ended"));
 				break;
 			default:

@@ -2,6 +2,7 @@ package carpet.microtiming.events;
 
 import carpet.microtiming.enums.EventType;
 import carpet.microtiming.utils.MicroTimingUtil;
+import carpet.microtiming.utils.TextUtil;
 import carpet.microtiming.utils.ToTextAble;
 import carpet.microtiming.utils.TranslatableBase;
 import carpet.utils.Messenger;
@@ -21,6 +22,7 @@ public abstract class BaseEvent extends TranslatableBase implements ToTextAble
 
 	protected BaseEvent(EventType eventType, String translateKey)
 	{
+		super("logger.microTiming.event", translateKey);
 		this.eventType = eventType;
 	}
 

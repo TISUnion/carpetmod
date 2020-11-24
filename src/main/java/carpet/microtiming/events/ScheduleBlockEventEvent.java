@@ -2,6 +2,7 @@ package carpet.microtiming.events;
 
 import carpet.microtiming.enums.EventType;
 import carpet.microtiming.utils.MicroTimingUtil;
+import carpet.microtiming.utils.TextUtil;
 import carpet.utils.Messenger;
 import net.minecraft.block.BlockEventData;
 import net.minecraft.util.text.ITextComponent;
@@ -26,10 +27,10 @@ public class ScheduleBlockEventEvent extends BaseEvent
 		return Messenger.c(
 				this.getEnclosedTranslatedBlockNameHeaderText(blockAction.getBlock()),
 				COLOR_ACTION + this.tr("Scheduled"),
-				MicroTimingUtil.getSpaceText(),
+				TextUtil.getSpaceText(),
 				COLOR_TARGET + this.tr("BlockEvent"),
 				ExecuteBlockEventEvent.getMessageExtraMessengerHoverText(blockAction),
-				MicroTimingUtil.getSpaceText(),
+				TextUtil.getSpaceText(),
 				MicroTimingUtil.getSuccessText(this.success, false)
 		);
 	}

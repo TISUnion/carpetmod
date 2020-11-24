@@ -2,6 +2,7 @@ package carpet.microtiming.tickstages;
 
 import carpet.microtiming.MicroTimingLoggerManager;
 import carpet.microtiming.utils.MicroTimingUtil;
+import carpet.microtiming.utils.TextUtil;
 import carpet.utils.Messenger;
 import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
@@ -39,6 +40,6 @@ public class TileEntityTickStageExtra extends TickStageExtraBase
 	@Override
 	public ClickEvent getClickEvent()
 	{
-		return new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, MicroTimingUtil.getTeleportCommand(this.pos, this.world.getDimension().getType()));
+		return new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, TextUtil.getTeleportCommand(this.pos, this.world.getDimension().getType()));
 	}
 }
