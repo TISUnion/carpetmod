@@ -143,7 +143,23 @@ Default: `false`
 
 Options: `false`, `true`
 
-Categories: command, creative
+Categories: creative
+
+## microTimingTarget
+
+Modify the way to specify events to be logged in microTiming logger
+
+`labelled`: Logs events labelled with wool
+
+`in_range`: Logs events within 32m of any player
+
+`all`: Logs every event. **Use with caution**
+
+Default: `labelled`
+
+Options: `labelled`, `in_range`, `all`
+
+Categories: creative
 
 ## structureBlockLimit
 
@@ -305,7 +321,6 @@ Options: `false`, `true`
 
 Categories: creative, survival
 
-
 ## blockPlacementIgnoreEntity
 
 Disable entity collision check before block placement, aka you can place blocks inside entities
@@ -315,6 +330,35 @@ Works with creative mode players only
 Default: `false`
 
 Options: `false`, `true`
+
+Categories: creative
+
+## chunkTickSpeed
+
+Modify how often the chunk tick occurs per chunk per game tick
+
+The default value is `1`. Set it to `0` to disables chunk ticks
+
+Affected game phases: 
+- thunder
+- ice and snow
+- randomtick
+
+With a value of `n`, in every chunk every game tick, climate things will tick `n` times, and randomtick will tick `n` * `randomTickSpeed` times per chunk section
+
+Default: `1`
+
+Options: `0`, `1`, `10`, `100`, `1000`
+
+Categories: creative
+
+## tileTickLimit
+
+Modify the limit of executed tile tick events per game tick
+
+Default: `65536`
+
+Options: `1024`, `65536`, `2147483647`
 
 Categories: creative
 
@@ -413,16 +457,6 @@ Options: none
 
 ------
 
-# Features
-
-## Stat for breaking bedrock
-
-When a bedrock is deleted by piston or sticky piston, the nearest player to the bedrock with 10m will +1 stat
-
-The stat name is `break_bedrock` in `custom` catalogory
-
-------
-
 # Commands
 
 ## epsTest
@@ -432,6 +466,16 @@ The stat name is `break_bedrock` in `custom` catalogory
 Trigger a `<duration>` (default: `30`) seconds long explosion performance test. When it finishes it will output the number of explosions which the server can process every second, aka Explosion per Second (EPS)
 
 Use `/carpet commandEPSTest` to enable / disable this command
+
+------
+
+# Features
+
+## Stat for breaking bedrock
+
+When a bedrock is deleted by piston or sticky piston, the nearest player to the bedrock with 10m will +1 stat
+
+The stat name is `break_bedrock` in `custom` catalogory
 
 ------
 

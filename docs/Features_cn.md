@@ -86,6 +86,8 @@
 
 将光照变化过的子区块视作非空子区块，以修复浮空建筑下的黑影等bug
 
+不再有烦人的黑影！
+
 默认值： `false`
 
 选项：`false`, `true`
@@ -105,6 +107,8 @@
 分类：experimental, optimization
 
 ## portalSuperCache
+
+极大提升了地狱门搜索的效率，by LucunJi
 
 目前最高效的地狱门优化
 
@@ -139,7 +143,23 @@
 
 选项：`false`, `true`
 
-分类：command, creative
+分类：creative
+
+## microTimingTarget
+
+设置指定微时序记录器记录目标的方法
+
+`labelled`: 记录被羊毛块标记的事件
+
+`in_range`: 记录离任意玩家 32m 内的事件
+
+`all`: 记录所有事件。**谨慎使用**
+
+默认值： `labelled`
+
+选项：`labelled`, `in_range`, `all`
+
+分类：creative
 
 ## structureBlockLimit
 
@@ -231,7 +251,6 @@
 
 分类: command
 
-
 ## blockEventPacketRange
 
 设置会在方块事件成功执行后收到数据包的玩家范围
@@ -292,7 +311,7 @@
 
 分类: creative
 
-## 禁用反刷屏监测 (antiSpamDisabled)
+## antiSpamDisabled
 
 禁用玩家身上的刷屏检测，包括：聊天信息发送冷却、创造模式扔物品冷却
 
@@ -302,7 +321,7 @@
 
 分类: creative, survival
 
-## 方块放置忽略实体 (blockPlacementIgnoreEntity)
+## blockPlacementIgnoreEntity
 
 方块可放置时无视实体碰撞检测，也就是你可以将方块放在实体内
 
@@ -314,10 +333,37 @@
 
 分类: creative
 
+## chunkTickSpeed
+
+修改每游戏刻每区块的区块刻运算的频率
+
+默认值为 `1`。将其设为 `0` 以禁用区块刻
+
+受影响的游戏阶段：
+- 雷电
+- 结冰与积雪
+- 随机刻
+  
+在值为 `n` 时，每游戏刻每区块，气候相关的阶段会发生 `n` 次，而随机刻会在每区段中发生 `n` * `randomTickSpeed` 次
+
+默认值: `1`
+
+选项: `0`, `1`, `10`, `100`, `1000`
+
+分类: creative
+
+## tileTickLimit
+
+修改每游戏刻中计划刻事件的执行次数上限
+
+默认值: `65536`
+
+选项: `1024`, `65536`, `2147483647`
+
+分类: creative
+
 
 ## YEET
-
-**Warn**: all yeet options will change vanilla behaviour, they WILL NOT behave like vanilla
 
 **警告**：所有的yeet选项都会改变原版的特性，它们的行为不会表现得跟原版一致！
 
@@ -415,8 +461,9 @@
 
 ## epsTest
 
-触发一个长为 2 分钟的基于爆炸的性能测试。完成时将会输出服务器每秒可处理的爆炸数，也就是 Explosion per Second (EPS)
+`/epsTest [<duration>]`
 
+触发一个长为 2 分钟的基于爆炸的性能测试。完成时将会输出服务器每秒可处理的爆炸数，也就是 Explosion per Second (EPS)
 
 使用 `/carpet commandEPSTest` 来启用 / 禁用此命令
 
@@ -470,4 +517,3 @@ TISCM 中也有一些在 lithium mod 不包含的优化：
 - 在 `TileEntityHopper` 以及 `TileEntityPiston` 中缓存 BoundingBoxList 的创建结果
 - 在 `TileEntityList` 中给 hashset/hashmap 预先分配 256 大小的空间以防止在方块实体数量较小时频繁重建容器
 - 在 `TileEntityFurnace` 中永久性地储存物品的燃烧时间以避免每次调用都重复创建时间表
-
