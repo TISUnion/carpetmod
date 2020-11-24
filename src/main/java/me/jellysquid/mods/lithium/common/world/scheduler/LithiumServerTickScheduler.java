@@ -2,6 +2,7 @@ package me.jellysquid.mods.lithium.common.world.scheduler;
 
 import carpet.microtiming.MicroTimingLoggerManager;
 import carpet.microtiming.tickstages.TileTickTickStageExtra;
+import carpet.settings.CarpetSettings;
 import it.unimi.dsi.fastutil.longs.Long2ObjectAVLTreeMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectSortedMap;
@@ -183,7 +184,8 @@ public class LithiumServerTickScheduler<T> extends ServerTickList<T> {
         // [VanillaCopy] ServerTickScheduler#tick
         // In order to fulfill the promise of not breaking vanilla behaviour, we keep the vanilla artifact of
         // tick suppression.
-        int limit = 65536;
+        // TISCM tileTickLimit
+        int limit = CarpetSettings.tileTickLimit;
 
         boolean canTick = true;
         long prevChunk = Long.MIN_VALUE;

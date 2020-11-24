@@ -189,7 +189,7 @@
                  Chunk chunk = iterator.next();
                  int j = chunk.x * 16;
                  int k = chunk.z * 16;
-@@ -407,7 +483,15 @@
+@@ -407,7 +483,20 @@
                  chunk.enqueueRelightChecks();
                  this.profiler.endStartSection("tickChunk");
                  chunk.tick(false);
@@ -200,12 +200,17 @@
 +                    continue;
 +                }
 +
++                // TISCM chunkTickSpeed
++                for (int chunkTickCounter = 0; chunkTickCounter < CarpetSettings.chunkTickSpeed; chunkTickCounter++)
++                // TISCM chunkTickSpeed bracket starts
++                {
++
                  this.profiler.endStartSection("thunder");
 +                MicroTimingLoggerManager.setTickStageDetail(this, "Thunder"); // TISCM Micro Timing logger
  
                  if (flag && flag1 && this.rand.nextInt(100000) == 0)
                  {
-@@ -434,6 +518,7 @@
+@@ -434,6 +523,7 @@
                  }
  
                  this.profiler.endStartSection("iceandsnow");
@@ -213,7 +218,7 @@
  
                  if (this.rand.nextInt(16) == 0)
                  {
-@@ -460,6 +545,7 @@
+@@ -460,6 +550,7 @@
                  }
  
                  this.profiler.endStartSection("tickBlocks");
@@ -221,7 +226,13 @@
  
                  if (i > 0)
                  {
-@@ -496,10 +582,15 @@
+@@ -493,13 +584,21 @@
+                         }
+                     }
+                 }
++
++                // TISCM chunkTickSpeed bracket ends
++                }
              }
  
              this.profiler.endSection();
@@ -238,7 +249,7 @@
      {
          BlockPos blockpos = this.getHeight(Heightmap.Type.MOTION_BLOCKING, pos);
          AxisAlignedBB axisalignedbb = (new AxisAlignedBB(blockpos, new BlockPos(blockpos.getX(), this.getHeight(), blockpos.getZ()))).grow(3.0D);
-@@ -625,12 +716,16 @@
+@@ -625,12 +724,16 @@
  
      private void tickBlock(NextTickListEntry<Block> blockTickEntry)
      {
@@ -255,7 +266,7 @@
      }
  
      public void tickEntity(Entity entityIn, boolean forceUpdate)
-@@ -1021,26 +1116,54 @@
+@@ -1021,26 +1124,54 @@
  
      public void addBlockEvent(BlockPos pos, Block blockIn, int eventID, int eventParam)
      {
