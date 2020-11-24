@@ -213,11 +213,13 @@ Categories: experimental, bugfix
 
 Set the random size ratio in `doExplosionA` to a fixed value
 
-The value should be between 0.7 and 1.3 as vanilla behavior. Set it to -1 to disable overriding
+More exactly, replace the return value of `nextFloat()` for blast ray strength randomization
 
-Default: `-1`
+The value should be between 0 and 1 as vanilla behavior. Set it to -1 to disable overriding
 
-Options: `-1`, `0.7`, `1`, `1.3`
+Default: `-1.0`
+
+Options: `-1.0, `0.0`, `0.5`, `1.0`
 
 Categories: creative
 
