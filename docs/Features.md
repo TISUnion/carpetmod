@@ -211,11 +211,11 @@ Categories: experimental, bugfix
 
 ## explosionRandomRatio
 
-Set the random size ratio in `doExplosionA` to a fixed value
+Set the random size ratio in `collectBlocksAndDamageEntities` to a fixed value
 
-More exactly, replace the return value of `nextFloat()` for blast ray strength randomization
+More exactly, it replaces the return value of `nextFloat()` for blast ray strength randomization, so the random blast strength of the explosion becomes predictable
 
-The value should be between 0 and 1 as vanilla behavior. Set it to -1 to disable overriding
+The value should be between 0.0 and 1.0. Set it to -1.0 to disable overriding
 
 Default: `-1.0`
 
