@@ -229,13 +229,13 @@ public class CarpetSettings
                     "More exactly, replace the return value of nextFloat() for blast ray strength randomization",
                     "The value should be between 0 and 1 as vanilla behavior. Set it to -1 to disable overriding"
             },
-            validate = ExplosionRandomSizeRatioValidator.class,
+            validate = ExplosionRandomRatioValidator.class,
             options = {"-1.0", "0.0", "0.5", "1.0"},
             category = CREATIVE
     )
-    public static float explosionRandomSizeRatio = -1.0F;
+    public static float explosionRandomRatio = -1.0F;
 
-    private static class ExplosionRandomSizeRatioValidator extends Validator<Float>
+    private static class ExplosionRandomRatioValidator extends Validator<Float>
     {
         @Override
         public Float validate(CommandSource source, ParsedRule<Float> currentRule, Float newValue, String string) {

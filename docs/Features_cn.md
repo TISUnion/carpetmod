@@ -209,7 +209,7 @@
 
 分类: experimental, bugfix
 
-## explosionRandomSizeRatio
+## explosionRandomRatio
 
 将 `doExplosionA` 中爆炸射线的随机比率设为一个固定值
 

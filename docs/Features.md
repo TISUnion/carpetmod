@@ -209,7 +209,7 @@ Options: `false`, `true`
 
 Categories: experimental, bugfix
 
-## explosionRandomSizeRatio
+## explosionRandomRatio
 
 Set the random size ratio in `doExplosionA` to a fixed value
 

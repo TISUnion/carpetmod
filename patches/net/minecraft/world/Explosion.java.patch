@@ -86,9 +86,9 @@
 +//                        d1 = d1 / d3;
 +//                        d2 = d2 / d3;
 +//                        float f = this.size * (0.7F + this.world.rand.nextFloat() * 0.6F);
-+//                        if (CarpetSettings.explosionRandomSizeRatio != -1.0F) // TISCM explosionRandomSize
++//                        if (CarpetSettings.explosionRandomRatio != -1.0F) // TISCM explosionRandomSize
 +//                        {
-+//                            f = this.size * (0.7F + CarpetSettings.explosionRandomSizeRatio * 0.6F);
++//                            f = this.size * (0.7F + CarpetSettings.explosionRandomRatio * 0.6F);
 +//                        }
 +//                        double d4 = this.x;
 +//                        double d6 = this.y;
@@ -325,9 +325,9 @@
 +        double normZ = vecZ / dist;
 +
 +        float strength = this.size * (0.7F + (random.nextFloat() * 0.6F));
-+        if (CarpetSettings.explosionRandomSizeRatio != -1.0F)
++        if (CarpetSettings.explosionRandomRatio != -1.0F)
 +        {
-+            strength = this.size * (0.7F + (CarpetSettings.explosionRandomSizeRatio * 0.6F));
++            strength = this.size * (0.7F + (CarpetSettings.explosionRandomRatio * 0.6F));
 +        }
 +
 +        double stepX = this.x;
