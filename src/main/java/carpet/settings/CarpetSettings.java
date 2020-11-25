@@ -385,6 +385,15 @@ public class CarpetSettings
         }
     }
 
+    @Rule(
+            desc = "Halve the delay of redstone repeaters upon a redstone ore",
+            extra = {
+                    "The delay will change from 2, 4, 6 or 8 game tick instead of 1, 2, 3 or 4 game tick"
+            },
+            category = {CREATIVE}
+    )
+    public static boolean repeaterHalfDelay = false;
+
 
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$

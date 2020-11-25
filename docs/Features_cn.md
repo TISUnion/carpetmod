@@ -364,6 +364,18 @@
 
 分类: creative
 
+## repeaterHalfDelay
+
+当红石中继器位于红石矿上方时，红石中继器的延迟将减半
+
+延迟将会由 2, 4, 6, 8 游戏刻变为 1, 2,3 ,4 游戏刻
+
+默认值: `false`
+
+选项: `false`, `true`
+
+分类: creative
+
 
 ## YEET
 
