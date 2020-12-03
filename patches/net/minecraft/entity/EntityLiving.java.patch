@@ -77,20 +77,21 @@
              this.persistenceRequired = true;
              this.onItemPickup(itemEntity, itemstack.getCount());
              itemEntity.remove();
-@@ -725,6 +752,12 @@
+@@ -714,11 +741,13 @@
+ 
+                 if (this.canDespawn() && d3 > 16384.0D)
                  {
-                     this.idleTime = 0;
++                    this.recordRemoval(LiteralRemovalReason.DESPAWN);  // TISCM lifetime tracker
+                     this.remove();
                  }
-+
-+                // TISCM lifetime tracker
-+                if (this.removed)
-+                {
-+                    this.recordRemoval(LiteralRemovalReason.DESPAWN);
-+                }
-             }
-         }
-     }
-@@ -912,7 +945,8 @@
+ 
+                 if (this.idleTime > 600 && this.rand.nextInt(800) == 0 && d3 > 1024.0D && this.canDespawn())
+                 {
++                    this.recordRemoval(LiteralRemovalReason.DESPAWN);  // TISCM lifetime tracker
+                     this.remove();
+                 }
+                 else if (d3 < 1024.0D)
+@@ -912,7 +941,8 @@
  
      protected void dropEquipment(boolean wasRecentlyHit, int lootingModifier)
      {
@@ -100,7 +101,7 @@
          {
              ItemStack itemstack = this.getItemStackFromSlot(entityequipmentslot);
              float f = this.getDropChance(entityequipmentslot);
-@@ -973,7 +1007,8 @@
+@@ -973,7 +1003,8 @@
  
              boolean flag = true;
  
@@ -110,7 +111,7 @@
              {
                  if (entityequipmentslot.getSlotType() == EntityEquipmentSlot.Type.ARMOR)
                  {
-@@ -1136,7 +1171,8 @@
+@@ -1136,7 +1167,8 @@
              this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, EnchantmentHelper.addRandomEnchantment(this.rand, this.getHeldItemMainhand(), (int)(5.0F + f * (float)this.rand.nextInt(18)), false));
          }
  
@@ -120,7 +121,7 @@
          {
              if (entityequipmentslot.getSlotType() == EntityEquipmentSlot.Type.ARMOR)
              {
-@@ -1174,6 +1210,9 @@
+@@ -1174,6 +1206,9 @@
  
      public void enablePersistence()
      {
@@ -130,7 +131,7 @@
          this.persistenceRequired = true;
      }
  
-@@ -1447,10 +1486,16 @@
+@@ -1447,10 +1482,16 @@
          float f = (float)this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getValue();
          int i = 0;
  
