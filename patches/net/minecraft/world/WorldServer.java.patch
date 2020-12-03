@@ -1,8 +1,10 @@
 --- a/net/minecraft/world/WorldServer.java
 +++ b/net/minecraft/world/WorldServer.java
-@@ -1,5 +1,14 @@
+@@ -1,5 +1,16 @@
  package net.minecraft.world;
  
++import carpet.commands.lifetime.LifeTimeTracker;
++import carpet.commands.lifetime.LifeTimeWorldTracker;
 +import carpet.helpers.TickSpeed;
 +import carpet.microtiming.MicroTimingLogger;
 +import carpet.microtiming.MicroTimingLoggerManager;
@@ -15,7 +17,7 @@
  import com.google.common.collect.Lists;
  import com.google.common.collect.Maps;
  import com.google.common.util.concurrent.ListenableFuture;
-@@ -14,6 +23,8 @@
+@@ -14,6 +25,8 @@
  import java.util.stream.Stream;
  import javax.annotation.Nonnull;
  import javax.annotation.Nullable;
@@ -24,11 +26,12 @@
  import net.minecraft.block.Block;
  import net.minecraft.block.BlockEventData;
  import net.minecraft.block.state.IBlockState;
-@@ -93,19 +104,23 @@
+@@ -93,19 +106,24 @@
      private final EntityTracker entityTracker;
      private final PlayerChunkMap playerChunkMap;
      private final Map<UUID, Entity> entitiesByUuid = Maps.newHashMap();
 +    private final MicroTimingLogger microTimingLogger;  // TISCM Micro Timing logger
++    private final LifeTimeWorldTracker lifetimeTracker;  // TISCM lifetime tracker
      public boolean disableLevelSaving;
      private boolean allPlayersSleeping;
      private int updateEntityTick;
@@ -50,23 +53,29 @@
      protected final VillageSiege villageSiege = new VillageSiege(this);
      ObjectLinkedOpenHashSet<BlockEventData> blockEventQueue = new ObjectLinkedOpenHashSet<>();
      private boolean insideTick;
-@@ -122,8 +137,15 @@
+@@ -122,8 +140,21 @@
          this.calculateInitialSkylight();
          this.calculateInitialWeather();
          this.getWorldBorder().setSize(server.getMaxWorldSize());
 +
 +        this.microTimingLogger = new MicroTimingLogger(this);  // TISCM Micro Timing logger
++        this.lifetimeTracker = new LifeTimeWorldTracker(this);  // TISCM lifetime tracker
      }
  
 +    public MicroTimingLogger getMicroTickLogger()  // TISCM Micro Timing logger
 +    {
-+        return microTimingLogger;
++        return this.microTimingLogger;
++    }
++
++    public LifeTimeWorldTracker getLifeTimeWorldTracker()  // TISCM lifetime tracker
++    {
++        return this.lifetimeTracker;
 +    }
 +
      public WorldServer init()
      {
          String s = VillageCollection.fileNameForProvider(this.dimension);
-@@ -191,15 +213,28 @@
+@@ -191,15 +222,28 @@
              this.wakeAllPlayers();
          }
  
@@ -95,7 +104,7 @@
          this.chunkProvider.tick(hasTimeLeft);
          int j = this.calculateSkylightSubtracted(1.0F);
  
-@@ -208,25 +243,57 @@
+@@ -208,25 +252,57 @@
              this.setSkylightSubtracted(j);
          }
  
@@ -154,7 +163,7 @@
          this.sendQueuedBlockEvents();
          this.insideTick = false;
      }
-@@ -270,7 +337,7 @@
+@@ -270,7 +346,7 @@
                  }
              }
  
@@ -163,7 +172,7 @@
          }
      }
  
-@@ -306,6 +373,13 @@
+@@ -306,6 +382,13 @@
      {
          if (this.allPlayersSleeping && !this.isRemote)
          {
@@ -177,7 +186,7 @@
              for (EntityPlayer entityplayer : this.playerEntities)
              {
                  if (!entityplayer.isSpectator() && !entityplayer.isPlayerFullyAsleep())
-@@ -397,9 +471,11 @@
+@@ -397,9 +480,11 @@
              boolean flag1 = this.isThundering();
              this.profiler.startSection("pollingChunks");
  
@@ -189,7 +198,7 @@
                  Chunk chunk = iterator.next();
                  int j = chunk.x * 16;
                  int k = chunk.z * 16;
-@@ -407,7 +483,20 @@
+@@ -407,7 +492,20 @@
                  chunk.enqueueRelightChecks();
                  this.profiler.endStartSection("tickChunk");
                  chunk.tick(false);
@@ -210,7 +219,7 @@
  
                  if (flag && flag1 && this.rand.nextInt(100000) == 0)
                  {
-@@ -434,6 +523,7 @@
+@@ -434,6 +532,7 @@
                  }
  
                  this.profiler.endStartSection("iceandsnow");
@@ -218,7 +227,7 @@
  
                  if (this.rand.nextInt(16) == 0)
                  {
-@@ -460,6 +550,7 @@
+@@ -460,6 +559,7 @@
                  }
  
                  this.profiler.endStartSection("tickBlocks");
@@ -226,7 +235,7 @@
  
                  if (i > 0)
                  {
-@@ -493,13 +584,21 @@
+@@ -493,13 +593,21 @@
                          }
                      }
                  }
@@ -249,7 +258,7 @@
      {
          BlockPos blockpos = this.getHeight(Heightmap.Type.MOTION_BLOCKING, pos);
          AxisAlignedBB axisalignedbb = (new AxisAlignedBB(blockpos, new BlockPos(blockpos.getX(), this.getHeight(), blockpos.getZ()))).grow(3.0D);
-@@ -625,12 +724,16 @@
+@@ -625,12 +733,16 @@
  
      private void tickBlock(NextTickListEntry<Block> blockTickEntry)
      {
@@ -266,7 +275,7 @@
      }
  
      public void tickEntity(Entity entityIn, boolean forceUpdate)
-@@ -1021,26 +1124,54 @@
+@@ -1021,26 +1133,54 @@
  
      public void addBlockEvent(BlockPos pos, Block blockIn, int eventID, int eventParam)
      {

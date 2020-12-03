@@ -1,14 +1,15 @@
 --- a/net/minecraft/command/impl/SummonCommand.java
 +++ b/net/minecraft/command/impl/SummonCommand.java
-@@ -1,5 +1,7 @@
+@@ -1,5 +1,8 @@
  package net.minecraft.command.impl;
  
++import carpet.commands.lifetime.spawning.LiteralSpawningReason;
 +import carpet.helpers.CommandPermissionHelper;
 +import carpet.settings.CarpetSettings;
  import com.mojang.brigadier.CommandDispatcher;
  import com.mojang.brigadier.exceptions.CommandSyntaxException;
  import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-@@ -14,11 +16,14 @@
+@@ -14,11 +17,14 @@
  import net.minecraft.entity.EntityType;
  import net.minecraft.entity.IEntityLivingData;
  import net.minecraft.entity.effect.EntityLightningBolt;
@@ -23,7 +24,7 @@
  import net.minecraft.world.chunk.storage.AnvilChunkLoader;
  
  public class SummonCommand
-@@ -27,11 +32,10 @@
+@@ -27,11 +33,10 @@
  
      public static void register(CommandDispatcher<CommandSource> dispatcher)
      {
@@ -38,7 +39,7 @@
              return summonEntity(p_198738_0_.getSource(), EntitySummonArgument.getEntityId(p_198738_0_, "entity"), p_198738_0_.getSource().getPos(), new NBTTagCompound(), true);
          }).then(Commands.argument("pos", Vec3Argument.vec3()).executes((p_198735_0_) ->
          {
-@@ -50,7 +54,35 @@
+@@ -50,7 +55,35 @@
          if (EntityType.getId(EntityType.LIGHTNING_BOLT).equals(type))
          {
              Entity entity1 = new EntityLightningBolt(source.getWorld(), pos.x, pos.y, pos.z, false);
@@ -75,3 +76,13 @@
              source.sendFeedback(new TextComponentTranslation("commands.summon.success", entity1.getDisplayName()), true);
              return 1;
          }
+@@ -66,6 +99,9 @@
+             {
+                 entity.setLocationAndAngles(pos.x, pos.y, pos.z, entity.rotationYaw, entity.rotationPitch);
+ 
++                // TISCM lifetime tracker
++                entity.recordSpawning(LiteralSpawningReason.COMMAND);
++
+                 if (randomizeProperties && entity instanceof EntityLiving)
+                 {
+                     ((EntityLiving)entity).onInitialSpawn(source.getWorld().getDifficultyForLocation(new BlockPos(entity)), (IEntityLivingData)null, (NBTTagCompound)null);

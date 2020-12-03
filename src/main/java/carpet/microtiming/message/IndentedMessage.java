@@ -1,6 +1,6 @@
 package carpet.microtiming.message;
 
-import carpet.microtiming.utils.ToTextAble;
+import carpet.utils.ToTextAble;
 import net.minecraft.util.text.ITextComponent;
 
 public class IndentedMessage implements ToTextAble

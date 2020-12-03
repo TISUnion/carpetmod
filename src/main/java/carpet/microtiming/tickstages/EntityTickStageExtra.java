@@ -1,7 +1,7 @@
 package carpet.microtiming.tickstages;
 
 import carpet.microtiming.MicroTimingLoggerManager;
-import carpet.microtiming.utils.TextUtil;
+import carpet.utils.TextUtil;
 import carpet.utils.Messenger;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;

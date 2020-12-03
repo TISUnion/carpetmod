@@ -1,8 +1,7 @@
 package carpet.commands;
 
 import carpet.CarpetServer;
-import carpet.microtiming.utils.MicroTimingUtil;
-import carpet.microtiming.utils.TextUtil;
+import carpet.utils.TextUtil;
 import carpet.settings.CarpetSettings;
 import carpet.settings.SettingsManager;
 import carpet.utils.BlockInfo;

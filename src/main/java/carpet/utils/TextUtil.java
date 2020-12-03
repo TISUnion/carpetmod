@@ -1,4 +1,4 @@
-package carpet.microtiming.utils;
+package carpet.utils;
 
 import carpet.utils.Messenger;
 import carpet.utils.Translations;
@@ -39,9 +39,9 @@ public class TextUtil
 		return text;
 	}
 
-	public static ITextComponent attachColor(ITextComponent text, TextFormatting formatting)
+	public static ITextComponent attachFormatting(ITextComponent text, TextFormatting... formattings)
 	{
-		text.getStyle().setColor(formatting);
+		text.applyTextStyles(formattings);
 		return text;
 	}
 	// mojang compatibility thing ends
@@ -104,23 +104,33 @@ public class TextUtil
 		return text;
 	}
 
-	private static ITextComponent __getCoordinateText(String style, Dimension dim, String posText, String command)
+	private static ITextComponent __getCoordinateText(String style, DimensionType dim, String posText, String command)
 	{
 		ITextComponent hoverText = Messenger.s("");
 		hoverText.appendText(String.format("%s %s\n", getTeleportHint(), posText));
 		hoverText.appendText(Translations.tr("util.teleport_hint_dimension", "Dimension: "));
-		hoverText.appendSibling(getDimensionNameText(dim.getType()));
+		hoverText.appendSibling(getDimensionNameText(dim));
 		return getFancyText(style, Messenger.s(posText), hoverText, new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, command));
 	}
-	public static ITextComponent getCoordinateText(String style, Vec3d pos, Dimension dim)
+
+	public static String getCoordinateString(Vec3d pos)
 	{
-		String posText = String.format("[%.1f, %.1f, %.1f]", pos.x, pos.y, pos.z);
-		return __getCoordinateText(style, dim, posText, getTeleportCommand(pos, dim.getType()));
+		return String.format("[%.1f, %.1f, %.1f]", pos.x, pos.y, pos.z);
 	}
-	public static ITextComponent getCoordinateText(String style, Vec3i pos, Dimension dim)
+
+	public static String getCoordinateString(Vec3i pos)
 	{
-		String posText = String.format("[%d, %d, %d]", pos.getX(), pos.getY(), pos.getZ());
-		return __getCoordinateText(style, dim, posText, getTeleportCommand(pos, dim.getType()));
+		return String.format("[%d, %d, %d]", pos.getX(), pos.getY(), pos.getZ());
+	}
+
+	public static ITextComponent getCoordinateText(String style, Vec3d pos, DimensionType dim)
+	{
+		return __getCoordinateText(style, dim, getCoordinateString(pos), getTeleportCommand(pos, dim));
+	}
+
+	public static ITextComponent getCoordinateText(String style, Vec3i pos, DimensionType dim)
+	{
+		return __getCoordinateText(style, dim, getCoordinateString(pos), getTeleportCommand(pos, dim));
 	}
 
 	public static ITextComponent getEntityText(String style, Entity entity)
@@ -145,7 +155,7 @@ public class TextUtil
 		TextComponentTranslation text = new TextComponentTranslation(key, args);
 		if (color != null)
 		{
-			attachColor(text, color);
+			attachFormatting(text, color);
 		}
 		return text;
 	}

@@ -4,6 +4,7 @@ import carpet.microtiming.MicroTimingLoggerManager;
 import carpet.microtiming.enums.MicroTimingTarget;
 import carpet.settings.CarpetSettings;
 import carpet.utils.Messenger;
+import carpet.utils.TextUtil;
 import carpet.utils.WoolTool;
 import com.google.common.collect.Maps;
 import net.minecraft.block.*;

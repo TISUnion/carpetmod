@@ -2,7 +2,7 @@ package carpet.microtiming.tickstages;
 
 import carpet.microtiming.MicroTimingLoggerManager;
 import carpet.microtiming.utils.MicroTimingUtil;
-import carpet.microtiming.utils.TextUtil;
+import carpet.utils.TextUtil;
 import carpet.utils.Messenger;
 import com.google.common.collect.Lists;
 import net.minecraft.block.Block;

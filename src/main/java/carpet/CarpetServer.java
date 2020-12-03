@@ -1,6 +1,8 @@
 package carpet;
 
 import carpet.commands.*;
+import carpet.commands.lifetime.LifeTimeCommand;
+import carpet.commands.lifetime.LifeTimeTracker;
 import carpet.helpers.TickSpeed;
 import carpet.logging.LoggerRegistry;
 import carpet.microtiming.MicroTimingLoggerManager;
@@ -39,8 +41,10 @@ public class CarpetServer // static for now - easier to handle all around the co
     {
         settingsManager = new SettingsManager(server);
         scriptServer = new CarpetScriptServer();
-        MicroTimingLoggerManager.attachServer(server);
         //ExpressionInspector.CarpetExpression_resetExpressionEngine();
+
+        MicroTimingLoggerManager.attachServer(server);
+        LifeTimeTracker.attachServer(server);
     }
     // Separate from onServerLoaded, because a server can be loaded multiple times in singleplayer
     public static void onGameStarted() {
@@ -50,6 +54,7 @@ public class CarpetServer // static for now - easier to handle all around the co
     public static void onServerClosed(MinecraftServer server)
     {
         MicroTimingLoggerManager.detachServer();
+        LifeTimeTracker.detachServer();
         disconnect();
     }
 
@@ -80,6 +85,9 @@ public class CarpetServer // static for now - easier to handle all around the co
         EpsCommand.register(dispatcher);
 
         //TestCommand.register(dispatcher);
+
+        // TISCM
+        LifeTimeCommand.getInstance().registerCommand(dispatcher);
     }
 
     public static void disconnect()

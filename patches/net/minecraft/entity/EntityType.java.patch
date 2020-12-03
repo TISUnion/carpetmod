@@ -1,0 +1,25 @@
+--- a/net/minecraft/entity/EntityType.java
++++ b/net/minecraft/entity/EntityType.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.entity;
+ 
++import carpet.commands.lifetime.spawning.LiteralSpawningReason;
+ import com.mojang.datafixers.DataFixUtils;
+ import com.mojang.datafixers.types.Type;
+ import java.util.UUID;
+@@ -263,7 +264,14 @@
+     @Nullable
+     public Entity spawn(World worldIn, @Nullable ItemStack itemIn, @Nullable EntityPlayer player, BlockPos pos, boolean p_208049_5_, boolean p_208049_6_)
+     {
+-        return this.spawn(worldIn, itemIn == null ? null : itemIn.getTag(), itemIn != null && itemIn.hasDisplayName() ? itemIn.getDisplayName() : null, player, pos, p_208049_5_, p_208049_6_);
++        Entity entity = this.spawn(worldIn, itemIn == null ? null : itemIn.getTag(), itemIn != null && itemIn.hasDisplayName() ? itemIn.getDisplayName() : null, player, pos, p_208049_5_, p_208049_6_);
++
++        // TISCM lifetime tracker
++        if (entity != null)
++        {
++            entity.recordSpawning(LiteralSpawningReason.ITEM);
++        }
++        return entity;
+     }
+ 
+     @Nullable

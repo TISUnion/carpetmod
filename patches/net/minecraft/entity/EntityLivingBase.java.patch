@@ -1,14 +1,16 @@
 --- a/net/minecraft/entity/EntityLivingBase.java
 +++ b/net/minecraft/entity/EntityLivingBase.java
-@@ -1,5 +1,7 @@
+@@ -1,5 +1,9 @@
  package net.minecraft.entity;
  
++import carpet.commands.lifetime.removal.LiteralRemovalReason;
++import carpet.commands.lifetime.spawning.MobDropSpawningReason;
 +import carpet.logging.logHelpers.DamageReporter;
 +import carpet.settings.CarpetSettings;
  import com.google.common.base.Objects;
  import com.google.common.collect.Maps;
  import java.util.Collection;
-@@ -139,6 +141,8 @@
+@@ -139,6 +143,8 @@
      protected int scoreValue;
      protected float lastDamage;
      protected boolean isJumping;
@@ -17,7 +19,21 @@
      public float moveStrafing;
      public float moveVertical;
      public float moveForward;
-@@ -917,12 +921,14 @@
+@@ -418,7 +424,12 @@
+                 {
+                     int j = EntityXPOrb.getXPSplit(i);
+                     i -= j;
+-                    this.world.spawnEntity(new EntityXPOrb(this.world, this.posX, this.posY, this.posZ, j));
++
++                    // TISCM lifetime tracker
++                    EntityXPOrb entityXPOrb = new EntityXPOrb(this.world, this.posX, this.posY, this.posZ, j);
++                    entityXPOrb.recordSpawning(new MobDropSpawningReason(this.getType()));
++
++                    this.world.spawnEntity(entityXPOrb);
+                 }
+             }
+ 
+@@ -917,12 +928,14 @@
          }
          else
          {
@@ -32,7 +48,7 @@
                  amount *= 0.75F;
              }
  
-@@ -932,6 +938,7 @@
+@@ -932,6 +945,7 @@
              if (amount > 0.0F && this.canBlockDamageSource(source))
              {
                  this.damageShield(amount);
@@ -40,7 +56,7 @@
                  f1 = amount;
                  amount = 0.0F;
  
-@@ -955,8 +962,10 @@
+@@ -955,8 +969,10 @@
              {
                  if (amount <= this.lastDamage)
                  {
@@ -51,7 +67,16 @@
  
                  this.damageEntity(source, amount - this.lastDamage);
                  this.lastDamage = amount;
-@@ -1407,6 +1416,9 @@
+@@ -1198,6 +1214,8 @@
+     {
+         if (!this.dead)
+         {
++            this.setDeathDamageSource(cause);  // TISCM lifetime tracker
++
+             Entity entity = cause.getTrueSource();
+             EntityLivingBase entitylivingbase = this.getAttackingEntity();
+ 
+@@ -1407,6 +1425,9 @@
                  int j = 25 - i;
                  float f = damage * (float)j;
                  float f1 = damage;
@@ -61,7 +86,7 @@
                  damage = Math.max(f / 25.0F, 0.0F);
                  float f2 = f1 - damage;
  
-@@ -1433,7 +1445,10 @@
+@@ -1433,7 +1454,10 @@
  
                  if (k > 0)
                  {
@@ -72,7 +97,7 @@
                  }
  
                  return damage;
-@@ -1445,11 +1460,21 @@
+@@ -1445,11 +1469,21 @@
      {
          if (!this.isInvulnerableTo(damageSrc))
          {
@@ -94,7 +119,7 @@
              float f1 = f - damageAmount;
  
              if (f1 > 0.0F && f1 < 3.4028235E37F && damageSrc.getTrueSource() instanceof EntityPlayerMP)
-@@ -1460,6 +1485,7 @@
+@@ -1460,6 +1494,7 @@
              if (damageAmount != 0.0F)
              {
                  float f2 = this.getHealth();
@@ -102,7 +127,7 @@
                  this.setHealth(f2 - damageAmount);
                  this.getCombatTracker().trackDamage(damageSrc, f2, damageAmount);
                  this.setAbsorptionAmount(this.getAbsorptionAmount() - damageAmount);
-@@ -2530,9 +2556,15 @@
+@@ -2530,9 +2565,15 @@
                      this.attackEntityFrom(DamageSource.CRAMMING, 6.0F);
                  }
              }

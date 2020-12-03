@@ -4,6 +4,7 @@ import carpet.logging.Logger;
 import carpet.microtiming.MicroTimingLogger;
 import carpet.microtiming.MicroTimingLoggerManager;
 import carpet.utils.Messenger;
+import carpet.utils.Translator;
 import net.minecraft.entity.player.EntityPlayer;
 
 import java.util.Arrays;

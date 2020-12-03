@@ -2,7 +2,7 @@ package carpet.microtiming.enums;
 
 import carpet.microtiming.MicroTimingLoggerManager;
 import carpet.microtiming.utils.MicroTimingUtil;
-import carpet.microtiming.utils.TextUtil;
+import carpet.utils.TextUtil;
 import com.google.common.base.Joiner;
 import net.minecraft.util.EnumFacing;
 

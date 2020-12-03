@@ -2,7 +2,7 @@ package carpet.microtiming.events;
 
 import carpet.microtiming.enums.EventType;
 import carpet.microtiming.utils.MicroTimingUtil;
-import carpet.microtiming.utils.TextUtil;
+import carpet.utils.TextUtil;
 import carpet.utils.Messenger;
 import com.google.common.collect.Lists;
 import net.minecraft.block.Block;

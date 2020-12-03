@@ -1,6 +1,6 @@
 package carpet.logging;
 
-import carpet.microtiming.utils.TranslatableBase;
+import carpet.utils.TranslatableBase;
 
 public abstract class AbstractLogger extends TranslatableBase
 {

@@ -1,10 +1,11 @@
 --- a/net/minecraft/tileentity/TileEntityHopper.java
 +++ b/net/minecraft/tileentity/TileEntityHopper.java
-@@ -4,6 +4,12 @@
+@@ -4,6 +4,13 @@
  import java.util.function.Supplier;
  import java.util.stream.Collectors;
  import javax.annotation.Nullable;
 +
++import carpet.commands.lifetime.removal.LiteralRemovalReason;
 +import carpet.helpers.HopperCounter;
 +import carpet.settings.CarpetSettings;
 +import carpet.utils.InventoryOptimizer;
@@ -13,7 +14,7 @@
  import net.minecraft.block.Block;
  import net.minecraft.block.BlockChest;
  import net.minecraft.block.BlockHopper;
-@@ -17,6 +23,7 @@
+@@ -17,6 +24,7 @@
  import net.minecraft.inventory.IInventory;
  import net.minecraft.inventory.ISidedInventory;
  import net.minecraft.inventory.ItemStackHelper;
@@ -21,7 +22,7 @@
  import net.minecraft.item.ItemStack;
  import net.minecraft.nbt.NBTTagCompound;
  import net.minecraft.util.EntitySelectors;
-@@ -150,6 +157,29 @@
+@@ -150,6 +158,29 @@
  
                  if (flag)
                  {
@@ -51,7 +52,7 @@
                      this.setTransferCooldown(8);
                      this.markDirty();
                      return true;
-@@ -197,6 +227,29 @@
+@@ -197,6 +228,29 @@
  
      private boolean transferItemsOut()
      {
@@ -81,7 +82,7 @@
          IInventory iinventory = this.getInventoryForHopperTransfer();
  
          if (iinventory == null)
-@@ -377,6 +430,10 @@
+@@ -377,12 +431,19 @@
  
      public static boolean captureItem(IInventory p_200114_0_, EntityItem p_200114_1_)
      {
@@ -92,7 +93,16 @@
          boolean flag = false;
          ItemStack itemstack = p_200114_1_.getItem().copy();
          ItemStack itemstack1 = putStackInInventoryAllSlots((IInventory)null, p_200114_0_, itemstack, (EnumFacing)null);
-@@ -396,6 +453,28 @@
+ 
+         if (itemstack1.isEmpty())
+         {
++            // TISCM lifetime tracker
++            p_200114_1_.recordRemoval(LiteralRemovalReason.HOPPER);
++
+             flag = true;
+             p_200114_1_.remove();
+         }
+@@ -396,6 +457,28 @@
  
      public static ItemStack putStackInInventoryAllSlots(@Nullable IInventory source, IInventory destination, ItemStack stack, @Nullable EnumFacing direction)
      {
@@ -121,7 +131,7 @@
          if (destination instanceof ISidedInventory && direction != null)
          {
              ISidedInventory isidedinventory = (ISidedInventory)destination;
-@@ -504,9 +583,12 @@
+@@ -504,9 +587,12 @@
          return getInventoryAtPosition(hopper.getWorld(), hopper.getXPos(), hopper.getYPos() + 1.0D, hopper.getZPos());
      }
  

@@ -2,9 +2,8 @@ package carpet.microtiming.events;
 
 import carpet.microtiming.enums.EventType;
 import carpet.microtiming.utils.MicroTimingUtil;
-import carpet.microtiming.utils.TextUtil;
-import carpet.microtiming.utils.ToTextAble;
-import carpet.microtiming.utils.TranslatableBase;
+import carpet.utils.ToTextAble;
+import carpet.utils.TranslatableBase;
 import carpet.utils.Messenger;
 import net.minecraft.block.Block;
 import net.minecraft.util.registry.IRegistry;

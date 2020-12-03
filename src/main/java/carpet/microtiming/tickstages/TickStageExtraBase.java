@@ -1,6 +1,6 @@
 package carpet.microtiming.tickstages;
 
-import carpet.microtiming.utils.ToTextAble;
+import carpet.utils.ToTextAble;
 import net.minecraft.util.text.event.ClickEvent;
 
 public abstract class TickStageExtraBase implements ToTextAble

@@ -394,6 +394,15 @@ public class CarpetSettings
     )
     public static boolean repeaterHalfDelay = false;
 
+    @Rule(
+            desc = "Enables /lifetime command to track entity lifetime and so on",
+            extra = {
+                    "Useful for mob farm debugging etc."
+            },
+            category = COMMAND
+    )
+    public static String commandLifeTime = "true";
+
 
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$

@@ -1,4 +1,4 @@
-package carpet.microtiming.utils;
+package carpet.utils;
 
 import net.minecraft.util.text.ITextComponent;
 

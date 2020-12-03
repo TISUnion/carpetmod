@@ -1,4 +1,4 @@
-package carpet.microtiming.utils;
+package carpet.utils;
 
 public interface Translatable
 {

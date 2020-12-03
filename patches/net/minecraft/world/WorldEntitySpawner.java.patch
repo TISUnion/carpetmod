@@ -1,13 +1,14 @@
 --- a/net/minecraft/world/WorldEntitySpawner.java
 +++ b/net/minecraft/world/WorldEntitySpawner.java
-@@ -1,5 +1,6 @@
+@@ -1,5 +1,7 @@
  package net.minecraft.world;
  
++import carpet.commands.lifetime.spawning.LiteralSpawningReason;
 +import carpet.utils.SpawnReporter;
  import com.google.common.collect.Sets;
  import java.util.List;
  import java.util.Random;
-@@ -20,10 +21,12 @@
+@@ -20,10 +22,12 @@
  import net.minecraft.server.management.PlayerChunkMapEntry;
  import net.minecraft.tags.BlockTags;
  import net.minecraft.tags.FluidTags;
@@ -20,7 +21,7 @@
  import net.minecraft.world.biome.Biome;
  import net.minecraft.world.chunk.Chunk;
  import net.minecraft.world.gen.Heightmap;
-@@ -84,16 +87,47 @@
+@@ -84,16 +88,47 @@
              int k4 = 0;
              BlockPos blockpos1 = worldServerIn.getSpawnPoint();
  
@@ -70,7 +71,7 @@
                          label158:
  
                          for (ChunkPos chunkpos1 : this.eligibleChunksForSpawning)
-@@ -175,7 +209,21 @@
+@@ -175,7 +210,24 @@
                                                              {
                                                                  ++j2;
                                                                  ++i4;
@@ -88,12 +89,15 @@
 +                                                                }
 +                                                                else
 +                                                                {
++                                                                    // TISCM lifetime tracker
++                                                                    entityliving.recordSpawning(LiteralSpawningReason.NATURAL);
++
 +                                                                    worldServerIn.spawnEntity(entityliving);
 +                                                                }
                                                              }
                                                              else
                                                              {
-@@ -202,7 +250,30 @@
+@@ -202,7 +254,30 @@
                                  }
                              }
                          }

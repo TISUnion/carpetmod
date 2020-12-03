@@ -8,7 +8,7 @@ import carpet.microtiming.events.BaseEvent;
 import carpet.microtiming.tickstages.TickStageExtraBase;
 import carpet.microtiming.utils.MicroTimingUtil;
 import carpet.microtiming.utils.StackTraceDeobfuscator;
-import carpet.microtiming.utils.TextUtil;
+import carpet.utils.TextUtil;
 import carpet.utils.Messenger;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
