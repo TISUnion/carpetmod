@@ -62,7 +62,7 @@ public class TextUtil
 
 	public static String getTeleportCommand(Vec3d pos, DimensionType dimensionType)
 	{
-		return String.format("/execute in %s run tp %f %f %f", dimensionType, pos.x, pos.y, pos.z);
+		return String.format("/execute in %s run tp %s %s %s", dimensionType, pos.x, pos.y, pos.z);
 	}
 
 	public static String getTeleportCommand(Vec3i pos, DimensionType dimensionType)
