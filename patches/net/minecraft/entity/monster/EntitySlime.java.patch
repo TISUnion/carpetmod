@@ -1,15 +1,27 @@
 --- a/net/minecraft/entity/monster/EntitySlime.java
 +++ b/net/minecraft/entity/monster/EntitySlime.java
-@@ -1,6 +1,8 @@
+@@ -1,6 +1,9 @@
  package net.minecraft.entity.monster;
  
  import javax.annotation.Nullable;
 +
++import carpet.commands.lifetime.spawning.LiteralSpawningReason;
 +import carpet.logging.logHelpers.DamageReporter;
  import net.minecraft.entity.Entity;
  import net.minecraft.entity.EntityLiving;
  import net.minecraft.entity.EntityLivingBase;
-@@ -254,7 +256,10 @@
+@@ -225,6 +228,10 @@
+ 
+                 entityslime.setSlimeSize(i / 2, true);
+                 entityslime.setLocationAndAngles(this.posX + (double)f, this.posY + 0.5D, this.posZ + (double)f1, this.rand.nextFloat() * 360.0F, 0.0F);
++
++                // TISCM lifetime tracker
++                entityslime.recordSpawning(LiteralSpawningReason.SLIME);
++
+                 this.world.spawnEntity(entityslime);
+             }
+         }
+@@ -254,7 +261,10 @@
      {
          int i = this.getSlimeSize();
  
@@ -21,7 +33,7 @@
          {
              this.playSound(SoundEvents.ENTITY_SLIME_ATTACK, 1.0F, (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F);
              this.applyEnchantments(this, entityIn);
-@@ -275,6 +280,8 @@
+@@ -275,6 +285,8 @@
      {
          return this.getSlimeSize();
      }

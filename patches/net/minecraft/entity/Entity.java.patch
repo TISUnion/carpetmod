@@ -98,9 +98,9 @@
 +    {
 +        if (this.doLifeTimeTracking && !this.recordedSpawning && this.world instanceof WorldServer)
 +        {
-+            if (this instanceof EntityCreature)
++            if (this instanceof EntityLiving)
 +            {
-+                if (((EntityCreature)this).isNoDespawnRequired())
++                if (((EntityLiving)this).isNoDespawnRequired())
 +                {
 +                    return;
 +                }
