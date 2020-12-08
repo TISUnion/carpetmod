@@ -75,9 +75,9 @@
 +        this.doLifeTimeTracking = false;
 +        this.recordedSpawning = false;
 +        this.recordedRemoval = false;
-+        if (this.world != null)
++        if (this.world instanceof WorldServer)
 +        {
-+            this.spawnTime = this.world.getGameTime();
++            this.spawnTime = ((WorldServer)this.world).getLifeTimeWorldTracker().getSpawnStageCounter();
 +            this.doLifeTimeTracking = LifeTimeTracker.isActivated() && LifeTimeTrackerUtil.isTrackedEntity(this);
 +        }
 +        this.deathDamageSource = null;
@@ -87,7 +87,7 @@
 +
 +    public long getLifeTime()
 +    {
-+        return this.world.getGameTime() - this.spawnTime;
++        return ((WorldServer)this.world).getLifeTimeWorldTracker().getSpawnStageCounter() - this.spawnTime;
 +    }
 +
 +    public Vec3d getSpawnPosition()

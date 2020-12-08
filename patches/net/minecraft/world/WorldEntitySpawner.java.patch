@@ -21,7 +21,16 @@
  import net.minecraft.world.biome.Biome;
  import net.minecraft.world.chunk.Chunk;
  import net.minecraft.world.gen.Heightmap;
-@@ -84,16 +88,47 @@
+@@ -38,6 +42,8 @@
+ 
+     public int findChunksForSpawning(WorldServer worldServerIn, boolean spawnHostileMobs, boolean spawnPeacefulMobs, boolean spawnOnSetTickRate)
+     {
++        worldServerIn.getLifeTimeWorldTracker().increaseSpawnStageCounter();  // TISCM lifetime tracker
++
+         if (!spawnHostileMobs && !spawnPeacefulMobs)
+         {
+             return 0;
+@@ -84,16 +90,47 @@
              int k4 = 0;
              BlockPos blockpos1 = worldServerIn.getSpawnPoint();
  
@@ -71,7 +80,7 @@
                          label158:
  
                          for (ChunkPos chunkpos1 : this.eligibleChunksForSpawning)
-@@ -175,7 +210,24 @@
+@@ -175,7 +212,24 @@
                                                              {
                                                                  ++j2;
                                                                  ++i4;
@@ -97,7 +106,7 @@
                                                              }
                                                              else
                                                              {
-@@ -202,7 +254,30 @@
+@@ -202,7 +256,30 @@
                                  }
                              }
                          }
