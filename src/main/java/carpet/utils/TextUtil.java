@@ -3,6 +3,7 @@ package carpet.utils;
 import carpet.utils.Messenger;
 import carpet.utils.Translations;
 import com.google.common.collect.Maps;
+import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
@@ -43,6 +44,11 @@ public class TextUtil
 	{
 		text.applyTextStyles(formattings);
 		return text;
+	}
+
+	public static ITextComponent copyText(ITextComponent text)
+	{
+		return text.deepCopy();
 	}
 	// mojang compatibility thing ends
 
@@ -162,6 +168,11 @@ public class TextUtil
 	public static TextComponentTranslation getTranslatedName(String key, Object... args)
 	{
 		return getTranslatedName(key, null, args);
+	}
+
+	public static ITextComponent getBlockName(Block block)
+	{
+		return TextUtil.attachFormatting(new TextComponentTranslation(block.getTranslationKey()), TextFormatting.WHITE);
 	}
 
 	// some language doesn't use space char to divide word

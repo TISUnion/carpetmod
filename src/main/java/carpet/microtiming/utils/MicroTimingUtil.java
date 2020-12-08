@@ -212,13 +212,6 @@ public class MicroTimingUtil
 		return optionalDyeColor;
 	}
 
-	public static ITextComponent getTranslatedText(Block block)
-	{
-		ITextComponent name = new TextComponentTranslation(block.getTranslationKey());
-		name.getStyle().setColor(TextFormatting.WHITE);
-		return name;
-	}
-
 	public static String getFormattedDirectionString(EnumFacing direction)
 	{
 		String name = direction.toString();

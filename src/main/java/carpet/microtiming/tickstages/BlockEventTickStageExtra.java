@@ -31,7 +31,7 @@ public class BlockEventTickStageExtra extends TickStageExtraBase
 		BlockPos pos = this.blockEventData.getPosition();
 		return Messenger.c(
 				String.format("w %s: ", MicroTimingLoggerManager.tr("Block")),
-				MicroTimingUtil.getTranslatedText(this.blockEventData.getBlock()),
+				TextUtil.getBlockName(this.blockEventData.getBlock()),
 				String.format("w \n%s: %d", MicroTimingLoggerManager.tr("Order"), this.order),
 				String.format("w \n%s: %d", MicroTimingLoggerManager.tr("Depth"), this.depth),
 				String.format("w \n%s: [%d, %d, %d]", MicroTimingLoggerManager.tr("Position"), pos.getX(), pos.getY(), pos.getZ())

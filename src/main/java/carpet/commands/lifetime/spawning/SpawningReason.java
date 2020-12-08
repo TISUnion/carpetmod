@@ -1,13 +1,11 @@
 package carpet.commands.lifetime.spawning;
 
-import carpet.commands.lifetime.LifeTimeTracker;
-import carpet.utils.ToTextAble;
-import carpet.utils.TranslatableBase;
+import carpet.commands.lifetime.utils.AbstractReason;
 
-public abstract class SpawningReason extends TranslatableBase implements ToTextAble
+public abstract class SpawningReason extends AbstractReason
 {
 	public SpawningReason()
 	{
-		super(LifeTimeTracker.getInstance().getTranslator().getTranslationPath(), "spawn_reason");
+		super("spawn_reason");
 	}
 }

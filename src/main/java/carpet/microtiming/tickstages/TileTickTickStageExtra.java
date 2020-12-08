@@ -38,7 +38,7 @@ public class TileTickTickStageExtra extends TickStageExtraBase
 		if (target instanceof Block)
 		{
 			list.add(String.format("w %s: ", MicroTimingLoggerManager.tr("Block")));
-			list.add(MicroTimingUtil.getTranslatedText((Block)target));
+			list.add(TextUtil.getBlockName((Block)target));
 			list.add("w \n");
 		}
 		list.add(String.format("w %s: %d\n", MicroTimingLoggerManager.tr("Order"), this.order));

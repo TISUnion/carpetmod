@@ -1,0 +1,35 @@
+--- a/net/minecraft/tileentity/CommandBlockBaseLogic.java
++++ b/net/minecraft/tileentity/CommandBlockBaseLogic.java
+@@ -3,6 +3,9 @@
+ import java.text.SimpleDateFormat;
+ import java.util.Date;
+ import javax.annotation.Nullable;
++
++import carpet.logging.commandblock.CommandBlockLogger;
++import carpet.logging.commandblock.ICommandBlockExecutor;
+ import net.minecraft.command.CommandSource;
+ import net.minecraft.command.ICommandSource;
+ import net.minecraft.crash.CrashReport;
+@@ -31,6 +34,22 @@
+     private String commandStored = "";
+     private ITextComponent customName = new TextComponentString("@");
+ 
++    // TISCM commandblock logger starts
++
++    private long lastLoggedTime = -CommandBlockLogger.MINIMUM_LOG_INTERVAL;
++
++    public long getLastLoggedTime()
++    {
++        return this.lastLoggedTime;
++    }
++
++    public void setLastLoggedTime(long time)
++    {
++        this.lastLoggedTime = time;
++    }
++
++    // TISCM commandblock logger ends
++
+     public int getSuccessCount()
+     {
+         return this.successCount;

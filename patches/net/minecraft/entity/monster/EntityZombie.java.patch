@@ -1,0 +1,20 @@
+--- a/net/minecraft/entity/monster/EntityZombie.java
++++ b/net/minecraft/entity/monster/EntityZombie.java
+@@ -5,6 +5,8 @@
+ import java.util.List;
+ import java.util.UUID;
+ import javax.annotation.Nullable;
++
++import carpet.commands.lifetime.spawning.LiteralSpawningReason;
+ import net.minecraft.block.Block;
+ import net.minecraft.block.state.IBlockState;
+ import net.minecraft.entity.CreatureAttribute;
+@@ -368,6 +370,8 @@
+ 
+                         if (!this.world.isAnyPlayerWithinRangeAt((double)i1, (double)j1, (double)k1, 7.0D) && this.world.checkNoEntityCollision(entityzombie, entityzombie.getBoundingBox()) && this.world.isCollisionBoxesEmpty(entityzombie, entityzombie.getBoundingBox()) && !this.world.containsAnyLiquid(entityzombie.getBoundingBox()))
+                         {
++                            entityzombie.recordSpawning(LiteralSpawningReason.ZOMBIE_REINFORCE);  // TISCM lifetime tracker
++
+                             this.world.spawnEntity(entityzombie);
+                             entityzombie.setAttackTarget(entitylivingbase);
+                             entityzombie.onInitialSpawn(this.world.getDifficultyForLocation(new BlockPos(entityzombie)), (IEntityLivingData)null, (NBTTagCompound)null);

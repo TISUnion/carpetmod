@@ -4,14 +4,19 @@ import net.minecraft.util.text.ITextComponent;
 
 public class CounterUtil
 {
-	private static double getRatePerHourValue(int rate, long ticks)
+	private static double getRatePerHourValue(long rate, long ticks)
 	{
 		return (double)rate / ticks * (20 * 60 * 60);
 	}
 
-	public static String ratePerHour(int rate, long ticks)
+	public static String ratePerHour(long rate, long ticks)
 	{
 		return String.format("%d, (%.1f/h)", rate, getRatePerHourValue(rate, ticks));
+	}
+
+	public static String ratePerHour(int rate, long ticks)
+	{
+		return ratePerHour((long)rate, ticks);
 	}
 
 	/**
@@ -21,7 +26,7 @@ public class CounterUtil
 	 *            ",", "(", "/h)" uses fmt[1]
 	 *            "%.1f uses fmt[2]
  	 */
-	public static ITextComponent ratePerHourText(int rate, long ticks, String fmt)
+	public static ITextComponent ratePerHourText(long rate, long ticks, String fmt)
 	{
 		assert fmt.length() == 3;
 		return Messenger.c(
@@ -30,5 +35,10 @@ public class CounterUtil
 				String.format("%s %.1f", fmt.charAt(2), getRatePerHourValue(rate, ticks)),
 				fmt.charAt(1) + " /h)"
 		);
+	}
+
+	public static ITextComponent ratePerHourText(int rate, long ticks, String fmt)
+	{
+		return ratePerHourText((long)rate, ticks, fmt);
 	}
 }

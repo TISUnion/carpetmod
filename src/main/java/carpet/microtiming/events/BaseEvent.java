@@ -2,6 +2,7 @@ package carpet.microtiming.events;
 
 import carpet.microtiming.enums.EventType;
 import carpet.microtiming.utils.MicroTimingUtil;
+import carpet.utils.TextUtil;
 import carpet.utils.ToTextAble;
 import carpet.utils.TranslatableBase;
 import carpet.utils.Messenger;
@@ -72,7 +73,7 @@ public abstract class BaseEvent extends TranslatableBase implements ToTextAble
 	{
 		return Messenger.c(
 				"g [",
-				MicroTimingUtil.getTranslatedText(block),
+				TextUtil.getBlockName(block),
 				"^w " + IRegistry.BLOCK.getKey(block),
 				"g ] "
 		);

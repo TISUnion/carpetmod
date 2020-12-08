@@ -31,7 +31,7 @@ public class TileEntityTickStageExtra extends TickStageExtraBase
 	{
 		return Messenger.c(
 				String.format("w %s: ", MicroTimingLoggerManager.tr("Block")),
-				MicroTimingUtil.getTranslatedText(this.block),
+				TextUtil.getBlockName(this.block),
 				String.format("w \n%s: %d", MicroTimingLoggerManager.tr("Order"), this.order),
 				String.format("w \n%s: [%d, %d, %d]", MicroTimingLoggerManager.tr("Position"), this.pos.getX(), this.pos.getY(), this.pos.getZ())
 		);

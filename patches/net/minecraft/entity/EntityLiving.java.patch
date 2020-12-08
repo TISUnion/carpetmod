@@ -81,13 +81,13 @@
  
                  if (this.canDespawn() && d3 > 16384.0D)
                  {
-+                    this.recordRemoval(LiteralRemovalReason.DESPAWN);  // TISCM lifetime tracker
++                    this.recordRemoval(LiteralRemovalReason.DESPAWN_IMMEDIATELY);  // TISCM lifetime tracker
                      this.remove();
                  }
  
                  if (this.idleTime > 600 && this.rand.nextInt(800) == 0 && d3 > 1024.0D && this.canDespawn())
                  {
-+                    this.recordRemoval(LiteralRemovalReason.DESPAWN);  // TISCM lifetime tracker
++                    this.recordRemoval(LiteralRemovalReason.DESPAWN_RANDOMLY);  // TISCM lifetime tracker
                      this.remove();
                  }
                  else if (d3 < 1024.0D)

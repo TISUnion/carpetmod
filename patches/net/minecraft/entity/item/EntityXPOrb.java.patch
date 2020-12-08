@@ -112,7 +112,7 @@
  
          if (this.xpOrbAge >= 6000)
          {
-+            this.recordRemoval(LiteralRemovalReason.DESPAWN);  // TISCM lifetime tracker
++            this.recordRemoval(LiteralRemovalReason.DESPAWN_TIMEOUT);  // TISCM lifetime tracker
              this.remove();
          }
      }

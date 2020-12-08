@@ -12,7 +12,7 @@
          if (!this.world.isRemote && this.world.getDifficulty() == EnumDifficulty.PEACEFUL)
          {
 +            // TISCM lifetime tracker
-+            this.recordRemoval(LiteralRemovalReason.DESPAWN);
++            this.recordRemoval(LiteralRemovalReason.DESPAWN_DIFFICULTY);
 +
              this.remove();
          }

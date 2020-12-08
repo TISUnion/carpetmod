@@ -104,7 +104,7 @@ public class LifeTimeWorldTracker extends TranslatableBase
 		// sorted by spawn count
 		// will being sorting by avg life time better?
 		this.dataMap.entrySet().stream().
-				sorted(Collections.reverseOrder(Comparator.comparingInt(a -> a.getValue().spawnCount))).
+				sorted(Collections.reverseOrder(Comparator.comparingLong(a -> a.getValue().spawnCount))).
 				forEach((entry) -> {
 					EntityType<?> entityType = entry.getKey();
 					TrackedData data = entry.getValue();
@@ -140,7 +140,7 @@ public class LifeTimeWorldTracker extends TranslatableBase
 													data.getSpawningCountText(ticks),
 													"w " + (spawningReasons.isEmpty() ? "" : "\n"),
 													Messenger.c(spawningReasons.toArray(new Object[0]))
-											).getString()
+											).getString()  // to reduce network load
 									),
 									new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, String.format("%s %s", currentCommandBase, SpecificDetailMode.SPAWNING))
 							),
@@ -153,7 +153,7 @@ public class LifeTimeWorldTracker extends TranslatableBase
 													data.getRemovalCountText(ticks),
 													"w " + (removalReasons.isEmpty() ? "" : "\n"),
 													Messenger.c(removalReasons.toArray(new Object[0]))
-											).getString()
+											).getString()  // to reduce network load
 									),
 									new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, String.format("%s %s", currentCommandBase, SpecificDetailMode.REMOVAL))
 							),
@@ -168,7 +168,7 @@ public class LifeTimeWorldTracker extends TranslatableBase
 											Messenger.c(
 													String.format("q %s\n", this.tr("Life Time Overview")),
 													data.lifeTimeStatistic.getResult("")
-											).getString()
+											).getString()  // to reduce network load
 									),
 									new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, String.format("%s %s", currentCommandBase, SpecificDetailMode.LIFE_TIME))
 							)

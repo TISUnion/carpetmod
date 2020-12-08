@@ -1,0 +1,17 @@
+--- a/net/minecraft/entity/item/EntityMinecartCommandBlock.java
++++ b/net/minecraft/entity/item/EntityMinecartCommandBlock.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.entity.item;
+ 
++import carpet.logging.commandblock.CommandBlockLogger;
+ import net.minecraft.block.state.IBlockState;
+ import net.minecraft.command.CommandSource;
+ import net.minecraft.entity.EntityType;
+@@ -77,6 +78,7 @@
+         if (receivingPower && this.ticksExisted - this.activatorRailCooldown >= 4)
+         {
+             this.getCommandBlockLogic().trigger(this.world);
++            CommandBlockLogger.getInstance().onCommandBlockMinecartActivated(this);  // TISCM commandblock logger
+             this.activatorRailCooldown = this.ticksExisted;
+         }
+     }
