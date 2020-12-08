@@ -482,6 +482,20 @@ Inform the player when the auto save trigger
 
 Options: none
 
+
+## commandBlock
+
+`/log commandBlock <option>`
+
+Info when a command block or command block minecart executes command
+
+It's useful to find out where the annoying hidden running command block is
+
+With default `throttled` option every command block will log at the highest frequency once every 3 seconds
+
+- Default option: `throttled`
+- Suggested options: `throttled`, `all`
+
 ------
 
 # Commands
@@ -499,6 +513,10 @@ Use `/carpet commandEPSTest` to enable / disable this command
 
 A tracker to track lifetime and spawn / removal reasons from all newly spawned and dead entities
 
+This tracker is mostly used to debug mobfarms. It aims to track the process from mob starting affecting the mobcap to mob being removed from the mobcap. The spawning tracking part of it doesn't cover every kind of mob spawning reasons
+
+Other than being removed from the world, if a mob becomes persistent for the first time like nametagged or item pickup, it will be marked as removal too. If the mob spawns 
+
 Adding a `realtime` suffix to the command will turn the rate result from in-game time based to realtime based
 
 ### tracking
@@ -508,25 +526,26 @@ Adding a `realtime` suffix to the command will turn the rate result from in-game
 Control the lifetime tracker
 
 Tracked entity types:
-- All kinds of mob (Entity catalogue is not `MISC`)
+- All kinds of mob (MobEntity)
 - Item Entity
 - Experience Orb Entity
 
 Tracked entity spawning reasons
 - Natural spawning
 - Portal pigman spawning
-- Becomes persistent. Note that the entity is still not removed from the world
 - Trans-dimension from portal
 - Spawned by item (spawn eggs etc.)
 - Slime division (for slime and magma cube)
+- Zombie Reinforce
 - `/summon` command
 - Mob dropping loot (item and xp orb only)
 
 Note that only entities that have been tracked spawning will be counted to the statistic 
 
 Tracked entity removal reasons
-- Despawn, including immediately despawn, random despawn and difficulty despawn
+- Despawn, including immediately despawn, random despawn, difficulty despawn and timeout despawn
 - Damaged to death
+- Becomes persistent. Note that the entity is still not removed from the world
 - Trans-dimension through portal
 - Entity merged (item and xp orb only)
 - Picked up by player (item and xp orb only)
@@ -537,7 +556,7 @@ The definition of lifetime is: **The difference in world time between entity spa
 
 Statistics are sorted by the proportion of the amount 
 
-## <entity_type>
+### <entity_type>
 
 `/lifetime <entity_type> [<life_time|removal|spawning>]`
 
