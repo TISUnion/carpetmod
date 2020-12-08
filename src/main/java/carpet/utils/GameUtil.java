@@ -1,6 +1,8 @@
 package carpet.utils;
 
 import carpet.CarpetServer;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.world.dimension.DimensionType;
 
 public class GameUtil
@@ -10,8 +12,18 @@ public class GameUtil
 		return CarpetServer.minecraft_server.getWorld(DimensionType.OVERWORLD).getGameTime();
 	}
 
-	public boolean isOnServerThread()
+	public static boolean isOnServerThread()
 	{
 		return CarpetServer.minecraft_server != null && CarpetServer.minecraft_server.isCallingFromMinecraftThread();
+	}
+
+	public static boolean countsTowardsMobcap(Entity entity)
+	{
+		if (entity instanceof EntityLiving)
+		{
+			EntityLiving entityLiving = (EntityLiving)entity;
+			return !entityLiving.isNoDespawnRequired();
+		}
+		return false;
 	}
 }

@@ -1,6 +1,6 @@
 --- a/net/minecraft/entity/Entity.java
 +++ b/net/minecraft/entity/Entity.java
-@@ -1,5 +1,16 @@
+@@ -1,5 +1,17 @@
  package net.minecraft.entity;
  
 +import carpet.commands.lifetime.LifeTimeTracker;
@@ -14,10 +14,11 @@
 +import carpet.commands.lifetime.utils.LifeTimeTrackerUtil;
 +import carpet.helpers.BlockRotator;
 +import carpet.settings.CarpetSettings;
++import carpet.utils.GameUtil;
  import com.google.common.collect.Iterables;
  import com.google.common.collect.Lists;
  import com.google.common.collect.Sets;
-@@ -35,6 +46,7 @@
+@@ -35,6 +47,7 @@
  import net.minecraft.entity.effect.EntityLightningBolt;
  import net.minecraft.entity.item.EntityBoat;
  import net.minecraft.entity.item.EntityItem;
@@ -25,7 +26,7 @@
  import net.minecraft.entity.player.EntityPlayer;
  import net.minecraft.entity.player.EntityPlayerMP;
  import net.minecraft.fluid.Fluid;
-@@ -59,6 +71,7 @@
+@@ -59,6 +72,7 @@
  import net.minecraft.server.MinecraftServer;
  import net.minecraft.tags.FluidTags;
  import net.minecraft.tags.Tag;
@@ -33,7 +34,7 @@
  import net.minecraft.util.DamageSource;
  import net.minecraft.util.EnumActionResult;
  import net.minecraft.util.EnumBlockRenderType;
-@@ -94,6 +107,7 @@
+@@ -94,6 +108,7 @@
  import net.minecraft.world.gen.Heightmap;
  import net.minecraftforge.api.distmarker.Dist;
  import net.minecraftforge.api.distmarker.OnlyIn;
@@ -41,7 +42,7 @@
  import org.apache.logging.log4j.LogManager;
  import org.apache.logging.log4j.Logger;
  
-@@ -151,6 +165,8 @@
+@@ -151,6 +166,8 @@
      protected Random rand;
      public int ticksExisted;
      private int fire;
@@ -50,7 +51,7 @@
      protected boolean inWater;
      protected double submergedHeight;
      protected boolean eyesInWater;
-@@ -192,6 +208,14 @@
+@@ -192,6 +209,14 @@
      private final double[] pistonDeltas;
      private long pistonDeltasGameTime;
  
@@ -65,7 +66,7 @@
      public Entity(EntityType<?> entityTypeIn, World worldIn)
      {
          this.entityId = nextEntityID++;
-@@ -225,8 +249,68 @@
+@@ -225,8 +250,65 @@
          this.dataManager.register(SILENT, false);
          this.dataManager.register(NO_GRAVITY, false);
          this.registerData();
@@ -98,12 +99,9 @@
 +    {
 +        if (this.doLifeTimeTracking && !this.recordedSpawning && this.world instanceof WorldServer)
 +        {
-+            if (this instanceof EntityLiving)
++            if (this instanceof EntityLiving && !GameUtil.countsTowardsMobcap(this))
 +            {
-+                if (((EntityLiving)this).isNoDespawnRequired())
-+                {
-+                    return;
-+                }
++                return;
 +            }
 +            this.recordedSpawning = true;
 +            this.spawnPos = this.getPositionVector();
@@ -134,7 +132,7 @@
      public EntityType<?> getType()
      {
          return this.type;
-@@ -312,6 +396,17 @@
+@@ -312,6 +394,17 @@
  
      public void remove()
      {
@@ -152,7 +150,7 @@
          this.removed = true;
      }
  
-@@ -570,6 +665,12 @@
+@@ -570,6 +663,12 @@
  
      public void move(MoverType type, double x, double y, double z)
      {
@@ -165,7 +163,7 @@
          if (this.noClip)
          {
              this.setBoundingBox(this.getBoundingBox().offset(x, y, z));
-@@ -979,7 +1080,422 @@
+@@ -979,7 +1078,422 @@
              this.world.profiler.endSection();
          }
      }
@@ -589,7 +587,7 @@
      protected float determineNextStepDistance()
      {
          return (float)((int)this.distanceWalkedOnStepModified + 1);
-@@ -1566,6 +2082,13 @@
+@@ -1566,6 +2080,13 @@
          return partialTicks == 1.0F ? this.rotationYaw : this.prevRotationYaw + (this.rotationYaw - this.prevRotationYaw) * partialTicks;
      }
  
@@ -603,7 +601,7 @@
      protected final Vec3d getVectorForRotation(float pitch, float yaw)
      {
          float f = pitch * ((float)Math.PI / 180F);
-@@ -1762,22 +2285,27 @@
+@@ -1762,22 +2283,27 @@
              this.motionX = nbttaglist2.getDouble(0);
              this.motionY = nbttaglist2.getDouble(1);
              this.motionZ = nbttaglist2.getDouble(2);
@@ -644,7 +642,7 @@
              this.posX = nbttaglist.getDouble(0);
              this.posY = nbttaglist.getDouble(1);
              this.posZ = nbttaglist.getDouble(2);
-@@ -1924,6 +2452,10 @@
+@@ -1924,6 +2450,10 @@
              EntityItem entityitem = new EntityItem(this.world, this.posX, this.posY + (double)offsetY, this.posZ, stack);
              entityitem.setDefaultPickupDelay();
              this.world.spawnEntity(entityitem);
@@ -655,7 +653,7 @@
              return entityitem;
          }
      }
-@@ -2592,6 +3124,9 @@
+@@ -2592,6 +3122,9 @@
                  this.dimension = DimensionType.OVERWORLD;
              }
  
@@ -665,7 +663,7 @@
              this.world.removeEntity(this);
              this.removed = false;
              this.world.profiler.startSection("reposition");
-@@ -2645,6 +3180,9 @@
+@@ -2645,6 +3178,9 @@
                      entity.moveToBlockPosAndAngles(blockpos, entity.rotationYaw, entity.rotationPitch);
                  }
  
@@ -675,7 +673,7 @@
                  boolean flag = entity.forceSpawn;
                  entity.forceSpawn = true;
                  worldserver1.spawnEntity(entity);
-@@ -2821,6 +3359,10 @@
+@@ -2821,6 +3357,10 @@
  
      public EnumFacing getHorizontalFacing()
      {
