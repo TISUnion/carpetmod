@@ -60,10 +60,12 @@ public class SuperCacheHandler {
             return false;
         }
         ChunkPos cPos = new ChunkPos(portalPos);
-        if (!chunkPortalMapping.containsKey(cPos)) {
+        Set<BlockPos> blockPosSet = chunkPortalMapping.get(cPos);
+        // there might be null value in the map so containsKey cannot guarantee it's safe to use the value
+        if (blockPosSet == null) {
             return false;
         }
-        return chunkPortalMapping.get(cPos).remove(new BlockPos(portalPos));
+        return blockPosSet.remove(new BlockPos(portalPos));
     }
 
     public boolean isMarked(ChunkPos chunkPos) {
