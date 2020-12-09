@@ -40,8 +40,8 @@
 +    }
 +    // lithium block.moving_block_shapes ends
 +
-+    // Cache BoundingBoxList creation
-+    private Optional<List<AxisAlignedBB>> voxelShapeBoundingBoxList;
++    // TISCM Cache BoundingBoxList creation
++    private List<AxisAlignedBB> voxelShapeBoundingBoxList;
 +
      public TileEntityPiston()
      {
@@ -51,7 +51,7 @@
          this.extending = extendingIn;
          this.shouldHeadBeRendered = shouldHeadBeRenderedIn;
 +
-+        // Cache BoundingBoxList creation
++        // TISCM Cache BoundingBoxList creation
 +        this.createVoxelShapeBoundingBoxListCache();
      }
  
@@ -150,14 +150,16 @@
      public NBTTagCompound getUpdateTag()
      {
          return this.write(new NBTTagCompound());
-@@ -112,15 +229,21 @@
+@@ -112,15 +229,28 @@
          return !this.isExtending() && this.shouldPistonHeadBeRendered() ? Blocks.PISTON_HEAD.getDefaultState().with(BlockPistonExtension.TYPE, this.pistonState.getBlock() == Blocks.STICKY_PISTON ? PistonType.STICKY : PistonType.DEFAULT).with(BlockPistonExtension.FACING, this.pistonState.get(BlockPistonBase.FACING)) : this.pistonState;
      }
  
++    // TISCM Cache BoundingBoxList creation
++    // it's correct if TileEntityPiston will not changes its pos
 +    private void createVoxelShapeBoundingBoxListCache()
 +    {
 +        VoxelShape voxelshape = this.getCollisionRelatedBlockState().getCollisionShape(this.world, this.getPos());
-+        this.voxelShapeBoundingBoxList = !voxelshape.isEmpty() ? Optional.of(voxelshape.toBoundingBoxList()) : Optional.empty();
++        this.voxelShapeBoundingBoxList = !voxelshape.isEmpty() ? voxelshape.toBoundingBoxList() : null;
 +    }
 +
      private void moveCollidedEntities(float p_184322_1_)
@@ -167,15 +169,20 @@
 -        VoxelShape voxelshape = this.getCollisionRelatedBlockState().getCollisionShape(this.world, this.getPos());
  
 -        if (!voxelshape.isEmpty())
-+        // Cache BoundingBoxList creation
-+        if (this.voxelShapeBoundingBoxList.isPresent())
++        // TISCM Cache BoundingBoxList creation
++//        VoxelShape voxelshape = this.getCollisionRelatedBlockState().getCollisionShape(this.world, this.getPos());
++//
++//        if (!voxelshape.isEmpty())
++//        {
++//            List<AxisAlignedBB> list = voxelshape.toBoundingBoxList();
++        if (this.voxelShapeBoundingBoxList != null)
          {
 -            List<AxisAlignedBB> list = voxelshape.toBoundingBoxList();
-+            List<AxisAlignedBB> list = this.voxelShapeBoundingBoxList.get();
++            List<AxisAlignedBB> list = this.voxelShapeBoundingBoxList;
              AxisAlignedBB axisalignedbb = this.moveByPositionAndProgress(this.getMinMaxPiecesAABB(list));
              List<Entity> list1 = this.world.getEntitiesWithinAABBExcludingEntity((Entity)null, this.getMovementArea(axisalignedbb, enumfacing, d0).union(axisalignedbb));
  
-@@ -134,7 +257,7 @@
+@@ -134,7 +264,7 @@
  
                      if (entity.getPushReaction() != EnumPushReaction.IGNORE)
                      {
@@ -184,7 +191,7 @@
                          {
                              switch (enumfacing.getAxis())
                              {
-@@ -170,14 +293,25 @@
+@@ -170,14 +300,25 @@
                          if (!(d1 <= 0.0D))
                          {
                              d1 = Math.min(d1, d0) + 0.01D;
@@ -213,7 +220,7 @@
                          }
                      }
                  }
-@@ -270,9 +404,12 @@
+@@ -270,9 +411,12 @@
              if (Math.abs(d0 - d1) < 0.01D)
              {
                  d0 = Math.min(d0, p_190605_3_) + 0.01D;
@@ -229,7 +236,7 @@
              }
          }
      }
-@@ -319,9 +456,38 @@
+@@ -319,9 +463,38 @@
                      iblockstate = Block.getValidBlockForPosition(this.pistonState, this.world, this.pos);
                  }
  
@@ -270,7 +277,7 @@
          }
      }
  
-@@ -351,8 +517,15 @@
+@@ -351,8 +524,15 @@
                          iblockstate = iblockstate.with(BlockStateProperties.WATERLOGGED, Boolean.valueOf(false));
                      }
  
@@ -288,7 +295,7 @@
                  }
              }
          }
-@@ -378,6 +551,18 @@
+@@ -378,6 +558,18 @@
          this.lastProgress = this.progress;
          this.extending = compound.getBoolean("extending");
          this.shouldHeadBeRendered = compound.getBoolean("source");
@@ -307,7 +314,7 @@
      }
  
      public NBTTagCompound write(NBTTagCompound compound)
-@@ -388,12 +573,19 @@
+@@ -388,12 +580,19 @@
          compound.putFloat("progress", this.lastProgress);
          compound.putBoolean("extending", this.extending);
          compound.putBoolean("source", this.shouldHeadBeRendered);
@@ -328,7 +335,7 @@
  
          if (!this.extending && this.shouldHeadBeRendered)
          {
-@@ -424,6 +616,25 @@
+@@ -424,6 +623,25 @@
              }
  
              float f = this.getExtendedProgress(this.progress);
@@ -354,7 +361,7 @@
              double d0 = (double)((float)this.pistonFacing.getXOffset() * f);
              double d1 = (double)((float)this.pistonFacing.getYOffset() * f);
              double d2 = (double)((float)this.pistonFacing.getZOffset() * f);
-@@ -435,4 +646,37 @@
+@@ -435,4 +653,37 @@
      {
          return this.lastTicked;
      }
