@@ -1,10 +1,12 @@
 --- a/net/minecraft/tileentity/TileEntityPiston.java
 +++ b/net/minecraft/tileentity/TileEntityPiston.java
-@@ -1,9 +1,14 @@
+@@ -1,9 +1,16 @@
  package net.minecraft.tileentity;
  
++import java.util.Arrays;
  import java.util.List;
 +import java.util.Optional;
++import java.util.concurrent.ConcurrentHashMap;
 +
 +import carpet.helpers.CreativeNoClipHelper;
 +import carpet.settings.CarpetSettings;
@@ -15,7 +17,7 @@
  import net.minecraft.block.material.EnumPushReaction;
  import net.minecraft.block.state.IBlockState;
  import net.minecraft.entity.Entity;
-@@ -29,6 +34,8 @@
+@@ -29,6 +36,8 @@
      private EnumFacing pistonFacing;
      private boolean extending;
      private boolean shouldHeadBeRendered;
@@ -24,17 +26,27 @@
      private static final ThreadLocal<EnumFacing> MOVING_ENTITY = new ThreadLocal<EnumFacing>()
      {
          protected EnumFacing initialValue()
-@@ -40,6 +47,9 @@
+@@ -40,6 +49,19 @@
      private float lastProgress;
      private long lastTicked;
  
++    // lithium block.moving_block_shapes
++    private static final VoxelShape[] PISTON_BASE_WITH_MOVING_HEAD_SHAPES = precomputePistonBaseWithMovingHeadShapes();
++    @SuppressWarnings("unchecked")
++    private static final ConcurrentHashMap<VoxelShape, VoxelShape>[] SHAPE_TO_OFFSET_SIMPLIFIED_SHAPE = new ConcurrentHashMap[1 + (2 * 6)];
++
++    static {
++        Arrays.setAll(SHAPE_TO_OFFSET_SIMPLIFIED_SHAPE, (int index) -> new ConcurrentHashMap<>());
++    }
++    // lithium block.moving_block_shapes ends
++
 +    // Cache BoundingBoxList creation
 +    private Optional<List<AxisAlignedBB>> voxelShapeBoundingBoxList;
 +
      public TileEntityPiston()
      {
          super(TileEntityType.PISTON);
-@@ -52,6 +62,9 @@
+@@ -52,8 +74,103 @@
          this.pistonFacing = pistonFacingIn;
          this.extending = extendingIn;
          this.shouldHeadBeRendered = shouldHeadBeRenderedIn;
@@ -43,8 +55,102 @@
 +        this.createVoxelShapeBoundingBoxListCache();
      }
  
++    // lithium block.moving_block_shapes starts
++
++    /**
++     * We memoize the offset and simplified VoxelShapes that are otherwise constructed on every call of getCollisionShape.
++     * For each offset direction and distance (6 directions, 2 distances each, and no direction with 0 distance) we
++     * store the offset and simplified VoxelShapes in a ConcurrentHashMap when they are accessed the first time.
++     * Concurrency is necessary, because both Render and Server thread are using the cache.
++     * We don't cause a memory leak, because only shapes from the ShapeCache are used. As the ShapeCache is only initialized
++     * once, the number is keys is limited, and therefore the number of entries in the map is bounded.
++     * We are using reference equality, as VoxelShapes do not implement equals.
++     *
++     *
++     * @param blockState2 the block used to determine whether the shape is from the ShapeCache and can be memoized without causing a memory leak
++     * @param blockShape the original shape, must not be modified after passing it as an argument to this method
++     * @param offset     the offset distance
++     * @param direction  the offset direction
++     * @return blockShape offset and simplified
++     */
++    private static VoxelShape getOffsetAndSimplified(IBlockState blockState2, VoxelShape blockShape, float offset, EnumFacing direction) {
++        int indexForOffset = getIndexForOffsetShapes(offset, direction);
++        ConcurrentHashMap<VoxelShape, VoxelShape> shape2OffsetSimplifiedShape = SHAPE_TO_OFFSET_SIMPLIFIED_SHAPE[indexForOffset];
++
++        VoxelShape offsetSimplifiedShape = shape2OffsetSimplifiedShape.get(blockShape);
++        if (offsetSimplifiedShape == null) {
++            offsetSimplifiedShape = blockShape.offset(direction.getXOffset() * offset, direction.getYOffset() * offset, direction.getZOffset() * offset).simplify();
++
++            //All blocks that do not have dynamic bounds have a shape cache. Blocks that have a shape cache will
++            //always return the same blockShape. Therefore the map won't be locking often and won't cause a memory leak.
++            //There are no pushable blocks with dynamic bounds in vanilla survival, but it is possible to get them using commands or other mods.
++            if (!blockState2.getBlock().isVariableOpacity()) {
++                shape2OffsetSimplifiedShape.put(blockShape, offsetSimplifiedShape);
++            }
++        }
++        return offsetSimplifiedShape;
++    }
++
++    /**
++     * Precompute all 18 possible configurations for the merged piston base and head shape.
++     *
++     * @return The array of the merged VoxelShapes, indexed by {@link TileEntityPiston#getIndexForMergedShape(float, EnumFacing)}
++     */
++    private static VoxelShape[] precomputePistonBaseWithMovingHeadShapes() {
++        float[] offsets = {0f, 0.5f, 1f};
++        EnumFacing[] directions = EnumFacing.values();
++
++        VoxelShape[] mergedShapes = new VoxelShape[offsets.length * directions.length];
++
++        for (EnumFacing facing : directions) {
++            VoxelShape baseShape = Blocks.PISTON.getDefaultState().with(BlockPistonBase.EXTENDED, true)
++                    .with(BlockPistonBase.FACING, facing).getCollisionShape(null, null);
++            for (float offset : offsets) {
++                //this cache is only required for the merged piston head + base shape.
++                //this shape is only used when !this.extending
++                //here: isShort = this.extending != 1.0F - this.progress < 4.0F can be simplified to:
++                //isShort = f < 4.0F , because f = getAmountExtended(this.progress) can be simplified to f == 1.0F - this.progress
++                //therefore isShort is dependent on the offset:
++                boolean isShort = offset < 4.0F;
++
++                VoxelShape headShape = (Blocks.PISTON_HEAD.getDefaultState().with(BlockPistonExtension.FACING, facing))
++                        .with(BlockPistonExtension.SHORT, isShort).getCollisionShape(null, null);
++
++                VoxelShape offsetHead = headShape.offset(facing.getXOffset() * offset,
++                        facing.getYOffset() * offset,
++                        facing.getZOffset() * offset);
++                mergedShapes[getIndexForMergedShape(offset, facing)] = VoxelShapes.or(baseShape, offsetHead);
++            }
++
++        }
++
++        return mergedShapes;
++    }
++
++    private static int getIndexForOffsetShapes(float offset, EnumFacing direction) {
++        if (offset != 0f && offset != 0.5f && offset != 1f) {
++            return -1;
++        }
++        if (offset == 0f) {
++            return 0; //can treat offsetting by 0 in all directions the same
++        }
++        return (int) (2 * offset) + 2 * direction.getIndex();
++    }
++
++    private static int getIndexForMergedShape(float offset, EnumFacing direction) {
++        if (offset != 0f && offset != 0.5f && offset != 1f) {
++            return -1;
++        }
++        //shape of offset 0 is still dependent on the direction, due to piston head and base being directional blocks
++        return (int) (2 * offset) + (3 * direction.getIndex());
++    }
++
++    // lithium block.moving_block_shapes ends
++
      public NBTTagCompound getUpdateTag()
-@@ -112,15 +125,21 @@
+     {
+         return this.write(new NBTTagCompound());
+@@ -112,15 +229,21 @@
          return !this.isExtending() && this.shouldPistonHeadBeRendered() ? Blocks.PISTON_HEAD.getDefaultState().with(BlockPistonExtension.TYPE, this.pistonState.getBlock() == Blocks.STICKY_PISTON ? PistonType.STICKY : PistonType.DEFAULT).with(BlockPistonExtension.FACING, this.pistonState.get(BlockPistonBase.FACING)) : this.pistonState;
      }
  
@@ -69,7 +175,7 @@
              AxisAlignedBB axisalignedbb = this.moveByPositionAndProgress(this.getMinMaxPiecesAABB(list));
              List<Entity> list1 = this.world.getEntitiesWithinAABBExcludingEntity((Entity)null, this.getMovementArea(axisalignedbb, enumfacing, d0).union(axisalignedbb));
  
-@@ -134,7 +153,7 @@
+@@ -134,7 +257,7 @@
  
                      if (entity.getPushReaction() != EnumPushReaction.IGNORE)
                      {
@@ -78,7 +184,7 @@
                          {
                              switch (enumfacing.getAxis())
                              {
-@@ -170,14 +189,25 @@
+@@ -170,14 +293,25 @@
                          if (!(d1 <= 0.0D))
                          {
                              d1 = Math.min(d1, d0) + 0.01D;
@@ -107,7 +213,7 @@
                          }
                      }
                  }
-@@ -270,9 +300,12 @@
+@@ -270,9 +404,12 @@
              if (Math.abs(d0 - d1) < 0.01D)
              {
                  d0 = Math.min(d0, p_190605_3_) + 0.01D;
@@ -123,7 +229,7 @@
              }
          }
      }
-@@ -319,9 +352,38 @@
+@@ -319,9 +456,38 @@
                      iblockstate = Block.getValidBlockForPosition(this.pistonState, this.world, this.pos);
                  }
  
@@ -164,7 +270,7 @@
          }
      }
  
-@@ -351,8 +413,15 @@
+@@ -351,8 +517,15 @@
                          iblockstate = iblockstate.with(BlockStateProperties.WATERLOGGED, Boolean.valueOf(false));
                      }
  
@@ -182,7 +288,7 @@
                  }
              }
          }
-@@ -378,6 +447,18 @@
+@@ -378,6 +551,18 @@
          this.lastProgress = this.progress;
          this.extending = compound.getBoolean("extending");
          this.shouldHeadBeRendered = compound.getBoolean("source");
@@ -201,7 +307,7 @@
      }
  
      public NBTTagCompound write(NBTTagCompound compound)
-@@ -388,6 +469,13 @@
+@@ -388,12 +573,19 @@
          compound.putFloat("progress", this.lastProgress);
          compound.putBoolean("extending", this.extending);
          compound.putBoolean("source", this.shouldHeadBeRendered);
@@ -215,7 +321,40 @@
          return compound;
      }
  
-@@ -435,4 +523,37 @@
+     public VoxelShape getCollisionShape(IBlockReader p_195508_1_, BlockPos p_195508_2_)
+     {
+-        VoxelShape voxelshape;
++        VoxelShape voxelshape;  // piston base voxel shape for piston block retracting
+ 
+         if (!this.extending && this.shouldHeadBeRendered)
+         {
+@@ -424,6 +616,25 @@
+             }
+ 
+             float f = this.getExtendedProgress(this.progress);
++
++            // lithium block.moving_block_shapes
++            if (this.extending || !this.shouldHeadBeRendered) {
++                //here voxelshape.isEmpty() is guaranteed, vanilla code would call union() which calls simplify()
++                VoxelShape blockShape = iblockstate.getCollisionShape(world, pos);
++
++                //we cache the simplified shapes, as the simplify() method costs a lot of CPU time and allocates several objects
++                VoxelShape offsetAndSimplified = getOffsetAndSimplified(iblockstate, blockShape, Math.abs(f), f < 0f ? this.pistonFacing.getOpposite() : this.pistonFacing);
++                return offsetAndSimplified;
++            } else {
++                //retracting piston heads have to act like their base as well, as the base block is replaced with the moving block
++                //f >= 0f is guaranteed (assuming no other mod interferes)
++                int index = getIndexForMergedShape(f, this.pistonFacing);
++                if (index != -1) {
++                    return PISTON_BASE_WITH_MOVING_HEAD_SHAPES[index];
++                }
++            }
++            // lithium block.moving_block_shapes ends
++
+             double d0 = (double)((float)this.pistonFacing.getXOffset() * f);
+             double d1 = (double)((float)this.pistonFacing.getYOffset() * f);
+             double d2 = (double)((float)this.pistonFacing.getZOffset() * f);
+@@ -435,4 +646,37 @@
      {
          return this.lastTicked;
      }
