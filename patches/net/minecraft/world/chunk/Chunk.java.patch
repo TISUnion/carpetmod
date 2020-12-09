@@ -1,15 +1,17 @@
 --- a/net/minecraft/world/chunk/Chunk.java
 +++ b/net/minecraft/world/chunk/Chunk.java
-@@ -1,5 +1,8 @@
+@@ -1,5 +1,10 @@
  package net.minecraft.world.chunk;
  
 +import carpet.settings.CarpetSettings;
 +import carpet.utils.LightInitHooks;
 +import carpet.utils.LightingHooks;
++import carpet.utils.portalsearcher.PortalSearcherAbstract;
++import carpet.utils.portalsearcher.SuperCacheHandler;
  import com.google.common.collect.Maps;
  import com.google.common.collect.Queues;
  import com.google.common.collect.Sets;
-@@ -55,6 +58,10 @@
+@@ -55,6 +60,10 @@
  import org.apache.logging.log4j.LogManager;
  import org.apache.logging.log4j.Logger;
  
@@ -20,7 +22,7 @@
  public class Chunk implements IChunk
  {
      private static final Logger LOGGER = LogManager.getLogger();
-@@ -89,6 +96,19 @@
+@@ -89,6 +98,19 @@
      private int neighborCount;
      private final AtomicInteger field_205757_F = new AtomicInteger();
      private final ChunkPos field_212816_F;
@@ -40,7 +42,7 @@
  
      @OnlyIn(Dist.CLIENT)
      public Chunk(World worldIn, int cx, int cz, Biome[] biomesIn)
-@@ -212,37 +232,45 @@
+@@ -212,37 +234,45 @@
              {
                  if (this.world.dimension.hasSkyLight())
                  {
@@ -112,7 +114,7 @@
                      }
                  }
              }
-@@ -339,40 +367,52 @@
+@@ -339,40 +369,52 @@
              int j = heightmap.getHeight(x & 15, z & 15);
              int k = this.x * 16 + x;
              int l = this.z * 16 + z;
@@ -191,7 +193,7 @@
                  }
              }
  
-@@ -380,19 +420,23 @@
+@@ -380,19 +422,23 @@
              {
                  this.heightMapMinimum = j;
              }
@@ -225,7 +227,7 @@
              }
  
              this.dirty = true;
-@@ -489,9 +533,16 @@
+@@ -489,9 +535,16 @@
          }
      }
  
@@ -242,7 +244,7 @@
          int i = pos.getX() & 15;
          int j = pos.getY();
          int k = pos.getZ() & 15;
-@@ -517,10 +568,16 @@
+@@ -517,10 +570,16 @@
                  }
  
                  chunksection = new ChunkSection(j >> 4 << 4, this.world.dimension.hasSkyLight());
@@ -260,7 +262,7 @@
              chunksection.set(i, j & 15, k, state);
              this.heightMap.get(Heightmap.Type.MOTION_BLOCKING).update(i, j, k, state);
              this.heightMap.get(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES).update(i, j, k, state);
-@@ -551,10 +608,14 @@
+@@ -551,10 +610,14 @@
                      int i1 = state.getOpacity(this.world, pos);
                      int j1 = iblockstate.getOpacity(this.world, pos);
                      this.relightBlock(i, j, k, state);
@@ -278,15 +280,25 @@
                      }
                  }
  
-@@ -568,14 +629,26 @@
-                     }
-                 }
+@@ -570,12 +633,36 @@
  
--                if (!this.world.isRemote)
-+                //if (!this.world.isRemote) // CM added support for placing without updates
-+                if (!skipUpdates && !this.world.isRemote)
+                 if (!this.world.isRemote)
                  {
-                     state.onBlockAdded(this.world, pos, iblockstate);
+-                    state.onBlockAdded(this.world, pos, iblockstate);
++                    // there will be updates
++                    if (!skipUpdates) // CM added support for placing without updates
++                    {
++                        state.onBlockAdded(this.world, pos, iblockstate);
++                    }
++                    // no update
++                    else
++                    {
++                        // TISCM portalSuperCache updating
++                        if (state.getBlock() == PortalSearcherAbstract.BLOCK_NETHER_PORTAL)
++                        {
++                            SuperCacheHandler.addPortal(this.world, pos);
++                        }
++                    }
                  }
  
                  if (block instanceof ITileEntityProvider)
@@ -307,7 +319,7 @@
  
                      if (tileentity1 == null)
                      {
-@@ -596,6 +669,9 @@
+@@ -596,6 +683,9 @@
  
      public int getLightFor(EnumLightType type, BlockPos pos)
      {
@@ -317,7 +329,7 @@
          return this.getLight(type, pos, this.world.getDimension().hasSkyLight());
      }
  
-@@ -651,10 +727,18 @@
+@@ -651,10 +741,18 @@
                  {
                      return;
                  }
@@ -338,7 +350,7 @@
              }
  
              if (light == EnumLightType.SKY)
-@@ -680,6 +764,9 @@
+@@ -680,6 +778,9 @@
  
      public int getLightSubtracted(BlockPos pos, int amount, boolean hasSkylight)
      {
@@ -348,7 +360,7 @@
          int i = pos.getX() & 15;
          int j = pos.getY();
          int k = pos.getZ() & 15;
-@@ -869,7 +956,7 @@
+@@ -869,7 +970,7 @@
          this.deferredTileEntities.put(new BlockPos(nbt.getInt("x"), nbt.getInt("y"), nbt.getInt("z")), nbt);
      }
  
@@ -357,7 +369,7 @@
      {
          if (this.loaded)
          {
-@@ -894,10 +981,24 @@
+@@ -894,10 +995,24 @@
                  return !(p_212383_0_ instanceof EntityPlayer);
              }));
          }
@@ -382,7 +394,7 @@
          this.loaded = false;
  
          for (TileEntity tileentity : this.tileEntities.values())
-@@ -909,6 +1010,15 @@
+@@ -909,6 +1024,15 @@
          {
              this.world.unloadEntities(classinheritancemultimap);
          }
@@ -398,7 +410,7 @@
      }
  
      public void markDirty()
-@@ -997,6 +1107,9 @@
+@@ -997,6 +1121,9 @@
  
      public void tick(boolean skipRecheckGaps)
      {
@@ -408,7 +420,7 @@
          if (this.isGapLightingUpdated && this.world.dimension.hasSkyLight() && !skipRecheckGaps)
          {
              this.recheckGaps(this.world.isRemote);
-@@ -1138,9 +1251,28 @@
+@@ -1138,9 +1265,28 @@
                  this.sections[l].recalculateRefCounts();
              }
          }
@@ -439,7 +451,7 @@
          for (TileEntity tileentity : this.tileEntities.values())
          {
              tileentity.updateContainingBlockInfo();
-@@ -1190,7 +1322,7 @@
+@@ -1190,7 +1336,7 @@
  
                      if (this.sections[j] == EMPTY_SECTION && flag || this.sections[j] != EMPTY_SECTION && this.sections[j].get(k, i1, l).isAir())
                      {
@@ -448,7 +460,7 @@
                          {
                              BlockPos blockpos2 = blockpos1.offset(enumfacing);
  
-@@ -1497,4 +1629,52 @@
+@@ -1497,4 +1643,52 @@
          QUEUED,
          CHECK;
      }

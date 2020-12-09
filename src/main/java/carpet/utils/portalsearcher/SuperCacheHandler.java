@@ -6,6 +6,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.World;
 
 import java.util.Collections;
 import java.util.Map;
@@ -44,6 +45,12 @@ public class SuperCacheHandler {
         return true;
     }
 
+    public static void addPortal(World worldIn, BlockPos pos)  {
+        if (pos.getY() < worldIn.getActualHeight()) {
+            (worldIn.getDimension().isNether() ? SuperCacheHandler.getHandlerNether() : SuperCacheHandler.getHandlerOverworld()).addPortal(pos);
+        }
+    }
+
     public boolean markChunk(ChunkPos chunkPos) {
         if (!checkOption()) {
             return false;
@@ -66,6 +73,12 @@ public class SuperCacheHandler {
             return false;
         }
         return blockPosSet.remove(new BlockPos(portalPos));
+    }
+
+    public static void removePortal(World worldIn, BlockPos pos) {
+        if (pos.getY() < worldIn.getActualHeight()) {
+            (worldIn.getDimension().isNether() ? SuperCacheHandler.getHandlerNether() : SuperCacheHandler.getHandlerOverworld()).removePortal(pos);
+        }
     }
 
     public boolean isMarked(ChunkPos chunkPos) {
