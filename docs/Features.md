@@ -615,6 +615,7 @@ Ports and enable part of implementations of [Lithium mod](https://github.com/jel
 
 - alloc.entity_tracker
 - alloc.enum_values
+- [block.moving_block_shapes](https://github.com/jellysquid3/lithium-fabric/pull/145)
 - block.piston_shapes
 - cached_hashcode
 - entity.data_tracker.use_arrays
