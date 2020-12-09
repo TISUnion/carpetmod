@@ -1,6 +1,63 @@
 --- a/net/minecraft/world/IEntityReader.java
 +++ b/net/minecraft/world/IEntityReader.java
-@@ -41,4 +41,52 @@
+@@ -6,7 +6,11 @@
+ import java.util.function.Predicate;
+ import java.util.stream.Stream;
+ import javax.annotation.Nullable;
++
++import carpet.settings.CarpetSettings;
+ import net.minecraft.entity.Entity;
++import net.minecraft.entity.item.EntityBoat;
++import net.minecraft.entity.item.EntityMinecart;
+ import net.minecraft.util.EntitySelectors;
+ import net.minecraft.util.math.AxisAlignedBB;
+ import net.minecraft.util.math.shapes.VoxelShape;
+@@ -16,11 +20,26 @@
+ {
+     List<Entity> getEntitiesInAABBexcluding(@Nullable Entity entityIn, AxisAlignedBB boundingBox, @Nullable Predicate <? super Entity > predicate);
+ 
++    // TISCM optimizedHardHitBoxEntityCollision
++    // let class World handle it
++    // or use default method getEntitiesInAABBexcluding
++    default List<Entity> getHardHitBoxEntitiesWithinAABBForEntity(@Nullable Entity entityIn, AxisAlignedBB boundingBox, @Nullable Predicate <? super Entity > predicate)
++    {
++        return this.getEntitiesInAABBexcluding(entityIn, boundingBox, predicate);
++    }
++
+ default List<Entity> getEntitiesWithinAABBExcludingEntity(@Nullable Entity entityIn, AxisAlignedBB bb)
+     {
+         return this.getEntitiesInAABBexcluding(entityIn, bb, EntitySelectors.NOT_SPECTATING);
+     }
+ 
++    // TISCM optimizedHardHitBoxEntityCollision
++default List<Entity> getHardHitBoxEntitiesWithinAABBExcludingEntity(@Nullable Entity entityIn, AxisAlignedBB bb)
++    {
++        // it's the same as getEntitiesWithinAABBExcludingEntity but uses a different method
++        return this.getHardHitBoxEntitiesWithinAABBForEntity(entityIn, bb, EntitySelectors.NOT_SPECTATING);
++    }
++
+ default Stream<VoxelShape> getCollisionBoxes(@Nullable Entity entityIn, VoxelShape shape, Set<Entity> breakOnEntityCollide)
+     {
+         if (shape.isEmpty())
+@@ -30,15 +49,69 @@
+         else
+         {
+             AxisAlignedBB axisalignedbb = shape.getBoundingBox();
+-            return this.getEntitiesWithinAABBExcludingEntity(entityIn, axisalignedbb.grow(0.25D)).stream().filter((p_212382_2_) ->
++            // TISCM optimizedHardHitBoxEntityCollision
++            List<Entity> entityList = (entityIn instanceof EntityBoat || entityIn instanceof EntityMinecart) ?  // these 2 might have entityIn.getCollisionBox not null in vanilla
++                    this.getEntitiesWithinAABBExcludingEntity(entityIn, axisalignedbb.grow(0.25D)):
++                    this.getHardHitBoxEntitiesWithinAABBExcludingEntity(entityIn, axisalignedbb.grow(0.25D));
++            return entityList.stream().filter((p_212382_2_) ->
+             {
+                 return !breakOnEntityCollide.contains(p_212382_2_) && (entityIn == null || !entityIn.isRidingSameEntity(p_212382_2_));
+             }).flatMap((p_212380_2_) ->
+             {
++                // p_212380_2_.getCollisionBoundingBox(): hard collision box of boat and shulker
++                // entityIn.getCollisionBox(p_212380_2_): if entityIn is boat or minecart it threats pushable entity collision box as hard collision box
+                 return Stream.of(p_212380_2_.getCollisionBoundingBox(), entityIn == null ? null : entityIn.getCollisionBox(p_212380_2_)).filter(Objects::nonNull).filter((p_212381_1_) -> {
+                     return p_212381_1_.intersects(axisalignedbb);
+                 }).map(VoxelShapes::create);
              });
          }
      }

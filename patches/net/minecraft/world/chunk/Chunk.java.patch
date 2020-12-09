@@ -22,7 +22,7 @@
  public class Chunk implements IChunk
  {
      private static final Logger LOGGER = LogManager.getLogger();
-@@ -89,6 +98,19 @@
+@@ -89,7 +98,25 @@
      private int neighborCount;
      private final AtomicInteger field_205757_F = new AtomicInteger();
      private final ChunkPos field_212816_F;
@@ -40,9 +40,35 @@
 +    private boolean isLightPopulated;
 +    // [TISCM] Newlight - End
  
++    // TISCM optimizedHardHitBoxEntityCollision
++    // an array like field entityLists but only stores entities with getCollisionBoundingBox() != null
++    private final ClassInheritanceMultiMap<Entity>[] hardHardHitBoxEntityLists;
++    private final boolean optimizedHardHitBoxEntityCollisionEnabled;
++
      @OnlyIn(Dist.CLIENT)
      public Chunk(World worldIn, int cx, int cz, Biome[] biomesIn)
-@@ -212,37 +234,45 @@
+     {
+@@ -99,6 +126,11 @@
+     public Chunk(World worldIn, int cx, int cz, Biome[] biomesIn, UpgradeData upgradeDataIn, ITickList<Block> blocksToBeTickedIn, ITickList<Fluid> fluidsToBeTickedIn, long inhabitedTimeIn)
+     {
+         this.entityLists = new ClassInheritanceMultiMap[16];
++
++        // TISCM optimizedHardHitBoxEntityCollision
++        this.hardHardHitBoxEntityLists = new ClassInheritanceMultiMap[this.entityLists.length];
++        this.optimizedHardHitBoxEntityCollisionEnabled = CarpetSettings.optimizedHardHitBoxEntityCollision;
++
+         this.world = worldIn;
+         this.x = cx;
+         this.z = cz;
+@@ -116,6 +148,7 @@
+         for (int i = 0; i < this.entityLists.length; ++i)
+         {
+             this.entityLists[i] = new ClassInheritanceMultiMap<>(Entity.class);
++            this.hardHardHitBoxEntityLists[i] = new ClassInheritanceMultiMap<>(Entity.class);
+         }
+ 
+         this.blockBiomeArray = biomesIn;
+@@ -212,37 +245,45 @@
              {
                  if (this.world.dimension.hasSkyLight())
                  {
@@ -114,7 +140,7 @@
                      }
                  }
              }
-@@ -339,40 +369,52 @@
+@@ -339,40 +380,52 @@
              int j = heightmap.getHeight(x & 15, z & 15);
              int k = this.x * 16 + x;
              int l = this.z * 16 + z;
@@ -193,7 +219,7 @@
                  }
              }
  
-@@ -380,19 +422,23 @@
+@@ -380,19 +433,23 @@
              {
                  this.heightMapMinimum = j;
              }
@@ -227,7 +253,7 @@
              }
  
              this.dirty = true;
-@@ -489,9 +535,16 @@
+@@ -489,9 +546,16 @@
          }
      }
  
@@ -244,7 +270,7 @@
          int i = pos.getX() & 15;
          int j = pos.getY();
          int k = pos.getZ() & 15;
-@@ -517,10 +570,16 @@
+@@ -517,10 +581,16 @@
                  }
  
                  chunksection = new ChunkSection(j >> 4 << 4, this.world.dimension.hasSkyLight());
@@ -262,7 +288,7 @@
              chunksection.set(i, j & 15, k, state);
              this.heightMap.get(Heightmap.Type.MOTION_BLOCKING).update(i, j, k, state);
              this.heightMap.get(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES).update(i, j, k, state);
-@@ -551,10 +610,14 @@
+@@ -551,10 +621,14 @@
                      int i1 = state.getOpacity(this.world, pos);
                      int j1 = iblockstate.getOpacity(this.world, pos);
                      this.relightBlock(i, j, k, state);
@@ -280,7 +306,7 @@
                      }
                  }
  
-@@ -570,12 +633,36 @@
+@@ -570,12 +644,36 @@
  
                  if (!this.world.isRemote)
                  {
@@ -319,7 +345,7 @@
  
                      if (tileentity1 == null)
                      {
-@@ -596,6 +683,9 @@
+@@ -596,6 +694,9 @@
  
      public int getLightFor(EnumLightType type, BlockPos pos)
      {
@@ -329,7 +355,7 @@
          return this.getLight(type, pos, this.world.getDimension().hasSkyLight());
      }
  
-@@ -651,10 +741,18 @@
+@@ -651,10 +752,18 @@
                  {
                      return;
                  }
@@ -350,7 +376,7 @@
              }
  
              if (light == EnumLightType.SKY)
-@@ -680,6 +778,9 @@
+@@ -680,6 +789,9 @@
  
      public int getLightSubtracted(BlockPos pos, int amount, boolean hasSkylight)
      {
@@ -360,7 +386,37 @@
          int i = pos.getX() & 15;
          int j = pos.getY();
          int k = pos.getZ() & 15;
-@@ -869,7 +970,7 @@
+@@ -742,6 +854,16 @@
+         entityIn.chunkCoordY = k;
+         entityIn.chunkCoordZ = this.z;
+         this.entityLists[k].add(entityIn);
++
++        // TISCM optimizedHardHitBoxEntityCollision
++        if (this.optimizedHardHitBoxEntityCollisionEnabled)
++        {
++            // only shulker and boat, in vanilla
++            if (entityIn.getCollisionBoundingBox() != null)
++            {
++                this.hardHardHitBoxEntityLists[k].add(entityIn);
++            }
++        }
+     }
+ 
+     public void setHeightmap(Heightmap.Type type, long[] data)
+@@ -767,6 +889,12 @@
+         }
+ 
+         this.entityLists[index].remove(entityIn);
++
++        // TISCM optimizedHardHitBoxEntityCollision
++        if (this.optimizedHardHitBoxEntityCollisionEnabled)
++        {
++            this.hardHardHitBoxEntityLists[index].remove(entityIn);
++        }
+     }
+ 
+     public boolean canSeeSky(BlockPos pos)
+@@ -869,7 +997,7 @@
          this.deferredTileEntities.put(new BlockPos(nbt.getInt("x"), nbt.getInt("y"), nbt.getInt("z")), nbt);
      }
  
@@ -369,7 +425,7 @@
      {
          if (this.loaded)
          {
-@@ -894,10 +995,24 @@
+@@ -894,10 +1022,24 @@
                  return !(p_212383_0_ instanceof EntityPlayer);
              }));
          }
@@ -394,7 +450,7 @@
          this.loaded = false;
  
          for (TileEntity tileentity : this.tileEntities.values())
-@@ -909,6 +1024,15 @@
+@@ -909,6 +1051,15 @@
          {
              this.world.unloadEntities(classinheritancemultimap);
          }
@@ -410,7 +466,48 @@
      }
  
      public void markDirty()
-@@ -997,6 +1121,9 @@
+@@ -916,7 +1067,8 @@
+         this.dirty = true;
+     }
+ 
+-    public void getEntitiesWithinAABBForEntity(@Nullable Entity entityIn, AxisAlignedBB aabb, List<Entity> listToFill, Predicate <? super Entity > filter)
++    // TISCM optimizedHardHitBoxEntityCollision added parameter entityLists
++    private void getEntitiesWithinAABBForEntityInner(@Nullable Entity entityIn, AxisAlignedBB aabb, List<Entity> listToFill, Predicate <? super Entity > filter,  ClassInheritanceMultiMap<Entity>[] entityLists)
+     {
+         int i = MathHelper.floor((aabb.minY - 2.0D) / 16.0D);
+         int j = MathHelper.floor((aabb.maxY + 2.0D) / 16.0D);
+@@ -925,9 +1077,9 @@
+ 
+         for (int k = i; k <= j; ++k)
+         {
+-            if (!this.entityLists[k].isEmpty())
++            if (!entityLists[k].isEmpty())
+             {
+-                for (Entity entity : this.entityLists[k])
++                for (Entity entity : entityLists[k])
+                 {
+                     if (entity.getBoundingBox().intersects(aabb) && entity != entityIn)
+                     {
+@@ -954,6 +1106,18 @@
+         }
+     }
+ 
++    // TISCM optimizedHardHitBoxEntityCollision preserves vanilla interface
++    public void getEntitiesWithinAABBForEntity(@Nullable Entity entityIn, AxisAlignedBB aabb, List<Entity> listToFill, Predicate <? super Entity > filter)
++    {
++        getEntitiesWithinAABBForEntityInner(entityIn, aabb, listToFill, filter, this.entityLists);
++    }
++
++    // TISCM optimizedHardHitBoxEntityCollision
++    public void getHardHitBoxEntitiesWithinAABBForEntity(@Nullable Entity entityIn, AxisAlignedBB aabb, List<Entity> listToFill, Predicate <? super Entity > filter)
++    {
++        getEntitiesWithinAABBForEntityInner(entityIn, aabb, listToFill, filter, CarpetSettings.optimizedHardHitBoxEntityCollision ? this.hardHardHitBoxEntityLists : this.entityLists);
++    }
++
+     public <T extends Entity> void getEntitiesOfTypeWithinAABB(Class <? extends T > entityClass, AxisAlignedBB aabb, List<T> listToFill, @Nullable Predicate <? super T > filter)
+     {
+         int i = MathHelper.floor((aabb.minY - 2.0D) / 16.0D);
+@@ -997,6 +1161,9 @@
  
      public void tick(boolean skipRecheckGaps)
      {
@@ -420,7 +517,7 @@
          if (this.isGapLightingUpdated && this.world.dimension.hasSkyLight() && !skipRecheckGaps)
          {
              this.recheckGaps(this.world.isRemote);
-@@ -1138,9 +1265,28 @@
+@@ -1138,9 +1305,28 @@
                  this.sections[l].recalculateRefCounts();
              }
          }
@@ -451,7 +548,7 @@
          for (TileEntity tileentity : this.tileEntities.values())
          {
              tileentity.updateContainingBlockInfo();
-@@ -1190,7 +1336,7 @@
+@@ -1190,7 +1376,7 @@
  
                      if (this.sections[j] == EMPTY_SECTION && flag || this.sections[j] != EMPTY_SECTION && this.sections[j].get(k, i1, l).isAir())
                      {
@@ -460,7 +557,7 @@
                          {
                              BlockPos blockpos2 = blockpos1.offset(enumfacing);
  
-@@ -1497,4 +1643,52 @@
+@@ -1497,4 +1683,52 @@
          QUEUED,
          CHECK;
      }

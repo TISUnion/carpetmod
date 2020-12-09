@@ -390,6 +390,23 @@ Options: `false`, `true`
 Categories: creative
 
 
+## optimizedHardHitBoxEntityCollision
+
+Optimize entity colliding with entities with hard hit box
+
+Use a separate list to store entities, that have a hard hit box including boat and shulker, in a chunk
+
+It reduces quite a lot of unnecessary iterating when an entity is moving and trying to search entities with hard hit box on the way, since the world is always not filled with boats and shulkers
+
+Enable it before loading the chunk to make it work
+
+Default: `false`
+
+Options: `false`, `true`
+
+Categories: optimization, experimental
+
+
 ## YEET
 
 **Warn**: all yeet options will change vanilla behaviour, they WILL NOT behave like vanilla
