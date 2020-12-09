@@ -488,7 +488,7 @@
                  {
                      if (entity.getBoundingBox().intersects(aabb) && entity != entityIn)
                      {
-@@ -954,6 +1106,18 @@
+@@ -954,6 +1106,21 @@
          }
      }
  
@@ -501,13 +501,16 @@
 +    // TISCM optimizedHardHitBoxEntityCollision
 +    public void getHardHitBoxEntitiesWithinAABBForEntity(@Nullable Entity entityIn, AxisAlignedBB aabb, List<Entity> listToFill, Predicate <? super Entity > filter)
 +    {
-+        getEntitiesWithinAABBForEntityInner(entityIn, aabb, listToFill, filter, CarpetSettings.optimizedHardHitBoxEntityCollision ? this.hardHardHitBoxEntityLists : this.entityLists);
++        ClassInheritanceMultiMap<Entity>[] entityList =
++                this.optimizedHardHitBoxEntityCollisionEnabled && CarpetSettings.optimizedHardHitBoxEntityCollision ?
++                        this.hardHardHitBoxEntityLists : this.entityLists;
++        getEntitiesWithinAABBForEntityInner(entityIn, aabb, listToFill, filter, entityList);
 +    }
 +
      public <T extends Entity> void getEntitiesOfTypeWithinAABB(Class <? extends T > entityClass, AxisAlignedBB aabb, List<T> listToFill, @Nullable Predicate <? super T > filter)
      {
          int i = MathHelper.floor((aabb.minY - 2.0D) / 16.0D);
-@@ -997,6 +1161,9 @@
+@@ -997,6 +1164,9 @@
  
      public void tick(boolean skipRecheckGaps)
      {
@@ -517,7 +520,7 @@
          if (this.isGapLightingUpdated && this.world.dimension.hasSkyLight() && !skipRecheckGaps)
          {
              this.recheckGaps(this.world.isRemote);
-@@ -1138,9 +1305,28 @@
+@@ -1138,9 +1308,28 @@
                  this.sections[l].recalculateRefCounts();
              }
          }
@@ -548,7 +551,7 @@
          for (TileEntity tileentity : this.tileEntities.values())
          {
              tileentity.updateContainingBlockInfo();
-@@ -1190,7 +1376,7 @@
+@@ -1190,7 +1379,7 @@
  
                      if (this.sections[j] == EMPTY_SECTION && flag || this.sections[j] != EMPTY_SECTION && this.sections[j].get(k, i1, l).isAir())
                      {
@@ -557,7 +560,7 @@
                          {
                              BlockPos blockpos2 = blockpos1.offset(enumfacing);
  
-@@ -1497,4 +1683,52 @@
+@@ -1497,4 +1686,52 @@
          QUEUED,
          CHECK;
      }
