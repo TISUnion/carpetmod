@@ -61,7 +61,7 @@
              for (EnumCreatureType enumcreaturetype : EnumCreatureType.values())
              {
 +                //CM start
-+                String type_code = String.format("%s", enumcreaturetype);
++                String type_code = enumcreaturetype.toString();
 +                String group_code = type_code+level_suffix;
 +                if (SpawnReporter.track_spawns > 0L)
 +                {
@@ -138,7 +138,7 @@
 +                                                                ++local_spawns;
 +                                                                if (SpawnReporter.track_spawns > 0L)
 +                                                                {
-+                                                                    String species = IRegistry.ENTITY_TYPE.getKey(entityliving.getType()).toString().replaceFirst("minecraft:","");
++                                                                    EntityType<?> species = entityliving.getType();
 +                                                                    SpawnReporter.registerSpawn(entityliving, type_code, species, blockpos$mutableblockpos);
 +                                                                }
 +                                                                if (SpawnReporter.mock_spawns)
