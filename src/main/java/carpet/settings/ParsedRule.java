@@ -46,6 +46,10 @@ public final class ParsedRule<T> implements Comparable<ParsedRule> {
             this.isStrict = true; // it has no sense otherwise
             this.options = ImmutableList.of("true", "false");
         }
+        else if (this.type == String.class && categories.contains(RuleCategory.COMMAND))
+        {
+            this.options = ImmutableList.of("true", "false", "ops");
+        }
         else if (this.type.isEnum())
         {
             this.isStrict = true; // it has no sense otherwise

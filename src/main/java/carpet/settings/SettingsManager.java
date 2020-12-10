@@ -124,13 +124,16 @@ public class SettingsManager
         return server.getActiveAnvilConverter().getFile(server.getFolderName(), "carpet.conf");
     }
 
-    public void disableBooleanFromCategory(String category)
+    public void disableBooleanCommands(String category)
     {
         for (ParsedRule<?> rule : rules.values())
         {
-            if (rule.type != boolean.class || !rule.categories.contains(category))
+            if (!rule.categories.contains(RuleCategory.COMMAND))
                 continue;
-            ((ParsedRule<Boolean>) rule).set(server.getCommandSource(), false, "false");
+            if (rule.type == boolean.class)
+                ((ParsedRule<Boolean>) rule).set(server.getCommandSource(), false, "false");
+            if (rule.type == String.class && rule.options.contains("false"))
+                ((ParsedRule<String>) rule).set(server.getCommandSource(), "false", "false");
         }
     }
 
@@ -176,7 +179,7 @@ public class SettingsManager
         if (conf.getRight())
         {
             LOG.info("[CM]: Carpet Mod is locked by the administrator");
-            disableBooleanFromCategory(RuleCategory.COMMAND);
+            disableBooleanCommands(RuleCategory.COMMAND);
         }
         for (String key: conf.getLeft().keySet())
         {
