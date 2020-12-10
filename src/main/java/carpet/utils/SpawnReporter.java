@@ -40,7 +40,7 @@ public class SpawnReporter
     
     public static Long track_spawns = 0L;
     public static final HashMap<Integer, HashMap<EnumCreatureType, Tuple<Integer,Integer>>> mobcaps = new HashMap<>();
-    public static final HashMap<String, HashMap<EntityType<?>,Long>> spawn_stats = new HashMap<>();
+    public static final HashMap<String, HashMap<String,Long>> spawn_stats = new HashMap<String, HashMap<String,Long>>();
     public static double mobcap_exponent = 0.0D;
     
     public static final HashMap<String, Long> spawn_attempts = new HashMap<String, Long>();
@@ -52,9 +52,9 @@ public class SpawnReporter
     public static final HashMap<String, Long> spawn_cap_count = new HashMap<String, Long>();
     public static class SpawnPos
     {
-        public EntityType<?> mob;
+        public String mob;
         public BlockPos pos;
-        public SpawnPos(EntityType<?> mob, BlockPos pos)
+        public SpawnPos(String mob, BlockPos pos)
         {
             this.mob = mob;
             this.pos = pos;
@@ -69,8 +69,8 @@ public class SpawnReporter
         reset_spawn_stats(true);
     }
 
-    public static void registerSpawn(EntityLiving el, String type, EntityType<?> mob, BlockPos pos) { registerSpawn(el, type, mob, pos, 1L);}
-    public static void registerSpawn(EntityLiving el, String type, EntityType<?> mob, BlockPos pos, long value)
+    public static void registerSpawn(EntityLiving el, String type, String mob, BlockPos pos) { registerSpawn(el, type, mob, pos, 1L);}
+    public static void registerSpawn(EntityLiving el, String type, String mob, BlockPos pos, long value)
     {
         if (lower_spawning_limit != null)
         {
@@ -342,12 +342,12 @@ public class SpawnReporter
             }
             if (there_are_mobs_to_list)
             {
-                for (EntityType<?> entityType : spawn_stats.get(type_code).keySet())
+                for (String creature_name : spawn_stats.get(type_code).keySet())
                 {
                     report.add(Messenger.s(String.format("   - %s: %d spawns, %d per hour",
-                            entityType.getName().getString(),
-                            spawn_stats.get(type_code).get(entityType),
-                            (72000 * spawn_stats.get(type_code).get(entityType)/duration ))));
+                            creature_name,
+                            spawn_stats.get(type_code).get(creature_name),
+                            (72000 * spawn_stats.get(type_code).get(creature_name)/duration ))));
                 }
             }
         }
