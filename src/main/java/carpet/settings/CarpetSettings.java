@@ -823,6 +823,9 @@ public class CarpetSettings
             category = {CREATIVE}
     )
     public static boolean creativeNoClip = false;
+    
+    @Rule(desc = "Spawning requires much less CPU and Memory", category = OPTIMIZATION)
+    public static boolean lagFreeSpawning = false;
 
     // /$$     /$$/$$$$$$$$ /$$$$$$$$/$$$$$$$$
     //|  $$   /$$/ $$_____/| $$_____/__  $$__/

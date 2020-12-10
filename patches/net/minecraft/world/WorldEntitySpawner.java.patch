@@ -1,14 +1,31 @@
 --- a/net/minecraft/world/WorldEntitySpawner.java
 +++ b/net/minecraft/world/WorldEntitySpawner.java
-@@ -1,5 +1,7 @@
+@@ -1,17 +1,16 @@
  package net.minecraft.world;
  
 +import carpet.commands.lifetime.spawning.LiteralSpawningReason;
++import carpet.settings.CarpetSettings;
 +import carpet.utils.SpawnReporter;
++import com.google.common.collect.Maps;
  import com.google.common.collect.Sets;
- import java.util.List;
- import java.util.Random;
-@@ -20,10 +22,12 @@
+-import java.util.List;
+-import java.util.Random;
+-import java.util.Set;
++
++import java.util.*;
+ import javax.annotation.Nullable;
+ import net.minecraft.block.Block;
+ import net.minecraft.block.state.IBlockState;
+-import net.minecraft.entity.EntityLiving;
+-import net.minecraft.entity.EntitySpawnPlacementRegistry;
+-import net.minecraft.entity.EntityType;
+-import net.minecraft.entity.EnumCreatureType;
+-import net.minecraft.entity.IEntityLivingData;
++import net.minecraft.entity.*;
+ import net.minecraft.entity.player.EntityPlayer;
+ import net.minecraft.fluid.IFluidState;
+ import net.minecraft.init.Blocks;
+@@ -20,10 +19,12 @@
  import net.minecraft.server.management.PlayerChunkMapEntry;
  import net.minecraft.tags.BlockTags;
  import net.minecraft.tags.FluidTags;
@@ -21,7 +38,7 @@
  import net.minecraft.world.biome.Biome;
  import net.minecraft.world.chunk.Chunk;
  import net.minecraft.world.gen.Heightmap;
-@@ -38,6 +42,8 @@
+@@ -38,6 +39,8 @@
  
      public int findChunksForSpawning(WorldServer worldServerIn, boolean spawnHostileMobs, boolean spawnPeacefulMobs, boolean spawnOnSetTickRate)
      {
@@ -30,13 +47,15 @@
          if (!spawnHostileMobs && !spawnPeacefulMobs)
          {
              return 0;
-@@ -84,16 +90,47 @@
+@@ -84,16 +87,49 @@
              int k4 = 0;
              BlockPos blockpos1 = worldServerIn.getSpawnPoint();
  
 +            //CM start
 +            int did = worldServerIn.dimension.getType().getId();
 +            String level_suffix = (did==0)?"":((did<0?" (N)":" (E)"));
++            // CM lagFreeSpawning
++            Map<EntityType<?>, EntityLiving> precookedMobs = Maps.newHashMap();
 +            //CM end
 +
              for (EnumCreatureType enumcreaturetype : EnumCreatureType.values())
@@ -80,7 +99,37 @@
                          label158:
  
                          for (ChunkPos chunkpos1 : this.eligibleChunksForSpawning)
-@@ -175,7 +212,24 @@
+@@ -157,7 +193,16 @@
+ 
+                                                         try
+                                                         {
+-                                                            entityliving = biome$spawnlistentry.entityType.create(worldServerIn);
++                                                            // CM lagFreeSpawning
++                                                            if (CarpetSettings.lagFreeSpawning)
++                                                            {
++                                                                entityliving = precookedMobs.computeIfAbsent(biome$spawnlistentry.entityType, entityType -> (EntityLiving)entityType.create(worldServerIn));
++                                                            }
++                                                            else
++                                                            {
++                                                                // vanilla
++                                                                entityliving = biome$spawnlistentry.entityType.create(worldServerIn);
++                                                            }
+                                                         }
+                                                         catch (Exception exception)
+                                                         {
+@@ -169,13 +214,36 @@
+ 
+                                                         if ((d0 <= 16384.0D || !entityliving.canDespawn()) && entityliving.canSpawn(worldServerIn, false) && entityliving.isNotColliding(worldServerIn))
+                                                         {
++                                                            // CM lagFreeSpawning
++                                                            if (CarpetSettings.lagFreeSpawning)
++                                                            {
++                                                                precookedMobs.remove(biome$spawnlistentry.entityType);
++                                                            }
++
+                                                             ientitylivingdata = entityliving.onInitialSpawn(worldServerIn.getDifficultyForLocation(new BlockPos(entityliving)), ientitylivingdata, (NBTTagCompound)null);
+ 
+                                                             if (entityliving.isNotColliding(worldServerIn))
                                                              {
                                                                  ++j2;
                                                                  ++i4;
@@ -106,7 +155,7 @@
                                                              }
                                                              else
                                                              {
-@@ -202,7 +256,30 @@
+@@ -202,7 +270,30 @@
                                  }
                              }
                          }
