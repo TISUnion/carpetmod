@@ -403,7 +403,6 @@ public class CarpetSettings
     )
     public static String commandLifeTime = "true";
 
-
     @Rule(
             desc = "Optimize entity colliding with entities with hard hit box",
             extra = {
@@ -823,7 +822,7 @@ public class CarpetSettings
             category = {CREATIVE}
     )
     public static boolean creativeNoClip = false;
-    
+
     @Rule(desc = "Spawning requires much less CPU and Memory", category = OPTIMIZATION)
     public static boolean lagFreeSpawning = false;
 
