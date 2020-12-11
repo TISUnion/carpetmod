@@ -37,13 +37,23 @@ public class BlockRotator
         //
         EnumFacing facing;
         float hitX = context.getHitX();
+        if (hitX<2) // vanilla
+        {
+            return null;
+        }
+        int code = (int)(hitX-2)/2;
+
         EntityPlayer placer = context.getPlayer();
         BlockPos pos = context.getPos();
         World world = context.getWorld();
+        if (placer == null)
+        {
+            return null;
+        }
 
         if (block instanceof BlockGlazedTerracotta)
         {
-            facing = EnumFacing.byIndex((int)hitX - 2);
+            facing = EnumFacing.byIndex(code);
             if(facing == EnumFacing.UP || facing == EnumFacing.DOWN)
             {
                 facing = placer.getHorizontalFacing().getOpposite();
@@ -53,37 +63,37 @@ public class BlockRotator
         else if (block instanceof BlockObserver)
         {
             return block.getDefaultState()
-                    .with(BlockDirectional.FACING, EnumFacing.byIndex((int)hitX - 2))
+                    .with(BlockDirectional.FACING, EnumFacing.byIndex(code))
                     .with(BlockObserver.POWERED, true);
         }
         else if (block instanceof BlockRedstoneRepeater)
         {
-            facing = EnumFacing.byIndex((((int)hitX) % 10) - 2);
+            facing = EnumFacing.byIndex(code % 16);
             if(facing == EnumFacing.UP || facing == EnumFacing.DOWN)
             {
                 facing = placer.getHorizontalFacing().getOpposite();
             }
             return block.getDefaultState()
                     .with(BlockHorizontal.HORIZONTAL_FACING, facing)
-                    .with(BlockRedstoneRepeater.DELAY, MathHelper.clamp((((int) hitX) / 10) + 1, 1, 4))
+                    .with(BlockRedstoneRepeater.DELAY, MathHelper.clamp(code / 16, 1, 4))
                     .with(BlockRedstoneRepeater.LOCKED, Boolean.FALSE);
         }
         else if (block instanceof BlockTrapDoor)
         {
             return block.getDefaultState()
-                    .with(BlockTrapDoor.HORIZONTAL_FACING, EnumFacing.byIndex((((int)hitX) % 10) - 2))
+                    .with(BlockTrapDoor.HORIZONTAL_FACING, EnumFacing.byIndex(code % 16))
                     .with(BlockTrapDoor.OPEN, Boolean.FALSE)
-                    .with(BlockTrapDoor.HALF, (hitX > 10) ? Half.TOP : Half.BOTTOM)
+                    .with(BlockTrapDoor.HALF, (code >= 16) ? Half.TOP : Half.BOTTOM)
                     .with(BlockTrapDoor.OPEN, world.isBlockPowered(pos));
         }
         else if (block instanceof BlockRedstoneComparator)
         {
-            facing = EnumFacing.byIndex((((int)hitX) % 10) - 2);
+            facing = EnumFacing.byIndex(code % 16);
             if((facing == EnumFacing.UP) || (facing == EnumFacing.DOWN))
             {
                 facing = placer.getHorizontalFacing().getOpposite();
             }
-            ComparatorMode m = (hitX > 10)?ComparatorMode.SUBTRACT: ComparatorMode.COMPARE;
+            ComparatorMode m = (hitX >= 16)?ComparatorMode.SUBTRACT: ComparatorMode.COMPARE;
             return block.getDefaultState()
                     .with(BlockHorizontal.HORIZONTAL_FACING, facing)
                     .with(BlockRedstoneComparator.POWERED, Boolean.FALSE)
@@ -92,20 +102,20 @@ public class BlockRotator
         else if (block instanceof BlockDispenser)
         {
             return block.getDefaultState()
-                    .with(BlockDispenser.FACING, EnumFacing.byIndex((int)hitX - 2))
+                    .with(BlockDispenser.FACING, EnumFacing.byIndex(code))
                     .with(BlockDispenser.TRIGGERED, Boolean.FALSE);
         }
         else if (block instanceof BlockPistonBase)
         {
             return block.getDefaultState()
-                    .with(BlockDirectional.FACING,EnumFacing.byIndex((int)hitX - 2) )
+                    .with(BlockDirectional.FACING, EnumFacing.byIndex(code))
                     .with(BlockPistonBase.EXTENDED, Boolean.FALSE);
         }
         else if (block instanceof BlockStairs)
         {
             return block.getStateForPlacement(context)//worldIn, pos, facing, hitX, hitY, hitZ, meta, placer)
-                    .with(BlockStairs.FACING, EnumFacing.byIndex((((int)hitX) % 10) - 2))
-                    .with(BlockStairs.HALF, ( hitX > 10)?Half.TOP : Half.BOTTOM);
+                    .with(BlockStairs.FACING, EnumFacing.byIndex(code % 16))
+                    .with(BlockStairs.HALF, ( hitX >= 16)?Half.TOP : Half.BOTTOM);
         }
         return null;
     }

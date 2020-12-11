@@ -826,6 +826,12 @@ public class CarpetSettings
     @Rule(desc = "Spawning requires much less CPU and Memory", category = OPTIMIZATION)
     public static boolean lagFreeSpawning = false;
 
+    @Rule(
+            desc = "Client can provide alternative block placement.",
+            category = {CREATIVE}
+    )
+    public static boolean accurateBlockPlacement = false;
+
     // /$$     /$$/$$$$$$$$ /$$$$$$$$/$$$$$$$$
     //|  $$   /$$/ $$_____/| $$_____/__  $$__/
     // \  $$ /$$/| $$      | $$        | $$

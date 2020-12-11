@@ -1,16 +1,53 @@
 --- a/net/minecraft/item/ItemBlock.java
 +++ b/net/minecraft/item/ItemBlock.java
-@@ -3,6 +3,9 @@
- import java.util.List;
- import java.util.Map;
- import javax.annotation.Nullable;
-+
+@@ -1,8 +1,8 @@
+ package net.minecraft.item;
+ 
+-import java.util.List;
+-import java.util.Map;
+-import javax.annotation.Nullable;
++import carpet.helpers.BlockRotator;
 +import carpet.helpers.CreativeNoClipHelper;
 +import carpet.settings.CarpetSettings;
  import net.minecraft.advancements.CriteriaTriggers;
  import net.minecraft.block.Block;
  import net.minecraft.block.SoundType;
-@@ -98,7 +101,21 @@
+@@ -22,6 +22,10 @@
+ import net.minecraftforge.api.distmarker.Dist;
+ import net.minecraftforge.api.distmarker.OnlyIn;
+ 
++import javax.annotation.Nullable;
++import java.util.List;
++import java.util.Map;
++
+ public class ItemBlock extends Item
+ {
+     @Deprecated
+@@ -92,13 +96,44 @@
+     @Nullable
+     protected IBlockState getStateForPlacement(BlockItemUseContext context)
+     {
+-        IBlockState iblockstate = this.getBlock().getStateForPlacement(context);
++        // CM accurateBlockPlacement
++//        IBlockState iblockstate = this.getBlock().getStateForPlacement(context);
++        Block block = this.getBlock();
++        IBlockState iblockstate = null;
++        if (CarpetSettings.accurateBlockPlacement)
++        {
++            IBlockState tryAlternative = BlockRotator.alternativeBlockPlacement(block, context);
++            if (tryAlternative != null)
++            {
++                iblockstate = tryAlternative;
++            }
++        }
++        if (iblockstate == null)
++        {
++            iblockstate = block.getStateForPlacement(context);
++        }
++        // CM accurateBlockPlacement ends
++
+         return iblockstate != null && this.canPlace(context, iblockstate) ? iblockstate : null;
+     }
  
      protected boolean canPlace(BlockItemUseContext p_195944_1_, IBlockState p_195944_2_)
      {
