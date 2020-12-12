@@ -1,6 +1,15 @@
 --- a/net/minecraft/util/math/AxisAlignedBB.java
 +++ b/net/minecraft/util/math/AxisAlignedBB.java
-@@ -14,6 +14,14 @@
+@@ -1,6 +1,8 @@
+ package net.minecraft.util.math;
+ 
+ import javax.annotation.Nullable;
++
++import me.jellysquid.mods.lithium.LithiumConfig;
+ import net.minecraft.util.EnumFacing;
+ import net.minecraftforge.api.distmarker.Dist;
+ import net.minecraftforge.api.distmarker.OnlyIn;
+@@ -14,6 +16,14 @@
      public final double maxY;
      public final double maxZ;
  
@@ -15,13 +24,18 @@
      public AxisAlignedBB(double x1, double y1, double z1, double x2, double y2, double z2)
      {
          this.minX = Math.min(x1, x2);
-@@ -42,12 +50,34 @@
+@@ -42,12 +52,44 @@
  
      public double getMin(EnumFacing.Axis axis)
      {
 -        return axis.getCoordinate(this.minX, this.minY, this.minZ);
 +        // Lithium math.fast_util
-+        // return axis.getCoordinate(this.minX, this.minY, this.minZ);
++        if (!LithiumConfig.MATH_FAST_UTIL)
++        {
++            // vanilla
++            return axis.getCoordinate(this.minX, this.minY, this.minZ);
++        }
++
 +        switch (axis.ordinal()) {
 +            case 0: //X
 +                return this.minX;
@@ -38,7 +52,12 @@
      {
 -        return axis.getCoordinate(this.maxX, this.maxY, this.maxZ);
 +        // Lithium math.fast_util
-+        // return axis.getCoordinate(this.maxX, this.maxY, this.maxZ);
++        if (!LithiumConfig.MATH_FAST_UTIL)
++        {
++            // vanilla
++            return axis.getCoordinate(this.maxX, this.maxY, this.maxZ);
++        }
++
 +        switch (axis.ordinal()) {
 +            case 0: //X
 +                return this.maxX;

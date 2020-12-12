@@ -7,11 +7,12 @@
  import com.google.common.annotations.VisibleForTesting;
  import com.google.common.math.DoubleMath;
  import com.google.common.math.IntMath;
-@@ -8,6 +9,11 @@
+@@ -8,6 +9,12 @@
  import java.util.Iterator;
  import java.util.Objects;
  import java.util.stream.Stream;
 +
++import me.jellysquid.mods.lithium.LithiumConfig;
 +import me.jellysquid.mods.lithium.common.shapes.VoxelShapeAlignedCuboid;
 +import me.jellysquid.mods.lithium.common.shapes.VoxelShapeEmpty;
 +import me.jellysquid.mods.lithium.common.shapes.VoxelShapeSimpleCube;
@@ -19,7 +20,7 @@
  import net.minecraft.util.AxisRotation;
  import net.minecraft.util.EnumFacing;
  import net.minecraft.util.Util;
-@@ -17,14 +23,63 @@
+@@ -17,14 +24,62 @@
  
  public final class VoxelShapes
  {
@@ -58,7 +59,6 @@
 +    // Lithium shapes.specialized_shapes
 +    // Re-initialize the global cached shapes with our specialized ones. This will happen right after all the static
 +    // state has been initialized and before any external classes access it.
-+    public static final boolean LITHIUM_SHAPES_SPECIALIZED_SHAPES_ENABLED = true;
 +    private static final VoxelShapePart FULL_CUBE_VOXELS;
 +
 +    static
@@ -67,7 +67,7 @@
 +        // contain multiple inner cuboids.
 +        FULL_CUBE_VOXELS = new VoxelShapePartBitSet(1, 1, 1);
 +        FULL_CUBE_VOXELS.setFilled(0, 0, 0, true, true);
-+        if (LITHIUM_SHAPES_SPECIALIZED_SHAPES_ENABLED)
++        if (LithiumConfig.SHAPES_SPECIALIZED_SHAPES)
 +        {
 +//            // Used in some rare cases to indicate a shape which encompasses the entire world (such as a moving world border)
 +//            UNBOUNDED = new VoxelShapeSimpleCube(FULL_CUBE_VOXELS, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY,
@@ -90,7 +90,7 @@
      public static VoxelShape create(AxisAlignedBB aabb)
      {
 +        // Lithium shapes.specialized_shapes
-+        if (LITHIUM_SHAPES_SPECIALIZED_SHAPES_ENABLED)
++        if (LithiumConfig.SHAPES_SPECIALIZED_SHAPES)
 +        {
 +            return create$lithium(aabb);
 +        }
@@ -154,14 +154,13 @@
      private static int getPrecisionBits(double p_197885_0_, double p_197885_2_)
      {
          if (!(p_197885_0_ < -1.0E-7D) && !(p_197885_2_ > 1.0000001D))
-@@ -312,7 +417,9 @@
+@@ -312,7 +417,8 @@
          }
          else
          {
 -            return new IndirectMerger(list1, list2, p_199410_3_, p_199410_4_);
 +            // Lithium shapes.shape_merging
-+            // return new IndirectMerger(list1, list2, p_199410_3_, p_199410_4_);
-+            return new LithiumDoublePairList(list1, list2, p_199410_3_, p_199410_4_);
++            return LithiumConfig.SHAPES_SHAPE_MERGING ? new LithiumDoublePairList(list1, list2, p_199410_3_, p_199410_4_) : new IndirectMerger(list1, list2, p_199410_3_, p_199410_4_);
          }
      }
  

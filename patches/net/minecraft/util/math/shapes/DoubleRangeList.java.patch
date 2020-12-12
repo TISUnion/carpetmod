@@ -1,8 +1,10 @@
 --- a/net/minecraft/util/math/shapes/DoubleRangeList.java
 +++ b/net/minecraft/util/math/shapes/DoubleRangeList.java
-@@ -2,18 +2,29 @@
+@@ -1,19 +1,32 @@
+ package net.minecraft.util.math.shapes;
  
  import it.unimi.dsi.fastutil.doubles.AbstractDoubleList;
++import me.jellysquid.mods.lithium.LithiumConfig;
  
 -class DoubleRangeList extends AbstractDoubleList
 +// it's FractionalDoubleList in yarn mapping
@@ -20,16 +22,17 @@
          this.field_197854_a = p_i47689_1_;
 +
 +        // Lithium shapes.precompute_shape_arrays
-+        this.scale = 1.0D / this.field_197854_a;
++        if (LithiumConfig.SHAPES_PRECOMPUTE_SHAPE_ARRAYS)
++        {
++            this.scale = 1.0D / this.field_197854_a;
++        }
      }
  
      public double getDouble(int p_getDouble_1_)
      {
 -        return (double)p_getDouble_1_ / (double)this.field_197854_a;
-+        // return (double)p_getDouble_1_ / (double)this.field_197854_a;
-+
 +        // Lithium shapes.precompute_shape_arrays
-+        return p_getDouble_1_ * this.scale;
++        return LithiumConfig.SHAPES_PRECOMPUTE_SHAPE_ARRAYS ? p_getDouble_1_ * this.scale : (double)p_getDouble_1_ / (double)this.field_197854_a;
      }
  
      public int size()

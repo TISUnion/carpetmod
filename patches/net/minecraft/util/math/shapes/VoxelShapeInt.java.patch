@@ -1,13 +1,15 @@
 --- a/net/minecraft/util/math/shapes/VoxelShapeInt.java
 +++ b/net/minecraft/util/math/shapes/VoxelShapeInt.java
-@@ -1,5 +1,6 @@
+@@ -1,6 +1,8 @@
  package net.minecraft.util.math.shapes;
  
 +import carpet.settings.CarpetSettings;
  import it.unimi.dsi.fastutil.doubles.DoubleList;
++import me.jellysquid.mods.lithium.LithiumConfig;
  import net.minecraft.util.EnumFacing;
  
-@@ -9,16 +10,41 @@
+ public final class VoxelShapeInt extends VoxelShape
+@@ -9,16 +11,43 @@
      private final int y;
      private final int z;
  
@@ -24,20 +26,22 @@
          this.z = z;
 +
 +        // Lithium shapes.precompute_shape_arrays
-+        this.list = new DoubleList[AXIS.length];
++        if (LithiumConfig.SHAPES_PRECOMPUTE_SHAPE_ARRAYS)
++        {
++            this.list = new DoubleList[AXIS.length];
 +
-+        for (EnumFacing.Axis axis : AXIS) {
-+            this.list[axis.ordinal()] = new IntRangeList(this.part.getSize(axis), axis.getCoordinate(this.x, this.y, this.z));
++            for (EnumFacing.Axis axis : AXIS)
++            {
++                this.list[axis.ordinal()] = new IntRangeList(this.part.getSize(axis), axis.getCoordinate(this.x, this.y, this.z));
++            }
 +        }
      }
  
      protected DoubleList getValues(EnumFacing.Axis axis)
      {
 -        return new IntRangeList(this.part.getSize(axis), axis.getCoordinate(this.x, this.y, this.z));
-+        // return new IntRangeList(this.part.getSize(axis), axis.getCoordinate(this.x, this.y, this.z));
-+
 +        // Lithium shapes.precompute_shape_arrays
-+        return this.list[axis.ordinal()];
++        return LithiumConfig.SHAPES_PRECOMPUTE_SHAPE_ARRAYS ? this.list[axis.ordinal()] : new IntRangeList(this.part.getSize(axis), axis.getCoordinate(this.x, this.y, this.z));
      }
 +    
 +    // [CM] start

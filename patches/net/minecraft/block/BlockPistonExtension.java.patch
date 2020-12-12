@@ -1,6 +1,15 @@
 --- a/net/minecraft/block/BlockPistonExtension.java
 +++ b/net/minecraft/block/BlockPistonExtension.java
-@@ -46,6 +46,31 @@
+@@ -1,6 +1,8 @@
+ package net.minecraft.block;
+ 
+ import java.util.Random;
++
++import me.jellysquid.mods.lithium.LithiumConfig;
+ import net.minecraft.block.state.BlockFaceShape;
+ import net.minecraft.block.state.IBlockState;
+ import net.minecraft.entity.player.EntityPlayer;
+@@ -46,6 +48,31 @@
      protected static final VoxelShape SHORT_EAST_ARM_AABB = Block.makeCuboidShape(0.0D, 6.0D, 6.0D, 12.0D, 10.0D, 10.0D);
      protected static final VoxelShape SHORT_WEST_ARM_AABB = Block.makeCuboidShape(4.0D, 6.0D, 6.0D, 16.0D, 10.0D, 10.0D);
  
@@ -32,15 +41,21 @@
      public BlockPistonExtension(Block.Properties properties)
      {
          super(properties);
-@@ -74,7 +99,10 @@
+@@ -74,7 +101,16 @@
  
      public VoxelShape getShape(IBlockState state, IBlockReader worldIn, BlockPos pos)
      {
 -        return VoxelShapes.or(this.func_196424_i(state), this.func_196425_x(state));
 +        // Lithium block.piston_shapes
-+        // return VoxelShapes.or(this.func_196424_i(state), this.func_196425_x(state));
-+
-+        return outlineShapes[state.get(FACING).ordinal()][state.get(SHORT) ? SHORT_IDX : LONG_IDX];
++        if (LithiumConfig.BLOCK_PISTON_SHAPES)
++        {
++            return outlineShapes[state.get(FACING).ordinal()][state.get(SHORT) ? SHORT_IDX : LONG_IDX];
++        }
++        else
++        {
++            // vanilla
++            return VoxelShapes.or(this.func_196424_i(state), this.func_196425_x(state));
++        }
      }
  
      private VoxelShape func_196425_x(IBlockState p_196425_1_)

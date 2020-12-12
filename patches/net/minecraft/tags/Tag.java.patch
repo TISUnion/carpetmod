@@ -1,11 +1,12 @@
 --- a/net/minecraft/tags/Tag.java
 +++ b/net/minecraft/tags/Tag.java
-@@ -14,13 +14,15 @@
+@@ -14,13 +14,16 @@
  import java.util.function.Function;
  import java.util.function.Predicate;
  import javax.annotation.Nullable;
 +
 +import it.unimi.dsi.fastutil.objects.ReferenceArraySet;
++import me.jellysquid.mods.lithium.LithiumConfig;
  import net.minecraft.util.JsonUtils;
  import net.minecraft.util.ResourceLocation;
  
@@ -17,7 +18,7 @@
      private final Collection<Tag.ITagEntry<T>> entries;
  
      public Tag(ResourceLocation resourceLocationIn)
-@@ -40,6 +42,21 @@
+@@ -40,6 +43,21 @@
          {
              itagentry.populate(this.taggedItems);
          }
@@ -32,7 +33,7 @@
 +         * @reason Use specialized implementations
 +         * @author JellySquid
 +         */
-+        if (this.taggedItems.size() <= 3)
++        if (LithiumConfig.TAG && this.taggedItems.size() <= 3)
 +        {
 +            this.taggedItems = new ReferenceArraySet<>(this.taggedItems);
 +        }

@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/Explosion.java
 +++ b/net/minecraft/world/Explosion.java
-@@ -1,13 +1,13 @@
+@@ -1,13 +1,14 @@
  package net.minecraft.world;
  
 +import carpet.settings.CarpetSettings;
@@ -15,10 +15,11 @@
 +import java.util.*;
  import javax.annotation.Nullable;
 +
++import me.jellysquid.mods.lithium.LithiumConfig;
  import net.minecraft.block.Block;
  import net.minecraft.block.state.IBlockState;
  import net.minecraft.enchantment.EnchantmentProtection;
-@@ -17,6 +17,7 @@
+@@ -17,6 +18,7 @@
  import net.minecraft.entity.player.EntityPlayer;
  import net.minecraft.fluid.IFluidState;
  import net.minecraft.init.Blocks;
@@ -26,7 +27,7 @@
  import net.minecraft.init.Particles;
  import net.minecraft.init.SoundEvents;
  import net.minecraft.util.DamageSource;
-@@ -25,6 +26,8 @@
+@@ -25,6 +27,8 @@
  import net.minecraft.util.math.BlockPos;
  import net.minecraft.util.math.MathHelper;
  import net.minecraft.util.math.Vec3d;
@@ -35,7 +36,7 @@
  import net.minecraftforge.api.distmarker.Dist;
  import net.minecraftforge.api.distmarker.OnlyIn;
  
-@@ -43,6 +46,25 @@
+@@ -43,6 +47,25 @@
      private final List<BlockPos> affectedBlockPositions = Lists.newArrayList();
      private final Map<EntityPlayer, Vec3d> playerKnockbackMap = Maps.newHashMap();
  
@@ -61,79 +62,32 @@
      @OnlyIn(Dist.CLIENT)
      public Explosion(World worldIn, @Nullable Entity entityIn, double x, double y, double z, float size, List<BlockPos> affectedPositions)
      {
-@@ -71,113 +93,176 @@
- 
+@@ -72,112 +95,151 @@
      public void doExplosionA()
      {
--        Set<BlockPos> set = Sets.newHashSet();
+         Set<BlockPos> set = Sets.newHashSet();
 -        int i = 16;
-+//        Set<BlockPos> set = Sets.newHashSet();
-+//        int i = 16;
-+//
-+//        for (int j = 0; j < 16; ++j)
-+//        {
-+//            for (int k = 0; k < 16; ++k)
-+//            {
-+//                for (int l = 0; l < 16; ++l)
-+//                {
-+//                    if (j == 0 || j == 15 || k == 0 || k == 15 || l == 0 || l == 15)
-+//                    {
-+//                        double d0 = (double)((float)j / 15.0F * 2.0F - 1.0F);
-+//                        double d1 = (double)((float)k / 15.0F * 2.0F - 1.0F);
-+//                        double d2 = (double)((float)l / 15.0F * 2.0F - 1.0F);
-+//                        double d3 = Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
-+//                        d0 = d0 / d3;
-+//                        d1 = d1 / d3;
-+//                        d2 = d2 / d3;
-+//                        float f = this.size * (0.7F + this.world.rand.nextFloat() * 0.6F);
-+//                        if (CarpetSettings.explosionRandomRatio != -1.0F) // TISCM explosionRandomSize
-+//                        {
-+//                            f = this.size * (0.7F + CarpetSettings.explosionRandomRatio * 0.6F);
-+//                        }
-+//                        double d4 = this.x;
-+//                        double d6 = this.y;
-+//                        double d8 = this.z;
-+//
-+//                        for (float f1 = 0.3F; f > 0.0F; f -= 0.22500001F)
-+//                        {
-+//                            BlockPos blockpos = new BlockPos(d4, d6, d8);
-+//                            IBlockState iblockstate = this.world.getBlockState(blockpos);
-+//                            IFluidState ifluidstate = this.world.getFluidState(blockpos);
-+//
-+//                            if (!iblockstate.isAir() || !ifluidstate.isEmpty())
-+//                            {
-+//                                float f2 = Math.max(iblockstate.getBlock().getExplosionResistance(), ifluidstate.getExplosionResistance());
-+//
-+//                                if (this.exploder != null)
-+//                                {
-+//                                    f2 = this.exploder.getExplosionResistance(this, this.world, blockpos, iblockstate, ifluidstate, f2);
-+//                                }
-+//
-+//                                f -= (f2 + 0.3F) * 0.3F;
-+//                            }
-+//
-+//                            if (f > 0.0F && (this.exploder == null || this.exploder.canExplosionDestroyBlock(this, this.world, blockpos, iblockstate, f)))
-+//                            {
-+//                                set.add(blockpos);
-+//                            }
-+//
-+//                            d4 += d0 * (double)0.3F;
-+//                            d6 += d1 * (double)0.3F;
-+//                            d8 += d2 * (double)0.3F;
-+//                        }
-+//                    }
-+//                }
-+//            }
-+//        }
  
 -        for (int j = 0; j < 16; ++j)
--        {
++        // Lithium world.explosions
++        if (LithiumConfig.WORLD_EXPLOSIONS)
+         {
 -            for (int k = 0; k < 16; ++k)
--            {
++            set = doExplosionA$lithium();
++        }
++        // vanilla
++        else
++        {
++            int i = 16;
++
++            for (int j = 0; j < 16; ++j)
+             {
 -                for (int l = 0; l < 16; ++l)
--                {
++                for (int k = 0; k < 16; ++k)
+                 {
 -                    if (j == 0 || j == 15 || k == 0 || k == 15 || l == 0 || l == 15)
--                    {
++                    for (int l = 0; l < 16; ++l)
+                     {
 -                        double d0 = (double)((float)j / 15.0F * 2.0F - 1.0F);
 -                        double d1 = (double)((float)k / 15.0F * 2.0F - 1.0F);
 -                        double d2 = (double)((float)l / 15.0F * 2.0F - 1.0F);
@@ -145,66 +99,79 @@
 -                        double d4 = this.x;
 -                        double d6 = this.y;
 -                        double d8 = this.z;
-+        // Lithium world.explosions starts
- 
+-
 -                        for (float f1 = 0.3F; f > 0.0F; f -= 0.22500001F)
--                        {
++                        if (j == 0 || j == 15 || k == 0 || k == 15 || l == 0 || l == 15)
+                         {
 -                            BlockPos blockpos = new BlockPos(d4, d6, d8);
 -                            IBlockState iblockstate = this.world.getBlockState(blockpos);
 -                            IFluidState ifluidstate = this.world.getFluidState(blockpos);
-+        // Using integer encoding for the block positions provides a massive speedup and prevents us from needing to
-+        // allocate a block position for every step we make along each ray, eliminating essentially all the memory
-+        // allocations of this function. The overhead of packing block positions into integer format is negligible
-+        // compared to a memory allocation and associated overhead of hashing real objects in a set.
-+        final Set<BlockPos> touched = Sets.newHashSet();
++                            double d0 = (double) ((float) j / 15.0F * 2.0F - 1.0F);
++                            double d1 = (double) ((float) k / 15.0F * 2.0F - 1.0F);
++                            double d2 = (double) ((float) l / 15.0F * 2.0F - 1.0F);
++                            double d3 = Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
++                            d0 = d0 / d3;
++                            d1 = d1 / d3;
++                            d2 = d2 / d3;
++                            float f = this.size * (0.7F + this.world.rand.nextFloat() * 0.6F);
++                            if (CarpetSettings.explosionRandomRatio != -1.0F) // TISCM explosionRandomSize
++                            {
++                                f = this.size * (0.7F + CarpetSettings.explosionRandomRatio * 0.6F);
++                            }
++                            double d4 = this.x;
++                            double d6 = this.y;
++                            double d8 = this.z;
  
 -                            if (!iblockstate.isAir() || !ifluidstate.isEmpty())
--                            {
++                            for (float f1 = 0.3F; f > 0.0F; f -= 0.22500001F)
+                             {
 -                                float f2 = Math.max(iblockstate.getBlock().getExplosionResistance(), ifluidstate.getExplosionResistance());
-+        final Random random = this.world.rand;
++                                BlockPos blockpos = new BlockPos(d4, d6, d8);
++                                IBlockState iblockstate = this.world.getBlockState(blockpos);
++                                IFluidState ifluidstate = this.world.getFluidState(blockpos);
  
 -                                if (this.exploder != null)
--                                {
++                                if (!iblockstate.isAir() || !ifluidstate.isEmpty())
+                                 {
 -                                    f2 = this.exploder.getExplosionResistance(this, this.world, blockpos, iblockstate, ifluidstate, f2);
--                                }
-+        // Explosions work by casting many rays through the world from the origin of the explosion
-+        for (int rayX = 0; rayX < 16; ++rayX) {
-+            boolean xPlane = rayX == 0 || rayX == 15;
++                                    float f2 = Math.max(iblockstate.getBlock().getExplosionResistance(), ifluidstate.getExplosionResistance());
++
++                                    if (this.exploder != null)
++                                    {
++                                        f2 = this.exploder.getExplosionResistance(this, this.world, blockpos, iblockstate, ifluidstate, f2);
++                                    }
++
++                                    f -= (f2 + 0.3F) * 0.3F;
+                                 }
  
 -                                f -= (f2 + 0.3F) * 0.3F;
 -                            }
-+            for (int rayY = 0; rayY < 16; ++rayY) {
-+                boolean yPlane = rayY == 0 || rayY == 15;
++                                if (f > 0.0F && (this.exploder == null || this.exploder.canExplosionDestroyBlock(this, this.world, blockpos, iblockstate, f)))
++                                {
++                                    set.add(blockpos);
++                                }
  
 -                            if (f > 0.0F && (this.exploder == null || this.exploder.canExplosionDestroyBlock(this, this.world, blockpos, iblockstate, f)))
 -                            {
 -                                set.add(blockpos);
--                            }
-+                for (int rayZ = 0; rayZ < 16; ++rayZ) {
-+                    boolean zPlane = rayZ == 0 || rayZ == 15;
- 
++                                d4 += d0 * (double) 0.3F;
++                                d6 += d1 * (double) 0.3F;
++                                d8 += d2 * (double) 0.3F;
+                             }
+-
 -                            d4 += d0 * (double)0.3F;
 -                            d6 += d1 * (double)0.3F;
 -                            d8 += d2 * (double)0.3F;
--                        }
-+                    // We only fire rays from the surface of our origin volume
-+                    if (xPlane || yPlane || zPlane) {
-+                        double vecX = (((float) rayX / 15.0F) * 2.0F) - 1.0F;
-+                        double vecY = (((float) rayY / 15.0F) * 2.0F) - 1.0F;
-+                        double vecZ = (((float) rayZ / 15.0F) * 2.0F) - 1.0F;
-+
-+                        this.performRayCast(random, vecX, vecY, vecZ, touched);
+                         }
                      }
                  }
              }
          }
  
 -        this.affectedBlockPositions.addAll(set);
-+        // Lithium world.explosions ends
-+
 +        // [CM] if statement around - explosionNoBlockDamage
 +        if (!CarpetSettings.explosionNoBlockDamage)
-+            this.affectedBlockPositions.addAll(touched);
++            this.affectedBlockPositions.addAll(set);
 +        // [CM] End - explosionNoBlockDamage
 +
 +        //TISCM cache explosions
@@ -310,13 +277,48 @@
                              }
                          }
                      }
-@@ -186,6 +271,171 @@
+@@ -186,6 +248,206 @@
          }
      }
  
 +    // ---------------------------------
 +    //  Lithium world.explosions starts
 +    // ---------------------------------
++
++    private Set<BlockPos> doExplosionA$lithium()
++    {
++        // Using integer encoding for the block positions provides a massive speedup and prevents us from needing to
++        // allocate a block position for every step we make along each ray, eliminating essentially all the memory
++        // allocations of this function. The overhead of packing block positions into integer format is negligible
++        // compared to a memory allocation and associated overhead of hashing real objects in a set.
++        final Set<BlockPos> touched = Sets.newHashSet();
++
++        final Random random = this.world.rand;
++
++        // Explosions work by casting many rays through the world from the origin of the explosion
++        for (int rayX = 0; rayX < 16; ++rayX) {
++            boolean xPlane = rayX == 0 || rayX == 15;
++
++            for (int rayY = 0; rayY < 16; ++rayY) {
++                boolean yPlane = rayY == 0 || rayY == 15;
++
++                for (int rayZ = 0; rayZ < 16; ++rayZ) {
++                    boolean zPlane = rayZ == 0 || rayZ == 15;
++
++                    // We only fire rays from the surface of our origin volume
++                    if (xPlane || yPlane || zPlane) {
++                        double vecX = (((float) rayX / 15.0F) * 2.0F) - 1.0F;
++                        double vecY = (((float) rayY / 15.0F) * 2.0F) - 1.0F;
++                        double vecZ = (((float) rayZ / 15.0F) * 2.0F) - 1.0F;
++
++                        this.performRayCast(random, vecX, vecY, vecZ, touched);
++                    }
++                }
++            }
++        }
++        return touched;
++    }
++
 +    private void performRayCast(Random random, double vecX, double vecY, double vecZ, Set<BlockPos> touched) {
 +        double dist = Math.sqrt((vecX * vecX) + (vecY * vecY) + (vecZ * vecZ));
 +
@@ -482,7 +484,7 @@
      public void doExplosionB(boolean spawnParticles)
      {
          this.world.playSound((EntityPlayer)null, this.x, this.y, this.z, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS, 4.0F, (1.0F + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.2F) * 0.7F);
-@@ -199,6 +449,7 @@
+@@ -199,6 +461,7 @@
              this.world.addParticle(Particles.EXPLOSION, this.x, this.y, this.z, 1.0D, 0.0D, 0.0D);
          }
  

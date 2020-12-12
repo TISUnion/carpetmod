@@ -1,6 +1,6 @@
 --- a/net/minecraft/network/datasync/EntityDataManager.java
 +++ b/net/minecraft/network/datasync/EntityDataManager.java
-@@ -5,11 +5,14 @@
+@@ -5,11 +5,15 @@
  import io.netty.handler.codec.DecoderException;
  import io.netty.handler.codec.EncoderException;
  import java.io.IOException;
@@ -12,16 +12,18 @@
  import javax.annotation.Nullable;
 +
 +import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
++import me.jellysquid.mods.lithium.LithiumConfig;
  import net.minecraft.crash.CrashReport;
  import net.minecraft.crash.CrashReportCategory;
  import net.minecraft.crash.ReportedException;
-@@ -26,11 +29,17 @@
+@@ -26,11 +30,18 @@
      private static final Logger LOGGER = LogManager.getLogger();
      private static final Map < Class <? extends Entity > , Integer > NEXT_ID_MAP = Maps.newHashMap();
      private final Entity entity;
 -    private final Map < Integer, EntityDataManager.DataEntry<? >> entries = Maps.newHashMap();
 +    // Lithium entity.data_tracker.use_arrays replaces Maps.newHashMap with Int2ObjectOpenHashMap
-+    private final Map < Integer, EntityDataManager.DataEntry<? >> entries = new Int2ObjectOpenHashMap<>();
++    private final Map < Integer, EntityDataManager.DataEntry<? >> entries = LithiumConfig.ENTITY_DATA_TRACKER_USE_ARRAYS ?
++            new Int2ObjectOpenHashMap<>() : Maps.newHashMap();
      private final ReadWriteLock lock = new ReentrantReadWriteLock();
      private boolean empty = true;
      private boolean dirty;
@@ -34,15 +36,22 @@
      public EntityDataManager(Entity entityIn)
      {
          this.entity = entityIn;
-@@ -117,11 +126,43 @@
+@@ -117,11 +128,50 @@
      {
          EntityDataManager.DataEntry<T> dataentry = new EntityDataManager.DataEntry<>(key, value);
          this.lock.writeLock().lock();
 -        this.entries.put(key.getId(), dataentry);
 +
 +        // Lithium entity.data_tracker.use_arrays
-+        // this.entries.put(key.getId(), dataentry);
-+        this.onAddTrackedDataInsertMap(this.entries, key.getId(), dataentry);
++        if (LithiumConfig.ENTITY_DATA_TRACKER_USE_ARRAYS)
++        {
++            this.onAddTrackedDataInsertMap(this.entries, key.getId(), dataentry);
++        }
++        else
++        {
++            // vanilla
++            this.entries.put(key.getId(), dataentry);
++        }
 +
          this.empty = false;
          this.lock.writeLock().unlock();
@@ -79,34 +88,41 @@
      private <T> EntityDataManager.DataEntry<T> getEntry(DataParameter<T> key)
      {
          this.lock.readLock().lock();
-@@ -129,7 +170,29 @@
+@@ -129,7 +179,36 @@
  
          try
          {
 -            dataentry = (EntityDataManager.DataEntry<T>)this.entries.get(key.getId());
 +            // Lithium entity.data_tracker.use_arrays
-+            // dataentry = (EntityDataManager.DataEntry<T>)this.entries.get(key.getId());
-+            EntityDataManager.DataEntry<?>[] array = this.entriesArray;
-+
-+            // Lithium entity.data_tracker.use_arrays implementation starts
-+            int id = key.getId();
-+
-+            // The vanilla implementation will simply return null if the tracker doesn't contain the specified entry. However,
-+            // accessing an array with an invalid pointer will throw a OOB exception, where-as a HashMap would simply
-+            // return null. We check this case (which should be free, even if so insignificant, as the subsequent bounds
-+            // check will hopefully be eliminated)
-+            if (id < 0 || id >= array.length)
++            if (LithiumConfig.ENTITY_DATA_TRACKER_USE_ARRAYS)
 +            {
-+                dataentry = null;
-+            }
-+            else
-+            {
-+                // This cast can fail if trying to access a entry which doesn't belong to this tracker, as the ID could
-+                // instead point to an entry of a different type. However, that is also vanilla behaviour.
-+                // noinspection unchecked
-+                dataentry = (EntityDataManager.DataEntry<T>) array[id];
++                EntityDataManager.DataEntry<?>[] array = this.entriesArray;
++
++                // Lithium entity.data_tracker.use_arrays implementation starts
++                int id = key.getId();
++
++                // The vanilla implementation will simply return null if the tracker doesn't contain the specified entry. However,
++                // accessing an array with an invalid pointer will throw a OOB exception, where-as a HashMap would simply
++                // return null. We check this case (which should be free, even if so insignificant, as the subsequent bounds
++                // check will hopefully be eliminated)
++                if (id < 0 || id >= array.length)
++                {
++                    dataentry = null;
++                }
++                else
++                {
++                    // This cast can fail if trying to access a entry which doesn't belong to this tracker, as the ID could
++                    // instead point to an entry of a different type. However, that is also vanilla behaviour.
++                    // noinspection unchecked
++                    dataentry = (EntityDataManager.DataEntry<T>) array[id];
++                }
 +            }
 +            // Lithium entity.data_tracker.use_arrays implementation ends
++            else
++            {
++                // vanilla
++                dataentry = (EntityDataManager.DataEntry<T>)this.entries.get(key.getId());
++            }
          }
          catch (Throwable throwable)
          {
