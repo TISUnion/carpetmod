@@ -3,7 +3,7 @@
 @@ -1,20 +1,32 @@
  package net.minecraft.world;
  
-+import carpet.helpers.ThrowableSuppression;
++import carpet.helpers.UpdateSuppressionException;
 +import carpet.helpers.TickSpeed;
 +import carpet.microtiming.MicroTimingLoggerManager;
 +import carpet.microtiming.enums.EventType;
@@ -186,8 +186,8 @@
              {
                  iblockstate.neighborChanged(this, pos, blockIn, fromPos);
              }
-+            catch (ThrowableSuppression | StackOverflowError e) {
-+                throw new ThrowableSuppression("Update Suppression");
++            catch (UpdateSuppressionException | StackOverflowError e) {
++                throw new UpdateSuppressionException("Update Suppression");
 +            }
              catch (Throwable throwable)
              {

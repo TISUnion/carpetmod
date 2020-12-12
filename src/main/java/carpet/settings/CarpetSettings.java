@@ -415,9 +415,6 @@ public class CarpetSettings
     )
     public static boolean optimizedHardHitBoxEntityCollision = false;
 
-    @Rule(desc = "Fixes updates suppression causing server crashes.", category = BUGFIX)
-    public static boolean updateSuppressionCrashFix;
-
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$
     //   | $$     | $$  | $$  \__/| $$  \__/| $$$$  /$$$$
@@ -864,4 +861,7 @@ public class CarpetSettings
             category = YEET
     )
     public static boolean yeetVillagerAi = false;
+
+    @Rule(desc = "Fixes updates suppression causing server crashes.", category = YEET)
+    public static boolean yeetUpdateSuppressionCrash;
 }
