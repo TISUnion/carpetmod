@@ -1,20 +1,22 @@
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1,5 +1,13 @@
+@@ -1,5 +1,15 @@
  package net.minecraft.server;
  
 +import carpet.CarpetServer;
 +import carpet.commands.EpsCommand;
++import carpet.helpers.ThrowableSuppression;
 +import carpet.helpers.TickSpeed;
 +import carpet.microtiming.MicroTimingLoggerManager;
 +import carpet.microtiming.enums.TickStage;
 +import carpet.microtiming.tickstages.LiteralTickStageExtra;
 +import carpet.settings.CarpetSettings;
 +import carpet.utils.CarpetProfiler;
++import carpet.utils.Messenger;
  import com.google.common.base.Stopwatch;
  import com.google.common.collect.Lists;
  import com.google.common.collect.Maps;
-@@ -178,6 +186,7 @@
+@@ -178,6 +188,7 @@
      public final Queue < FutureTask<? >> futureTaskQueue = Queues.newConcurrentLinkedQueue();
      private Thread serverThread;
      private long serverTime = Util.milliTime();
@@ -22,7 +24,7 @@
      @OnlyIn(Dist.CLIENT)
      private boolean worldIconSet;
      private final IReloadableResourceManager resourceManager = new SimpleReloadableResourceManager(ResourcePackType.SERVER_DATA);
-@@ -212,6 +221,8 @@
+@@ -212,6 +223,8 @@
          this.resourceManager.addReloadListener(this.lootTableManager);
          this.resourceManager.addReloadListener(this.functionManager);
          this.resourceManager.addReloadListener(this.advancementManager);
@@ -31,7 +33,7 @@
      }
  
      public abstract boolean init() throws IOException;
-@@ -571,6 +582,7 @@
+@@ -571,6 +584,7 @@
      public void stopServer()
      {
          LOGGER.info("Stopping server");
@@ -39,7 +41,7 @@
  
          if (this.getNetworkSystem() != null)
          {
-@@ -642,31 +654,53 @@
+@@ -642,31 +656,53 @@
              if (this.init())
              {
                  this.serverTime = Util.milliTime();
@@ -111,7 +113,7 @@
                  }
              }
              else
-@@ -782,6 +816,12 @@
+@@ -782,6 +818,12 @@
      {
          long i = Util.nanoTime();
          ++this.tickCounter;
@@ -124,7 +126,7 @@
  
          if (this.startProfiling)
          {
-@@ -790,6 +830,9 @@
+@@ -790,6 +832,9 @@
          }
  
          this.profiler.startSection("root");
@@ -134,7 +136,7 @@
          this.updateTimeLightAndEntities(hasTimeLeft);
  
          if (i - this.nanoTimeSinceStatusRefresh >= 5000000000L)
-@@ -810,10 +853,16 @@
+@@ -810,10 +855,16 @@
  
          if (this.tickCounter % 900 == 0)
          {
@@ -151,7 +153,7 @@
          }
  
          this.profiler.startSection("snooper");
-@@ -829,16 +878,25 @@
+@@ -829,16 +880,25 @@
          }
  
          this.profiler.endSection();
@@ -177,7 +179,7 @@
          FutureTask<?> futuretask;
  
          while ((futuretask = this.futureTaskQueue.poll()) != null)
-@@ -847,6 +905,7 @@
+@@ -847,6 +907,7 @@
          }
  
          this.profiler.endStartSection("commandFunctions");
@@ -185,7 +187,54 @@
          this.getFunctionManager().tick();
          this.profiler.endStartSection("levels");
  
-@@ -905,10 +964,13 @@
+@@ -870,26 +931,44 @@
+ 
+                 this.profiler.startSection("tick");
+ 
++                // Update suppression fix
+                 try
+                 {
+                     worldserver.tick(hasTimeLeft);
+                 }
++                catch (ThrowableSuppression e) {
++                    Messenger.print_server_message(this, "You just caused a server crash in world tick");
++                }
+                 catch (Throwable throwable1)
+                 {
+                     CrashReport crashreport = CrashReport.makeCrashReport(throwable1, "Exception ticking world");
+                     worldserver.fillCrashReport(crashreport);
+-                    throw new ReportedException(crashreport);
++                    if (!CarpetSettings.updateSuppressionCrashFix || !(crashreport.getCrashCause() instanceof ThrowableSuppression)) {
++                        throw new ReportedException(crashreport);
++                    }
++                    else {
++                        Messenger.print_server_message(this, "You just caused a server crash in world tick");
++                    }
+                 }
+ 
++                // Update suppression fix
+                 try
+                 {
+                     worldserver.tickEntities();
+                 }
++                catch (ThrowableSuppression e) {
++                    Messenger.print_server_message(this, "You just caused a server crash in update entities.");
++                }
+                 catch (Throwable throwable)
+                 {
+                     CrashReport crashreport1 = CrashReport.makeCrashReport(throwable, "Exception ticking world entities");
+                     worldserver.fillCrashReport(crashreport1);
+-                    throw new ReportedException(crashreport1);
++                    if (!CarpetSettings.updateSuppressionCrashFix || !(crashreport1.getCrashCause() instanceof ThrowableSuppression)) {
++                        throw new ReportedException(crashreport1);
++                    }
++                    else {
++                        Messenger.print_server_message(this, "You just caused a server crash in update entities.");
++                    }
+                 }
+ 
+                 this.profiler.endSection();
+@@ -905,10 +984,13 @@
              }))[this.tickCounter % 100] = Util.nanoTime() - i;
          }
  
@@ -199,7 +248,7 @@
          this.profiler.endStartSection("tickables");
  
          for (int j = 0; j < this.tickables.size(); ++j)
-@@ -1142,7 +1204,8 @@
+@@ -1142,7 +1224,8 @@
  
      public String getServerModName()
      {
@@ -209,7 +258,7 @@
      }
  
      public CrashReport addServerInfoToCrashReport(CrashReport report)
-@@ -1605,6 +1668,12 @@
+@@ -1605,6 +1688,12 @@
      {
          return this.serverTime;
      }
@@ -222,7 +271,7 @@
  
      public Thread getServerThread()
      {
-@@ -1825,4 +1894,12 @@
+@@ -1825,4 +1914,12 @@
              return 0;
          }
      }

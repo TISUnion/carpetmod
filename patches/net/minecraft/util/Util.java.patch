@@ -1,0 +1,21 @@
+--- a/net/minecraft/util/Util.java
++++ b/net/minecraft/util/Util.java
+@@ -1,5 +1,7 @@
+ package net.minecraft.util;
+ 
++import carpet.helpers.ThrowableSuppression;
++import carpet.settings.CarpetSettings;
+ import com.google.common.collect.Iterators;
+ import it.unimi.dsi.fastutil.Hash.Strategy;
+ import java.io.File;
+@@ -158,7 +160,9 @@
+         }
+         catch (ExecutionException executionexception)
+         {
+-            logger.fatal("Error executing task", (Throwable)executionexception);
++            if(!CarpetSettings.updateSuppressionCrashFix || !(executionexception.getCause() instanceof ThrowableSuppression)) {
++                logger.fatal("Error executing task", (Throwable)executionexception);
++            }
+         }
+         catch (InterruptedException interruptedexception)
+         {

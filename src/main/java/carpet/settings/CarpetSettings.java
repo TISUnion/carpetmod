@@ -415,6 +415,9 @@ public class CarpetSettings
     )
     public static boolean optimizedHardHitBoxEntityCollision = false;
 
+    @Rule(desc = "Fixes updates suppression causing server crashes.", category = BUGFIX)
+    public static boolean updateSuppressionCrashFix;
+
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$
     //   | $$     | $$  | $$  \__/| $$  \__/| $$$$  /$$$$
