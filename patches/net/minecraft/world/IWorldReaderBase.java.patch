@@ -1,15 +1,87 @@
 --- a/net/minecraft/world/IWorldReaderBase.java
 +++ b/net/minecraft/world/IWorldReaderBase.java
-@@ -6,6 +6,8 @@
+@@ -6,6 +6,9 @@
  import java.util.stream.Stream;
  import java.util.stream.StreamSupport;
  import javax.annotation.Nullable;
 +
 +import carpet.settings.CarpetSettings;
++import me.jellysquid.mods.lithium.common.shapes.VoxelShapeCaster;
  import net.minecraft.block.state.IBlockState;
  import net.minecraft.entity.Entity;
  import net.minecraft.entity.player.EntityPlayer;
-@@ -253,7 +255,9 @@
+@@ -129,7 +132,8 @@
+         return this.checkNoEntityCollision(entityIn, VoxelShapes.create(aabb));
+     }
+ 
+-default Stream<VoxelShape> getCollisionBoxes(VoxelShape area, VoxelShape entityShape, boolean isEntityInsideWorldBorder)
++    // Lithium shapes.specialized_shapes added entityAABB parameter for lithium VoxelShapeCaster boosting
++default Stream<VoxelShape> getCollisionBoxes(VoxelShape area, VoxelShape entityShape, boolean isEntityInsideWorldBorder, @Nullable AxisAlignedBB entityAABB)
+     {
+         int i = MathHelper.floor(area.getStart(EnumFacing.Axis.X)) - 1;
+         int j = MathHelper.ceil(area.getEnd(EnumFacing.Axis.X)) + 1;
+@@ -168,8 +172,20 @@
+ 
+                 VoxelShape voxelshape1 = entityShape.withOffset((double)(-k1), (double)(-l1), (double)(-i2));
+ 
+-                if (VoxelShapes.compare(voxelshape1, voxelshape, IBooleanFunction.AND))
++                // Lithium shapes.specialized_shapes
++                boolean flagCompare;
++                if (entityAABB != null && voxelshape instanceof VoxelShapeCaster)
+                 {
++                    flagCompare = ((VoxelShapeCaster) voxelshape).intersects(entityAABB, k1, l1, i2);
++//                    assert flagCompare == VoxelShapes.compare(voxelshape1, voxelshape, IBooleanFunction.AND);
++                }
++                else
++                {
++                    flagCompare = VoxelShapes.compare(voxelshape1, voxelshape, IBooleanFunction.AND);
++                }
++
++                if (flagCompare)
++                {
+                     return VoxelShapes.empty();
+                 }
+                 else if (voxelshape == VoxelShapes.fullCube())
+@@ -204,7 +220,7 @@
+         VoxelShape voxelshape = VoxelShapes.create(entityBB);
+         VoxelShape voxelshape1 = VoxelShapes.create(entityBB.offset(dx > 0.0D ? -1.0E-7D : 1.0E-7D, dy > 0.0D ? -1.0E-7D : 1.0E-7D, dz > 0.0D ? -1.0E-7D : 1.0E-7D));
+         VoxelShape voxelshape2 = VoxelShapes.combine(VoxelShapes.create(entityBB.expand(dx, dy, dz).grow(1.0E-7D)), voxelshape1, IBooleanFunction.ONLY_FIRST);
+-        return this.getCollisionBoxes(entityIn, voxelshape2, voxelshape, entitiesToIgnore);
++        return this.getCollisionBoxes(entityIn, voxelshape2, voxelshape, entitiesToIgnore, entityBB);
+     }
+ 
+ default Stream<VoxelShape> getCollisionBoxes(@Nullable Entity movingEntity, AxisAlignedBB area)
+@@ -212,7 +228,8 @@
+         return this.getCollisionBoxes(movingEntity, VoxelShapes.create(area), VoxelShapes.empty(), Collections.emptySet());
+     }
+ 
+-default Stream<VoxelShape> getCollisionBoxes(@Nullable Entity movingEntity, VoxelShape area, VoxelShape entityShape, Set<Entity> entitiesToIgnore)
++    // Lithium shapes.specialized_shapes added entityAABB parameter
++default Stream<VoxelShape> getCollisionBoxes(@Nullable Entity movingEntity, VoxelShape area, VoxelShape entityShape, Set<Entity> entitiesToIgnore, @Nullable AxisAlignedBB entityAABB)
+     {
+         boolean flag = movingEntity != null && movingEntity.isOutsideBorder();
+         boolean flag1 = movingEntity != null && this.isInsideWorldBorder(movingEntity);
+@@ -222,11 +239,17 @@
+             movingEntity.setOutsideBorder(!flag1);
+         }
+ 
+-        return this.getCollisionBoxes(area, entityShape, flag1);
++        return this.getCollisionBoxes(area, entityShape, flag1, entityAABB);
+     }
+ 
+-default boolean isInsideWorldBorder(Entity entityToCheck)
++    // Lithium shapes.specialized_shapes preserves vanilla interface
++default Stream<VoxelShape> getCollisionBoxes(@Nullable Entity movingEntity, VoxelShape area, VoxelShape entityShape, Set<Entity> entitiesToIgnore)
+     {
++        return this.getCollisionBoxes(movingEntity, area, entityShape, entitiesToIgnore, null);
++    }
++
++    default boolean isInsideWorldBorder(Entity entityToCheck)
++    {
+         WorldBorder worldborder = this.getWorldBorder();
+         double d0 = worldborder.minX();
+         double d1 = worldborder.minZ();
+@@ -253,7 +276,9 @@
  
  default boolean isCollisionBoxesEmpty(@Nullable Entity entityIn, AxisAlignedBB aabb, Set<Entity> entitiesToIgnore)
      {
@@ -20,7 +92,7 @@
      }
  
  default boolean isCollisionBoxesEmpty(@Nullable Entity entityIn, AxisAlignedBB aabb)
-@@ -417,4 +421,227 @@
+@@ -417,4 +442,227 @@
      }
  
      Dimension getDimension();

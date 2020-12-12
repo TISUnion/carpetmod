@@ -459,7 +459,16 @@
          if (!this.isAreaLoaded(pos, 17, false))
          {
              return false;
-@@ -2290,9 +2433,8 @@
+@@ -2284,15 +2427,15 @@
+         }
+     }
+ 
+-    public Stream<VoxelShape> getCollisionBoxes(@Nullable Entity movingEntity, VoxelShape area, VoxelShape entityShape, Set<Entity> entitiesToIgnore)
++    // Lithium shapes.specialized_shapes added entityAABB parameter
++    public Stream<VoxelShape> getCollisionBoxes(@Nullable Entity movingEntity, VoxelShape area, VoxelShape entityShape, Set<Entity> entitiesToIgnore, AxisAlignedBB entityAABB)
+     {
+-        Stream<VoxelShape> stream = IWorld.super.getCollisionBoxes(movingEntity, area, entityShape, entitiesToIgnore);
++        Stream<VoxelShape> stream = IWorld.super.getCollisionBoxes(movingEntity, area, entityShape, entitiesToIgnore, entityAABB);
          return movingEntity == null ? stream : Stream.concat(stream, this.getCollisionBoxes(movingEntity, area, entitiesToIgnore));
      }
  
@@ -470,7 +479,7 @@
          int i = MathHelper.floor((boundingBox.minX - 2.0D) / 16.0D);
          int j = MathHelper.floor((boundingBox.maxX + 2.0D) / 16.0D);
          int k = MathHelper.floor((boundingBox.minZ - 2.0D) / 16.0D);
-@@ -2304,14 +2446,33 @@
+@@ -2304,14 +2447,33 @@
              {
                  if (this.isChunkLoaded(i1, j1, true))
                  {
@@ -505,7 +514,7 @@
      public <T extends Entity> List<T> getEntities(Class <? extends T > entityType, Predicate <? super T > filter)
      {
          List<T> list = Lists.newArrayList();
-@@ -3204,4 +3365,17 @@
+@@ -3204,4 +3366,17 @@
      public abstract RecipeManager getRecipeManager();
  
      public abstract NetworkTagManager getTags();
