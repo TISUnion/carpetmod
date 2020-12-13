@@ -187,7 +187,7 @@
          this.getFunctionManager().tick();
          this.profiler.endStartSection("levels");
  
-@@ -870,26 +931,48 @@
+@@ -870,6 +931,7 @@
  
                  this.profiler.startSection("tick");
  
@@ -195,22 +195,16 @@
                  try
                  {
                      worldserver.tick(hasTimeLeft);
-                 }
-+                catch (UpdateSuppressionException e) {
-+                    if (CarpetSettings.yeetUpdateSuppressionCrash) {
-+                        Messenger.print_server_message(this, "You just caused a server crash in world tick");
-+                    }
-+                }
-                 catch (Throwable throwable1)
+@@ -878,9 +940,15 @@
                  {
                      CrashReport crashreport = CrashReport.makeCrashReport(throwable1, "Exception ticking world");
                      worldserver.fillCrashReport(crashreport);
 -                    throw new ReportedException(crashreport);
-+                    if (!CarpetSettings.yeetUpdateSuppressionCrash || !(crashreport.getCrashCause() instanceof UpdateSuppressionException)) {
-+                        throw new ReportedException(crashreport);
++                    if (CarpetSettings.yeetUpdateSuppressionCrash && crashreport.getCrashCause() instanceof UpdateSuppressionException) {
++                        Messenger.print_server_message(this, "You just caused a server crash in world tick: " + crashreport.getCrashCause());
 +                    }
 +                    else {
-+                        Messenger.print_server_message(this, "You just caused a server crash in world tick");
++                        throw new ReportedException(crashreport);
 +                    }
                  }
  
@@ -218,27 +212,21 @@
                  try
                  {
                      worldserver.tickEntities();
-                 }
-+                catch (UpdateSuppressionException e) {
-+                    if (CarpetSettings.yeetUpdateSuppressionCrash) {
-+                        Messenger.print_server_message(this, "You just caused a server crash in update entities.");
-+                    }
-+                }
-                 catch (Throwable throwable)
+@@ -889,7 +957,12 @@
                  {
                      CrashReport crashreport1 = CrashReport.makeCrashReport(throwable, "Exception ticking world entities");
                      worldserver.fillCrashReport(crashreport1);
 -                    throw new ReportedException(crashreport1);
-+                    if (!CarpetSettings.yeetUpdateSuppressionCrash || !(crashreport1.getCrashCause() instanceof UpdateSuppressionException)) {
-+                        throw new ReportedException(crashreport1);
++                    if (CarpetSettings.yeetUpdateSuppressionCrash && crashreport1.getCrashCause() instanceof UpdateSuppressionException) {
++                        Messenger.print_server_message(this, "You just caused a server crash in update entities: " + crashreport1.getCrashCause());
 +                    }
 +                    else {
-+                        Messenger.print_server_message(this, "You just caused a server crash in update entities.");
++                        throw new ReportedException(crashreport1);
 +                    }
                  }
  
                  this.profiler.endSection();
-@@ -905,10 +988,13 @@
+@@ -905,10 +978,13 @@
              }))[this.tickCounter % 100] = Util.nanoTime() - i;
          }
  
@@ -252,7 +240,7 @@
          this.profiler.endStartSection("tickables");
  
          for (int j = 0; j < this.tickables.size(); ++j)
-@@ -1142,7 +1228,8 @@
+@@ -1142,7 +1218,8 @@
  
      public String getServerModName()
      {
@@ -262,7 +250,7 @@
      }
  
      public CrashReport addServerInfoToCrashReport(CrashReport report)
-@@ -1605,6 +1692,12 @@
+@@ -1605,6 +1682,12 @@
      {
          return this.serverTime;
      }
@@ -275,7 +263,7 @@
  
      public Thread getServerThread()
      {
-@@ -1825,4 +1918,12 @@
+@@ -1825,4 +1908,12 @@
              return 0;
          }
      }

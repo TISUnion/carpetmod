@@ -441,6 +441,18 @@ Options: `false`, `true`
 
 Categories: yeet
 
+### yeetUpdateSuppressionCrash
+
+yeet updates suppression causing server crashes
+
+**WARNING**: Unknown game behaviors might occur after updates suppression, better restart the server or restore a backup for safety
+
+Default: `false`
+
+Options: `false`, `true`
+
+Categories: yeet
+
 ------
 
 # Loggers

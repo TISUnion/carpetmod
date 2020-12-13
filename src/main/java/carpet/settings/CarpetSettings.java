@@ -862,6 +862,10 @@ public class CarpetSettings
     )
     public static boolean yeetVillagerAi = false;
 
-    @Rule(desc = "Fixes updates suppression causing server crashes.", category = YEET)
+    @Rule(
+            desc = "yeet updates suppression causing server crashes",
+            extra = "WARNING: Unknown game behaviors might occur after updates suppression, better restart the server or restore a backup for safety",
+            category = YEET
+    )
     public static boolean yeetUpdateSuppressionCrash;
 }
