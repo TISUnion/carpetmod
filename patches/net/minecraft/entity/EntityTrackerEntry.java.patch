@@ -1,22 +1,23 @@
 --- a/net/minecraft/entity/EntityTrackerEntry.java
 +++ b/net/minecraft/entity/EntityTrackerEntry.java
-@@ -5,6 +5,8 @@
+@@ -5,6 +5,9 @@
  import java.util.Collections;
  import java.util.List;
  import java.util.Set;
 +
 +import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
++import me.jellysquid.mods.lithium.LithiumConfig;
  import net.minecraft.block.Block;
  import net.minecraft.entity.ai.attributes.AttributeMap;
  import net.minecraft.entity.ai.attributes.IAttributeInstance;
-@@ -94,8 +96,10 @@
+@@ -94,8 +97,10 @@
      private boolean ridingEntity;
      private boolean onGround;
      public boolean playerEntitiesUpdated;
 -    private final Set<EntityPlayerMP> trackingPlayers = Sets.newHashSet();
  
 +    // Lithium alloc.entity_tracker
-+    private final Set<EntityPlayerMP> trackingPlayers = new ObjectOpenHashSet<>(Sets.newHashSet());
++    private final Set<EntityPlayerMP> trackingPlayers = LithiumConfig.ALLOC_ENTITY_TRACKER ? new ObjectOpenHashSet<>() : Sets.newHashSet();
 +
      public EntityTrackerEntry(Entity entityIn, int rangeIn, int maxRangeIn, int updateInterval, boolean sendVelocityUpdatesIn)
      {

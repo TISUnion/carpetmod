@@ -622,10 +622,13 @@ Ports and enable part of implementations of [Lithium mod](https://github.com/jel
 - math.fast_util
 - shapes.precompute_shape_arrays
 - shapes.shape_merging
+- shapes.specialized_shapes
 - tag
 - world.block_entity_ticking
 - world.explosions
 - world.tick_scheduler
+
+If necessary, part of the lithium port implementation can be switched manually in the `LithiumConfig` class
 
 ## Custom Optimizations
 

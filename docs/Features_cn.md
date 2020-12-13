@@ -622,10 +622,13 @@ TISCM 中包含着一些对游戏的优化。这些优化都不太适合做成�
 - math.fast_util
 - shapes.precompute_shape_arrays
 - shapes.shape_merging
+- shapes.specialized_shapes
 - tag
 - world.block_entity_ticking
 - world.explosions
 - world.tick_scheduler
+
+如果需要，部分 Lithium 移植的实现可在 `LithiumConfig` 类中手动开关
 
 ## 定制的优化
 

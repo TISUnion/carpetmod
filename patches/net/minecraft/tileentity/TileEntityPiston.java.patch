@@ -1,6 +1,6 @@
 --- a/net/minecraft/tileentity/TileEntityPiston.java
 +++ b/net/minecraft/tileentity/TileEntityPiston.java
-@@ -1,9 +1,16 @@
+@@ -1,9 +1,17 @@
  package net.minecraft.tileentity;
  
 +import java.util.Arrays;
@@ -10,6 +10,7 @@
 +
 +import carpet.helpers.CreativeNoClipHelper;
 +import carpet.settings.CarpetSettings;
++import me.jellysquid.mods.lithium.LithiumConfig;
  import net.minecraft.block.Block;
  import net.minecraft.block.BlockPistonBase;
  import net.minecraft.block.BlockPistonExtension;
@@ -17,7 +18,7 @@
  import net.minecraft.block.material.EnumPushReaction;
  import net.minecraft.block.state.IBlockState;
  import net.minecraft.entity.Entity;
-@@ -29,6 +36,8 @@
+@@ -29,6 +37,8 @@
      private EnumFacing pistonFacing;
      private boolean extending;
      private boolean shouldHeadBeRendered;
@@ -26,7 +27,7 @@
      private static final ThreadLocal<EnumFacing> MOVING_ENTITY = new ThreadLocal<EnumFacing>()
      {
          protected EnumFacing initialValue()
-@@ -40,6 +49,19 @@
+@@ -40,6 +50,19 @@
      private float lastProgress;
      private long lastTicked;
  
@@ -46,7 +47,7 @@
      public TileEntityPiston()
      {
          super(TileEntityType.PISTON);
-@@ -52,8 +74,103 @@
+@@ -52,8 +75,103 @@
          this.pistonFacing = pistonFacingIn;
          this.extending = extendingIn;
          this.shouldHeadBeRendered = shouldHeadBeRenderedIn;
@@ -150,7 +151,7 @@
      public NBTTagCompound getUpdateTag()
      {
          return this.write(new NBTTagCompound());
-@@ -112,15 +229,28 @@
+@@ -112,15 +230,28 @@
          return !this.isExtending() && this.shouldPistonHeadBeRendered() ? Blocks.PISTON_HEAD.getDefaultState().with(BlockPistonExtension.TYPE, this.pistonState.getBlock() == Blocks.STICKY_PISTON ? PistonType.STICKY : PistonType.DEFAULT).with(BlockPistonExtension.FACING, this.pistonState.get(BlockPistonBase.FACING)) : this.pistonState;
      }
  
@@ -182,7 +183,7 @@
              AxisAlignedBB axisalignedbb = this.moveByPositionAndProgress(this.getMinMaxPiecesAABB(list));
              List<Entity> list1 = this.world.getEntitiesWithinAABBExcludingEntity((Entity)null, this.getMovementArea(axisalignedbb, enumfacing, d0).union(axisalignedbb));
  
-@@ -134,7 +264,7 @@
+@@ -134,7 +265,7 @@
  
                      if (entity.getPushReaction() != EnumPushReaction.IGNORE)
                      {
@@ -191,7 +192,7 @@
                          {
                              switch (enumfacing.getAxis())
                              {
-@@ -170,14 +300,25 @@
+@@ -170,14 +301,25 @@
                          if (!(d1 <= 0.0D))
                          {
                              d1 = Math.min(d1, d0) + 0.01D;
@@ -220,7 +221,7 @@
                          }
                      }
                  }
-@@ -270,9 +411,12 @@
+@@ -270,9 +412,12 @@
              if (Math.abs(d0 - d1) < 0.01D)
              {
                  d0 = Math.min(d0, p_190605_3_) + 0.01D;
@@ -236,7 +237,7 @@
              }
          }
      }
-@@ -319,9 +463,38 @@
+@@ -319,9 +464,38 @@
                      iblockstate = Block.getValidBlockForPosition(this.pistonState, this.world, this.pos);
                  }
  
@@ -277,7 +278,7 @@
          }
      }
  
-@@ -351,8 +524,15 @@
+@@ -351,8 +525,15 @@
                          iblockstate = iblockstate.with(BlockStateProperties.WATERLOGGED, Boolean.valueOf(false));
                      }
  
@@ -295,7 +296,7 @@
                  }
              }
          }
-@@ -378,6 +558,18 @@
+@@ -378,6 +559,18 @@
          this.lastProgress = this.progress;
          this.extending = compound.getBoolean("extending");
          this.shouldHeadBeRendered = compound.getBoolean("source");
@@ -314,7 +315,7 @@
      }
  
      public NBTTagCompound write(NBTTagCompound compound)
-@@ -388,12 +580,19 @@
+@@ -388,12 +581,19 @@
          compound.putFloat("progress", this.lastProgress);
          compound.putBoolean("extending", this.extending);
          compound.putBoolean("source", this.shouldHeadBeRendered);
@@ -335,25 +336,32 @@
  
          if (!this.extending && this.shouldHeadBeRendered)
          {
-@@ -424,6 +623,25 @@
+@@ -424,6 +624,32 @@
              }
  
              float f = this.getExtendedProgress(this.progress);
 +
 +            // lithium block.moving_block_shapes
-+            if (this.extending || !this.shouldHeadBeRendered) {
-+                //here voxelshape.isEmpty() is guaranteed, vanilla code would call union() which calls simplify()
-+                VoxelShape blockShape = iblockstate.getCollisionShape(world, pos);
++            if (LithiumConfig.BLOCK_MOVING_BLOCK_SHAPES)
++            {
++                if (this.extending || !this.shouldHeadBeRendered)
++                {
++                    //here voxelshape.isEmpty() is guaranteed, vanilla code would call union() which calls simplify()
++                    VoxelShape blockShape = iblockstate.getCollisionShape(world, pos);
 +
-+                //we cache the simplified shapes, as the simplify() method costs a lot of CPU time and allocates several objects
-+                VoxelShape offsetAndSimplified = getOffsetAndSimplified(iblockstate, blockShape, Math.abs(f), f < 0f ? this.pistonFacing.getOpposite() : this.pistonFacing);
-+                return offsetAndSimplified;
-+            } else {
-+                //retracting piston heads have to act like their base as well, as the base block is replaced with the moving block
-+                //f >= 0f is guaranteed (assuming no other mod interferes)
-+                int index = getIndexForMergedShape(f, this.pistonFacing);
-+                if (index != -1) {
-+                    return PISTON_BASE_WITH_MOVING_HEAD_SHAPES[index];
++                    //we cache the simplified shapes, as the simplify() method costs a lot of CPU time and allocates several objects
++                    VoxelShape offsetAndSimplified = getOffsetAndSimplified(iblockstate, blockShape, Math.abs(f), f < 0f ? this.pistonFacing.getOpposite() : this.pistonFacing);
++                    return offsetAndSimplified;
++                }
++                else
++                {
++                    //retracting piston heads have to act like their base as well, as the base block is replaced with the moving block
++                    //f >= 0f is guaranteed (assuming no other mod interferes)
++                    int index = getIndexForMergedShape(f, this.pistonFacing);
++                    if (index != -1)
++                    {
++                        return PISTON_BASE_WITH_MOVING_HEAD_SHAPES[index];
++                    }
 +                }
 +            }
 +            // lithium block.moving_block_shapes ends
@@ -361,7 +369,7 @@
              double d0 = (double)((float)this.pistonFacing.getXOffset() * f);
              double d1 = (double)((float)this.pistonFacing.getYOffset() * f);
              double d2 = (double)((float)this.pistonFacing.getZOffset() * f);
-@@ -435,4 +653,37 @@
+@@ -435,4 +661,37 @@
      {
          return this.lastTicked;
      }
