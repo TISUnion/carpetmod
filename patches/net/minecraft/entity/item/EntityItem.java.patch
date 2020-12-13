@@ -1,18 +1,19 @@
 --- a/net/minecraft/entity/item/EntityItem.java
 +++ b/net/minecraft/entity/item/EntityItem.java
-@@ -2,6 +2,11 @@
+@@ -2,6 +2,12 @@
  
  import java.util.UUID;
  import javax.annotation.Nullable;
 +
 +import carpet.commands.lifetime.removal.LiteralRemovalReason;
++import carpet.commands.lifetime.removal.MobPickupRemovalReason;
 +import carpet.helpers.InventoryHelper;
 +import carpet.settings.CarpetSettings;
 +import net.minecraft.block.BlockShulkerBox;
  import net.minecraft.entity.Entity;
  import net.minecraft.entity.EntityType;
  import net.minecraft.entity.MoverType;
-@@ -9,6 +14,7 @@
+@@ -9,6 +15,7 @@
  import net.minecraft.init.Items;
  import net.minecraft.init.SoundEvents;
  import net.minecraft.item.Item;
@@ -20,7 +21,7 @@
  import net.minecraft.item.ItemStack;
  import net.minecraft.nbt.NBTTagCompound;
  import net.minecraft.nbt.NBTUtil;
-@@ -37,6 +43,12 @@
+@@ -37,6 +44,12 @@
      private UUID owner;
      public float hoverStart = (float)(Math.random() * Math.PI * 2.0D);
  
@@ -33,7 +34,7 @@
      public EntityItem(World worldIn)
      {
          super(EntityType.ITEM, worldIn);
-@@ -57,6 +69,15 @@
+@@ -57,6 +70,15 @@
      {
          this(worldIn, x, y, z);
          this.setItem(stack);
@@ -49,7 +50,7 @@
      }
  
      protected boolean canTriggerWalking()
-@@ -166,6 +187,7 @@
+@@ -166,6 +188,7 @@
  
              if (!this.world.isRemote && this.age >= 6000)
              {
@@ -57,7 +58,7 @@
                  this.remove();
              }
          }
-@@ -205,8 +227,12 @@
+@@ -205,8 +228,12 @@
              {
                  if (this.age != -32768 && other.age != -32768)
                  {
@@ -71,7 +72,7 @@
                          return false;
                      }
                      else if (itemstack1.hasTag() ^ itemstack.hasTag())
-@@ -229,12 +255,17 @@
+@@ -229,12 +256,17 @@
                      {
                          return false;
                      }
@@ -89,7 +90,7 @@
                          this.remove();
                          return true;
                      }
-@@ -282,6 +313,7 @@
+@@ -282,6 +314,7 @@
  
              if (this.health <= 0)
              {
@@ -97,15 +98,15 @@
                  this.remove();
              }
  
-@@ -354,6 +386,7 @@
+@@ -354,6 +387,7 @@
  
                  if (itemstack.isEmpty())
                  {
-+                    this.recordRemoval(LiteralRemovalReason.PICKUP);  // TISCM lifetime tracker
++                    this.recordRemoval(new MobPickupRemovalReason(entityIn.getType()));  // TISCM lifetime tracker
                      this.remove();
                      itemstack.setCount(i);
                  }
-@@ -460,4 +493,44 @@
+@@ -460,4 +494,44 @@
          this.setInfinitePickupDelay();
          this.age = 5999;
      }

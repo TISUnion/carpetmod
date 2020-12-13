@@ -1,9 +1,10 @@
 --- a/net/minecraft/entity/EntityLiving.java
 +++ b/net/minecraft/entity/EntityLiving.java
-@@ -1,7 +1,12 @@
+@@ -1,7 +1,13 @@
  package net.minecraft.entity;
  
 +import carpet.commands.lifetime.removal.LiteralRemovalReason;
++import carpet.commands.lifetime.removal.MobPickupRemovalReason;
 +import carpet.logging.logHelpers.DamageReporter;
 +import carpet.settings.CarpetSettings;
  import com.google.common.collect.Maps;
@@ -13,7 +14,7 @@
  import java.util.Map;
  import java.util.Random;
  import java.util.UUID;
-@@ -9,6 +14,7 @@
+@@ -9,6 +15,7 @@
  import net.minecraft.block.BlockAbstractSkull;
  import net.minecraft.block.state.IBlockState;
  import net.minecraft.enchantment.EnchantmentHelper;
@@ -21,7 +22,7 @@
  import net.minecraft.entity.ai.EntityAITasks;
  import net.minecraft.entity.ai.EntityJumpHelper;
  import net.minecraft.entity.ai.EntityLookHelper;
-@@ -75,6 +81,9 @@
+@@ -75,6 +82,9 @@
      protected PathNavigate navigator;
      protected final EntityAITasks tasks;
      protected final EntityAITasks targetTasks;
@@ -31,7 +32,7 @@
      private EntityLivingBase attackTarget;
      private final EntitySenses senses;
      private final NonNullList<ItemStack> inventoryHands = NonNullList.withSize(2, ItemStack.EMPTY);
-@@ -90,6 +99,9 @@
+@@ -90,6 +100,9 @@
      private Entity leashHolder;
      private NBTTagCompound leashNBTTag;
  
@@ -41,7 +42,7 @@
      protected EntityLiving(EntityType<?> type, World worldIn)
      {
          super(type, worldIn);
-@@ -110,6 +122,13 @@
+@@ -110,6 +123,13 @@
          }
      }
  
@@ -55,7 +56,7 @@
      protected void initEntityAI()
      {
      }
-@@ -423,6 +442,11 @@
+@@ -423,6 +443,11 @@
  
              compound.put("Leash", nbttagcompound2);
          }
@@ -67,17 +68,18 @@
  
          compound.putBoolean("LeftHanded", this.isLeftHanded());
  
-@@ -617,6 +641,9 @@
+@@ -617,6 +642,10 @@
                      this.inventoryArmorDropChances[entityequipmentslot.getIndex()] = 2.0F;
              }
  
 +            // TISCM lifetime tracker
 +            this.recordRemoval(LiteralRemovalReason.PERSISTENT);
++            itemEntity.recordRemoval(new MobPickupRemovalReason(this.getType()));
 +
              this.persistenceRequired = true;
              this.onItemPickup(itemEntity, itemstack.getCount());
              itemEntity.remove();
-@@ -714,11 +741,13 @@
+@@ -714,11 +743,13 @@
  
                  if (this.canDespawn() && d3 > 16384.0D)
                  {
@@ -91,7 +93,7 @@
                      this.remove();
                  }
                  else if (d3 < 1024.0D)
-@@ -912,7 +941,8 @@
+@@ -912,7 +943,8 @@
  
      protected void dropEquipment(boolean wasRecentlyHit, int lootingModifier)
      {
@@ -101,7 +103,7 @@
          {
              ItemStack itemstack = this.getItemStackFromSlot(entityequipmentslot);
              float f = this.getDropChance(entityequipmentslot);
-@@ -973,7 +1003,8 @@
+@@ -973,7 +1005,8 @@
  
              boolean flag = true;
  
@@ -111,7 +113,7 @@
              {
                  if (entityequipmentslot.getSlotType() == EntityEquipmentSlot.Type.ARMOR)
                  {
-@@ -1136,7 +1167,8 @@
+@@ -1136,7 +1169,8 @@
              this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, EnchantmentHelper.addRandomEnchantment(this.rand, this.getHeldItemMainhand(), (int)(5.0F + f * (float)this.rand.nextInt(18)), false));
          }
  
@@ -121,7 +123,7 @@
          {
              if (entityequipmentslot.getSlotType() == EntityEquipmentSlot.Type.ARMOR)
              {
-@@ -1174,6 +1206,9 @@
+@@ -1174,6 +1208,9 @@
  
      public void enablePersistence()
      {
@@ -131,7 +133,7 @@
          this.persistenceRequired = true;
      }
  
-@@ -1447,10 +1482,16 @@
+@@ -1447,10 +1484,16 @@
          float f = (float)this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getValue();
          int i = 0;
  

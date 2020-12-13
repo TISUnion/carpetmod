@@ -1,14 +1,15 @@
 --- a/net/minecraft/entity/item/EntityXPOrb.java
 +++ b/net/minecraft/entity/item/EntityXPOrb.java
-@@ -1,5 +1,7 @@
+@@ -1,5 +1,8 @@
  package net.minecraft.entity.item;
  
 +import carpet.commands.lifetime.removal.LiteralRemovalReason;
++import carpet.commands.lifetime.removal.MobPickupRemovalReason;
 +import carpet.settings.CarpetSettings;
  import net.minecraft.enchantment.EnchantmentHelper;
  import net.minecraft.entity.Entity;
  import net.minecraft.entity.EntityType;
-@@ -17,11 +19,14 @@
+@@ -17,11 +20,14 @@
  import net.minecraftforge.api.distmarker.Dist;
  import net.minecraftforge.api.distmarker.OnlyIn;
  
@@ -23,7 +24,7 @@
      private int xpOrbHealth = 5;
      private int xpValue;
      private EntityPlayer closestPlayer;
-@@ -37,8 +42,26 @@
+@@ -37,8 +43,26 @@
          this.motionY = (double)((float)(Math.random() * 0.2D) * 2.0F);
          this.motionZ = (double)((float)(Math.random() * (double)0.2F - (double)0.1F) * 2.0F);
          this.xpValue = expValue;
@@ -50,7 +51,7 @@
      public EntityXPOrb(World worldIn)
      {
          super(EntityType.EXPERIENCE_ORB, worldIn);
-@@ -103,28 +126,28 @@
+@@ -103,28 +127,28 @@
          }
  
          this.pushOutOfBlocks(this.posX, (this.getBoundingBox().minY + this.getBoundingBox().maxY) / 2.0D, this.posZ);
@@ -86,7 +87,7 @@
              double d4 = Math.sqrt(d1 * d1 + d2 * d2 + d3 * d3);
              double d5 = 1.0D - d4;
  
-@@ -138,6 +161,21 @@
+@@ -138,6 +162,21 @@
          }
  
          this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
@@ -108,7 +109,7 @@
          float f = 0.98F;
  
          if (this.onGround)
-@@ -159,6 +197,7 @@
+@@ -159,6 +198,7 @@
  
          if (this.xpOrbAge >= 6000)
          {
@@ -116,7 +117,7 @@
              this.remove();
          }
      }
-@@ -193,6 +232,7 @@
+@@ -193,6 +233,7 @@
  
              if (this.xpOrbHealth <= 0)
              {
@@ -124,7 +125,7 @@
                  this.remove();
              }
  
-@@ -218,7 +258,8 @@
+@@ -218,7 +259,8 @@
      {
          if (!this.world.isRemote)
          {
@@ -134,15 +135,15 @@
              {
                  entityIn.xpCooldown = 2;
                  entityIn.onItemPickup(this, 1);
-@@ -236,6 +277,7 @@
+@@ -236,6 +278,7 @@
                      entityIn.giveExperiencePoints(this.xpValue);
                  }
  
-+                this.recordRemoval(LiteralRemovalReason.PICKUP);  // TISCM lifetime tracker
++                this.recordRemoval(new MobPickupRemovalReason(entityIn.getType()));  // TISCM lifetime tracker
                  this.remove();
              }
          }
-@@ -251,6 +293,10 @@
+@@ -251,6 +294,10 @@
          return xp * 2;
      }
  
