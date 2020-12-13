@@ -1,0 +1,24 @@
+--- a/net/minecraft/util/Util.java
++++ b/net/minecraft/util/Util.java
+@@ -1,5 +1,7 @@
+ package net.minecraft.util;
+ 
++import carpet.helpers.UpdateSuppressionException;
++import carpet.settings.CarpetSettings;
+ import com.google.common.collect.Iterators;
+ import it.unimi.dsi.fastutil.Hash.Strategy;
+ import java.io.File;
+@@ -158,7 +160,12 @@
+         }
+         catch (ExecutionException executionexception)
+         {
+-            logger.fatal("Error executing task", (Throwable)executionexception);
++            if(!CarpetSettings.yeetUpdateSuppressionCrash || !(executionexception.getCause() instanceof UpdateSuppressionException)) {
++                logger.fatal("Error executing task", (Throwable)executionexception);
++            }
++            else {
++                logger.fatal(String.format("Error executing task: %s", executionexception.getClass().getName()));
++            }
+         }
+         catch (InterruptedException interruptedexception)
+         {

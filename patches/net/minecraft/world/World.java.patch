@@ -1,8 +1,9 @@
 --- a/net/minecraft/world/World.java
 +++ b/net/minecraft/world/World.java
-@@ -1,20 +1,31 @@
+@@ -1,20 +1,32 @@
  package net.minecraft.world;
  
++import carpet.helpers.UpdateSuppressionException;
 +import carpet.helpers.TickSpeed;
 +import carpet.microtiming.MicroTimingLoggerManager;
 +import carpet.microtiming.enums.EventType;
@@ -38,7 +39,7 @@
  import net.minecraft.block.Block;
  import net.minecraft.block.material.Material;
  import net.minecraft.block.state.IBlockState;
-@@ -82,9 +93,12 @@
+@@ -82,9 +94,12 @@
      private int seaLevel = 63;
      public final List<Entity> loadedEntityList = Lists.newArrayList();
      protected final List<Entity> unloadedEntityList = Lists.newArrayList();
@@ -54,7 +55,7 @@
      private final List<TileEntity> tileEntitiesToBeRemoved = Lists.newArrayList();
      public final List<EntityPlayer> playerEntities = Lists.newArrayList();
      public final List<Entity> weatherEffects = Lists.newArrayList();
-@@ -116,6 +130,13 @@
+@@ -116,6 +131,13 @@
      private final WorldBorder worldBorder;
      int[] lightUpdateBlockList = new int['\u8000'];
  
@@ -68,7 +69,7 @@
      protected World(ISaveHandler p_i49813_1_, @Nullable WorldSavedDataStorage p_i49813_2_, WorldInfo p_i49813_3_, Dimension p_i49813_4_, Profiler p_i49813_5_, boolean p_i49813_6_)
      {
          this.saveHandler = p_i49813_1_;
-@@ -125,6 +146,8 @@
+@@ -125,6 +147,8 @@
          this.dimension = p_i49813_4_;
          this.isRemote = p_i49813_6_;
          this.worldBorder = p_i49813_4_.createWorldBorder();
@@ -77,7 +78,7 @@
      }
  
      public Biome getBiome(BlockPos pos)
-@@ -224,8 +247,25 @@
+@@ -224,8 +248,25 @@
          }
      }
  
@@ -103,7 +104,7 @@
          if (isOutsideBuildHeight(pos))
          {
              return false;
-@@ -238,7 +278,7 @@
+@@ -238,7 +279,7 @@
          {
              Chunk chunk = this.getChunk(pos);
              Block block = newState.getBlock();
@@ -112,7 +113,7 @@
  
              if (iblockstate == null)
              {
-@@ -262,6 +302,13 @@
+@@ -262,6 +303,13 @@
                          this.markBlockRangeForRenderUpdate(pos, pos);
                      }
  
@@ -126,7 +127,7 @@
                      if ((flags & 2) != 0 && (!this.isRemote || (flags & 4) == 0) && chunk.isPopulated())
                      {
                          this.notifyBlockUpdate(pos, iblockstate, newState, flags);
-@@ -277,7 +324,9 @@
+@@ -277,7 +325,9 @@
                          }
                      }
  
@@ -137,7 +138,7 @@
                      {
                          int i = flags & -2;
                          iblockstate.updateDiagonalNeighbors(this, pos, i);
-@@ -372,19 +421,22 @@
+@@ -372,19 +422,22 @@
              this.eventListeners.get(i).markBlockRangeForRenderUpdate(x1, y1, z1, x2, y2, z2);
          }
      }
@@ -161,24 +162,37 @@
          if (skipSide != EnumFacing.WEST)
          {
              this.neighborChanged(pos.west(), blockType, pos);
-@@ -414,10 +466,15 @@
+@@ -414,18 +467,29 @@
          {
              this.neighborChanged(pos.south(), blockType, pos);
          }
--    }
- 
++
 +        MicroTimingLoggerManager.onBlockUpdate(this, pos, blockType, BlockUpdateType.BLOCK_UPDATE_EXCEPT, skipSide, EventType.ACTION_END); // TISCM Micro Timing logger
-+    }
+     }
+ 
      public void neighborChanged(BlockPos pos, Block blockIn, BlockPos fromPos)
      {
-+    	if (CarpetSettings.totallyNoBlockUpdate)
-+    	{
-+    		return;
-+    	}
++        if (CarpetSettings.totallyNoBlockUpdate)
++        {
++            return;
++        }
++
          if (!this.isRemote)
          {
              IBlockState iblockstate = this.getBlockState(pos);
-@@ -1199,13 +1256,22 @@
+ 
++            // Update suppression fix
+             try
+             {
+                 iblockstate.neighborChanged(this, pos, blockIn, fromPos);
+             }
++            catch (UpdateSuppressionException | StackOverflowError e) {
++                throw new UpdateSuppressionException("Update Suppression");
++            }
+             catch (Throwable throwable)
+             {
+                 CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Exception while updating neighbours");
+@@ -1199,13 +1263,22 @@
      {
          this.profiler.startSection("entities");
          this.profiler.startSection("global");
@@ -201,7 +215,7 @@
                  ++entity.ticksExisted;
                  entity.tick();
              }
-@@ -1233,6 +1299,7 @@
+@@ -1233,6 +1306,7 @@
          }
  
          this.profiler.endStartSection("remove");
@@ -209,7 +223,7 @@
          this.loadedEntityList.removeAll(this.unloadedEntityList);
  
          for (int k = 0; k < this.unloadedEntityList.size(); ++k)
-@@ -1253,12 +1320,14 @@
+@@ -1253,12 +1327,14 @@
          }
  
          this.unloadedEntityList.clear();
@@ -224,7 +238,7 @@
              Entity entity3 = entity2.getRidingEntity();
  
              if (entity3 != null)
-@@ -1273,8 +1342,10 @@
+@@ -1273,8 +1349,10 @@
  
              this.profiler.startSection("tick");
  
@@ -236,7 +250,7 @@
                  try
                  {
                      this.tickEntity(entity2);
-@@ -1304,11 +1375,17 @@
+@@ -1304,11 +1382,17 @@
                  this.loadedEntityList.remove(i1--);
                  this.onEntityRemoved(entity2);
              }
@@ -254,7 +268,7 @@
  
          if (!this.tileEntitiesToBeRemoved.isEmpty())
          {
-@@ -1316,19 +1393,22 @@
+@@ -1316,19 +1400,22 @@
              this.loadedTileEntityList.removeAll(this.tileEntitiesToBeRemoved);
              this.tileEntitiesToBeRemoved.clear();
          }
@@ -279,7 +293,7 @@
                  {
                      try
                      {
-@@ -1336,6 +1416,7 @@
+@@ -1336,6 +1423,7 @@
                          {
                              return String.valueOf((Object)TileEntityType.getId(tileentity.getType()));
                          });
@@ -287,7 +301,7 @@
                          ((ITickable)tileentity).tick();
                          this.profiler.endSection();
                      }
-@@ -1359,12 +1440,18 @@
+@@ -1359,12 +1447,18 @@
                      this.getChunk(tileentity.getPos()).removeTileEntity(tileentity.getPos());
                  }
              }
@@ -307,7 +321,7 @@
          {
              for (int j1 = 0; j1 < this.addedTileEntityList.size(); ++j1)
              {
-@@ -1389,11 +1476,52 @@
+@@ -1389,11 +1483,52 @@
  
              this.addedTileEntityList.clear();
          }
@@ -360,7 +374,7 @@
      protected void tickPlayers()
      {
      }
-@@ -1413,7 +1541,7 @@
+@@ -1413,7 +1548,7 @@
              IBlockState iblockstate = this.getBlockState(blockpos);
              this.notifyBlockUpdate(blockpos, iblockstate, iblockstate, 2);
          }
@@ -369,7 +383,7 @@
          return flag;
      }
  
-@@ -1514,7 +1642,8 @@
+@@ -1514,7 +1649,8 @@
                  this.getChunk(entityIn.chunkCoordX, entityIn.chunkCoordZ).removeEntityAtIndex(entityIn, entityIn.chunkCoordY);
              }
  
@@ -379,7 +393,7 @@
              {
                  entityIn.addedToChunk = false;
              }
-@@ -1834,17 +1963,21 @@
+@@ -1834,17 +1970,21 @@
      @Nullable
      private TileEntity getPendingTileEntityAt(BlockPos pos)
      {
@@ -411,7 +425,7 @@
      }
  
      public void setTileEntity(BlockPos pos, @Nullable TileEntity tileEntityIn)
-@@ -1856,19 +1989,22 @@
+@@ -1856,19 +1996,22 @@
                  if (this.processingLoadedTiles)
                  {
                      tileEntityIn.setPos(pos);
@@ -445,7 +459,7 @@
                      this.addedTileEntityList.add(tileEntityIn);
                  }
                  else
-@@ -2149,6 +2285,13 @@
+@@ -2149,6 +2292,13 @@
  
      public boolean checkLightFor(EnumLightType lightType, BlockPos pos)
      {
@@ -459,7 +473,7 @@
          if (!this.isAreaLoaded(pos, 17, false))
          {
              return false;
-@@ -2290,9 +2433,8 @@
+@@ -2290,9 +2440,8 @@
          return movingEntity == null ? stream : Stream.concat(stream, this.getCollisionBoxes(movingEntity, area, entitiesToIgnore));
      }
  
@@ -470,7 +484,7 @@
          int i = MathHelper.floor((boundingBox.minX - 2.0D) / 16.0D);
          int j = MathHelper.floor((boundingBox.maxX + 2.0D) / 16.0D);
          int k = MathHelper.floor((boundingBox.minZ - 2.0D) / 16.0D);
-@@ -2304,14 +2446,33 @@
+@@ -2304,14 +2453,33 @@
              {
                  if (this.isChunkLoaded(i1, j1, true))
                  {
@@ -505,7 +519,7 @@
      public <T extends Entity> List<T> getEntities(Class <? extends T > entityType, Predicate <? super T > filter)
      {
          List<T> list = Lists.newArrayList();
-@@ -3204,4 +3365,17 @@
+@@ -3204,4 +3372,17 @@
      public abstract RecipeManager getRecipeManager();
  
      public abstract NetworkTagManager getTags();

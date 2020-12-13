@@ -861,4 +861,7 @@ public class CarpetSettings
             category = YEET
     )
     public static boolean yeetVillagerAi = false;
+
+    @Rule(desc = "Fixes updates suppression causing server crashes.", category = YEET)
+    public static boolean yeetUpdateSuppressionCrash;
 }
