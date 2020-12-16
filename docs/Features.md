@@ -407,6 +407,21 @@ Options: `false`, `true`
 Categories: optimization, experimental
 
 
+## optimizedFastEntityMovement
+
+Optimize fast entity movement by only checking block collisions on current moving axis
+
+Inspired by the `fastMovingEntityOptimization` rule in [carpetmod112](https://github.com/gnembon/carpetmod112)
+
+Use with rule `optimizedTNT` to greatly improve performance in cannons
+
+Default: `false`
+
+Options: `false`, `true`
+
+Categories: optimization, experimental
+
+
 ## YEET
 
 **Warn**: all yeet options will change vanilla behaviour, they WILL NOT behave like vanilla

@@ -18,23 +18,7 @@
  import com.google.common.collect.Iterables;
  import com.google.common.collect.Lists;
  import com.google.common.collect.Sets;
-@@ -35,6 +47,7 @@
- import net.minecraft.entity.effect.EntityLightningBolt;
- import net.minecraft.entity.item.EntityBoat;
- import net.minecraft.entity.item.EntityItem;
-+import net.minecraft.entity.monster.EntityMob;
- import net.minecraft.entity.player.EntityPlayer;
- import net.minecraft.entity.player.EntityPlayerMP;
- import net.minecraft.fluid.Fluid;
-@@ -59,6 +72,7 @@
- import net.minecraft.server.MinecraftServer;
- import net.minecraft.tags.FluidTags;
- import net.minecraft.tags.Tag;
-+import net.minecraft.tileentity.TileEntity;
- import net.minecraft.util.DamageSource;
- import net.minecraft.util.EnumActionResult;
- import net.minecraft.util.EnumBlockRenderType;
-@@ -94,6 +108,7 @@
+@@ -94,6 +106,7 @@
  import net.minecraft.world.gen.Heightmap;
  import net.minecraftforge.api.distmarker.Dist;
  import net.minecraftforge.api.distmarker.OnlyIn;
@@ -42,7 +26,7 @@
  import org.apache.logging.log4j.LogManager;
  import org.apache.logging.log4j.Logger;
  
-@@ -151,6 +166,8 @@
+@@ -151,6 +164,8 @@
      protected Random rand;
      public int ticksExisted;
      private int fire;
@@ -51,7 +35,7 @@
      protected boolean inWater;
      protected double submergedHeight;
      protected boolean eyesInWater;
-@@ -192,6 +209,14 @@
+@@ -192,6 +207,19 @@
      private final double[] pistonDeltas;
      private long pistonDeltasGameTime;
  
@@ -63,10 +47,15 @@
 +    private Vec3d spawnPos;
 +    private DamageSource deathDamageSource;
 +
++    // TISCM optimizedFastEntityMovement
++    // minimum squared velocity to trigger the optimization
++    // set it to 0 to test vanilla behavior if you want
++    private static final double OPTIMIZED_FAST_ENTITY_MOVEMENT_THRESHOLD = 4.0D * 4.0D;
++
      public Entity(EntityType<?> entityTypeIn, World worldIn)
      {
          this.entityId = nextEntityID++;
-@@ -225,8 +250,65 @@
+@@ -225,8 +253,65 @@
          this.dataManager.register(SILENT, false);
          this.dataManager.register(NO_GRAVITY, false);
          this.registerData();
@@ -132,7 +121,7 @@
      public EntityType<?> getType()
      {
          return this.type;
-@@ -312,6 +394,17 @@
+@@ -312,6 +397,17 @@
  
      public void remove()
      {
@@ -150,7 +139,7 @@
          this.removed = true;
      }
  
-@@ -570,6 +663,12 @@
+@@ -570,6 +666,12 @@
  
      public void move(MoverType type, double x, double y, double z)
      {
@@ -163,11 +152,63 @@
          if (this.noClip)
          {
              this.setBoundingBox(this.getBoundingBox().offset(x, y, z));
-@@ -979,7 +1078,422 @@
+@@ -720,16 +822,38 @@
+ 
+             if (x != 0.0D || y != 0.0D || z != 0.0D)
+             {
+-                ReuseableStream<VoxelShape> reuseablestream = new ReuseableStream<>(this.world.getCollisionBoxes(this, this.getBoundingBox(), x, y, z));
++                // TISCM optimizedFastEntityMovement
++//                ReuseableStream<VoxelShape> reuseablestream = new ReuseableStream<>(this.world.getCollisionBoxes(this, this.getBoundingBox(), x, y, z));
++                ReuseableStream<VoxelShape> reuseablestream = null;
++                boolean optimizedFastEntityMovementEnabled = CarpetSettings.optimizedFastEntityMovement && (new Vec3d(x, y, z)).lengthSquared() >= OPTIMIZED_FAST_ENTITY_MOVEMENT_THRESHOLD;
++                if (!optimizedFastEntityMovementEnabled)
++                {
++                    reuseablestream = new ReuseableStream<>(this.world.getCollisionBoxes(this, this.getBoundingBox(), x, y, z));
++                }
++                // TISCM optimizedFastEntityMovement ends
+ 
+                 if (y != 0.0D)
+                 {
++                    // TISCM optimizedFastEntityMovement
++                    if (optimizedFastEntityMovementEnabled)
++                    {
++                        reuseablestream = new ReuseableStream<>(this.world.getCollisionBoxes(this, this.getBoundingBox(), 0.0D, y, 0.0D));
++                    }
++                    // TISCM optimizedFastEntityMovement ends
++
+                     y = VoxelShapes.func_212437_a(EnumFacing.Axis.Y, this.getBoundingBox(), reuseablestream.createStream(), y);
+                     this.setBoundingBox(this.getBoundingBox().offset(0.0D, y, 0.0D));
+                 }
+ 
+                 if (x != 0.0D)
+                 {
++                    // TISCM optimizedFastEntityMovement
++                    if (optimizedFastEntityMovementEnabled)
++                    {
++                        reuseablestream = new ReuseableStream<>(this.world.getCollisionBoxes(this, this.getBoundingBox(), x, 0.0D, 0.0D));
++                    }
++                    // TISCM optimizedFastEntityMovement ends
++
+                     x = VoxelShapes.func_212437_a(EnumFacing.Axis.X, this.getBoundingBox(), reuseablestream.createStream(), x);
+ 
+                     if (x != 0.0D)
+@@ -740,6 +864,12 @@
+ 
+                 if (z != 0.0D)
+                 {
++                    // TISCM optimizedFastEntityMovement
++                    if (optimizedFastEntityMovementEnabled)
++                    {
++                        reuseablestream = new ReuseableStream<>(this.world.getCollisionBoxes(this, this.getBoundingBox(), 0.0D, 0.0D, z));
++                    }
++
+                     z = VoxelShapes.func_212437_a(EnumFacing.Axis.Z, this.getBoundingBox(), reuseablestream.createStream(), z);
+ 
+                     if (z != 0.0D)
+@@ -979,7 +1109,422 @@
              this.world.profiler.endSection();
          }
      }
--
 +    
 +    public void move_new(MoverType type, double x, double y, double z)
 +    {
@@ -322,7 +363,7 @@
 +            if (x != 0.0D || y != 0.0D || z != 0.0D)
 +            {
 +                final ocd.mcoptimizations.shapecast.IShapecaster shapecaster = this.world.createShapecaster(this, this.getBoundingBox(), x, y, z);
-+                
+ 
 +                if (y != 0.0D)
 +                {
 +                    y = shapecaster.shapecast(this.getBoundingBox(), EnumFacing.Axis.Y, y);
@@ -587,7 +628,7 @@
      protected float determineNextStepDistance()
      {
          return (float)((int)this.distanceWalkedOnStepModified + 1);
-@@ -1566,6 +2080,13 @@
+@@ -1566,6 +2111,13 @@
          return partialTicks == 1.0F ? this.rotationYaw : this.prevRotationYaw + (this.rotationYaw - this.prevRotationYaw) * partialTicks;
      }
  
@@ -601,7 +642,7 @@
      protected final Vec3d getVectorForRotation(float pitch, float yaw)
      {
          float f = pitch * ((float)Math.PI / 180F);
-@@ -1762,22 +2283,27 @@
+@@ -1762,22 +2314,27 @@
              this.motionX = nbttaglist2.getDouble(0);
              this.motionY = nbttaglist2.getDouble(1);
              this.motionZ = nbttaglist2.getDouble(2);
@@ -642,7 +683,7 @@
              this.posX = nbttaglist.getDouble(0);
              this.posY = nbttaglist.getDouble(1);
              this.posZ = nbttaglist.getDouble(2);
-@@ -1924,6 +2450,10 @@
+@@ -1924,6 +2481,10 @@
              EntityItem entityitem = new EntityItem(this.world, this.posX, this.posY + (double)offsetY, this.posZ, stack);
              entityitem.setDefaultPickupDelay();
              this.world.spawnEntity(entityitem);
@@ -653,7 +694,7 @@
              return entityitem;
          }
      }
-@@ -2592,6 +3122,9 @@
+@@ -2592,6 +3153,9 @@
                  this.dimension = DimensionType.OVERWORLD;
              }
  
@@ -663,7 +704,7 @@
              this.world.removeEntity(this);
              this.removed = false;
              this.world.profiler.startSection("reposition");
-@@ -2645,6 +3178,9 @@
+@@ -2645,6 +3209,9 @@
                      entity.moveToBlockPosAndAngles(blockpos, entity.rotationYaw, entity.rotationPitch);
                  }
  
@@ -673,7 +714,7 @@
                  boolean flag = entity.forceSpawn;
                  entity.forceSpawn = true;
                  worldserver1.spawnEntity(entity);
-@@ -2821,6 +3357,10 @@
+@@ -2821,6 +3388,10 @@
  
      public EnumFacing getHorizontalFacing()
      {

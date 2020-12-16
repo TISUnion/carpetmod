@@ -3,7 +3,7 @@ package me.jellysquid.mods.lithium.common.shapes.lists;
 import it.unimi.dsi.fastutil.doubles.AbstractDoubleList;
 
 public class OffsetFractionalDoubleList extends AbstractDoubleList {
-    //this class must not extend FractionalDoubleList, due to VoxelShapes.createListPair using instanceof
+    //this class must not extend FractionalDoubleList (DoubleRangeList in mcp), due to VoxelShapes.createListPair (makeListMerger in mcp) using instanceof
     private final int numSections;
     private final double offset;
 

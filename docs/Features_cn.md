@@ -407,6 +407,21 @@
 分类: optimization, experimental
 
 
+## optimizedFastEntityMovement
+
+通过仅检测沿轴移动方向的方块碰撞来优化高速实体的移动
+
+受 [carpetmod112](https://github.com/gnembon/carpetmod112) 的规则 `fastMovingEntityOptimization` 启发
+
+同规则 `optimizedTNT` 一起使用可大幅度提升炮的性能表现
+
+默认值: `false`
+
+选项: `false`, `true`
+
+分类: optimization, experimental
+
+
 ## YEET
 
 **警告**：所有的yeet选项都会改变原版的特性，它们的行为不会表现得跟原版一致！

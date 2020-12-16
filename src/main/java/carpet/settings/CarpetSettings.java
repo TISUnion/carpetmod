@@ -415,6 +415,16 @@ public class CarpetSettings
     )
     public static boolean optimizedHardHitBoxEntityCollision = false;
 
+    @Rule(
+            desc = "Optimize fast entity movement by only checking block collisions on current moving axis",
+            extra = {
+                    "Inspired by the fastMovingEntityOptimization rule in carpetmod112",
+                    "Use with rule optimizedTNT to greatly improve performance in cannons"
+            },
+            category = {OPTIMIZATION, EXPERIMENTAL}
+    )
+    public static boolean optimizedFastEntityMovement = false;
+
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$
     //   | $$     | $$  | $$  \__/| $$  \__/| $$$$  /$$$$
