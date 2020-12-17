@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/Explosion.java
 +++ b/net/minecraft/world/Explosion.java
-@@ -1,13 +1,14 @@
+@@ -1,13 +1,15 @@
  package net.minecraft.world;
  
 +import carpet.settings.CarpetSettings;
@@ -15,11 +15,12 @@
 +import java.util.*;
  import javax.annotation.Nullable;
 +
++import com.mojang.datafixers.util.Pair;
 +import me.jellysquid.mods.lithium.LithiumConfig;
  import net.minecraft.block.Block;
  import net.minecraft.block.state.IBlockState;
  import net.minecraft.enchantment.EnchantmentProtection;
-@@ -17,6 +18,7 @@
+@@ -17,6 +19,7 @@
  import net.minecraft.entity.player.EntityPlayer;
  import net.minecraft.fluid.IFluidState;
  import net.minecraft.init.Blocks;
@@ -27,7 +28,7 @@
  import net.minecraft.init.Particles;
  import net.minecraft.init.SoundEvents;
  import net.minecraft.util.DamageSource;
-@@ -25,6 +27,8 @@
+@@ -25,6 +28,8 @@
  import net.minecraft.util.math.BlockPos;
  import net.minecraft.util.math.MathHelper;
  import net.minecraft.util.math.Vec3d;
@@ -36,18 +37,12 @@
  import net.minecraftforge.api.distmarker.Dist;
  import net.minecraftforge.api.distmarker.OnlyIn;
  
-@@ -43,6 +47,25 @@
+@@ -43,6 +48,19 @@
      private final List<BlockPos> affectedBlockPositions = Lists.newArrayList();
      private final Map<EntityPlayer, Vec3d> playerKnockbackMap = Maps.newHashMap();
  
-+    //TISCM cache explosions
-+    private static Vec3d cachedPos = new Vec3d(0,0,0);
-+    private static float cachedSize = 0;
-+    private static long cachedTick = -1;
-+    private static final Map<Entity, Vec3d> cachedMotionMap = Maps.newHashMap();
-+    private static final Map<EntityPlayer, Vec3d> cachedKnockBackMap = Maps.newHashMap();
-+
 +    // Lithium world.explosions starts
++
 +    private final BlockPos.MutableBlockPos cachedPos$lithium = new BlockPos.MutableBlockPos();
 +
 +    // The chunk coordinate of the most recently stepped through block.
@@ -62,7 +57,7 @@
      @OnlyIn(Dist.CLIENT)
      public Explosion(World worldIn, @Nullable Entity entityIn, double x, double y, double z, float size, List<BlockPos> affectedPositions)
      {
-@@ -72,112 +95,151 @@
+@@ -72,111 +90,140 @@
      public void doExplosionA()
      {
          Set<BlockPos> set = Sets.newHashSet();
@@ -174,23 +169,8 @@
 +            this.affectedBlockPositions.addAll(set);
 +        // [CM] End - explosionNoBlockDamage
 +
-+        //TISCM cache explosions
-+        if (CarpetSettings.cacheExplosions && cachedPos.x == this.x && cachedPos.y == this.y && cachedPos.z == this.z && cachedSize == this.size && cachedTick == this.world.getGameTime()) {
-+            for (Entity entity : cachedMotionMap.keySet()){
-+                if (cachedMotionMap.get(entity) != null){
-+                    Vec3d motion = cachedMotionMap.get(entity);
-+                    entity.motionX += motion.x;
-+                    entity.motionY += motion.y;
-+                    entity.motionZ += motion.z;
-+                }
-+            }
-+
-+            this.playerKnockbackMap.putAll(cachedKnockBackMap);
-+            return;
-+        }
-+        //TISCM cache explosions
-+        cachedMotionMap.clear();
-+        cachedKnockBackMap.clear();
++        // TISCM cache explosions
++        Map<Pair<Vec3d, AxisAlignedBB>, Float> blockDensityCache = Maps.newHashMap();
 +
          float f3 = this.size * 2.0F;
 -        int k1 = MathHelper.floor(this.x - (double)f3 - 1.0D);
@@ -237,7 +217,22 @@
                          d7 = d7 / d13;
                          d9 = d9 / d13;
 -                        double d14 = (double)this.world.getBlockDensity(vec3d, entity.getBoundingBox());
-+                        double d14 = (double) this.world.getBlockDensity(vec3d, entity.getBoundingBox());
++
++                        // TISCM cache explosions
++//                        double d14 = (double) this.world.getBlockDensity(vec3d, entity.getBoundingBox());
++                        double d14;
++                        if (CarpetSettings.cacheExplosions)
++                        {
++                            Pair<Vec3d, AxisAlignedBB> key = Pair.of(vec3d, entity.getBoundingBox());
++                            d14 = blockDensityCache.computeIfAbsent(key, k -> this.world.getBlockDensity(vec3d, entity.getBoundingBox()));
++                        }
++                        else
++                        {
++                            // vanilla
++                            d14 = (double) this.world.getBlockDensity(vec3d, entity.getBoundingBox());
++                        }
++                        // TISCM cache explosions ends
++
                          double d10 = (1.0D - d12) * d14;
 -                        entity.attackEntityFrom(this.getDamageSource(), (float)((int)((d10 * d10 + d10) / 2.0D * 7.0D * (double)f3 + 1.0D)));
 +                        entity.attackEntityFrom(this.getDamageSource(), (float) ((int) ((d10 * d10 + d10) / 2.0D * 7.0D * (double) f3 + 1.0D)));
@@ -257,27 +252,16 @@
 -                        if (entity instanceof EntityPlayer)
 -                        {
 -                            EntityPlayer entityplayer = (EntityPlayer)entity;
-+                        if (CarpetSettings.cacheExplosions) {
-+                            cachedMotionMap.put(entity, new Vec3d(d5 * d11, d7 * d11, d9 * d11));
-+                            cachedPos = vec3d;
-+                            cachedSize = this.size;
-+                            cachedTick = this.world.getGameTime();
-+                        }
++                        if (entity instanceof EntityPlayer) {
++                            EntityPlayer entityplayer = (EntityPlayer) entity;
  
 -                            if (!entityplayer.isSpectator() && (!entityplayer.isCreative() || !entityplayer.abilities.isFlying))
 -                            {
-+                        if (entity instanceof EntityPlayer) {
-+                            EntityPlayer entityplayer = (EntityPlayer) entity;
-+
 +                            if (!entityplayer.isSpectator() && (!entityplayer.isCreative() || !entityplayer.abilities.isFlying)) {
                                  this.playerKnockbackMap.put(entityplayer, new Vec3d(d5 * d10, d7 * d10, d9 * d10));
-+                                if (CarpetSettings.cacheExplosions) {
-+                                    cachedKnockBackMap.put(entityplayer, new Vec3d(d5 * d10, d7 * d10, d9 * d10));
-+                                }
                              }
                          }
-                     }
-@@ -186,6 +248,206 @@
+@@ -186,6 +233,206 @@
          }
      }
  
@@ -484,7 +468,7 @@
      public void doExplosionB(boolean spawnParticles)
      {
          this.world.playSound((EntityPlayer)null, this.x, this.y, this.z, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS, 4.0F, (1.0F + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.2F) * 0.7F);
-@@ -199,6 +461,7 @@
+@@ -199,6 +446,7 @@
              this.world.addParticle(Particles.EXPLOSION, this.x, this.y, this.z, 1.0D, 0.0D, 0.0D);
          }
  
