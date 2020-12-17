@@ -413,7 +413,7 @@ Optimize fast entity movement by only checking block collisions on current movin
 
 Inspired by the `fastMovingEntityOptimization` rule in [carpetmod112](https://github.com/gnembon/carpetmod112)
 
-Use with rule `optimizedTNT` to greatly improve performance in cannons
+Works with `optimizeVoxelCode` off. Rule `optimizeVoxelCode` itself already has relative optimization
 
 Default: `false`
 

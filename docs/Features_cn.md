@@ -413,7 +413,7 @@
 
 受 [carpetmod112](https://github.com/gnembon/carpetmod112) 的规则 `fastMovingEntityOptimization` 启发
 
-同规则 `optimizedTNT` 一起使用可大幅度提升炮的性能表现
+在 `optimizeVoxelCode` 关闭时可用。规则 `optimizeVoxelCode` 已包含类似优化
 
 默认值: `false`
 
