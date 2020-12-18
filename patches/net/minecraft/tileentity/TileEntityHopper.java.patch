@@ -86,7 +86,7 @@
  
      public static boolean captureItem(IInventory p_200114_0_, EntityItem p_200114_1_)
      {
-+        if (p_200114_1_.removed)  // TISCM to avoid repeatedly extraction an item entity in onEntityCollided for hopperCountersUnlimitedSpeed
++        if (CarpetSettings.hopperCountersUnlimitedSpeed && p_200114_1_.removed)  // TISCM to avoid repeatedly extraction an item entity in onEntityCollided for hopperCountersUnlimitedSpeed
 +        {
 +            return false;
 +        }
