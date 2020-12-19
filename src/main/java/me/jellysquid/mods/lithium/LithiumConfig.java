@@ -4,6 +4,8 @@ package me.jellysquid.mods.lithium;
  * Code level configurable lithium config
  * Great thanks to lithium mod team for providing such OP optimizations
  * Lithium mod repos: https://github.com/jellysquid3/lithium-fabric
+ *
+ * See also: {@link carpet.utils.TISCMOptimizationConfig}
  */
 @SuppressWarnings("PointlessBooleanExpression")
 public class LithiumConfig

@@ -1,5 +1,6 @@
 package me.jellysquid.mods.lithium.common.util.collections;
 
+import carpet.utils.TISCMOptimizationConfig;
 import it.unimi.dsi.fastutil.longs.Long2ReferenceOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceLinkedOpenHashSet;
 import net.minecraft.nbt.NBTTagCompound;
@@ -14,7 +15,8 @@ public class TileEntityList implements List<TileEntity> {
     //This collection behaves like a set with insertion order. It also provides a position->TileEntity lookup.
 
     // pre-allocate 256 volume in hashsets/hashmaps to avoid constantly rehash when the amount of TileEntity is small
-    private final int COLLECTION_DEFAULT_SIZE = 256;
+    @SuppressWarnings("FieldCanBeLocal")
+    private final int COLLECTION_DEFAULT_SIZE = TISCMOptimizationConfig.LARGER_TILE_ENTITY_LIST ? 256 : Long2ReferenceOpenHashMap.DEFAULT_INITIAL_SIZE;
 
     private final ReferenceLinkedOpenHashSet<TileEntity> allBlockEntities;
 

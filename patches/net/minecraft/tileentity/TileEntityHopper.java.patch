@@ -1,10 +1,11 @@
 --- a/net/minecraft/tileentity/TileEntityHopper.java
 +++ b/net/minecraft/tileentity/TileEntityHopper.java
-@@ -4,6 +4,13 @@
+@@ -4,6 +4,14 @@
  import java.util.function.Supplier;
  import java.util.stream.Collectors;
  import javax.annotation.Nullable;
 +
++import carpet.utils.TISCMOptimizationConfig;
 +import carpet.commands.lifetime.removal.LiteralRemovalReason;
 +import carpet.helpers.HopperCounter;
 +import carpet.settings.CarpetSettings;
@@ -14,7 +15,7 @@
  import net.minecraft.block.Block;
  import net.minecraft.block.BlockChest;
  import net.minecraft.block.BlockHopper;
-@@ -17,6 +24,7 @@
+@@ -17,6 +25,7 @@
  import net.minecraft.inventory.IInventory;
  import net.minecraft.inventory.ISidedInventory;
  import net.minecraft.inventory.ItemStackHelper;
@@ -22,7 +23,7 @@
  import net.minecraft.item.ItemStack;
  import net.minecraft.nbt.NBTTagCompound;
  import net.minecraft.util.EntitySelectors;
-@@ -150,6 +158,29 @@
+@@ -150,6 +159,29 @@
  
                  if (flag)
                  {
@@ -52,7 +53,7 @@
                      this.setTransferCooldown(8);
                      this.markDirty();
                      return true;
-@@ -197,6 +228,29 @@
+@@ -197,6 +229,29 @@
  
      private boolean transferItemsOut()
      {
@@ -82,7 +83,7 @@
          IInventory iinventory = this.getInventoryForHopperTransfer();
  
          if (iinventory == null)
-@@ -377,12 +431,19 @@
+@@ -377,12 +432,19 @@
  
      public static boolean captureItem(IInventory p_200114_0_, EntityItem p_200114_1_)
      {
@@ -102,7 +103,7 @@
              flag = true;
              p_200114_1_.remove();
          }
-@@ -396,6 +457,28 @@
+@@ -396,6 +458,28 @@
  
      public static ItemStack putStackInInventoryAllSlots(@Nullable IInventory source, IInventory destination, ItemStack stack, @Nullable EnumFacing direction)
      {
@@ -131,17 +132,22 @@
          if (destination instanceof ISidedInventory && direction != null)
          {
              ISidedInventory isidedinventory = (ISidedInventory)destination;
-@@ -504,9 +587,12 @@
+@@ -504,9 +588,17 @@
          return getInventoryAtPosition(hopper.getWorld(), hopper.getXPos(), hopper.getYPos() + 1.0D, hopper.getZPos());
      }
  
-+    // Cache BoundingBoxList creation
++    // TISCM Cache BoundingBoxList creation
 +    private static final List<AxisAlignedBB> HOPPER_COLLECTION_BOX = IHopper.COLLECTION_AREA_SHAPE.toBoundingBoxList();
 +
      public static List<EntityItem> getCaptureItems(IHopper p_200115_0_)
      {
 -        return p_200115_0_.getCollectionArea().toBoundingBoxList().stream().flatMap((p_200110_1_) ->
-+        return HOPPER_COLLECTION_BOX.stream().flatMap((p_200110_1_) ->
++        // TISCM Cache BoundingBoxList creation
++//        return p_200115_0_.getCollectionArea().toBoundingBoxList().stream().flatMap((p_200110_1_) ->
++        List<AxisAlignedBB> axisAlignedBBList = TISCMOptimizationConfig.CACHE_BOUNDING_BOX_LIST_CREATION ?
++                HOPPER_COLLECTION_BOX :
++                p_200115_0_.getCollectionArea().toBoundingBoxList();
++        return axisAlignedBBList.stream().flatMap((p_200110_1_) ->
          {
              return p_200115_0_.getWorld().getEntitiesWithinAABB(EntityItem.class, p_200110_1_.offset(p_200115_0_.getXPos() - 0.5D, p_200115_0_.getYPos() - 0.5D, p_200115_0_.getZPos() - 0.5D), EntitySelectors.IS_ALIVE).stream();
          }).collect(Collectors.toList());

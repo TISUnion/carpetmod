@@ -665,3 +665,5 @@ TISCM 中也有一些在 lithium mod 不包含的优化：
 - 在 `TileEntityHopper` 以及 `TileEntityPiston` 中缓存 BoundingBoxList 的创建结果
 - 在 `TileEntityList` 中给 hashset/hashmap 预先分配 256 大小的空间以防止在方块实体数量较小时频繁重建容器
 - 在 `TileEntityFurnace` 中永久性地储存物品的燃烧时间以避免每次调用都重复创建时间表
+
+如果需要，部分优化的实现可在 `TISCMOptimizationConfig` 类中手动开关
