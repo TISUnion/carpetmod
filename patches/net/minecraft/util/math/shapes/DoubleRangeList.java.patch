@@ -1,6 +1,6 @@
 --- a/net/minecraft/util/math/shapes/DoubleRangeList.java
 +++ b/net/minecraft/util/math/shapes/DoubleRangeList.java
-@@ -1,19 +1,32 @@
+@@ -1,19 +1,34 @@
  package net.minecraft.util.math.shapes;
  
  import it.unimi.dsi.fastutil.doubles.AbstractDoubleList;
@@ -12,10 +12,12 @@
 +public class DoubleRangeList extends AbstractDoubleList
  {
      private final int field_197854_a;
-+    // Lithium shapes.precompute_shape_arrays
-+    private final double scale;
  
 -    DoubleRangeList(int p_i47689_1_)
++    // Lithium shapes.precompute_shape_arrays
++    @SuppressWarnings("FieldMayBeFinal")
++    private double scale;
++
 +    // Lithium shapes.specialized_shapes makes public
 +    public DoubleRangeList(int p_i47689_1_)
      {
