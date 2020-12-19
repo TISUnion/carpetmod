@@ -9,13 +9,15 @@
  import net.minecraft.util.EnumFacing;
  
  public final class VoxelShapeInt extends VoxelShape
-@@ -9,16 +11,43 @@
+@@ -9,16 +11,45 @@
      private final int y;
      private final int z;
  
 +    // Lithium shapes.precompute_shape_arrays
 +    private static final EnumFacing.Axis[] AXIS = EnumFacing.Axis.values();
-+    private final DoubleList[] list;
++
++    @SuppressWarnings("FieldMayBeFinal")
++    private DoubleList[] list;
 +
 +
      public VoxelShapeInt(VoxelShapePart p_i47679_1_, int x, int y, int z)
