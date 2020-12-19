@@ -5,12 +5,12 @@
      {
          boolean flag = false;
 -        float[] afloat = new float[EnumFacing.values().length * 2];
-+        float[] afloat = new float[EnumFacing.ENUM_FACING_VALUES.length * 2];
++        float[] afloat = new float[(me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values()).length * 2];
          BitSet bitset = new BitSet(3);
          BlockModelRenderer.AmbientOcclusionFace blockmodelrenderer$ambientocclusionface = new BlockModelRenderer.AmbientOcclusionFace();
  
 -        for (EnumFacing enumfacing : EnumFacing.values())
-+        for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
++        for (EnumFacing enumfacing : (me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values()))
          {
              randomIn.setSeed(rand);
              List<BakedQuad> list = modelIn.getQuads(stateIn, enumfacing, randomIn);
@@ -19,7 +19,7 @@
          BitSet bitset = new BitSet(3);
  
 -        for (EnumFacing enumfacing : EnumFacing.values())
-+        for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
++        for (EnumFacing enumfacing : (me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values()))
          {
              randomIn.setSeed(rand);
              List<BakedQuad> list = modelIn.getQuads(stateIn, enumfacing, randomIn);
@@ -28,7 +28,7 @@
              quadBounds[EnumFacing.NORTH.getIndex()] = f2;
              quadBounds[EnumFacing.SOUTH.getIndex()] = f5;
 -            int j = EnumFacing.values().length;
-+            int j = EnumFacing.ENUM_FACING_VALUES.length;
++            int j = (me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values()).length;
              quadBounds[EnumFacing.WEST.getIndex() + j] = 1.0F - f;
              quadBounds[EnumFacing.EAST.getIndex() + j] = 1.0F - f3;
              quadBounds[EnumFacing.DOWN.getIndex() + j] = 1.0F - f1;
@@ -37,7 +37,7 @@
          long i = 42L;
  
 -        for (EnumFacing enumfacing : EnumFacing.values())
-+        for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
++        for (EnumFacing enumfacing : (me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values()))
          {
              random.setSeed(42L);
              this.renderModelBrightnessColorQuads(brightness, red, green, blue, modelIn.getQuads(state, enumfacing, random));
@@ -46,7 +46,7 @@
          private Orientation(EnumFacing facingIn, boolean flip)
          {
 -            this.shape = facingIn.getIndex() + (flip ? EnumFacing.values().length : 0);
-+            this.shape = facingIn.getIndex() + (flip ? EnumFacing.ENUM_FACING_VALUES.length : 0);
++            this.shape = facingIn.getIndex() + (flip ? (me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values()).length : 0);
          }
      }
  

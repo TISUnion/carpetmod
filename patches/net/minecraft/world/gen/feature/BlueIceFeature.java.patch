@@ -5,7 +5,7 @@
              boolean flag = false;
  
 -            for (EnumFacing enumfacing : EnumFacing.values())
-+            for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
++            for (EnumFacing enumfacing : (me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values()))
              {
                  if (enumfacing != EnumFacing.DOWN && worldIn.getBlockState(pos.offset(enumfacing)).getBlock() == Blocks.PACKED_ICE)
                  {
@@ -14,7 +14,7 @@
                          if (iblockstate.getMaterial() == Material.AIR || block == Blocks.WATER || block == Blocks.PACKED_ICE || block == Blocks.ICE)
                          {
 -                            for (EnumFacing enumfacing1 : EnumFacing.values())
-+                            for (EnumFacing enumfacing1 : EnumFacing.ENUM_FACING_VALUES)
++                            for (EnumFacing enumfacing1 : (me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values()))
                              {
                                  Block block1 = worldIn.getBlockState(blockpos.offset(enumfacing1)).getBlock();
  

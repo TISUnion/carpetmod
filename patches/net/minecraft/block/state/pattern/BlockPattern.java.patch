@@ -5,10 +5,10 @@
          for (BlockPos blockpos : BlockPos.getAllInBox(pos, pos.add(i - 1, i - 1, i - 1)))
          {
 -            for (EnumFacing enumfacing : EnumFacing.values())
-+            for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
++            for (EnumFacing enumfacing : (me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values()))
              {
 -                for (EnumFacing enumfacing1 : EnumFacing.values())
-+                for (EnumFacing enumfacing1 : EnumFacing.ENUM_FACING_VALUES)
++                for (EnumFacing enumfacing1 : (me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values()))
                  {
                      if (enumfacing1 != enumfacing && enumfacing1 != enumfacing.getOpposite())
                      {

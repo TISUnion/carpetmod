@@ -5,7 +5,7 @@
      protected boolean canLive(IBlockReader p_203943_1_, BlockPos p_203943_2_)
      {
 -        for (EnumFacing enumfacing : EnumFacing.values())
-+        for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
++        for (EnumFacing enumfacing : (me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values()))
          {
              IFluidState ifluidstate = p_203943_1_.getFluidState(p_203943_2_.offset(enumfacing));
  

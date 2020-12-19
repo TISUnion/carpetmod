@@ -566,7 +566,7 @@
                      if (this.sections[j] == EMPTY_SECTION && flag || this.sections[j] != EMPTY_SECTION && this.sections[j].get(k, i1, l).isAir())
                      {
 -                        for (EnumFacing enumfacing : EnumFacing.values())
-+                        for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
++                        for (EnumFacing enumfacing : (me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values()))
                          {
                              BlockPos blockpos2 = blockpos1.offset(enumfacing);
  

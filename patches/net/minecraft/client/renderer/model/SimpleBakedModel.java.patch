@@ -5,7 +5,7 @@
                  this.builderTexture = p_i48189_2_.getParticleTexture();
  
 -                for (EnumFacing enumfacing : EnumFacing.values())
-+                for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
++                for (EnumFacing enumfacing : (me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values()))
                  {
                      p_i48189_4_.setSeed(p_i48189_5_);
  
@@ -14,7 +14,7 @@
              private Builder(boolean ambientOcclusion, boolean gui3d, ItemCameraTransforms transforms, ItemOverrideList overrides)
              {
 -                for (EnumFacing enumfacing : EnumFacing.values())
-+                for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
++                for (EnumFacing enumfacing : (me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values()))
                  {
                      this.builderFaceQuads.put(enumfacing, Lists.newArrayList());
                  }

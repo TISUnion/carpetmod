@@ -5,7 +5,7 @@
                  for (BlockPos blockpos : Lists.newArrayList(set))
                  {
 -                    for (EnumFacing enumfacing : EnumFacing.values())
-+                    for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
++                    for (EnumFacing enumfacing : (me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values()))
                      {
                          blockpos$pooledmutableblockpos.setPos(blockpos).move(enumfacing);
  
@@ -14,7 +14,7 @@
                  for (BlockPos blockpos1 : set1)
                  {
 -                    for (EnumFacing enumfacing1 : EnumFacing.values())
-+                    for (EnumFacing enumfacing1 : EnumFacing.ENUM_FACING_VALUES)
++                    for (EnumFacing enumfacing1 : (me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values()))
                      {
                          blockpos$pooledmutableblockpos.setPos(blockpos1).move(enumfacing1);
  

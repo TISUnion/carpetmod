@@ -5,7 +5,7 @@
          stringbuilder.append(' ');
  
 -        for (EnumFacing enumfacing : EnumFacing.values())
-+        for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
++        for (EnumFacing enumfacing : (me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values()))
          {
              stringbuilder.append(' ').append(enumfacing.toString().toUpperCase().charAt(0));
          }
@@ -13,12 +13,12 @@
          stringbuilder.append('\n');
  
 -        for (EnumFacing enumfacing2 : EnumFacing.values())
-+        for (EnumFacing enumfacing2 : EnumFacing.ENUM_FACING_VALUES)
++        for (EnumFacing enumfacing2 : (me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values()))
          {
              stringbuilder.append(enumfacing2.toString().toUpperCase().charAt(0));
  
 -            for (EnumFacing enumfacing1 : EnumFacing.values())
-+            for (EnumFacing enumfacing1 : EnumFacing.ENUM_FACING_VALUES)
++            for (EnumFacing enumfacing1 : (me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values()))
              {
                  if (enumfacing2 == enumfacing1)
                  {

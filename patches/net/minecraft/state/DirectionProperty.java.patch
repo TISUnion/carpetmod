@@ -5,7 +5,7 @@
      public static DirectionProperty create(String name, Predicate<EnumFacing> filter)
      {
 -        return create(name, Arrays.stream(EnumFacing.values()).filter(filter).collect(Collectors.toList()));
-+        return create(name, Arrays.stream(EnumFacing.ENUM_FACING_VALUES).filter(filter).collect(Collectors.toList()));
++        return create(name, Arrays.stream((me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values())).filter(filter).collect(Collectors.toList()));
      }
  
      public static DirectionProperty create(String p_196962_0_, EnumFacing... p_196962_1_)

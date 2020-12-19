@@ -13,7 +13,7 @@ public class LithiumConfig
 	private static final boolean LITHIUM_ENABLE = true;
 
 	public static final boolean ALLOC_ENTITY_TRACKER            = LITHIUM_ENABLE && true;
-//	public static final boolean ALLOC_ENUM_VALUES               = LITHIUM_ENABLE && true;  // to complicated to be switchable
+	public static final boolean ALLOC_ENUM_VALUES               = LITHIUM_ENABLE && true;
 	public static final boolean BLOCK_MOVING_BLOCK_SHAPES       = LITHIUM_ENABLE && true;
 	public static final boolean BLOCK_PISTON_SHAPES             = LITHIUM_ENABLE && true;
 	public static final boolean CACHED_HASHCODE                 = LITHIUM_ENABLE && true;

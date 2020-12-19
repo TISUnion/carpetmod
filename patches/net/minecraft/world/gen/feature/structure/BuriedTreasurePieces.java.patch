@@ -23,7 +23,7 @@
                          IBlockState iblockstate2 = !iblockstate.isAir() && !this.func_204295_a(iblockstate) ? iblockstate : Blocks.SAND.getDefaultState();
  
 -                        for (EnumFacing enumfacing : EnumFacing.values())
-+                        for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
++                        for (EnumFacing enumfacing : (me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values()))
                          {
                              BlockPos blockpos = blockpos$mutableblockpos.offset(enumfacing);
                              IBlockState iblockstate3 = worldIn.getBlockState(blockpos);

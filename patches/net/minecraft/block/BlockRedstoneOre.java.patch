@@ -5,7 +5,7 @@
          Random random = p_180691_0_.rand;
  
 -        for (EnumFacing enumfacing : EnumFacing.values())
-+        for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
++        for (EnumFacing enumfacing : (me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values()))
          {
              BlockPos blockpos = worldIn.offset(enumfacing);
  

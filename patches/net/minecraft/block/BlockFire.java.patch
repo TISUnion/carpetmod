@@ -5,7 +5,7 @@
              IBlockState iblockstate1 = this.getDefaultState();
  
 -            for (EnumFacing enumfacing : EnumFacing.values())
-+            for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
++            for (EnumFacing enumfacing : (me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values()))
              {
                  BooleanProperty booleanproperty = FACING_TO_PROPERTY_MAP.get(enumfacing);
  
@@ -14,7 +14,7 @@
      private boolean areNeighborsFlammable(IBlockReader worldIn, BlockPos pos)
      {
 -        for (EnumFacing enumfacing : EnumFacing.values())
-+        for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
++        for (EnumFacing enumfacing : (me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values()))
          {
              if (this.canBurn(worldIn.getBlockState(pos.offset(enumfacing))))
              {
@@ -23,7 +23,7 @@
              int i = 0;
  
 -            for (EnumFacing enumfacing : EnumFacing.values())
-+            for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
++            for (EnumFacing enumfacing : (me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values()))
              {
                  i = Math.max(this.getEncouragement(worldIn.getBlockState(pos.offset(enumfacing)).getBlock()), i);
              }

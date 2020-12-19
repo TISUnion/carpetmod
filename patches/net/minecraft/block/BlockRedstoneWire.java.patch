@@ -163,7 +163,7 @@
 -                this.blocksNeedingUpdate.add(p_212568_2_.offset(enumfacing1));
 +                this.blocksNeedingUpdate.add(p_212568_2_);
 +
-+                for (EnumFacing enumfacing1 : EnumFacing.ENUM_FACING_VALUES) {
++                for (EnumFacing enumfacing1 : (me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values())) {
 +                    this.blocksNeedingUpdate.add(p_212568_2_.offset(enumfacing1));
 +                }
              }
@@ -174,7 +174,7 @@
              worldIn.notifyNeighborsOfStateChange(pos, this);
  
 -            for (EnumFacing enumfacing : EnumFacing.values())
-+            for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
++            for (EnumFacing enumfacing : (me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values()))
              {
                  worldIn.notifyNeighborsOfStateChange(pos.offset(enumfacing), this);
              }
@@ -193,7 +193,7 @@
              if (!worldIn.isRemote)
              {
 -                for (EnumFacing enumfacing : EnumFacing.values())
-+                for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
++                for (EnumFacing enumfacing : (me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values()))
                  {
                      worldIn.notifyNeighborsOfStateChange(pos.offset(enumfacing), this);
                  }

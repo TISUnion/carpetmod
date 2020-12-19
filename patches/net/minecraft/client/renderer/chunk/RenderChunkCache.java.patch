@@ -5,7 +5,7 @@
              int i = 0;
  
 -            for (EnumFacing enumfacing : EnumFacing.values())
-+            for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
++            for (EnumFacing enumfacing : (me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values()))
              {
                  int j = this.getLightSubtracted(pos.offset(enumfacing), amount);
  
@@ -14,7 +14,7 @@
                      int l = 0;
  
 -                    for (EnumFacing enumfacing : EnumFacing.values())
-+                    for (EnumFacing enumfacing : EnumFacing.ENUM_FACING_VALUES)
++                    for (EnumFacing enumfacing : (me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values()))
                      {
                          int k = RenderChunkCache.this.getLightFor(lightType, pos.offset(enumfacing));
  

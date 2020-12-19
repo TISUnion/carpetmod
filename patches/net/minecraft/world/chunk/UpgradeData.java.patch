@@ -5,7 +5,7 @@
              int i1 = (p_196991_0_.z << 4) + (!flag4 || !flag && !flag1 ? (flag3 ? 0 : 15) : 1);
              int j1 = (p_196991_0_.z << 4) + (!flag4 || !flag && !flag1 ? (flag3 ? 0 : 15) : 14);
 -            EnumFacing[] aenumfacing = EnumFacing.values();
-+            EnumFacing[] aenumfacing = EnumFacing.ENUM_FACING_VALUES;
++            EnumFacing[] aenumfacing = (me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values());
              BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
  
              for (BlockPos.MutableBlockPos blockpos$mutableblockpos1 : BlockPos.getAllInBoxMutable(k, 0, i1, l, world.getHeight() - 1, j1))
@@ -14,7 +14,7 @@
                  if (chunksection != null && aint != null && aint.length > 0)
                  {
 -                    EnumFacing[] aenumfacing = EnumFacing.values();
-+                    EnumFacing[] aenumfacing = EnumFacing.ENUM_FACING_VALUES;
++                    EnumFacing[] aenumfacing = (me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values());
                      BlockStateContainer<IBlockState> blockstatecontainer = chunksection.getData();
  
                      for (int j : aint)
@@ -23,7 +23,7 @@
          };
  
 -        public static final EnumFacing[] field_208827_f = EnumFacing.values();
-+        public static final EnumFacing[] field_208827_f = EnumFacing.ENUM_FACING_VALUES;
++        public static final EnumFacing[] field_208827_f = (me.jellysquid.mods.lithium.LithiumConfig.ALLOC_ENUM_VALUES ? EnumFacing.ENUM_FACING_VALUES : EnumFacing.values());
  
          private BlockFixers(Block... p_i47847_3_)
          {
