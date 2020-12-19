@@ -586,8 +586,15 @@ public class CarpetSettings
     @Rule(desc = "Enables /spawn command for spawn tracking", category = COMMAND)
     public static String commandSpawn = "true";
 
-    @Rule(desc = "Enables /tick command to control game clocks", category = COMMAND)
+    @Rule(
+            desc = "Enables /profile command to monitor game performance",
+            extra = "subset of /tick command capabilities",
+            category = COMMAND
+    )
     public static String commandTick = "true";
+
+    @Rule(desc = "Enables /tick command to control game clocks", category = COMMAND)
+    public static String commandProfile = "true";
 
     @Rule(desc = "Enables /log command to monitor events in the game via chat and overlays", category = COMMAND)
     public static String commandLog = "true";
