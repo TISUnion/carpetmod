@@ -228,7 +228,7 @@ public class CarpetSettings
             extra = {
                     "More exactly, it replaces the return value of nextFloat() for blast ray strength randomization, " +
                             "so the random blast strength of the explosion becomes predictable",
-                    "The value should be between 0.0 and 1.0. Set it to -1.0 to disable overriding",
+                    "The value should be between 0.0 and 1.0, where 0.0 is for minimum possible strength and 1.0 is for maxmium possible strength. Set it to -1.0 to disable overriding",
             },
             validate = ExplosionRandomRatioValidator.class,
             options = {"-1.0", "0.0", "0.5", "1.0"},
