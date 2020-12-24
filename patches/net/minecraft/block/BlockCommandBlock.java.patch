@@ -22,27 +22,33 @@
  import org.apache.logging.log4j.LogManager;
  import org.apache.logging.log4j.Logger;
  
-@@ -65,7 +65,18 @@
+@@ -65,7 +65,24 @@
                      if (flag)
                      {
                          tileentitycommandblock.setConditionMet();
 -                        worldIn.getPendingBlockTicks().scheduleTick(pos, this, this.tickRate(worldIn));
-+                        if (CarpetSettings.instantCommandBlock && tileentitycommandblock.getMode() == TileEntityCommandBlock.Mode.REDSTONE)  // TISCM instantCommandBlock
++
++                        // TISCM instantCommandBlock
++//                        worldIn.getPendingBlockTicks().scheduleTick(pos, this, this.tickRate(worldIn));
++                        boolean doVanillaLogic = true;
++                        if (CarpetSettings.instantCommandBlock && tileentitycommandblock.getMode() == TileEntityCommandBlock.Mode.REDSTONE)
 +                        {
 +                            Block blockBelow = worldIn.getBlockState(pos.down()).getBlock();
 +                            if (blockBelow == Blocks.REDSTONE_ORE)
 +                            {
 +                                this.tick(state, worldIn, pos, worldIn.getRandom());
++                                doVanillaLogic = false;
 +                            }
 +                        }
-+                        else
++                        if (doVanillaLogic)
 +                        {
++                            // vanilla thing
 +                            worldIn.getPendingBlockTicks().scheduleTick(pos, this, this.tickRate(worldIn));
 +                        }
                      }
                  }
              }
-@@ -126,6 +137,7 @@
+@@ -126,6 +143,7 @@
          if (p_193387_5_)
          {
              p_193387_4_.trigger(p_193387_2_);
