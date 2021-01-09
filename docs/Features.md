@@ -629,7 +629,7 @@ Fixes for original CarpetMod
 
 - Fixed no username length limit with `/player` command (long name will make everyone cannot enter the server) 
 - Removed lever modification ability from flippinCactus
-- Added a permission check for cheaty command `/player mount` (minimum permission level 4)
+- Added an OP permission check for cheaty command `/player mount`
 
 -----
 
