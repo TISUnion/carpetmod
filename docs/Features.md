@@ -627,8 +627,9 @@ The stat name is `break_bedrock` in `custom` catalogory
 
 Fixes for original CarpetMod
 
-- fix no username length limit with `/player` command (long name will make everyone cannot enter the server) 
-- remove lever modification ability from flippinCactus
+- Fixed no username length limit with `/player` command (long name will make everyone cannot enter the server) 
+- Removed lever modification ability from flippinCactus
+- Removed `/player mount` command since it's illegal
 
 -----
 

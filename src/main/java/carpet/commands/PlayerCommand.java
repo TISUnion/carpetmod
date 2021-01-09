@@ -76,8 +76,9 @@ public class PlayerCommand
                                 executes(PlayerCommand::kill)).
                         then(literal("shadow").
                                 executes(PlayerCommand::shadow)).
-                        then(literal("mount").
-                                executes(PlayerCommand::mount)).
+// TISCM: yeeted illegal mount command
+//                        then(literal("mount").
+//                                executes(PlayerCommand::mount)).
                         then(literal("dismount").
                                 executes(PlayerCommand::dismount)).
                         then(literal("sneak").
