@@ -76,9 +76,8 @@ public class PlayerCommand
                                 executes(PlayerCommand::kill)).
                         then(literal("shadow").
                                 executes(PlayerCommand::shadow)).
-// TISCM: yeeted illegal mount command
-//                        then(literal("mount").
-//                                executes(PlayerCommand::mount)).
+                        then(literal("mount").
+                                executes(PlayerCommand::mount)).
                         then(literal("dismount").
                                 executes(PlayerCommand::dismount)).
                         then(literal("sneak").
@@ -312,6 +311,8 @@ public class PlayerCommand
     private static int mount(CommandContext<CommandSource> context)
     {
         if (cantManipulate(context)) return 0;
+        // TISCM added permission for mount command
+        if (!context.getSource().hasPermissionLevel(2)) return 0;
         getPlayer(context).actionPack.mount();
         return 1;
     }
