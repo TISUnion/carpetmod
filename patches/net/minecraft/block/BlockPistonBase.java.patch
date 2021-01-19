@@ -1,8 +1,9 @@
 --- a/net/minecraft/block/BlockPistonBase.java
 +++ b/net/minecraft/block/BlockPistonBase.java
-@@ -1,9 +1,8 @@
+@@ -1,9 +1,9 @@
  package net.minecraft.block;
  
++import carpet.helpers.BedrockBreakingStatHelper;
 +import carpet.settings.CarpetSettings;
  import com.google.common.collect.Lists;
  import com.google.common.collect.Sets;
@@ -11,7 +12,7 @@
  import net.minecraft.block.material.EnumPushReaction;
  import net.minecraft.block.state.BlockFaceShape;
  import net.minecraft.block.state.BlockPistonStructureHelper;
-@@ -19,6 +18,7 @@
+@@ -19,6 +19,7 @@
  import net.minecraft.state.StateContainer;
  import net.minecraft.state.properties.BlockStateProperties;
  import net.minecraft.state.properties.PistonType;
@@ -19,7 +20,7 @@
  import net.minecraft.tileentity.TileEntity;
  import net.minecraft.tileentity.TileEntityPiston;
  import net.minecraft.util.EnumFacing;
-@@ -32,6 +32,9 @@
+@@ -32,6 +33,9 @@
  import net.minecraft.world.World;
  import net.minecraft.world.WorldServer;
  
@@ -29,7 +30,7 @@
  public class BlockPistonBase extends BlockDirectional
  {
      public static final BooleanProperty EXTENDED = BlockStateProperties.EXTENDED;
-@@ -43,6 +46,9 @@
+@@ -43,6 +47,9 @@
      protected static final VoxelShape PISTON_BASE_DOWN_AABB = Block.makeCuboidShape(0.0D, 4.0D, 0.0D, 16.0D, 16.0D, 16.0D);
      private final boolean isSticky;
  
@@ -39,7 +40,7 @@
      public BlockPistonBase(boolean sticky, Block.Properties properties)
      {
          super(properties);
-@@ -158,7 +164,8 @@
+@@ -158,7 +165,8 @@
  
      private boolean shouldBeExtended(World worldIn, BlockPos pos, EnumFacing facing)
      {
@@ -49,7 +50,7 @@
          {
              if (enumfacing != facing && worldIn.isSidePowered(pos.offset(enumfacing), enumfacing))
              {
-@@ -172,9 +179,17 @@
+@@ -172,9 +180,17 @@
          }
          else
          {
@@ -68,38 +69,38 @@
              {
                  if (enumfacing1 != EnumFacing.DOWN && worldIn.isSidePowered(blockpos.offset(enumfacing1), enumfacing1))
                  {
-@@ -186,6 +201,15 @@
+@@ -186,6 +202,15 @@
          }
      }
  
 +    // TISCM break_bedrock stat
-+    private void tryAddNearestPlayerStats(World worldIn, BlockPos pos)
++    private void tryAddNearestPlayerStats(World worldIn, BlockPos pistonPos, BlockPos bedrockPos)
 +    {
-+        if (worldIn.getBlockState(pos).getBlock() == Blocks.BEDROCK)
++        if (worldIn.getBlockState(bedrockPos).getBlock() == Blocks.BEDROCK)
 +        {
-+            worldIn.getServer().getPlayerList().addStatsToNearestPlayersInDimensionNear(worldIn.getDimension().getType(), pos, 10, StatList.BREAK_BEDROCK, 1);
++            BedrockBreakingStatHelper.onBedrockYeeted(worldIn, pistonPos, bedrockPos);
 +        }
 +    }
 +
      public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int id, int param)
      {
          EnumFacing enumfacing = state.get(FACING);
-@@ -255,6 +279,9 @@
+@@ -255,6 +280,9 @@
                  {
                      if (id != 1 || iblockstate.isAir() || !canPush(iblockstate, worldIn, blockpos, enumfacing.getOpposite(), false, enumfacing) || iblockstate.getPushReaction() != EnumPushReaction.NORMAL && block != Blocks.PISTON && block != Blocks.STICKY_PISTON)
                      {
 +                        // TISCM break_bedrock stat
-+                        tryAddNearestPlayerStats(worldIn, pos.offset(enumfacing));
++                        tryAddNearestPlayerStats(worldIn, pos, pos.offset(enumfacing));
 +
                          worldIn.removeBlock(pos.offset(enumfacing));
                      }
                      else
-@@ -265,12 +292,14 @@
+@@ -265,12 +293,14 @@
              }
              else
              {
 +                // TISCM break_bedrock stat
-+                tryAddNearestPlayerStats(worldIn, pos.offset(enumfacing));
++                tryAddNearestPlayerStats(worldIn, pos, pos.offset(enumfacing));
 +
                  worldIn.removeBlock(pos.offset(enumfacing));
              }
@@ -110,7 +111,7 @@
          return true;
      }
  
-@@ -316,8 +345,14 @@
+@@ -316,8 +346,14 @@
                  {
                      return false;
                  }
@@ -127,7 +128,7 @@
              }
              else
              {
-@@ -329,6 +364,14 @@
+@@ -329,6 +365,14 @@
              return false;
          }
      }
@@ -142,7 +143,7 @@
  
      private boolean doMove(World worldIn, BlockPos pos, EnumFacing direction, boolean extending)
      {
-@@ -371,6 +414,24 @@
+@@ -371,6 +415,24 @@
                  --k;
                  aiblockstate[k] = iblockstate;
              }
@@ -167,7 +168,7 @@
  
              for (int l = list.size() - 1; l >= 0; --l)
              {
-@@ -379,7 +440,19 @@
+@@ -379,7 +441,19 @@
                  blockpos3 = blockpos3.offset(enumfacing);
                  set.remove(blockpos3);
                  worldIn.setBlockState(blockpos3, Blocks.MOVING_PISTON.getDefaultState().with(FACING, direction), 68);
