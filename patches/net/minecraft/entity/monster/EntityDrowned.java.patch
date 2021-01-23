@@ -1,54 +1,43 @@
 --- a/net/minecraft/entity/monster/EntityDrowned.java
 +++ b/net/minecraft/entity/monster/EntityDrowned.java
-@@ -3,6 +3,8 @@
+@@ -3,6 +3,7 @@
  import java.util.Random;
  import java.util.function.Predicate;
  import javax.annotation.Nullable;
 +
-+import carpet.settings.CarpetSettings;
  import net.minecraft.entity.EntityCreature;
  import net.minecraft.entity.EntityLivingBase;
  import net.minecraft.entity.EntityType;
-@@ -254,18 +256,40 @@
-         }
+@@ -30,12 +31,7 @@
+ import net.minecraft.inventory.EntityEquipmentSlot;
+ import net.minecraft.item.ItemStack;
+ import net.minecraft.nbt.NBTTagCompound;
+-import net.minecraft.pathfinding.Path;
+-import net.minecraft.pathfinding.PathNavigate;
+-import net.minecraft.pathfinding.PathNavigateGround;
+-import net.minecraft.pathfinding.PathNavigateSwimmer;
+-import net.minecraft.pathfinding.PathNodeType;
+-import net.minecraft.pathfinding.PathPoint;
++import net.minecraft.pathfinding.*;
+ import net.minecraft.util.DamageSource;
+ import net.minecraft.util.ResourceLocation;
+ import net.minecraft.util.SoundEvent;
+@@ -65,6 +61,18 @@
+         this.groundNavigator = new PathNavigateGround(this, p_i48903_1_);
      }
  
 +    // TISCM drownedNavigatorMemoryLeakFix
-+    private void setNavigator(PathNavigate navigator)
++    public PathNavigateSwimmer getWaterNavigator()
 +    {
-+        if (CarpetSettings.drownedNavigatorMemoryLeakFix)
-+        {
-+            this.world.getPathListener().onEntityRemoved(this);
-+            this.navigator = navigator;
-+            this.world.getPathListener().onEntityAdded(this);
-+        }
-+        else
-+        {
-+            // why u choose this vanilla buggy behavior xd
-+            this.navigator = navigator;
-+        }
++        return this.waterNavigator;
 +    }
 +
-     public void updateSwimming()
++    public PathNavigateGround getGroundNavigator()
++    {
++        return this.groundNavigator;
++    }
++    // TISCM drownedNavigatorMemoryLeakFix ends
++
+     protected void applyEntityAI()
      {
-         if (!this.world.isRemote)
-         {
-             if (this.isServerWorld() && this.isInWater() && this.func_204715_dF())
-             {
--                this.navigator = this.waterNavigator;
-+                // TISCM drownedNavigatorMemoryLeakFix
-+//                this.navigator = this.waterNavigator;
-+                this.setNavigator(this.waterNavigator);
-+
-                 this.setSwimming(true);
-             }
-             else
-             {
--                this.navigator = this.groundNavigator;
-+                // TISCM drownedNavigatorMemoryLeakFix
-+//                this.navigator = this.groundNavigator;
-+                this.setNavigator(this.groundNavigator);
-+
-                 this.setSwimming(false);
-             }
-         }
+         this.tasks.addTask(1, new EntityDrowned.AIGoToWater(this, 1.0D));
