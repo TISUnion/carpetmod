@@ -425,6 +425,13 @@ public class CarpetSettings
     )
     public static boolean optimizedFastEntityMovement = false;
 
+    @Rule(
+            desc = "Fixed memory leak caused by drowned path finding AI",
+            extra = "Check MC-202246 for details",
+            category = {BUGFIX}
+    )
+    public static boolean drownedNavigatorMemoryLeakFix = false;
+
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$
     //   | $$     | $$  | $$  \__/| $$  \__/| $$$$  /$$$$

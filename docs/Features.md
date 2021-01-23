@@ -422,6 +422,19 @@ Options: `false`, `true`
 Categories: optimization, experimental
 
 
+## drownedNavigatorMemoryLeakFix
+
+Fixed memory leak caused by drowned path finding AI
+
+Check [MC-202246](https://bugs.mojang.com/browse/MC-202246) for details
+
+Default: `false`
+
+Options: `false`, `true`
+
+Categories: bugfix
+
+
 ## YEET
 
 **Warn**: all yeet options will change vanilla behaviour, they WILL NOT behave like vanilla
