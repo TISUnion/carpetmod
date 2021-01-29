@@ -46,7 +46,7 @@
          this.preventEntitySpawning = true;
          this.isImmuneToFire = true;
          this.setSize(0.98F, 0.98F);
-@@ -31,11 +49,14 @@
+@@ -31,11 +49,20 @@
      {
          this(worldIn);
          this.setPosition(x, y, z);
@@ -62,11 +62,17 @@
 +            this.motionY = (double) 0.2F;
 +            this.motionZ = (double) (-((float) Math.cos((double) f)) * 0.02F);
 +        }
++        // CM hardcodeTNTangle
++        if (CarpetSettings.hardcodeTNTangle != -1.0D)
++        {
++            this.setVelocity(-Math.sin(CarpetSettings.hardcodeTNTangle) * 0.02F, 0.2F, -Math.cos(CarpetSettings.hardcodeTNTangle) * 0.02F);
++        }
++
 +        this.setFuse(CarpetSettings.tntFuseDuration);
          this.prevPosX = x;
          this.prevPosY = y;
          this.prevPosZ = z;
-@@ -44,7 +65,7 @@
+@@ -44,7 +71,7 @@
  
      protected void registerData()
      {
@@ -75,7 +81,7 @@
      }
  
      protected boolean canTriggerWalking()
-@@ -59,6 +80,12 @@
+@@ -59,6 +86,12 @@
  
      public void tick()
      {
@@ -88,7 +94,7 @@
          this.prevPosX = this.posX;
          this.prevPosY = this.posY;
          this.prevPosZ = this.posZ;
-@@ -100,6 +127,10 @@
+@@ -100,6 +133,10 @@
  
      private void explode()
      {
