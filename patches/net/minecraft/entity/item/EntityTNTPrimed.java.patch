@@ -56,16 +56,16 @@
 -        this.motionZ = (double)(-((float)Math.cos((double)f)) * 0.02F);
 -        this.setFuse(80);
 +        float f = (float) (Math.random() * (double) ((float) Math.PI * 2F));
++        // CM hardcodeTNTangle
++        if (CarpetSettings.hardcodeTNTangle != -1.0D)
++        {
++            f = (float)CarpetSettings.hardcodeTNTangle;
++        }
 +        // [CM] Changed value of float 'f' and if statement around vanilla code.
 +        if(!CarpetSettings.tntPrimerMomentumRemoved) {
 +            this.motionX = (double) (-((float) Math.sin((double) f)) * 0.02F);
 +            this.motionY = (double) 0.2F;
 +            this.motionZ = (double) (-((float) Math.cos((double) f)) * 0.02F);
-+        }
-+        // CM hardcodeTNTangle
-+        if (CarpetSettings.hardcodeTNTangle != -1.0D)
-+        {
-+            this.setVelocity(-Math.sin(CarpetSettings.hardcodeTNTangle) * 0.02F, 0.2F, -Math.cos(CarpetSettings.hardcodeTNTangle) * 0.02F);
 +        }
 +
 +        this.setFuse(CarpetSettings.tntFuseDuration);
