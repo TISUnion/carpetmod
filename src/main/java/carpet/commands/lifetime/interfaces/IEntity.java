@@ -6,9 +6,13 @@ import net.minecraft.util.math.Vec3d;
 
 public interface IEntity
 {
+	int getTrackId();
+
 	long getLifeTime();
 
-	Vec3d getSpawnPosition();
+	Vec3d getSpawningPosition();
+
+	Vec3d getRemovalPosition();
 
 	void recordSpawning(SpawningReason reason);
 

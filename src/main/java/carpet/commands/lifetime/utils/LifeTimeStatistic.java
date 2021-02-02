@@ -31,8 +31,8 @@ public class LifeTimeStatistic extends TranslatableBase
 	{
 		this.count = 0;
 		this.timeSum = 0;
-		this.minTimeElement = new StatisticElement(Integer.MAX_VALUE, null, null);
-		this.maxTimeElement = new StatisticElement(Integer.MIN_VALUE, null, null);
+		this.minTimeElement = new StatisticElement(Integer.MAX_VALUE, null, null, null);
+		this.maxTimeElement = new StatisticElement(Integer.MIN_VALUE, null, null, null);
 	}
 
 	public boolean isValid()
@@ -45,7 +45,7 @@ public class LifeTimeStatistic extends TranslatableBase
 		long time = entity.getLifeTime();
 		this.count++;
 		this.timeSum += time;
-		StatisticElement element = new StatisticElement(time, entity.dimension, entity.getSpawnPosition());
+		StatisticElement element = new StatisticElement(time, entity.dimension, entity.getSpawningPosition(), entity.getRemovalPosition());
 		if (time < this.minTimeElement.time)
 		{
 			this.minTimeElement = element;
@@ -63,7 +63,7 @@ public class LifeTimeStatistic extends TranslatableBase
 	 *
 	 * @param indentString spaces for indent
 	 */
-	public ITextComponent getResult(String indentString)
+	public ITextComponent getResult(String indentString, boolean hoverMode)
 	{
 		ITextComponent indent = Messenger.s(indentString, "g");
 		ITextComponent newLine = Messenger.s("\n");
@@ -74,10 +74,10 @@ public class LifeTimeStatistic extends TranslatableBase
 		indent = Messenger.c(indent, "g - ");
 		return Messenger.c(
 				indent,
-				this.minTimeElement.getTimeWithPos(this.tr("Minimum life time"), COLOR_MIN_TIME),
+				this.minTimeElement.getTimeWithPos(this.tr("Minimum life time"), COLOR_MIN_TIME, hoverMode),
 				newLine,
 				indent,
-				this.maxTimeElement.getTimeWithPos(this.tr("Maximum life time"), COLOR_MAX_TIME),
+				this.maxTimeElement.getTimeWithPos(this.tr("Maximum life time"), COLOR_MAX_TIME, hoverMode),
 				newLine,
 				indent,
 				"w " + this.tr("Average life time"),
@@ -110,32 +110,57 @@ public class LifeTimeStatistic extends TranslatableBase
 	{
 		private final long time;
 		private final DimensionType dimensionType;
-		private final Vec3d spawnPos;
+		private final Vec3d spawningPos;
+		private final Vec3d removalPos;
 
-		private StatisticElement(long time, DimensionType dimensionType, Vec3d spawnPos)
+		private StatisticElement(long time, DimensionType dimensionType, Vec3d spawningPos, Vec3d removalPos)
 		{
 			this.time = time;
 			this.dimensionType = dimensionType;
-			this.spawnPos = spawnPos;
+			this.spawningPos = spawningPos;
+			this.removalPos = removalPos;
 		}
 
-		private ITextComponent getTimeWithPos(String hint, String fmt)
+		/**
+		 * [hint]: 123 gt
+		 * [hint]: 123 gt [S] [R]
+		 */
+		private ITextComponent getTimeWithPos(String hint, String fmt, boolean hoverMode)
 		{
-			return TextUtil.getFancyText(
-					null,
-					Messenger.c(
-							"w " + hint,
-							"g : ",
-							fmt + this.time,
-							"g  gt"
-					),
-					Messenger.c(
-							"w " + tr("Spawn Position"),
-							"g : ",
-							"w " + TextUtil.getCoordinateString(this.spawnPos)
-					),
-					new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, TextUtil.getTeleportCommand(this.spawnPos, this.dimensionType))
+			ITextComponent text = Messenger.c(
+					"w " + hint,
+					"g : ",
+					fmt + this.time,
+					"g  gt"
 			);
+			if (!hoverMode)
+			{
+				text.appendSibling(Messenger.c(
+						"w  ",
+						TextUtil.getFancyText(
+								null,
+								Messenger.s("[S]", "e"),
+								Messenger.c(
+										"w " + tr("Spawning Position"),
+										"g : ",
+										"w " + TextUtil.getCoordinateString(this.spawningPos)
+								),
+								new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, TextUtil.getTeleportCommand(this.spawningPos, this.dimensionType))
+						),
+						"w  ",
+						TextUtil.getFancyText(
+								null,
+								Messenger.s("[R]", "r"),
+								Messenger.c(
+										"w " + tr("Removal Position"),
+										"g : ",
+										"w " + TextUtil.getCoordinateString(this.removalPos)
+								),
+								new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, TextUtil.getTeleportCommand(this.removalPos, this.dimensionType))
+						)
+				));
+			}
+			return text;
 		}
 	}
 }
