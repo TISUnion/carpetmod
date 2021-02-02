@@ -72,7 +72,7 @@ public class MicroTimingLoggerManager
         CarpetServer.LOGGER.debug("Detached MicroTick loggers");
     }
 
-    private static Optional<MicroTimingLogger> getWorldLogger(World world)
+    public static Optional<MicroTimingLogger> getWorldLogger(World world)
     {
         if (instance != null && world instanceof WorldServer)
         {
