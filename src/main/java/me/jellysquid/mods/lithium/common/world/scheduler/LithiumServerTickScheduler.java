@@ -105,7 +105,7 @@ public class LithiumServerTickScheduler<T> extends ServerTickList<T> {
     @Override
     public List<NextTickListEntry<T>> getPending(Chunk chunk, boolean mutates) {
         ChunkPos chunkPos = chunk.getPos();
-        MutableBoundingBox box = new MutableBoundingBox(chunkPos.getXStart() - 2, chunkPos.getZStart() - 2, chunkPos.getXEnd() + 2, chunkPos.getZEnd() + 2);
+        MutableBoundingBox box = new MutableBoundingBox(chunkPos.getXStart() - 2, 0, chunkPos.getZStart() - 2, chunkPos.getXEnd() + 2, 256, chunkPos.getZEnd() + 2);
         return this.getPending(box, mutates);
     }
 
@@ -291,14 +291,14 @@ public class LithiumServerTickScheduler<T> extends ServerTickList<T> {
         this.executingTicks.clear();
     }
 
-    private List<NextTickListEntry<T>> collectTicks(MutableBoundingBox box, boolean remove, Predicate<TickEntry<?>> predicate) {
+    private List<NextTickListEntry<T>> collectTicks(MutableBoundingBox bounds, boolean remove, Predicate<TickEntry<?>> predicate) {
         List<NextTickListEntry<T>> ret = new ArrayList<>();
 
-        int minChunkX = box.minX >> 4;
-        int maxChunkX = box.maxX >> 4;
+        int minChunkX = bounds.minX >> 4;
+        int maxChunkX = bounds.maxX >> 4;
 
-        int minChunkZ = box.minZ >> 4;
-        int maxChunkZ = box.maxZ >> 4;
+        int minChunkZ = bounds.minZ >> 4;
+        int maxChunkZ = bounds.maxZ >> 4;
 
         // Iterate over all chunks encompassed by the block box
         for (int chunkX = minChunkX; chunkX <= maxChunkX; chunkX++) {
@@ -312,11 +312,16 @@ public class LithiumServerTickScheduler<T> extends ServerTickList<T> {
                 }
 
                 for (TickEntry<T> tick : set) {
-                    if (!box.isVecInside(tick.position) || !predicate.test(tick)) {
-                        continue;
-                    }
+                    BlockPos pos = tick.position;
 
-                    ret.add(tick);
+                    // [VanillaCopy] ServerTickScheduler#transferTickInBounds
+                    // The minimum coordinate is include while the maximum coordinate is exclusive
+                    // Possibly a bug in vanilla, but we need to match it here.
+                    if (pos.getX() >= bounds.minX && pos.getX() < bounds.maxX && pos.getZ() >= bounds.minZ && pos.getZ() < bounds.maxZ) {
+                        if (predicate.test(tick)) {
+                            ret.add(tick);
+                        }
+                    }
                 }
             }
         }
