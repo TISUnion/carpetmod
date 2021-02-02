@@ -432,6 +432,12 @@ public class CarpetSettings
     )
     public static boolean drownedNavigatorMemoryLeakFix = false;
 
+    @Rule(
+            desc = "Allow creative players to open a shulker block even if the shulker box is blocked",
+            category = {CREATIVE}
+    )
+    public static boolean creativeOpenShulkerBoxForcibly = false;
+
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$
     //   | $$     | $$  | $$  \__/| $$  \__/| $$$$  /$$$$

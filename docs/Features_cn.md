@@ -428,11 +428,22 @@
 
 更多详情见 [MC-202246](https://bugs.mojang.com/browse/MC-202246)
 
-Default: `false`
+默认值: `false`
 
-Options: `false`, `true`
+选项: `false`, `true`
 
-Categories: bugfix
+分类: bugfix
+
+
+## creativeOpenShulkerBoxForcibly
+
+允许创造模式的玩家打开被阻挡的潜影盒
+
+默认值: `false`
+
+选项: `false`, `true`
+
+分类: creative
 
 
 ## YEET

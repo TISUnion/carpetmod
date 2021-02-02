@@ -435,6 +435,17 @@ Options: `false`, `true`
 Categories: bugfix
 
 
+## creativeOpenShulkerBoxForcibly
+
+Allow creative players to open a shulker block even if the shulker box is blocked
+
+Default: `false`
+
+Options: `false`, `true`
+
+Categories: creative
+
+
 ## YEET
 
 **Warn**: all yeet options will change vanilla behaviour, they WILL NOT behave like vanilla
