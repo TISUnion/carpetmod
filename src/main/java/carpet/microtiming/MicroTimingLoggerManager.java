@@ -155,14 +155,6 @@ public class MicroTimingLoggerManager
     {
         onEvent(world, pos, () -> new ScheduleTileTickEvent(block, pos, delay, priority, success));
     }
-    public static void onScheduleTileTickEvent(World world, Block block, BlockPos pos, int delay, TickPriority priority)
-    {
-        onScheduleTileTickEvent(world, block, pos, delay, priority, null);
-    }
-    public static void onScheduleTileTickEvent(World world, Block block, BlockPos pos, int delay)
-    {
-        onScheduleTileTickEvent(world, block, pos, delay, TickPriority.NORMAL);
-    }
 
     /*
      * -------------

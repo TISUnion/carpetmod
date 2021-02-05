@@ -59,6 +59,9 @@ public class LithiumServerTickScheduler<T> extends ServerTickList<T> {
     private final WorldServer world;
     private final Consumer<NextTickListEntry<T>> tickConsumer;
 
+    // TISCM Micro Timing logger
+    private boolean scheduleSuccess;
+
     public LithiumServerTickScheduler(WorldServer world, Predicate<T> invalidPredicate, Function<T, ResourceLocation> idToName, Function<ResourceLocation, T> deserializerIn, Consumer<NextTickListEntry<T>> tickConsumer) {
         super(world, invalidPredicate, idToName, deserializerIn, tickConsumer);
 
@@ -124,8 +127,6 @@ public class LithiumServerTickScheduler<T> extends ServerTickList<T> {
 
     @Override
     public void scheduleTick(BlockPos pos, T obj, int delay, TickPriority priority) {
-        int oldListSize = this.scheduledTicks.size();  // TISCM Micro Timing logger
-
         // An extra isBlockLoaded check is needed in 1.13
         if (this.world.isBlockLoaded(pos)) {
             this.scheduleUpdateNoLoadedCheck(pos, obj, delay, priority);
@@ -134,7 +135,7 @@ public class LithiumServerTickScheduler<T> extends ServerTickList<T> {
         // TISCM Micro Timing logger
         if (obj instanceof Block)
         {
-            MicroTimingLoggerManager.onScheduleTileTickEvent(this.world, (Block)obj, pos, delay, priority, this.scheduledTicks.size() > oldListSize);
+            MicroTimingLoggerManager.onScheduleTileTickEvent(this.world, (Block)obj, pos, delay, priority, this.scheduleSuccess);
         }
     }
 
@@ -343,6 +344,9 @@ public class LithiumServerTickScheduler<T> extends ServerTickList<T> {
      */
     private void addScheduledTick(NextTickListEntry<T> tick) {
         TickEntry<T> entry = this.scheduledTicks.computeIfAbsent(tick, this::createTickEntry);
+
+        // TISCM Micro Timing logger
+        this.scheduleSuccess = !entry.scheduled;
 
         if (!entry.scheduled) {
             TickEntryQueue<T> timeIdx = this.scheduledTicksOrdered.computeIfAbsent(getBucketKey(tick.scheduledTime, tick.priority), key -> new TickEntryQueue<>());
