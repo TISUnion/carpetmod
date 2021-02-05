@@ -9,7 +9,16 @@
  import com.google.common.collect.Lists;
  import com.google.common.collect.Sets;
  import java.util.Collections;
-@@ -23,8 +26,7 @@
+@@ -10,6 +13,8 @@
+ import java.util.function.Consumer;
+ import java.util.function.Function;
+ import java.util.function.Predicate;
++
++import net.minecraft.block.Block;
+ import net.minecraft.block.state.IBlockState;
+ import net.minecraft.crash.CrashReport;
+ import net.minecraft.crash.CrashReportCategory;
+@@ -23,8 +28,7 @@
  import net.minecraft.util.math.MutableBoundingBox;
  import net.minecraft.world.chunk.Chunk;
  
@@ -19,7 +28,7 @@
      protected final Predicate<T> filter;
      protected final Function<T, ResourceLocation> serializer;
      protected final Function<ResourceLocation, T> deserializer;
-@@ -34,8 +36,8 @@
+@@ -34,8 +38,8 @@
      private final List<NextTickListEntry<T>> pendingTickListEntriesThisTick = Lists.newArrayList();
      private final Consumer<NextTickListEntry<T>> tickFunction;
  
@@ -30,7 +39,7 @@
          this.filter = filter;
          this.serializer = serializerIn;
          this.deserializer = deserializerIn;
-@@ -43,29 +45,23 @@
+@@ -43,29 +47,23 @@
          this.tickFunction = tickFunctionIn;
      }
  
@@ -69,7 +78,7 @@
                      break;
                  }
  
-@@ -76,46 +72,47 @@
+@@ -76,46 +74,47 @@
  
              this.world.profiler.endSection();
              this.world.profiler.startSection("ticking");
@@ -135,7 +144,7 @@
          ChunkPos chunkpos = p_205364_1_.getPos();
          int i = (chunkpos.x << 4) - 2;
          int j = i + 16 + 2;
-@@ -124,42 +121,33 @@
+@@ -124,42 +123,33 @@
          return this.getPending(new MutableBoundingBox(i, 0, k, j, 256, l), remove);
      }
  
@@ -188,7 +197,7 @@
                          list = Lists.newArrayList();
                      }
  
-@@ -171,83 +159,73 @@
+@@ -171,83 +161,82 @@
          return list == null ? Collections.emptyList() : list;
      }
  
@@ -269,17 +278,26 @@
 -            if (this.world.isBlockLoaded(pos))
 -            {
 +    public void scheduleTick(BlockPos pos, T itemIn, int scheduledTime, TickPriority priority) {
++        // TISCM Micro Timing logger
++        int oldListSize = this.pendingTickListEntriesHashSet.size();
++
 +        if (!this.filter.test(itemIn)) {
 +            if (this.world.isBlockLoaded(pos)) {
                  this.addEntry(pos, itemIn, scheduledTime, priority);
              }
          }
-     }
+-    }
  
 -    protected void scheduleUpdateNoLoadedCheck(BlockPos pos, T p_205367_2_, int p_205367_3_, TickPriority priority)
 -    {
 -        if (!this.filter.test(p_205367_2_))
--        {
++        // TISCM Micro Timing logger
++        if (itemIn instanceof Block)
+         {
++            MicroTimingLoggerManager.onScheduleTileTickEvent(this.world, (Block)itemIn, pos, scheduledTime, priority, this.pendingTickListEntriesHashSet.size() > oldListSize);
++        }
++    }
++
 +    protected void scheduleUpdateNoLoadedCheck(BlockPos pos, T p_205367_2_, int p_205367_3_, TickPriority priority) {
 +        if (!this.filter.test(p_205367_2_)) {
              this.addEntry(pos, p_205367_2_, p_205367_3_, priority);
