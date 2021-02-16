@@ -393,9 +393,9 @@ public class EntityPlayerActionPack
 
                         if (player.getEntityWorld().getBlockState(blockpos).getMaterial() != Material.AIR)
                         {
-                            float x = (float) raytraceresult.hitVec.x;
-                            float y = (float) raytraceresult.hitVec.y;
-                            float z = (float) raytraceresult.hitVec.z;
+                            float x = (float)(raytraceresult.hitVec.x - (double)blockpos.getX());
+                            float y = (float)(raytraceresult.hitVec.y - (double)blockpos.getY());
+                            float z = (float)(raytraceresult.hitVec.z - (double)blockpos.getZ());
 
                             EnumActionResult res = player.interactionManager.processRightClickBlock(player, player.getEntityWorld(), itemstack, enumhand, blockpos, raytraceresult.sideHit, x, y, z);
                             if (res == EnumActionResult.SUCCESS)
