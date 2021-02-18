@@ -177,7 +177,7 @@ public class CarpetSettings
         @Override
         public Integer validate(CommandSource source, ParsedRule<Integer> currentRule, Integer newValue, String string)
         {
-            return (newValue > 0 && newValue <= 1000) ? newValue : null;
+            return (newValue > 0 && newValue <= 65536) ? newValue : null;
         }
         public String description()
         {

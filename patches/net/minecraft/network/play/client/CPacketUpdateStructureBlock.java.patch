@@ -21,3 +21,44 @@
          this.mirror = buf.readEnumValue(Mirror.class);
          this.rotation = buf.readEnumValue(Rotation.class);
          this.field_210399_i = buf.readString(12);
+@@ -70,6 +73,21 @@
+         this.field_210400_j = (i & 1) != 0;
+         this.field_210401_k = (i & 2) != 0;
+         this.field_210402_l = (i & 4) != 0;
++
++        // [CM] Fabric Carpet 1.4.25+ Protocol for rule structureBlockLimit
++        if (buf.readableBytes() == 6 * 4)
++        {
++            this.field_210395_e = new BlockPos(
++                    MathHelper.clamp(buf.readInt(), -limit, limit),
++                    MathHelper.clamp(buf.readInt(), -limit, limit),
++                    MathHelper.clamp(buf.readInt(), -limit, limit)
++            );
++            this.size = new BlockPos(
++                    MathHelper.clamp(buf.readInt(), 0, limit),
++                    MathHelper.clamp(buf.readInt(), 0, limit),
++                    MathHelper.clamp(buf.readInt(), 0, limit)
++            );
++        }
+     }
+ 
+     public void writePacketData(PacketBuffer buf) throws IOException
+@@ -107,6 +125,18 @@
+         }
+ 
+         buf.writeByte(i);
++
++        // [CM] Fabric Carpet 1.4.25+ Protocol for rule structureBlockLimit
++        // client method, only applicable if with carpet is on the server, or running locally
++        if (CarpetSettings.structureBlockLimit >= 128)
++        {
++            buf.writeInt(this.field_210395_e.getX());
++            buf.writeInt(this.field_210395_e.getY());
++            buf.writeInt(this.field_210395_e.getZ());
++            buf.writeInt(this.size.getX());
++            buf.writeInt(this.size.getY());
++            buf.writeInt(this.size.getZ());
++        }
+     }
+ 
+     public void processPacket(INetHandlerPlayServer handler)
