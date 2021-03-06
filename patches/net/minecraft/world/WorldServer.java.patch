@@ -97,24 +97,29 @@
              this.wakeAllPlayers();
          }
  
+-        this.profiler.startSection("spawner");
 +        //CM profiler
 +        int did = this.dimension.getType().getId();
 +        String world_name = (did==0)?"Overworld":((did<0?"The Nether":"The End"));
 +        // CM end
-+
+ 
+-        if (this.getGameRules().getBoolean("doMobSpawning") && this.worldInfo.getGenerator() != WorldType.DEBUG_ALL_BLOCK_STATES)
+-        {
+-            this.entitySpawner.findChunksForSpawning(this, this.spawnHostileMobs, this.spawnPeacefulMobs, this.worldInfo.getGameTime() % 400L == 0L);
+-            this.getChunkProvider().spawnMobs(this, this.spawnHostileMobs, this.spawnPeacefulMobs);
 +        if (TickSpeed.process_entities)
 +        { // [CM] extra indent to skip processing of entities
-         this.profiler.startSection("spawner");
-+        CarpetProfiler.start_section(world_name, "Spawning");
-+        MicroTimingLoggerManager.setTickStage(this, TickStage.SPAWNING); // TISCM Micro Timing logger
- 
-         if (this.getGameRules().getBoolean("doMobSpawning") && this.worldInfo.getGenerator() != WorldType.DEBUG_ALL_BLOCK_STATES)
-         {
-             this.entitySpawner.findChunksForSpawning(this, this.spawnHostileMobs, this.spawnPeacefulMobs, this.worldInfo.getGameTime() % 400L == 0L);
-             this.getChunkProvider().spawnMobs(this, this.spawnHostileMobs, this.spawnPeacefulMobs);
++            this.profiler.startSection("spawner");
++            CarpetProfiler.start_section(world_name, "Spawning");
++            MicroTimingLoggerManager.setTickStage(this, TickStage.SPAWNING); // TISCM Micro Timing logger
++
++            if (this.getGameRules().getBoolean("doMobSpawning") && this.worldInfo.getGenerator() != WorldType.DEBUG_ALL_BLOCK_STATES)
++            {
++                this.entitySpawner.findChunksForSpawning(this, this.spawnHostileMobs, this.spawnPeacefulMobs, this.worldInfo.getGameTime() % 400L == 0L);
++                this.getChunkProvider().spawnMobs(this, this.spawnHostileMobs, this.spawnPeacefulMobs);
++            }
++            CarpetProfiler.end_current_section();
          }
-+        CarpetProfiler.end_current_section();
-+        }
 +        // [CM] end extra indent
  
          this.profiler.endStartSection("chunkSource");
@@ -122,7 +127,7 @@
          this.chunkProvider.tick(hasTimeLeft);
          int j = this.calculateSkylightSubtracted(1.0F);
  
-@@ -208,25 +264,57 @@
+@@ -208,26 +264,64 @@
              this.setSkylightSubtracted(j);
          }
  
@@ -130,32 +135,42 @@
 +        if (TickSpeed.process_entities)
 +        { // CM extra indent to skip processing of entities
  
-+        // TISCM Micro Timing logger
-+        // Flushes messages right before overworld gametime increases
-+        if (this.getDimension().getType() == DimensionType.OVERWORLD)
-+        {
-+            MicroTimingLoggerManager.flushMessages(this.getGameTime());
-+        }
-+
-+        this.worldInfo.setGameTime(this.worldInfo.getGameTime() + 1L);
-         if (this.getGameRules().getBoolean("doDaylightCycle"))
-         {
-             this.worldInfo.setDayTime(this.worldInfo.getDayTime() + 1L);
-         }
+-        if (this.getGameRules().getBoolean("doDaylightCycle"))
+-        {
+-            this.worldInfo.setDayTime(this.worldInfo.getDayTime() + 1L);
+-        }
++            // TISCM Micro Timing logger
++            // Flushes messages right before overworld gametime increases
++            if (this.getDimension().getType() == DimensionType.OVERWORLD)
++            {
++                MicroTimingLoggerManager.flushMessages(this.getGameTime());
++            }
  
-         this.profiler.endStartSection("tickPending");
-+        CarpetProfiler.start_section(world_name, "Blocks");
-+        MicroTimingLoggerManager.setTickStage(this, TickStage.TILE_TICK); // TISCM Micro Timing logger
-         this.tickPending();
-+        CarpetProfiler.end_current_section();
+-        this.profiler.endStartSection("tickPending");
+-        this.tickPending();
++            this.worldInfo.setGameTime(this.worldInfo.getGameTime() + 1L);
++            if (this.getGameRules().getBoolean("doDaylightCycle"))
++            {
++                this.worldInfo.setDayTime(this.worldInfo.getDayTime() + 1L);
++            }
++
++            this.profiler.endStartSection("tickPending");
++            CarpetProfiler.start_section(world_name, "Tile Tick");
++            MicroTimingLoggerManager.setTickStage(this, TickStage.TILE_TICK); // TISCM Micro Timing logger
++            this.tickPending();
++            CarpetProfiler.end_current_section();
 +        } // end extra indent
++
          this.profiler.endStartSection("tickBlocks");
-+        CarpetProfiler.start_section(world_name, "Blocks");
++        CarpetProfiler.start_section(world_name, "Chunk Tick");
          this.tickBlocks();
 +        CarpetProfiler.end_current_section();
-+        MicroTimingLoggerManager.setTickStage(this, TickStage.PLAYER_CHUNK_MAP); // TISCM Micro Timing logger
++
          this.profiler.endStartSection("chunkMap");
++        CarpetProfiler.start_section(world_name, "Player Chunk Map");
++        MicroTimingLoggerManager.setTickStage(this, TickStage.PLAYER_CHUNK_MAP); // TISCM Micro Timing logger
          this.playerChunkMap.tick();
++        CarpetProfiler.end_current_section();
 +
 +        if (TickSpeed.process_entities)
 +        { // CM extra indent to skip processing of entities
@@ -177,11 +192,14 @@
 +            this.getLightingEngine().procLightUpdates();
 +        }
          this.profiler.endSection();
++        CarpetProfiler.start_section(world_name, "Block Events");
 +        MicroTimingLoggerManager.setTickStage(this, TickStage.BLOCK_EVENT); // TISCM Micro Timing logger
          this.sendQueuedBlockEvents();
++        CarpetProfiler.end_current_section();
          this.insideTick = false;
      }
-@@ -270,7 +358,7 @@
+ 
+@@ -270,7 +364,7 @@
                  }
              }
  
@@ -190,7 +208,7 @@
          }
      }
  
-@@ -306,6 +394,13 @@
+@@ -306,6 +400,13 @@
      {
          if (this.allPlayersSleeping && !this.isRemote)
          {
@@ -204,7 +222,7 @@
              for (EntityPlayer entityplayer : this.playerEntities)
              {
                  if (!entityplayer.isSpectator() && !entityplayer.isPlayerFullyAsleep())
-@@ -397,9 +492,11 @@
+@@ -397,9 +498,11 @@
              boolean flag1 = this.isThundering();
              this.profiler.startSection("pollingChunks");
  
@@ -216,7 +234,7 @@
                  Chunk chunk = iterator.next();
                  int j = chunk.x * 16;
                  int k = chunk.z * 16;
-@@ -407,7 +504,20 @@
+@@ -407,7 +510,20 @@
                  chunk.enqueueRelightChecks();
                  this.profiler.endStartSection("tickChunk");
                  chunk.tick(false);
@@ -237,7 +255,7 @@
  
                  if (flag && flag1 && this.rand.nextInt(100000) == 0)
                  {
-@@ -434,6 +544,7 @@
+@@ -434,6 +550,7 @@
                  }
  
                  this.profiler.endStartSection("iceandsnow");
@@ -245,7 +263,7 @@
  
                  if (this.rand.nextInt(16) == 0)
                  {
-@@ -460,6 +571,7 @@
+@@ -460,6 +577,7 @@
                  }
  
                  this.profiler.endStartSection("tickBlocks");
@@ -253,7 +271,7 @@
  
                  if (i > 0)
                  {
-@@ -493,13 +605,21 @@
+@@ -493,13 +611,21 @@
                          }
                      }
                  }
@@ -276,7 +294,7 @@
      {
          BlockPos blockpos = this.getHeight(Heightmap.Type.MOTION_BLOCKING, pos);
          AxisAlignedBB axisalignedbb = (new AxisAlignedBB(blockpos, new BlockPos(blockpos.getX(), this.getHeight(), blockpos.getZ()))).grow(3.0D);
-@@ -625,12 +745,16 @@
+@@ -625,12 +751,16 @@
  
      private void tickBlock(NextTickListEntry<Block> blockTickEntry)
      {
@@ -293,7 +311,7 @@
      }
  
      public void tickEntity(Entity entityIn, boolean forceUpdate)
-@@ -1021,26 +1145,54 @@
+@@ -1021,26 +1151,54 @@
  
      public void addBlockEvent(BlockPos pos, Block blockIn, int eventID, int eventParam)
      {

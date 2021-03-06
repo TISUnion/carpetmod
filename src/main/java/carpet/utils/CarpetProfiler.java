@@ -23,7 +23,10 @@ public class CarpetProfiler
     private static long current_tick_start = 0;
     private static String [] GENERAL_SECTIONS = {"Network", "Autosave"};
     private static String [] DIMENSIONS = {"Overworld","The End","The Nether"};
-    private static String [] SECTIONS = {"Spawning","Blocks","Entities","Tile Entities","Entities(client)","Tile Entities(client)","Villages"};
+    private static String [] SECTIONS = {
+            "Spawning","Blocks","Entities","Tile Entities","Entities(client)","Tile Entities(client)","Villages",  // legacy CM
+            "Tile Tick", "Chunk Tick", "Block Events", "Player Chunk Map"  // TIS CM
+    };
 
     public static void prepare_tick_report(int ticks)
     {
