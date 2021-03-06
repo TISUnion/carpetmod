@@ -14,6 +14,7 @@ public class TileEntityList implements List<TileEntity> {
     //TileEntityList does not support double-add of the same object. But it does support multiple at the same position.
     //This collection behaves like a set with insertion order. It also provides a position->TileEntity lookup.
 
+    // TISCM Larger tile entity list
     // pre-allocate 256 volume in hashsets/hashmaps to avoid constantly rehash when the amount of TileEntity is small
     @SuppressWarnings("FieldCanBeLocal")
     private final int COLLECTION_DEFAULT_SIZE = TISCMOptimizationConfig.LARGER_TILE_ENTITY_LIST ? 256 : Long2ReferenceOpenHashMap.DEFAULT_INITIAL_SIZE;

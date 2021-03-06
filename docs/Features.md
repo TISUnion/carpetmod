@@ -691,5 +691,6 @@ There are also a few optimizations which is not from lithium mod:
 - Cache BoundingBoxList creation in TileEntityHopper and TileEntityPiston
 - Pre-allocate 256 size in hashsets/hashmaps to avoid constantly rehash when the amount of TileEntity is small
 - Permanently store item burn times in `TileEntityFurnace` to avoid costly map generating each time
+- Cache some expensive tile entity serialization data
 
 If necessary, part of the optimization implementation can be switched manually in the `TISCMOptimizationConfig` class

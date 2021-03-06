@@ -27,10 +27,13 @@
      private static final ThreadLocal<EnumFacing> MOVING_ENTITY = new ThreadLocal<EnumFacing>()
      {
          protected EnumFacing initialValue()
-@@ -40,6 +50,19 @@
+@@ -40,6 +50,22 @@
      private float lastProgress;
      private long lastTicked;
  
++   // TISCM cache TileEntity Serialization
++    private NBTTagCompound pistonStateNBTCache;
++
 +    // lithium block.moving_block_shapes
 +    private static final VoxelShape[] PISTON_BASE_WITH_MOVING_HEAD_SHAPES = precomputePistonBaseWithMovingHeadShapes();
 +    @SuppressWarnings("unchecked")
@@ -47,13 +50,16 @@
      public TileEntityPiston()
      {
          super(TileEntityType.PISTON);
-@@ -52,8 +75,103 @@
+@@ -52,8 +78,106 @@
          this.pistonFacing = pistonFacingIn;
          this.extending = extendingIn;
          this.shouldHeadBeRendered = shouldHeadBeRenderedIn;
 +
 +        // TISCM Cache BoundingBoxList creation
 +        this.createVoxelShapeBoundingBoxListCache();
++
++       // TISCM cache TileEntity Serialization
++        this.pistonStateNBTCache = null;
      }
  
 +    // lithium block.moving_block_shapes starts
@@ -151,7 +157,7 @@
      public NBTTagCompound getUpdateTag()
      {
          return this.write(new NBTTagCompound());
-@@ -112,15 +230,45 @@
+@@ -112,15 +236,45 @@
          return !this.isExtending() && this.shouldPistonHeadBeRendered() ? Blocks.PISTON_HEAD.getDefaultState().with(BlockPistonExtension.TYPE, this.pistonState.getBlock() == Blocks.STICKY_PISTON ? PistonType.STICKY : PistonType.DEFAULT).with(BlockPistonExtension.FACING, this.pistonState.get(BlockPistonBase.FACING)) : this.pistonState;
      }
  
@@ -200,7 +206,7 @@
              AxisAlignedBB axisalignedbb = this.moveByPositionAndProgress(this.getMinMaxPiecesAABB(list));
              List<Entity> list1 = this.world.getEntitiesWithinAABBExcludingEntity((Entity)null, this.getMovementArea(axisalignedbb, enumfacing, d0).union(axisalignedbb));
  
-@@ -134,7 +282,7 @@
+@@ -134,7 +288,7 @@
  
                      if (entity.getPushReaction() != EnumPushReaction.IGNORE)
                      {
@@ -209,7 +215,7 @@
                          {
                              switch (enumfacing.getAxis())
                              {
-@@ -170,14 +318,25 @@
+@@ -170,14 +324,25 @@
                          if (!(d1 <= 0.0D))
                          {
                              d1 = Math.min(d1, d0) + 0.01D;
@@ -238,7 +244,7 @@
                          }
                      }
                  }
-@@ -270,9 +429,12 @@
+@@ -270,9 +435,12 @@
              if (Math.abs(d0 - d1) < 0.01D)
              {
                  d0 = Math.min(d0, p_190605_3_) + 0.01D;
@@ -254,7 +260,7 @@
              }
          }
      }
-@@ -319,9 +481,38 @@
+@@ -319,9 +487,38 @@
                      iblockstate = Block.getValidBlockForPosition(this.pistonState, this.world, this.pos);
                  }
  
@@ -295,7 +301,7 @@
          }
      }
  
-@@ -351,8 +542,15 @@
+@@ -351,8 +548,15 @@
                          iblockstate = iblockstate.with(BlockStateProperties.WATERLOGGED, Boolean.valueOf(false));
                      }
  
@@ -313,7 +319,7 @@
                  }
              }
          }
-@@ -378,6 +576,18 @@
+@@ -378,22 +582,59 @@
          this.lastProgress = this.progress;
          this.extending = compound.getBoolean("extending");
          this.shouldHeadBeRendered = compound.getBoolean("source");
@@ -329,10 +335,32 @@
 +
 +        // Cache BoundingBoxList creation
 +        this.createVoxelShapeBoundingBoxListCache();
++
++       // TISCM cache TileEntity Serialization
++        this.pistonStateNBTCache = null;
      }
  
      public NBTTagCompound write(NBTTagCompound compound)
-@@ -388,12 +598,19 @@
+     {
+         super.write(compound);
+-        compound.put("blockState", NBTUtil.writeBlockState(this.pistonState));
++
++       // TISCM cache TileEntity Serialization
++//        compound.put("blockState", NBTUtil.writeBlockState(this.pistonState));
++        NBTTagCompound blockStateNBT;
++        if (TISCMOptimizationConfig.CACHE_TILE_ENTITY_SERIALIZATION && this.pistonStateNBTCache != null)
++        {
++            blockStateNBT = this.pistonStateNBTCache;
++        }
++        else
++        {
++            // vanilla
++            blockStateNBT = NBTUtil.writeBlockState(this.pistonState);
++            this.pistonStateNBTCache = blockStateNBT;
++        }
++        compound.put("blockState", blockStateNBT);
++
+         compound.putInt("facing", this.pistonFacing.getIndex());
          compound.putFloat("progress", this.lastProgress);
          compound.putBoolean("extending", this.extending);
          compound.putBoolean("source", this.shouldHeadBeRendered);
@@ -353,7 +381,7 @@
  
          if (!this.extending && this.shouldHeadBeRendered)
          {
-@@ -424,6 +641,32 @@
+@@ -424,6 +665,32 @@
              }
  
              float f = this.getExtendedProgress(this.progress);
@@ -386,7 +414,7 @@
              double d0 = (double)((float)this.pistonFacing.getXOffset() * f);
              double d1 = (double)((float)this.pistonFacing.getYOffset() * f);
              double d2 = (double)((float)this.pistonFacing.getZOffset() * f);
-@@ -435,4 +678,37 @@
+@@ -435,4 +702,37 @@
      {
          return this.lastTicked;
      }
