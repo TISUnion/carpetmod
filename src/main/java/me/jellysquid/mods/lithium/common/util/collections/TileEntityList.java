@@ -1,6 +1,7 @@
 package me.jellysquid.mods.lithium.common.util.collections;
 
 import carpet.utils.TISCMOptimizationConfig;
+import it.unimi.dsi.fastutil.Hash;
 import it.unimi.dsi.fastutil.longs.Long2ReferenceOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceLinkedOpenHashSet;
 import net.minecraft.nbt.NBTTagCompound;
@@ -14,10 +15,9 @@ public class TileEntityList implements List<TileEntity> {
     //TileEntityList does not support double-add of the same object. But it does support multiple at the same position.
     //This collection behaves like a set with insertion order. It also provides a position->TileEntity lookup.
 
-    // TISCM Larger tile entity list
-    // pre-allocate 256 volume in hashsets/hashmaps to avoid constantly rehash when the amount of TileEntity is small
+    // TISCM Smaller hashset list container load factor
     @SuppressWarnings("FieldCanBeLocal")
-    private final int COLLECTION_DEFAULT_SIZE = TISCMOptimizationConfig.LARGER_TILE_ENTITY_LIST ? 256 : Long2ReferenceOpenHashMap.DEFAULT_INITIAL_SIZE;
+    private final float COLLECTION_LOAD_FACTOR = TISCMOptimizationConfig.HASH_SET_LIST_LOAD_FACTOR ? Hash.VERY_FAST_LOAD_FACTOR : Hash.DEFAULT_LOAD_FACTOR;
 
     private final ReferenceLinkedOpenHashSet<TileEntity> allBlockEntities;
 
@@ -27,15 +27,15 @@ public class TileEntityList implements List<TileEntity> {
     private final Long2ReferenceOpenHashMap<TileEntity> posMap;
     private final Long2ReferenceOpenHashMap<List<TileEntity>> posMapMulti;
     public TileEntityList(List<TileEntity> list, boolean hasPositionLookup) {
-        this.posMap = hasPositionLookup ? new Long2ReferenceOpenHashMap<>(COLLECTION_DEFAULT_SIZE) : null;
-        this.posMapMulti = hasPositionLookup ? new Long2ReferenceOpenHashMap<>(COLLECTION_DEFAULT_SIZE) : null;
+        this.posMap = hasPositionLookup ? new Long2ReferenceOpenHashMap<>(Long2ReferenceOpenHashMap.DEFAULT_INITIAL_SIZE, COLLECTION_LOAD_FACTOR) : null;
+        this.posMapMulti = hasPositionLookup ? new Long2ReferenceOpenHashMap<>(Long2ReferenceOpenHashMap.DEFAULT_INITIAL_SIZE, COLLECTION_LOAD_FACTOR) : null;
 
         if (this.posMap != null) {
             this.posMap.defaultReturnValue(null);
             this.posMapMulti.defaultReturnValue(null);
         }
 
-        this.allBlockEntities = new ReferenceLinkedOpenHashSet<>(COLLECTION_DEFAULT_SIZE);
+        this.allBlockEntities = new ReferenceLinkedOpenHashSet<>(Long2ReferenceOpenHashMap.DEFAULT_INITIAL_SIZE, COLLECTION_LOAD_FACTOR);
         this.addAll(list);
     }
 

@@ -689,7 +689,7 @@ There are also a few optimizations which is not from lithium mod:
 
 - Cache `EnumFacing.values()` like Lithium alloc.enum_values but in everywhere
 - Cache BoundingBoxList creation in TileEntityHopper and TileEntityPiston
-- Pre-allocate 256 size in hashsets/hashmaps to avoid constantly rehash when the amount of TileEntity is small
+- Use smaller load factor (`Hash.VERY_FAST_LOAD_FACTOR`) in TileEntityList
 - Permanently store item burn times in `TileEntityFurnace` to avoid costly map generating each time
 - Cache some expensive tile entity serialization data
 

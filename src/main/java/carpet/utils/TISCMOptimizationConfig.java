@@ -13,8 +13,10 @@ public class TISCMOptimizationConfig
 
 	// TISCM Cache BoundingBoxList creation
 	public static final boolean CACHE_BOUNDING_BOX_LIST_CREATION  = TISCM_OPTIMIZATION_ENABLE && true;
-	// TISCM Larger tile entity list
-	public static final boolean LARGER_TILE_ENTITY_LIST           = TISCM_OPTIMIZATION_ENABLE && true;
+	// TISCM Smaller hashset list container load factor
+	// Some hashsets (e.g. TileEntityList, block event queue) works as a list but store elements with hash table
+	// Smaller load factor might boost up the performance since memory isn't an issue here
+	public static final boolean HASH_SET_LIST_LOAD_FACTOR         = TISCM_OPTIMIZATION_ENABLE && true;
 	// TISCM cache item burn times
 	public static final boolean CACHE_ITEM_BURN_TIMES             = TISCM_OPTIMIZATION_ENABLE && true;
 	// TISCM cache TileEntity Serialization

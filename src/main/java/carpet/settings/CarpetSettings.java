@@ -82,6 +82,10 @@ public class CarpetSettings
 
     @Rule(
             desc = "optimizes the voxel code which is used by e.g. the entity movement",
+            extra = {
+                    "This will disable voxel shape optimization by lithium shapes.specialized_shapes",
+                    "There's no conclusion about which implementation works best, I'll suggest u to test between setting the rule on or off"
+            },
             category = OPTIMIZATION,
             validate = ValidateVoxelOpt.class
     )
@@ -419,7 +423,7 @@ public class CarpetSettings
             desc = "Optimize fast entity movement by only checking block collisions on current moving axis",
             extra = {
                     "Inspired by the fastMovingEntityOptimization rule in carpetmod112",
-                    "Works with optimizeVoxelCode off. Rule optimizeVoxelCode itself already has relative optimization"
+                    "Works with optimizeVoxelCode off. Rule optimizeVoxelCode itself already has relative optimization",
             },
             category = {OPTIMIZATION, EXPERIMENTAL}
     )
