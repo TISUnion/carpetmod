@@ -40,29 +40,31 @@
  import net.minecraft.block.Block;
  import net.minecraft.block.material.Material;
  import net.minecraft.block.state.IBlockState;
-@@ -82,9 +95,19 @@
+@@ -82,10 +95,20 @@
      private int seaLevel = 63;
      public final List<Entity> loadedEntityList = Lists.newArrayList();
      protected final List<Entity> unloadedEntityList = Lists.newArrayList();
 -    public final List<TileEntity> loadedTileEntityList = Lists.newArrayList();
 -    public final List<TileEntity> tickableTileEntities = Lists.newArrayList();
 -    private final List<TileEntity> addedTileEntityList = Lists.newArrayList();
+-    private final List<TileEntity> tileEntitiesToBeRemoved = Lists.newArrayList();
 +
 +    // Lithium world.block_entity_ticking
 +    public final List<TileEntity> loadedTileEntityList = LithiumConfig.WORLD_BLOCK_ENTITY_TICKING ?
 +            new TileEntityList(Lists.newArrayList(), false) :
 +            Lists.newArrayList();
-+    public final List<TileEntity> tickableTileEntities = LithiumConfig.WORLD_BLOCK_ENTITY_TICKING ?
-+            new HashedReferenceList<>(Lists.newArrayList()) :
-+            Lists.newArrayList();
++    public final List<TileEntity> tickableTileEntities = Lists.newArrayList();  // vanilla
 +    private final List<TileEntity> addedTileEntityList = LithiumConfig.WORLD_BLOCK_ENTITY_TICKING ?
 +            new TileEntityList(Lists.newArrayList(), true) :
 +            Lists.newArrayList();
++    private final List<TileEntity> tileEntitiesToBeRemoved = LithiumConfig.WORLD_BLOCK_ENTITY_TICKING ?
++            new HashedReferenceList<>(Lists.newArrayList()) :
++            Lists.newArrayList();
 +    // Lithium world.block_entity_ticking ends
 +
-     private final List<TileEntity> tileEntitiesToBeRemoved = Lists.newArrayList();
      public final List<EntityPlayer> playerEntities = Lists.newArrayList();
      public final List<Entity> weatherEffects = Lists.newArrayList();
+     protected final IntHashMap<Entity> entitiesById = new IntHashMap<>();
 @@ -116,6 +139,13 @@
      private final WorldBorder worldBorder;
      int[] lightUpdateBlockList = new int['\u8000'];
