@@ -14,9 +14,13 @@
  import net.minecraft.util.AxisRotation;
  import net.minecraft.util.EnumFacing;
  import net.minecraft.util.math.AxisAlignedBB;
-@@ -19,7 +22,12 @@
+@@ -17,9 +20,15 @@
+ 
+ public abstract class VoxelShape
  {
-     protected final VoxelShapePart part;
+-    protected final VoxelShapePart part;
++    // lithium shapes.optimized_matching make public
++    public final VoxelShapePart part;
  
 -    VoxelShape(VoxelShapePart part)
 +    // Lithium shapes.specialized_shapes
@@ -28,7 +32,17 @@
      {
          this.part = part;
      }
-@@ -59,11 +67,18 @@
+@@ -55,15 +64,28 @@
+ 
+     protected abstract DoubleList getValues(EnumFacing.Axis axis);
+ 
++    // lithium shapes.optimized_matching added invoker
++    public DoubleList invokeGetValues(EnumFacing.Axis axis)
++    {
++        return this.getValues(axis);
++    }
++
+     public boolean isEmpty()
      {
          return this.part.isEmpty();
      }
@@ -48,7 +62,7 @@
  
      public VoxelShape simplify()
      {
-@@ -199,11 +214,19 @@
+@@ -199,11 +221,19 @@
  
      public double func_212430_a(EnumFacing.Axis p_212430_1_, AxisAlignedBB p_212430_2_, double p_212430_3_)
      {
@@ -69,7 +83,7 @@
          if (this.isEmpty())
          {
              return p_212431_3_;
-@@ -279,8 +302,240 @@
+@@ -279,8 +309,240 @@
          }
      }
  

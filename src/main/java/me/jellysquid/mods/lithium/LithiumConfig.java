@@ -19,6 +19,7 @@ public class LithiumConfig
 	public static final boolean CACHED_HASHCODE                 = LITHIUM_ENABLE && true;
 	public static final boolean ENTITY_DATA_TRACKER_USE_ARRAYS  = LITHIUM_ENABLE && true;
 	public static final boolean MATH_FAST_UTIL                  = LITHIUM_ENABLE && true;
+	public static final boolean SHAPES_OPTIMIZED_MATCHING       = LITHIUM_ENABLE && true;
 	public static final boolean SHAPES_PRECOMPUTE_SHAPE_ARRAYS  = LITHIUM_ENABLE && true;
 	public static final boolean SHAPES_SHAPE_MERGING            = LITHIUM_ENABLE && true;
 	public static final boolean SHAPES_SPECIALIZED_SHAPES       = LITHIUM_ENABLE && true;

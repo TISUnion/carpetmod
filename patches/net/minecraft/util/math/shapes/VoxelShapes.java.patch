@@ -7,20 +7,23 @@
  import com.google.common.annotations.VisibleForTesting;
  import com.google.common.math.DoubleMath;
  import com.google.common.math.IntMath;
-@@ -8,6 +9,12 @@
+@@ -7,7 +8,15 @@
+ import it.unimi.dsi.fastutil.doubles.DoubleList;
  import java.util.Iterator;
  import java.util.Objects;
++import java.util.Optional;
  import java.util.stream.Stream;
 +
 +import me.jellysquid.mods.lithium.LithiumConfig;
 +import me.jellysquid.mods.lithium.common.shapes.VoxelShapeAlignedCuboid;
 +import me.jellysquid.mods.lithium.common.shapes.VoxelShapeEmpty;
++import me.jellysquid.mods.lithium.common.shapes.VoxelShapeMatchesAnywhere;
 +import me.jellysquid.mods.lithium.common.shapes.VoxelShapeSimpleCube;
 +import me.jellysquid.mods.lithium.common.shapes.pairs.LithiumDoublePairList;
  import net.minecraft.util.AxisRotation;
  import net.minecraft.util.EnumFacing;
  import net.minecraft.util.Util;
-@@ -17,14 +24,62 @@
+@@ -17,14 +26,62 @@
  
  public final class VoxelShapes
  {
@@ -85,7 +88,7 @@
      public static VoxelShape empty()
      {
          return EMPTY;
-@@ -42,6 +97,12 @@
+@@ -42,6 +99,12 @@
  
      public static VoxelShape create(AxisAlignedBB aabb)
      {
@@ -98,7 +101,7 @@
          int i = getPrecisionBits(aabb.minX, aabb.maxX);
          int j = getPrecisionBits(aabb.minY, aabb.maxY);
          int k = getPrecisionBits(aabb.minZ, aabb.maxZ);
-@@ -81,10 +142,54 @@
+@@ -81,10 +144,54 @@
          }
          else
          {
@@ -154,7 +157,24 @@
      private static int getPrecisionBits(double p_197885_0_, double p_197885_2_)
      {
          if (!(p_197885_0_ < -1.0E-7D) && !(p_197885_2_ > 1.0000001D))
-@@ -312,7 +417,8 @@
+@@ -195,6 +302,16 @@
+                 }
+             }
+ 
++            // lithium shapes.optimized_matching
++            if (LithiumConfig.SHAPES_OPTIMIZED_MATCHING)
++            {
++                Optional<Boolean> optionalBoolean = VoxelShapeMatchesAnywhere.cuboidMatchesAnywhere(shape1, shape2, function);
++                if (optionalBoolean.isPresent())
++                {
++                    return optionalBoolean.get();
++                }
++            }
++
+             IDoubleListMerger idoublelistmerger = makeListMerger(1, shape1.getValues(EnumFacing.Axis.X), shape2.getValues(EnumFacing.Axis.X), flag, flag1);
+             IDoubleListMerger idoublelistmerger1 = makeListMerger(idoublelistmerger.func_212435_a().size() - 1, shape1.getValues(EnumFacing.Axis.Y), shape2.getValues(EnumFacing.Axis.Y), flag, flag1);
+             IDoubleListMerger idoublelistmerger2 = makeListMerger((idoublelistmerger.func_212435_a().size() - 1) * (idoublelistmerger1.func_212435_a().size() - 1), shape1.getValues(EnumFacing.Axis.Z), shape2.getValues(EnumFacing.Axis.Z), flag, flag1);
+@@ -312,7 +429,8 @@
          }
          else
          {
