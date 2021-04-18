@@ -442,6 +442,34 @@ public class CarpetSettings
     )
     public static boolean creativeOpenShulkerBoxForcibly = false;
 
+    public static final int VANILLA_CHUNK_PACKET_THRESHOLD = 64;
+    public static final int MAXIMUM_CHUNK_PACKET_THRESHOLD = 65536;
+    @Rule(
+            desc = "The threshold which the game will just send an chunk data packet if the amount of block change is more than",
+            extra = {
+                    "Increasing this value might reduce network bandwidth usage",
+                    "Set it to really high to simulate 1.16+ behavior, which is no chunk packet but only multiple block change packet"
+            },
+            validate = ValidateChunkPacketThreshold.class,
+            options = {"64", "512", "4096", "65536"},
+            strict = false,
+            category = {EXPERIMENTAL}
+    )
+    public static int chunkPacketThreshold = VANILLA_CHUNK_PACKET_THRESHOLD;
+    private static class ValidateChunkPacketThreshold extends Validator<Integer>
+    {
+        @Override
+        public Integer validate(CommandSource source, ParsedRule<Integer> currentRule, Integer newValue, String string)
+        {
+            return (newValue >= 2 && newValue <= MAXIMUM_CHUNK_PACKET_THRESHOLD) ? newValue : null;
+        }
+
+        public String description()
+        {
+            return "You must choose a value from 2 to " + MAXIMUM_CHUNK_PACKET_THRESHOLD;
+        }
+    }
+
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$
     //   | $$     | $$  | $$  \__/| $$  \__/| $$$$  /$$$$
