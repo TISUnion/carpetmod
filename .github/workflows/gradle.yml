@@ -17,6 +17,11 @@ jobs:
       with:
         java-version: 1.8
 
+    - name: Download libs
+      run: |
+        wget https://files.catbox.moe/ub9fw4.zip -O TISCM_libs.zip
+        unzip TISCM_libs.zip
+
     - name: Cache gradle files
       uses: actions/cache@v2
       with:
