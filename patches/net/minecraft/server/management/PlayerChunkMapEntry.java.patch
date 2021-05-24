@@ -21,7 +21,7 @@
      private final List<EntityPlayerMP> players = Lists.newArrayList();
      private final ChunkPos pos;
 -    private final short[] changedBlocks = new short[64];
-+    // TISCM chunkPacketThreshold removed final
++    // TISCM chunkUpdatePacketThreshold removed final
 +    private short[] changedBlocks = new short[64];
      @Nullable
      private Chunk chunk;
@@ -35,36 +35,46 @@
 +    private final java.util.Map<EntityPlayerMP, int[]> neighborLightTrackings = new java.util.HashMap<>();
 +    // [TISCM] Newlight - end
  
-+    // TISCM chunkPacketThreshold
-+    private final boolean chunkPacketThresholdEnabled;
-+    private final int chunkPacketThresholdValue;
-+    private final Set<Short> changedBlocksSet = new ShortLinkedOpenHashSet();
-+    // TISCM chunkPacketThreshold ends
++    // TISCM chunkUpdatePacketThreshold
++    private boolean ruleEnabled$CUPT;
++    private int ruleValue$CUPT;
++    private final Set<Short> changedBlocksSet$CUPT = new ShortLinkedOpenHashSet();
++    // TISCM chunkUpdatePacketThreshold ends
 +
      public PlayerChunkMapEntry(PlayerChunkMap mapIn, int chunkX, int chunkZ)
      {
          this.playerChunkMap = mapIn;
-@@ -40,8 +58,19 @@
+@@ -40,8 +58,29 @@
          ChunkProviderServer chunkproviderserver = mapIn.getWorld().getChunkProvider();
          chunkproviderserver.touch(chunkX, chunkZ);
          this.chunk = chunkproviderserver.getChunk(chunkX, chunkZ, true, false);
 +
-+        // TISCM chunkPacketThreshold
-+        this.chunkPacketThresholdValue = CarpetSettings.chunkPacketThreshold;
-+        this.chunkPacketThresholdEnabled = CarpetSettings.chunkPacketThreshold != CarpetSettings.VANILLA_CHUNK_PACKET_THRESHOLD;
++        // TISCM chunkUpdatePacketThreshold
++        this.updateRuleStatus$CUPT();
      }
  
-+    // TISCM chunkPacketThreshold
++    private void updateRuleStatus$CUPT()
++    {
++        this.ruleValue$CUPT = CarpetSettings.chunkUpdatePacketThreshold;
++        this.ruleEnabled$CUPT = this.ruleValue$CUPT != CarpetSettings.VANILLA_CHUNK_UPDATE_PACKET_THRESHOLD;
++        // rollback to vanilla array
++        if (!this.ruleEnabled$CUPT)
++        {
++            this.changedBlocks = new short[CarpetSettings.VANILLA_CHUNK_UPDATE_PACKET_THRESHOLD];
++        }
++    }
++
++    // TISCM chunkUpdatePacketThreshold
 +    private int getChunkPacketThreshold()
 +    {
 +        // 64 is the vanilla value
-+        return this.chunkPacketThresholdEnabled ? this.chunkPacketThresholdValue : 64;
++        return this.ruleEnabled$CUPT ? this.ruleValue$CUPT : 64;
 +    }
 +
      public ChunkPos getPos()
      {
          return this.pos;
-@@ -64,6 +93,9 @@
+@@ -64,6 +103,9 @@
  
              if (this.sentToPlayers)
              {
@@ -74,7 +84,7 @@
                  this.sendToPlayer(player);
              }
          }
-@@ -75,6 +107,9 @@
+@@ -75,6 +117,9 @@
          {
              if (this.sentToPlayers)
              {
@@ -84,7 +94,7 @@
                  player.connection.sendPacket(new SPacketUnloadChunk(this.pos.x, this.pos.z));
              }
  
-@@ -126,8 +161,16 @@
+@@ -126,8 +171,16 @@
  
                  for (EntityPlayerMP entityplayermp : this.players)
                  {
@@ -101,7 +111,7 @@
                  }
              }
  
-@@ -141,6 +184,10 @@
+@@ -141,6 +194,10 @@
          {
              player.connection.sendPacket(new SPacketChunkData(this.chunk, 65535));
              this.playerChunkMap.getWorld().getEntityTracker().sendLeashedEntitiesInChunk(player, this.chunk);
@@ -112,7 +122,7 @@
          }
      }
  
-@@ -167,19 +214,31 @@
+@@ -167,19 +224,31 @@
  
              this.changedSectionFilter |= 1 << (y >> 4);
  
@@ -125,11 +135,11 @@
  
 -                for (int i = 0; i < this.changes; ++i)
 +                // TISCM changedBlocksList
-+                if (this.chunkPacketThresholdEnabled)
++                if (this.ruleEnabled$CUPT)
                  {
 -                    if (this.changedBlocks[i] == short1)
-+                    this.changedBlocksSet.add(short1);
-+                    this.changes = this.changedBlocksSet.size();
++                    this.changedBlocksSet$CUPT.add(short1);
++                    this.changes = this.changedBlocksSet$CUPT.size();
 +                }
 +                // vanilla
 +                else
@@ -150,31 +160,31 @@
              }
          }
      }
-@@ -201,6 +260,18 @@
+@@ -201,6 +270,18 @@
          {
              if (this.changes != 0)
              {
-+                // TISCM chunkPacketThreshold
-+                if (this.chunkPacketThresholdEnabled)
++                // TISCM chunkUpdatePacketThreshold
++                if (this.ruleEnabled$CUPT)
 +                {
-+                    this.changedBlocks = new short[this.changedBlocksSet.size()];
++                    this.changedBlocks = new short[this.changedBlocksSet$CUPT.size()];
 +                    int i = 0;
-+                    for (Short s: this.changedBlocksSet)
++                    for (Short s: this.changedBlocksSet$CUPT)
 +                    {
 +                        this.changedBlocks[i++] = s;
 +                    }
-+                    this.changedBlocksSet.clear();
++                    this.changedBlocksSet$CUPT.clear();
 +                }
 +
                  if (this.changes == 1)
                  {
                      int i = (this.changedBlocks[0] >> 12 & 15) + this.pos.x * 16;
-@@ -214,9 +285,14 @@
+@@ -214,9 +295,14 @@
                          this.sendBlockEntity(this.playerChunkMap.getWorld().getTileEntity(blockpos));
                      }
                  }
 -                else if (this.changes == 64)
-+                // TISCM chunkPacketThreshold
++                // TISCM chunkUpdatePacketThreshold
 +                // modified constant 64
 +                else if (this.changes == this.getChunkPacketThreshold())
                  {
@@ -185,7 +195,17 @@
                  }
                  else
                  {
-@@ -309,4 +385,15 @@
+@@ -239,6 +325,9 @@
+                 this.changes = 0;
+                 this.changedSectionFilter = 0;
+             }
++
++            // TISCM chunkUpdatePacketThreshold
++            this.updateRuleStatus$CUPT();
+         }
+     }
+ 
+@@ -309,4 +398,15 @@
  
          return d0;
      }
