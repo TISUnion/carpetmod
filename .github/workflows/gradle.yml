@@ -19,7 +19,7 @@ jobs:
 
     - name: Download libs
       run: |
-        wget https://files.catbox.moe/ub9fw4.zip -O TISCM_libs.zip
+        wget https://files.catbox.moe/wpe6a5.zip -O TISCM_libs.zip
         unzip TISCM_libs.zip
 
     - name: Cache gradle files
