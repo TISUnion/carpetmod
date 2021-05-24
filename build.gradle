@@ -1,6 +1,7 @@
 buildscript {
     repositories {
         mavenLocal()
+        maven { url "$projectDir/TISCM_libs" }
         maven { url = 'http://files.minecraftforge.net/maven' }
         jcenter()
         mavenCentral()

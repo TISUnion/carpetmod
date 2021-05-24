@@ -8,3 +8,5 @@
 /installer/*.zip
 /installer/*.tar.gz
 Carpetmod.iml
+/TISCM_libs
+/TISCM_libs.zip
