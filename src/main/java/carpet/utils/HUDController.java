@@ -2,7 +2,9 @@ package carpet.utils;
 
 import carpet.helpers.HopperCounter;
 import carpet.helpers.TickSpeed;
+import carpet.logging.AbstractHUDLogger;
 import carpet.logging.LoggerRegistry;
+import carpet.logging.lifetime.LifeTimeHUDLogger;
 import carpet.logging.logHelpers.AutoSaveLogHelper;
 import carpet.logging.logHelpers.PacketCounter;
 import carpet.logging.tickwarp.TickWarpHUDLogger;
@@ -93,8 +95,8 @@ public class HUDController
         if (LoggerRegistry.__autosave)
             LoggerRegistry.getLogger("autosave").log(AutoSaveLogHelper::send_hud_info);
 
-        if (LoggerRegistry.__tickWarp)
-            LoggerRegistry.getLogger(TickWarpHUDLogger.NAME).log((playerOption, player) -> TickWarpHUDLogger.getInstance().onHudUpdate(playerOption, player));
+        doHudLogging(LoggerRegistry.__lifeTime, LifeTimeHUDLogger.NAME, LifeTimeHUDLogger.getInstance());
+        doHudLogging(LoggerRegistry.__tickWarp, TickWarpHUDLogger.NAME, TickWarpHUDLogger.getInstance());
 
         for (EntityPlayer player: player_huds.keySet())
         {
@@ -104,6 +106,16 @@ public class HUDController
             ((EntityPlayerMP)player).connection.sendPacket(packet);
         }
     }
+
+    // ported from carpet tis addition for easier formatting hud update
+    private static void doHudLogging(boolean condition, String loggerName, AbstractHUDLogger logger)
+    {
+        if (condition)
+        {
+            LoggerRegistry.getLogger(loggerName).log(logger::onHudUpdate);
+        }
+    }
+
     private static ITextComponent [] send_tps_display(MinecraftServer server)
     {
         double MSPT = MathHelper.average(server.tickTimeArray) * 1.0E-6D;

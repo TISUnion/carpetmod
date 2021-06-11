@@ -17,6 +17,17 @@ public class Translator implements Translatable
 		this.translationPath = this.generateTranslationPath();
 	}
 
+	public Translator(String prefix)
+	{
+		this(prefix, null);
+	}
+
+	public Translator getDerivedTranslator(String derivedName)
+	{
+		String name = this.name == null ? derivedName : this.name + "." + derivedName;
+		return new Translator(this.type, name);
+	}
+
 	public String getTranslationPath()
 	{
 		return this.translationPath;
@@ -38,11 +49,6 @@ public class Translator implements Translatable
 			path = path.substring(0, path.length() - 1);
 		}
 		return path;
-	}
-
-	public Translator(String prefix)
-	{
-		this(null, prefix);
 	}
 
 	// use <type>.<name>.<key> as translation key

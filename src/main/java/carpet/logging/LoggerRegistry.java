@@ -1,6 +1,7 @@
 package carpet.logging;
 
 import carpet.logging.commandblock.CommandBlockLogger;
+import carpet.logging.lifetime.LifeTimeHUDLogger;
 import carpet.logging.tickwarp.TickWarpHUDLogger;
 import carpet.settings.CarpetSettings;
 import net.minecraft.entity.player.EntityPlayer;
@@ -37,6 +38,7 @@ public class LoggerRegistry
     public static boolean __autosave;
     public static boolean __commandBlock;
     public static boolean __tickWarp;
+    public static boolean __lifeTime;
 
     public static void initLoggers()
     {
@@ -53,26 +55,15 @@ public class LoggerRegistry
         registerLogger("counter",new HUDLogger("counter","white", Arrays.stream(EnumDyeColor.values()).map(Object::toString).toArray(String[]::new)));
         registerLogger("mobcaps", new HUDLogger("mobcaps", "dynamic",new String[]{"dynamic", "overworld", "nether","end"}));
 
-        //TISCM add chunk debug
+        // TISCM loggers
         registerLogger("chunkdebug", new Logger("chunkdebug",null, null));
-
-        //TISCM: add villagecount
         registerLogger("villagecount", new HUDLogger("villagecount", null, null));
-
-        //TISCM: add memory
         registerLogger("memory", new HUDLogger("memory", null, null));
-
-        //TISCM: add micro tick
         registerLogger("microTiming", new Logger("microTiming", "merged", new String[]{"merged", "all", "unique"}));
-
-        //TISCM: add Autosave
         registerLogger("autosave", new HUDLogger("autosave", null, null));
-
-        //TISCM: add commandblock
         registerLogger(CommandBlockLogger.NAME, new Logger(CommandBlockLogger.NAME, "throttled", new String[]{"throttled", "all"}));
-
-        //TISCM: add tickWarp
         registerLogger(TickWarpHUDLogger.NAME, new HUDLogger(TickWarpHUDLogger.NAME, "bar", new String[]{"bar", "value"}));
+        registerLogger(LifeTimeHUDLogger.NAME, LifeTimeHUDLogger.getInstance().getHUDLogger());
     }
 
     /**

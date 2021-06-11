@@ -1,0 +1,23 @@
+--- a/net/minecraft/entity/item/EntityExpBottle.java
++++ b/net/minecraft/entity/item/EntityExpBottle.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.entity.item;
+ 
++import carpet.commands.lifetime.spawning.LiteralSpawningReason;
+ import net.minecraft.entity.EntityLivingBase;
+ import net.minecraft.entity.EntityType;
+ import net.minecraft.entity.projectile.EntityThrowable;
+@@ -42,7 +43,12 @@
+             {
+                 int j = EntityXPOrb.getXPSplit(i);
+                 i -= j;
+-                this.world.spawnEntity(new EntityXPOrb(this.world, this.posX, this.posY, this.posZ, j));
++
++                // TISCM lifetime tracker
++//                this.world.spawnEntity(new EntityXPOrb(this.world, this.posX, this.posY, this.posZ, j));
++                EntityXPOrb entityXPOrb = new EntityXPOrb(this.world, this.posX, this.posY, this.posZ, j);
++                entityXPOrb.recordSpawning(LiteralSpawningReason.ITEM);
++                this.world.spawnEntity(entityXPOrb);
+             }
+ 
+             this.remove();

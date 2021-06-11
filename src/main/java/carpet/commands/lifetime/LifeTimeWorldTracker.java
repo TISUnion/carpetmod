@@ -1,10 +1,13 @@
 package carpet.commands.lifetime;
 
+import carpet.commands.lifetime.filter.EntityFilterManager;
 import carpet.commands.lifetime.removal.RemovalReason;
 import carpet.commands.lifetime.spawning.SpawningReason;
+import carpet.commands.lifetime.trackeddata.BasicTrackedData;
+import carpet.commands.lifetime.trackeddata.ExperienceOrbTrackedData;
+import carpet.commands.lifetime.trackeddata.ItemTrackedData;
 import carpet.commands.lifetime.utils.LifeTimeTrackerUtil;
 import carpet.commands.lifetime.utils.SpecificDetailMode;
-import carpet.commands.lifetime.utils.TrackedData;
 import carpet.utils.Messenger;
 import carpet.utils.TextUtil;
 import carpet.utils.TranslatableBase;
@@ -13,6 +16,8 @@ import com.google.common.collect.Maps;
 import net.minecraft.command.CommandSource;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.event.ClickEvent;
@@ -23,7 +28,7 @@ import java.util.*;
 public class LifeTimeWorldTracker extends TranslatableBase
 {
 	private final WorldServer world;
-	private final Map<EntityType<?>, TrackedData> dataMap = Maps.newHashMap();
+	private final Map<EntityType<?>, BasicTrackedData> dataMap = Maps.newHashMap();
 	// a counter which accumulates when spawning stage occurs
 	// it's used to determine life time
 	private long spawnStageCounter;
@@ -34,7 +39,7 @@ public class LifeTimeWorldTracker extends TranslatableBase
 		this.world = world;
 	}
 
-	public Map<EntityType<?>, TrackedData> getDataMap()
+	public Map<EntityType<?>, BasicTrackedData> getDataMap()
 	{
 		return this.dataMap;
 	}
@@ -44,11 +49,21 @@ public class LifeTimeWorldTracker extends TranslatableBase
 		this.dataMap.clear();
 	}
 
-	private Optional<TrackedData> getTrackedData(Entity entity)
+	private Optional<BasicTrackedData> getTrackedData(Entity entity)
 	{
-		if (LifeTimeTracker.willTrackEntity(entity))
+		if (LifeTimeTracker.getInstance().willTrackEntity(entity))
 		{
-			return Optional.of(this.dataMap.computeIfAbsent(entity.getType(), (e -> new TrackedData())));
+			return Optional.of(this.dataMap.computeIfAbsent(entity.getType(), (e -> {
+				if (entity instanceof EntityItem)
+				{
+					return new ItemTrackedData();
+				}
+				if (entity instanceof EntityXPOrb)
+				{
+					return new ExperienceOrbTrackedData();
+				}
+				return new BasicTrackedData();
+			})));
 		}
 		return Optional.empty();
 	}
@@ -85,7 +100,7 @@ public class LifeTimeWorldTracker extends TranslatableBase
 	protected int print(CommandSource source, long ticks, EntityType<?> specificType, SpecificDetailMode detailMode)
 	{
 		// existence check
-		TrackedData specificData = this.dataMap.get(specificType);
+		BasicTrackedData specificData = this.dataMap.get(specificType);
 		if (this.dataMap.isEmpty() || (specificType != null && specificData == null))
 		{
 			return 0;
@@ -94,8 +109,8 @@ public class LifeTimeWorldTracker extends TranslatableBase
 		// dimension name header
 		// Overworld (minecraft:overworld)
 		List<ITextComponent> result = Lists.newArrayList();
+		result.add(Messenger.s(" "));
 		result.add(Messenger.c(
-				"w  \n",
 				TextUtil.attachFormatting(TextUtil.getDimensionNameText(this.world.getDimension().getType()), TextFormatting.BOLD, TextFormatting.GOLD),
 				String.format("g  (%s)", this.world.getDimension().getType().toString())
 		));
@@ -117,20 +132,26 @@ public class LifeTimeWorldTracker extends TranslatableBase
 		// sorted by spawn count
 		// will being sorting by avg life time better?
 		this.dataMap.entrySet().stream().
-				sorted(Collections.reverseOrder(Comparator.comparingLong(a -> a.getValue().spawnCount))).
+				sorted(Collections.reverseOrder(Comparator.comparingLong(a -> a.getValue().getSpawningCount()))).
 				forEach((entry) -> {
 					EntityType<?> entityType = entry.getKey();
-					TrackedData data = entry.getValue();
+					BasicTrackedData data = entry.getValue();
 					List<ITextComponent> spawningReasons = data.getSpawningReasonsTexts(ticks, true);
 					List<ITextComponent> removalReasons = data.getRemovalReasonsTexts(ticks, true);
 					String currentCommandBase = String.format("/%s %s", LifeTimeTracker.getInstance().getCommandPrefix(), LifeTimeTrackerUtil.getEntityTypeDescriptor(entityType));
-					// [Creeper] S: 76, (1513.3/h), L: 4gt / 815gt / 210.2gt
+					// [Creeper] S/R: 21/8, L: 145/145/145.00 (gt)
 					result.add(Messenger.c(
 							"g - [",
 							TextUtil.getFancyText(
 									null,
 									entityType.getName(),
-									Messenger.s(this.tr("detail_hint", "Click to show detail")),
+									Messenger.c(
+											String.format("w %s: ", this.tr("filter_info_header", "Filter")),
+											EntityFilterManager.getInstance().getEntityFilterText(entityType),
+											"g  / [G] ",
+											EntityFilterManager.getInstance().getEntityFilterText(null),
+											"w \n" + this.tr("detail_hint", "Click to show detail")
+									),
 									new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, currentCommandBase)
 							),
 							"g ] ",
@@ -147,7 +168,7 @@ public class LifeTimeWorldTracker extends TranslatableBase
 							"g : ",
 							TextUtil.getFancyText(
 									null,
-									Messenger.c("e " + data.spawnCount),
+									Messenger.c("e " + data.getSpawningCount()),
 									Messenger.s(
 											Messenger.c(
 													data.getSpawningCountText(ticks),
@@ -175,7 +196,7 @@ public class LifeTimeWorldTracker extends TranslatableBase
 									null,
 									Messenger.c(
 											"q L", "g : ",
-											data.lifeTimeStatistic.getCompressedResult("g /")
+											data.lifeTimeStatistic.getCompressedResult(true)
 									),
 									Messenger.s(
 											Messenger.c(
@@ -189,8 +210,16 @@ public class LifeTimeWorldTracker extends TranslatableBase
 				});
 	}
 
-	private void printSpecific(long ticks, EntityType<?> specificType, TrackedData specificData, SpecificDetailMode detailMode, List<ITextComponent> result)
+	private void printSpecific(long ticks, EntityType<?> specificType, BasicTrackedData specificData, SpecificDetailMode detailMode, List<ITextComponent> result)
 	{
+		result.add(Messenger.c(
+				String.format("c %s: ", this.tr("filter_info_header", "Filter")),
+				EntityFilterManager.getInstance().getEntityFilterText(specificType),
+				"g  / ",
+				TextUtil.getFancyText("g", Messenger.s("[G]"), Messenger.s(EntityFilterManager.getInstance().tr("Global")), null),
+				"g  ",
+				EntityFilterManager.getInstance().getEntityFilterText(null)
+		));
 		boolean showLifeTime = detailMode == null || detailMode == SpecificDetailMode.LIFE_TIME;
 		boolean showSpawning = detailMode == null || detailMode == SpecificDetailMode.SPAWNING;
 		boolean showRemoval = detailMode == null || detailMode == SpecificDetailMode.REMOVAL;
