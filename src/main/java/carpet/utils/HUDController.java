@@ -5,6 +5,7 @@ import carpet.helpers.TickSpeed;
 import carpet.logging.LoggerRegistry;
 import carpet.logging.logHelpers.AutoSaveLogHelper;
 import carpet.logging.logHelpers.PacketCounter;
+import carpet.logging.tickwarp.TickWarpHUDLogger;
 import carpet.settings.CarpetSettings;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
@@ -91,6 +92,9 @@ public class HUDController
 
         if (LoggerRegistry.__autosave)
             LoggerRegistry.getLogger("autosave").log(AutoSaveLogHelper::send_hud_info);
+
+        if (LoggerRegistry.__tickWarp)
+            LoggerRegistry.getLogger(TickWarpHUDLogger.NAME).log((playerOption, player) -> TickWarpHUDLogger.getInstance().onHudUpdate(playerOption, player));
 
         for (EntityPlayer player: player_huds.keySet())
         {

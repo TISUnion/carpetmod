@@ -1,5 +1,9 @@
 package carpet.utils;
 
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextComponentTranslationFormatException;
+
 public class Translator implements Translatable
 {
 	private final String type;
@@ -84,5 +88,28 @@ public class Translator implements Translatable
 	public String tr(String key)
 	{
 		return Translations.tr(getPath(key, true), key);
+	}
+
+	public ITextComponent advTr(String key, String defaultKeyText, Object ...args)
+	{
+		for (int i = 0; i < args.length; i++)
+		{
+			if (!(args[i] instanceof ITextComponent))
+			{
+				args[i] = Messenger.s(args[i].toString());
+			}
+		}
+		String msgKeyString = this.tr(key, defaultKeyText);
+		TextComponentTranslation fixedTranslatableText = new TextComponentTranslation(msgKeyString, args);
+		try
+		{
+			fixedTranslatableText.getChildren().clear();
+			fixedTranslatableText.invokeInitializeFromFormat(msgKeyString);
+			return Messenger.c(fixedTranslatableText.getChildren().toArray(new Object[0]));
+		}
+		catch (TextComponentTranslationFormatException e)
+		{
+			return Messenger.s(msgKeyString);
+		}
 	}
 }

@@ -1,6 +1,7 @@
 package carpet.logging;
 
 import carpet.logging.commandblock.CommandBlockLogger;
+import carpet.logging.tickwarp.TickWarpHUDLogger;
 import carpet.settings.CarpetSettings;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumDyeColor;
@@ -35,6 +36,7 @@ public class LoggerRegistry
     public static boolean __microTiming;
     public static boolean __autosave;
     public static boolean __commandBlock;
+    public static boolean __tickWarp;
 
     public static void initLoggers()
     {
@@ -68,6 +70,9 @@ public class LoggerRegistry
 
         //TISCM: add commandblock
         registerLogger(CommandBlockLogger.NAME, new Logger(CommandBlockLogger.NAME, "throttled", new String[]{"throttled", "all"}));
+
+        //TISCM: add tickWarp
+        registerLogger(TickWarpHUDLogger.NAME, new HUDLogger(TickWarpHUDLogger.NAME, "bar", new String[]{"bar", "value"}));
     }
 
     /**

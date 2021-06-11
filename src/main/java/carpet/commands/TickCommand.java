@@ -1,6 +1,7 @@
 package carpet.commands;
 
 import carpet.helpers.TickSpeed;
+import carpet.logging.tickwarp.TickWarpHUDLogger;
 import carpet.settings.CarpetSettings;
 import carpet.settings.SettingsManager;
 import carpet.utils.CarpetProfiler;
@@ -31,6 +32,7 @@ public class TickCommand
                                 executes((c) -> setTps(c.getSource(), getFloat(c, "rate"))))).
                 then(literal("warp").
                         executes( (c)-> setWarp(c.getSource(), 0, null)).
+                        then(literal("status").executes(c -> TickWarpHUDLogger.getInstance().showTickWarpInfo(c.getSource()))).  // TISCM added /tick warp status
                         then(argument("ticks", integer(0,2147483647)).
                                 suggests( (c, b) -> ISuggestionProvider.suggest(new String[]{"3600","72000"},b)).
                                 executes((c) -> setWarp(c.getSource(), getInteger(c,"ticks"), null)).

@@ -1,0 +1,21 @@
+--- a/net/minecraft/util/text/TextComponentTranslation.java
++++ b/net/minecraft/util/text/TextComponentTranslation.java
+@@ -45,6 +45,18 @@
+         }
+     }
+ 
++    // TISCM added getter
++    public List<ITextComponent> getChildren()
++    {
++        return this.children;
++    }
++
++    // TISCM added invoker
++    public void invokeInitializeFromFormat(String format)
++    {
++        this.initializeFromFormat(format);
++    }
++
+     @VisibleForTesting
+ 
+     synchronized void ensureInitialized()

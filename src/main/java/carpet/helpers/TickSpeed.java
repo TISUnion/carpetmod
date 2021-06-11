@@ -1,6 +1,7 @@
 package carpet.helpers;
 
 import carpet.CarpetServer;
+import carpet.logging.tickwarp.TickWarpHUDLogger;
 import carpet.network.CarpetServerNetworkHandler;
 import carpet.utils.Messenger;
 import net.minecraft.command.CommandSource;
@@ -92,11 +93,17 @@ public class TickSpeed
         time_bias = advance;
         tick_warp_callback = callback;
         tick_warp_sender = source;
+
+        // TISCM tickwarp logger
+        TickWarpHUDLogger.getInstance().recordTickWarpAdvancer();
+
         return Messenger.c("gi Warp speed ....");
     }
 
     public static void finish_time_warp()
     {
+        // TISCM tickwarp logger
+        TickWarpHUDLogger.getInstance().recordTickWarpResult();
 
         long completed_ticks = time_warp_scheduled_ticks - time_bias;
         double milis_to_complete = System.nanoTime()-time_warp_start_time;
