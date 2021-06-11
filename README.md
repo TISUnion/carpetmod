@@ -18,6 +18,6 @@ Thanks to [Lithium mod](https://github.com/jellysquid3/lithium-fabric) for some 
 
 ## Developing CarpetMod:
 
-------
+See https://github.com/gnembon/carpetmod/blob/master/README.md
 
-see https://github.com/gnembon/carpetmod/blob/master/README.md
+Also you need to download TISCM_libs from [here](https://files.catbox.moe/wpe6a5.zip) and unzip it into the project folder, since some of the library providers are down
