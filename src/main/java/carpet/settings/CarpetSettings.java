@@ -3,6 +3,7 @@ package carpet.settings;
 import carpet.CarpetServer;
 import carpet.microtiming.enums.MicroTimingTarget;
 import carpet.utils.Messenger;
+import carpet.utils.Translations;
 import net.minecraft.command.CommandSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
@@ -936,6 +937,32 @@ public class CarpetSettings
             return "Must be between 0 and 2pi, or -1";
         }
     }
+
+    private static class LanguageValidator extends Validator<String>
+    {
+        @Override public String validate(CommandSource source, ParsedRule<String> currentRule, String newValue, String string)
+        {
+            if (currentRule.get().equals(newValue) || source == null)
+            {
+                return newValue;
+            }
+            if (!Translations.isValidLanguage(newValue))
+            {
+                Messenger.m(source, "r "+newValue+" is not a valid language");
+                return null;
+            }
+            CarpetSettings.language = newValue;
+            Translations.updateLanguage(source);
+            return newValue;
+        }
+    }
+    @Rule(
+            desc = "sets the language for carpet",
+            category = FEATURE,
+            options = {"none", "zh_cn"},
+            validate = LanguageValidator.class
+    )
+    public static String language = "none";
 
     // /$$     /$$/$$$$$$$$ /$$$$$$$$/$$$$$$$$
     //|  $$   /$$/ $$_____/| $$_____/__  $$__/
