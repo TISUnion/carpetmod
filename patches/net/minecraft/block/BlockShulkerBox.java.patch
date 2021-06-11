@@ -14,8 +14,8 @@
                      AxisAlignedBB axisalignedbb = VoxelShapes.fullCube().getBoundingBox().expand((double)(0.5F * (float)enumfacing.getXOffset()), (double)(0.5F * (float)enumfacing.getYOffset()), (double)(0.5F * (float)enumfacing.getZOffset())).contract((double)enumfacing.getXOffset(), (double)enumfacing.getYOffset(), (double)enumfacing.getZOffset());
                      flag = worldIn.isCollisionBoxesEmpty((Entity)null, axisalignedbb.offset(pos.offset(enumfacing)));
 +
-+                    // TISCM creativeOpenShulkerBoxForcibly
-+                    if (CarpetSettings.creativeOpenShulkerBoxForcibly)
++                    // TISCM creativeOpenContainerForcibly
++                    if (CarpetSettings.creativeOpenContainerForcibly)
 +                    {
 +                        flag |= player.isCreative();
 +                    }

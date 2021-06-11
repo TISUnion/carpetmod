@@ -437,10 +437,10 @@ public class CarpetSettings
     public static boolean drownedNavigatorMemoryLeakFix = false;
 
     @Rule(
-            desc = "Allow creative players to open a shulker block even if the shulker box is blocked",
+            desc = "Allow creative players to open a container even if the container is blocked. e.g. for shulker box",
             category = {CREATIVE}
     )
-    public static boolean creativeOpenShulkerBoxForcibly = false;
+    public static boolean creativeOpenContainerForcibly = false;
 
     public static final int VANILLA_CHUNK_UPDATE_PACKET_THRESHOLD = 64;
     public static final int MAXIMUM_CHUNK_UPDATE_PACKET_THRESHOLD = 65536;
@@ -469,6 +469,28 @@ public class CarpetSettings
             return "You must choose a value from 2 to " + MAXIMUM_CHUNK_UPDATE_PACKET_THRESHOLD;
         }
     }
+
+    @Rule(
+            desc = "Hopper with wool block on top outputs item infinitely without having its item decreased",
+            category = {CREATIVE}
+    )
+    public static boolean hopperNoItemCost = false;
+
+    @Rule(
+            desc = "Disable block destruction by fluid flowing",
+            extra = {
+                    "Fluid will just simple stopped at the state before destroying the block",
+                    "It's useful to prevent liquid from accidentally flooding your redstone wiring in creative"
+            },
+            category = {CREATIVE}
+    )
+    public static boolean fluidDestructionDisabled = false;
+
+    @Rule(
+            desc = "Remove all enchantment restriction checks inside /enchant command",
+            category = {CREATIVE}
+    )
+    public static boolean enchantCommandNoRestriction = false;
 
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$

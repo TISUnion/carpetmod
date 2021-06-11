@@ -1,0 +1,22 @@
+--- a/net/minecraft/fluid/FlowingFluid.java
++++ b/net/minecraft/fluid/FlowingFluid.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.fluid;
+ 
++import carpet.settings.CarpetSettings;
+ import com.google.common.collect.Maps;
+ import com.mojang.datafixers.util.Pair;
+ import it.unimi.dsi.fastutil.objects.Object2ByteLinkedOpenHashMap;
+@@ -335,6 +336,12 @@
+         {
+             if (!blockStateIn.isAir())
+             {
++                // TISCM fluidDestructionDisabled
++                if (CarpetSettings.fluidDestructionDisabled)
++                {
++                    return;
++                }
++
+                 this.beforeReplacingBlock(worldIn, pos, blockStateIn);
+             }
+ 

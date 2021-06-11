@@ -1,0 +1,23 @@
+--- a/net/minecraft/block/BlockChest.java
++++ b/net/minecraft/block/BlockChest.java
+@@ -2,6 +2,8 @@
+ 
+ import java.util.List;
+ import javax.annotation.Nullable;
++
++import carpet.settings.CarpetSettings;
+ import net.minecraft.block.state.BlockFaceShape;
+ import net.minecraft.block.state.IBlockState;
+ import net.minecraft.entity.EntityLivingBase;
+@@ -249,7 +251,10 @@
+         }
+         else
+         {
+-            ILockableContainer ilockablecontainer = this.getContainer(state, worldIn, pos, false);
++            // TISCM creativeOpenContainerForcibly
++            boolean allowBlockedChest = CarpetSettings.creativeOpenContainerForcibly;
++            // TISCM replaced the last parameter `false` with local field allowBlockedChest
++            ILockableContainer ilockablecontainer = this.getContainer(state, worldIn, pos, allowBlockedChest);
+ 
+             if (ilockablecontainer != null)
+             {

@@ -83,7 +83,31 @@
          IInventory iinventory = this.getInventoryForHopperTransfer();
  
          if (iinventory == null)
-@@ -377,12 +432,19 @@
+@@ -223,6 +278,23 @@
+                         if (itemstack1.isEmpty())
+                         {
+                             iinventory.markDirty();
++
++                            // TISCM hopperNoItemCost
++                            if (CarpetSettings.hopperNoItemCost)
++                            {
++                                World world = this.getWorld();
++                                if (world != null)
++                                {
++                                    EnumDyeColor wool_color = WoolTool.getWoolColorAtPosition(world, new BlockPos(this.getXPos(), this.getYPos(), this.getZPos()).offset(EnumFacing.UP));
++                                    if (wool_color != null)
++                                    {
++                                        // restore the hopper inventory slot
++                                        this.setInventorySlotContents(i, itemstack);
++                                    }
++                                }
++                            }
++                            // TISCM hopperNoItemCost ends
++
+                             return true;
+                         }
+ 
+@@ -377,12 +449,19 @@
  
      public static boolean captureItem(IInventory p_200114_0_, EntityItem p_200114_1_)
      {
@@ -103,7 +127,7 @@
              flag = true;
              p_200114_1_.remove();
          }
-@@ -396,6 +458,28 @@
+@@ -396,6 +475,28 @@
  
      public static ItemStack putStackInInventoryAllSlots(@Nullable IInventory source, IInventory destination, ItemStack stack, @Nullable EnumFacing direction)
      {
@@ -132,7 +156,7 @@
          if (destination instanceof ISidedInventory && direction != null)
          {
              ISidedInventory isidedinventory = (ISidedInventory)destination;
-@@ -504,9 +588,17 @@
+@@ -504,9 +605,17 @@
          return getInventoryAtPosition(hopper.getWorld(), hopper.getXPos(), hopper.getYPos() + 1.0D, hopper.getZPos());
      }
  

@@ -1,0 +1,21 @@
+--- a/net/minecraft/block/BlockEnderChest.java
++++ b/net/minecraft/block/BlockEnderChest.java
+@@ -1,6 +1,8 @@
+ package net.minecraft.block;
+ 
+ import java.util.Random;
++
++import carpet.settings.CarpetSettings;
+ import net.minecraft.block.state.BlockFaceShape;
+ import net.minecraft.block.state.IBlockState;
+ import net.minecraft.entity.player.EntityPlayer;
+@@ -94,7 +96,8 @@
+ 
+         if (inventoryenderchest != null && tileentity instanceof TileEntityEnderChest)
+         {
+-            if (worldIn.getBlockState(pos.up()).isNormalCube())
++            // TISCM creativeOpenContainerForcibly added rule value check
++            if (worldIn.getBlockState(pos.up()).isNormalCube() && !CarpetSettings.creativeOpenContainerForcibly)
+             {
+                 return true;
+             }
