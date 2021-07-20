@@ -498,7 +498,7 @@ public class CarpetSettings
                     "Minecraft will make a `tickEntity` call in the previous world when changing the dimension of a player",
                     "which causes the player entity to be added in a chunk in the new player position in the previous world",
                     "If the player returns to the previous dimension before that chunk gets unloaded, when that chunk gets unloaded,",
-                    "the player will be removed from the world, which causes the player becomes invisible and more wired stuffs"
+                    "the player will be removed from the world, which causes the player becomes invisible and more weird stuffs"
             },
             category = {BUGFIX}
     )
