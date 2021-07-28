@@ -61,6 +61,10 @@ public class VillageCommand
 					generateVillageInfo(messages, village, i);
 				}
 			}
+			if (messages.isEmpty())
+			{
+				messages.add(Messenger.s("Seems like there's no village in all dimensions"));
+			}
 		}
 		else
 		{
@@ -106,7 +110,7 @@ public class VillageCommand
 							"w ------------\n",
 							String.format("w X: %d\n", pos.getX()),
 							String.format("w Y: %d\n", pos.getY()),
-							String.format("w Z: %d\n", pos.getZ())
+							String.format("w Z: %d", pos.getZ())
 					),
 					new ClickEvent(ClickEvent.Action.RUN_COMMAND, TextUtil.getTeleportCommand(pos, village.getWorld().getDimension().getType()))
 			));
