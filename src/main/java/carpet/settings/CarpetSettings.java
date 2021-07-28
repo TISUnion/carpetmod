@@ -62,6 +62,12 @@ public class CarpetSettings
     public static String commandPing = "true";
 
     @Rule(
+            desc = "Enables /refresh command to refresh client desync",
+            category = COMMAND
+    )
+    public static String commandRefresh = "true";
+
+    @Rule(
             desc = "enable visualize projectile logger",
             category = SURVIVAL
     )
