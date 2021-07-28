@@ -85,6 +85,7 @@ public class CarpetServer // static for now - easier to handle all around the co
         PingCommand.register(dispatcher);
         EpsCommand.register(dispatcher);
         RefreshCommand.register(dispatcher);
+        VillageCommand.register(dispatcher);
 
         //TestCommand.register(dispatcher);
 

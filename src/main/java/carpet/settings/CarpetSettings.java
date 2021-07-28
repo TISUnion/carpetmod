@@ -68,6 +68,12 @@ public class CarpetSettings
     public static String commandRefresh = "true";
 
     @Rule(
+            desc = "Enables /village command to debug village stuffs",
+            category = COMMAND
+    )
+    public static String commandVillage = "false";
+
+    @Rule(
             desc = "enable visualize projectile logger",
             category = SURVIVAL
     )
