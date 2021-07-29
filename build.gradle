@@ -79,6 +79,7 @@ project(':clean') {
 
 project(':' + settings.modname) {
     evaluationDependsOn(':clean')
+    apply plugin: 'java'
     apply plugin: 'eclipse'
     apply plugin: 'net.minecraftforge.gradle.forgedev.patcher'
     sourceSets {
@@ -92,6 +93,7 @@ project(':' + settings.modname) {
         }
     }
     repositories {
+        maven { url = 'https://maven.enginehub.org/repo' }
         mavenLocal()
         mavenCentral()
     }
@@ -117,6 +119,9 @@ project(':' + settings.modname) {
     }
     dependencies {
         // Add extra dependencies here
+        compile 'com.sk89q.worldedit:worldedit-core:7.2.6-SNAPSHOT'
+        compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
+        compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.14.1'
     }
 
     task runclient(type: JavaExec, dependsOn: [":" + settings.modname + ":downloadAssets", ":" + settings.modname + ":extractNatives"]) {

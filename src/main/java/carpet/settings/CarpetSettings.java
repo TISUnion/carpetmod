@@ -14,14 +14,14 @@ import static carpet.settings.RuleCategory.*;
 
 public class CarpetSettings
 {
-    public static final String carpetVersion = "TISCarpet_build_undefined";
+    public static final String carpetVersion = "TISCarpet_build_261";
     public static final Logger LOG = LogManager.getLogger();
     public static boolean skipGenerationChecks = false;
     public static boolean impendingFillSkipUpdates = false;
     public static final int SHULKERBOX_MAX_STACK_AMOUNT = 64;
     public static boolean isEpsActive = false;
-    
-    private static class ValidateVoxelOpt extends Validator<Boolean>
+
+	private static class ValidateVoxelOpt extends Validator<Boolean>
     {
         @Override
         public Boolean validate(CommandSource source, ParsedRule<Boolean> currentRule, Boolean newValue, String string)
@@ -72,6 +72,12 @@ public class CarpetSettings
             category = COMMAND
     )
     public static String commandVillage = "false";
+
+    @Rule(
+            desc = "Enables world edit operations",
+            category = COMMAND
+    )
+    public static String worldEdit = "false";
 
     @Rule(
             desc = "enable visualize projectile logger",

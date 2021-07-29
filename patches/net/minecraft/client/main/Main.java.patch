@@ -1,0 +1,19 @@
+--- a/net/minecraft/client/main/Main.java
++++ b/net/minecraft/client/main/Main.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.client.main;
+ 
++import carpet.worldedit.FabricWorldEdit;
+ import com.google.gson.Gson;
+ import com.google.gson.GsonBuilder;
+ import com.mojang.authlib.properties.PropertyMap;
+@@ -70,6 +71,9 @@
+             System.out.println("Completely ignored arguments: " + list);
+         }
+ 
++        // CM worldedit
++        FabricWorldEdit.inst.onInitialize();
++
+         String s = func_206236_a(optionset, optionspec5);
+         Proxy proxy = Proxy.NO_PROXY;
+ 
