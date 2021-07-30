@@ -42,7 +42,7 @@
      public EnumActionResult processRightClickBlock(EntityPlayer player, World worldIn, ItemStack stack, EnumHand hand, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ)
      {
 +        // CM worldedit
-+        EnumActionResult weResult = CarpetWEWorldEdit.inst.onRightClickBlock(player, worldIn, hand, facing, pos.getX() + hitX, pos.getY() + hitY, pos.getZ() + hitZ);
++        EnumActionResult weResult = CarpetWEWorldEdit.inst.onRightClickBlock(player, worldIn, hand, facing, pos);
 +        if (weResult != EnumActionResult.PASS)
 +        {
 +            return weResult;
