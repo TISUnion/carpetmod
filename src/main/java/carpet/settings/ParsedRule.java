@@ -131,6 +131,8 @@ public final class ParsedRule<T> implements Comparable<ParsedRule> {
                 if (value == null)
                 {
                     Messenger.m(source, "r Wrong value for " + name + ": " + stringValue);
+                    if (validator.description() != null)
+                        Messenger.m(source, "r " + validator.description());
                     return null;
                 }
             }
