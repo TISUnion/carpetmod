@@ -91,9 +91,7 @@ public class CarpetWEWorldEdit
 
     private CarpetWEPermissionsProvider provider;
 
-    public static final CarpetWEWorldEdit inst = TISCMConfig.MOD_WORLDEDIT ?
-            new CarpetWEWorldEdit() :      // enabled
-            new DummyCarpetWEWorldEdit();  // disabled
+    public static final CarpetWEWorldEdit inst = new CarpetWEWorldEdit();
 
     private CarpetWEPlatform platform;
     private CarpetWEConfiguration config;
@@ -102,8 +100,13 @@ public class CarpetWEWorldEdit
     public CarpetWEWorldEdit() {
     }
 
+    public static boolean isEnabled() {
+        // carpet rule worldEdit is more like a permission lock
+        return TISCMConfig.MOD_WORLDEDIT;
+    }
+
     public static boolean canPlayerUseWorldEdit(CommandSource source) {
-        return SettingsManager.canUseCommand(source, CarpetSettings.worldEdit);
+        return isEnabled() && SettingsManager.canUseCommand(source, CarpetSettings.worldEdit);
     }
 
     public static boolean canPlayerUseWorldEdit(EntityPlayer playerMP) {
@@ -391,59 +394,5 @@ public class CarpetWEWorldEdit
 
     public CarpetWEPermissionsProvider getPermissionsProvider() {
         return provider;
-    }
-
-    /**
-     * A dummy class that does nothing
-     * It's used when world edit mod is disabled
-     */
-    private static class DummyCarpetWEWorldEdit extends CarpetWEWorldEdit {
-        @Override
-        public void onInitialize() {
-        }
-
-        @Override
-        public void onStartingServer(MinecraftServer minecraftServer) {
-        }
-
-        @Override
-        public void onStartServer(MinecraftServer minecraftServer) {
-        }
-
-        @Override
-        public void onStopServer(MinecraftServer minecraftServer) {
-        }
-
-        @Override
-        public void onEndServerTick(MinecraftServer minecraftServer) {
-        }
-
-        @Override
-        public void onPlayerDisconnect(EntityPlayerMP player) {
-        }
-
-        @Override
-        public EnumActionResult onLeftClickBlock(EntityPlayer playerEntity, World world, EnumHand hand, BlockPos blockPos, EnumFacing direction) {
-            return EnumActionResult.PASS;
-        }
-
-        @Override
-        public EnumActionResult onRightClickBlock(EntityPlayer playerEntity, World world, EnumHand hand, EnumFacing facing, BlockPos blockPos) {
-            return EnumActionResult.PASS;
-        }
-
-        @Override
-        public ActionResult<ItemStack> onRightClickAir(EntityPlayer playerEntity, World world, EnumHand hand) {
-            // result doesn't matter since the type is PASS
-            return new ActionResult<>(EnumActionResult.PASS, ItemStack.EMPTY);
-        }
-
-        @Override
-        public void registerCommands(CommandDispatcher<CommandSource> dispatcher) {
-        }
-
-        @Override
-        public void onCuiPacket(PacketBuffer buf, EntityPlayerMP player) {
-        }
     }
 }

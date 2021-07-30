@@ -22,37 +22,43 @@
  
          return flag;
      }
-@@ -312,6 +321,14 @@
+@@ -312,6 +321,17 @@
  
      public EnumActionResult processRightClick(EntityPlayer player, World worldIn, ItemStack stack, EnumHand hand)
      {
 +        // CM worldedit
-+        ActionResult<ItemStack> weResult = CarpetWEWorldEdit.inst.onRightClickAir(player, worldIn, hand);
-+        if (weResult.getType() != EnumActionResult.PASS)
++        if (CarpetWEWorldEdit.isEnabled())
 +        {
-+            return weResult.getType();
++            ActionResult<ItemStack> weResult = CarpetWEWorldEdit.inst.onRightClickAir(player, worldIn, hand);
++            if (weResult.getType() != EnumActionResult.PASS)
++            {
++                return weResult.getType();
++            }
 +        }
 +        // CM worldedit ends
 +
          if (this.gameType == GameType.SPECTATOR)
          {
              return EnumActionResult.PASS;
-@@ -366,6 +383,14 @@
+@@ -366,6 +386,17 @@
  
      public EnumActionResult processRightClickBlock(EntityPlayer player, World worldIn, ItemStack stack, EnumHand hand, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ)
      {
 +        // CM worldedit
-+        EnumActionResult weResult = CarpetWEWorldEdit.inst.onRightClickBlock(player, worldIn, hand, facing, pos);
-+        if (weResult != EnumActionResult.PASS)
++        if (CarpetWEWorldEdit.isEnabled())
 +        {
-+            return weResult;
++            EnumActionResult weResult = CarpetWEWorldEdit.inst.onRightClickBlock(player, worldIn, hand, facing, pos);
++            if (weResult != EnumActionResult.PASS)
++            {
++                return weResult;
++            }
 +        }
 +        // CM worldedit ends
 +
          IBlockState iblockstate = worldIn.getBlockState(pos);
  
          if (this.gameType == GameType.SPECTATOR)
-@@ -401,11 +426,20 @@
+@@ -401,11 +432,20 @@
              boolean flag = !player.getHeldItemMainhand().isEmpty() || !player.getHeldItemOffhand().isEmpty();
              boolean flag1 = player.isSneaking() && flag;
  

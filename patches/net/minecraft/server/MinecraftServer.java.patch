@@ -51,24 +51,30 @@
      }
  
      public abstract boolean init() throws IOException;
-@@ -571,7 +586,11 @@
+@@ -571,7 +586,14 @@
      public void stopServer()
      {
          LOGGER.info("Stopping server");
 +        CarpetServer.onServerClosed(this);
  
 +        // CM worldedit
-+        CarpetWEWorldEdit.inst.onStopServer(this);
++        if (CarpetWEWorldEdit.isEnabled())
++        {
++            CarpetWEWorldEdit.inst.onStopServer(this);
++        }
 +
          if (this.getNetworkSystem() != null)
          {
              this.getNetworkSystem().terminateEndpoints();
-@@ -639,34 +658,62 @@
+@@ -639,34 +661,68 @@
      {
          try
          {
 +            // CM worldedit
-+            CarpetWEWorldEdit.inst.onStartingServer(this);
++            if (CarpetWEWorldEdit.isEnabled())
++            {
++                CarpetWEWorldEdit.inst.onStartingServer(this);
++            }
 +
              if (this.init())
              {
@@ -81,10 +87,12 @@
                  this.applyServerIconToResponse(this.statusResponse);
  
 -                while (this.serverRunning)
--                {
--                    long i = Util.milliTime() - this.serverTime;
 +                // CM worldedit
-+                CarpetWEWorldEdit.inst.onStartServer(this);
++                if (CarpetWEWorldEdit.isEnabled())
+                 {
+-                    long i = Util.milliTime() - this.serverTime;
++                    CarpetWEWorldEdit.inst.onStartServer(this);
++                }
  
 -                    if (i > 2000L && this.serverTime - this.timeOfLastWarning >= 15000L)
 +                while (this.serverRunning) {
@@ -143,7 +151,7 @@
                  }
              }
              else
-@@ -782,6 +829,12 @@
+@@ -782,6 +838,12 @@
      {
          long i = Util.nanoTime();
          ++this.tickCounter;
@@ -156,7 +164,7 @@
  
          if (this.startProfiling)
          {
-@@ -790,6 +843,9 @@
+@@ -790,6 +852,9 @@
          }
  
          this.profiler.startSection("root");
@@ -166,7 +174,7 @@
          this.updateTimeLightAndEntities(hasTimeLeft);
  
          if (i - this.nanoTimeSinceStatusRefresh >= 5000000000L)
-@@ -810,10 +866,16 @@
+@@ -810,10 +875,16 @@
  
          if (this.tickCounter % 900 == 0)
          {
@@ -183,7 +191,7 @@
          }
  
          this.profiler.startSection("snooper");
-@@ -829,16 +891,28 @@
+@@ -829,16 +900,31 @@
          }
  
          this.profiler.endSection();
@@ -201,7 +209,10 @@
 +        }
 +
 +        // CM worldedit
-+        CarpetWEWorldEdit.inst.onEndServerTick(this);
++        if (CarpetWEWorldEdit.isEnabled())
++        {
++            CarpetWEWorldEdit.inst.onEndServerTick(this);
++        }
      }
  
      public void updateTimeLightAndEntities(BooleanSupplier hasTimeLeft)
@@ -212,7 +223,7 @@
          FutureTask<?> futuretask;
  
          while ((futuretask = this.futureTaskQueue.poll()) != null)
-@@ -847,6 +921,7 @@
+@@ -847,6 +933,7 @@
          }
  
          this.profiler.endStartSection("commandFunctions");
@@ -220,7 +231,7 @@
          this.getFunctionManager().tick();
          this.profiler.endStartSection("levels");
  
-@@ -870,6 +945,7 @@
+@@ -870,6 +957,7 @@
  
                  this.profiler.startSection("tick");
  
@@ -228,7 +239,7 @@
                  try
                  {
                      worldserver.tick(hasTimeLeft);
-@@ -878,9 +954,15 @@
+@@ -878,9 +966,15 @@
                  {
                      CrashReport crashreport = CrashReport.makeCrashReport(throwable1, "Exception ticking world");
                      worldserver.fillCrashReport(crashreport);
@@ -245,7 +256,7 @@
                  try
                  {
                      worldserver.tickEntities();
-@@ -889,7 +971,12 @@
+@@ -889,7 +983,12 @@
                  {
                      CrashReport crashreport1 = CrashReport.makeCrashReport(throwable, "Exception ticking world entities");
                      worldserver.fillCrashReport(crashreport1);
@@ -259,7 +270,7 @@
                  }
  
                  this.profiler.endSection();
-@@ -905,10 +992,13 @@
+@@ -905,10 +1004,13 @@
              }))[this.tickCounter % 100] = Util.nanoTime() - i;
          }
  
@@ -273,17 +284,20 @@
          this.profiler.endStartSection("tickables");
  
          for (int j = 0; j < this.tickables.size(); ++j)
-@@ -1004,6 +1094,9 @@
+@@ -1004,6 +1106,12 @@
                  }
              }
  
 +            // CM worldedit
-+            CarpetWEWorldEdit.inst.onInitialize();
++            if (CarpetWEWorldEdit.isEnabled())
++            {
++                CarpetWEWorldEdit.inst.onInitialize();
++            }
 +
              YggdrasilAuthenticationService yggdrasilauthenticationservice = new YggdrasilAuthenticationService(Proxy.NO_PROXY, UUID.randomUUID().toString());
              MinecraftSessionService minecraftsessionservice = yggdrasilauthenticationservice.createMinecraftSessionService();
              GameProfileRepository gameprofilerepository = yggdrasilauthenticationservice.createProfileRepository();
-@@ -1142,7 +1235,8 @@
+@@ -1142,7 +1250,8 @@
  
      public String getServerModName()
      {
@@ -293,7 +307,7 @@
      }
  
      public CrashReport addServerInfoToCrashReport(CrashReport report)
-@@ -1605,6 +1699,12 @@
+@@ -1605,6 +1714,12 @@
      {
          return this.serverTime;
      }
@@ -306,7 +320,7 @@
  
      public Thread getServerThread()
      {
-@@ -1825,4 +1925,18 @@
+@@ -1825,4 +1940,18 @@
              return 0;
          }
      }
