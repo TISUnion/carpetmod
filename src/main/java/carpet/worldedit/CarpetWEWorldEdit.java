@@ -393,8 +393,7 @@ public class CarpetWEWorldEdit
         }
 
         @Override
-        public void onEndServerTick(MinecraftServer minecraftServer)
-        {
+        public void onEndServerTick(MinecraftServer minecraftServer) {
         }
 
         @Override

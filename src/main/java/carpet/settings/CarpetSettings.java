@@ -3,6 +3,7 @@ package carpet.settings;
 import carpet.CarpetServer;
 import carpet.microtiming.enums.MicroTimingTarget;
 import carpet.utils.Messenger;
+import carpet.utils.TISCMConfig;
 import net.minecraft.command.CommandSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
@@ -14,7 +15,7 @@ import static carpet.settings.RuleCategory.*;
 
 public class CarpetSettings
 {
-    public static final String carpetVersion = "TISCarpet_build_261";
+    public static final String carpetVersion = "TISCarpet_build_262";
     public static final Logger LOG = LogManager.getLogger();
     public static boolean skipGenerationChecks = false;
     public static boolean impendingFillSkipUpdates = false;
@@ -75,9 +76,27 @@ public class CarpetSettings
 
     @Rule(
             desc = "Enables world edit operations",
-            category = COMMAND
+            category = COMMAND,
+            validate = ValidateWorldEdit.class
     )
     public static String worldEdit = "false";
+
+    private static class ValidateWorldEdit extends Validator<String>
+    {
+        @Override
+        public String validate(CommandSource source, ParsedRule<String> currentRule, String newValue, String string)
+        {
+            if (!newValue.equals("false") && !TISCMConfig.MOD_WORLDEDIT)
+            {
+                return null;
+            }
+            return newValue;
+        }
+        public String description()
+        {
+            return "You must set `TISCMConfig.MOD_WORLDEDIT` to true during mod compiling to enable world edit";
+        }
+    }
 
     @Rule(
             desc = "enable visualize projectile logger",
