@@ -203,7 +203,7 @@ public class CarpetWEWorldEdit
     }
 
     // fabric-api: UseBlockCallback.EVENT
-    public EnumActionResult onRightClickBlock(EntityPlayer playerEntity, World world, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onRightClickBlock(EntityPlayer playerEntity, World world, EnumHand hand, EnumFacing facing, BlockPos blockPos) {
         if (!canPlayerUseWorldEdit(playerEntity) || shouldSkip() || hand == EnumHand.OFF_HAND || world.isRemote) {
             return EnumActionResult.PASS;
         }
@@ -211,7 +211,7 @@ public class CarpetWEWorldEdit
         WorldEdit we = WorldEdit.getInstance();
         CarpetWEPlayer player = adaptPlayer((EntityPlayerMP) playerEntity);
         CarpetWEWorld localWorld = getWorld(world);
-        Location pos = new Location(localWorld, hitX, hitY, hitZ);
+        Location pos = new Location(localWorld, blockPos.getX(), blockPos.getY(), blockPos.getZ());
         com.sk89q.worldedit.util.Direction direction = CarpetWEAdapter.adaptEnumFacing(facing);
 
         if (we.handleBlockRightClick(player, pos, direction)) {
@@ -428,7 +428,7 @@ public class CarpetWEWorldEdit
         }
 
         @Override
-        public EnumActionResult onRightClickBlock(EntityPlayer playerEntity, World world, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+        public EnumActionResult onRightClickBlock(EntityPlayer playerEntity, World world, EnumHand hand, EnumFacing facing, BlockPos blockPos) {
             return EnumActionResult.PASS;
         }
 

@@ -60,7 +60,7 @@ public interface CarpetWEPermissionsProvider
 
         @Override
         public boolean hasPermission(EntityPlayerMP player, String permission) {
-            return super.hasPermission(player, permission) && SettingsManager.canUseCommand(player.getCommandSource(), CarpetSettings.worldEdit);
+            return super.hasPermission(player, permission) && CarpetWEWorldEdit.canPlayerUseWorldEdit(player);
         }
     }
 }
