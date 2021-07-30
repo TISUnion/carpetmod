@@ -26,5 +26,5 @@ public class TISCMConfig
 
 	// ========== Mods ==========
 
-	public static final boolean MOD_WORLDEDIT = true;
+	public static final boolean MOD_WORLDEDIT = false;
 }

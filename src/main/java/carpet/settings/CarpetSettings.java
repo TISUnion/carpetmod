@@ -15,7 +15,7 @@ import static carpet.settings.RuleCategory.*;
 
 public class CarpetSettings
 {
-    public static final String carpetVersion = "TISCarpet_build_262";
+    public static final String carpetVersion = "TISCarpet_build_worldedit_2";
     public static final Logger LOG = LogManager.getLogger();
     public static boolean skipGenerationChecks = false;
     public static boolean impendingFillSkipUpdates = false;

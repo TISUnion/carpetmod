@@ -149,7 +149,7 @@ def projectMod = project(':' + settings.modname) {
         compile 'com.sk89q.worldedit:worldedit-core:7.2.6-SNAPSHOT'
         extraLibs ('com.sk89q.worldedit:worldedit-core:7.2.6-SNAPSHOT') {
             exclude group: 'com.ibm.icu'
-            exclude group: 'org.antlr'
+            exclude group: 'org.antlr', module: 'antlr4'
             exclude group: 'org.mozilla'
             exclude group: 'org.yaml'
         }
