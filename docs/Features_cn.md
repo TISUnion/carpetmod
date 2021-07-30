@@ -645,6 +645,15 @@
 
 统计项名为 `custom` 分类下的 `break_bedrock`
 
+## World Edit mod 移植
+
+移植了 world-edit 7.2.6-SNAPSHOT
+
+见规则 [worldEdit](#worldEdit) 以了解其的游戏内开关
+
+如果你的确不想使用它，你可以通过修改类 `TISCMConfig` 中的常量 `MOD_WORLDEDIT` 来完全禁用它
+
+
 ------
 
 # 修复

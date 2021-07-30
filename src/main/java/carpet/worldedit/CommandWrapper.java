@@ -72,7 +72,7 @@ public final class CommandWrapper {
 
         for (String alias : aliases.build()) {
             LiteralArgumentBuilder<CommandSource> base = literal(alias)
-                    .requires((player) -> SettingsManager.canUseCommand(player, CarpetSettings.worldEdit))
+                    .requires(CarpetWEWorldEdit::canPlayerUseWorldEdit)
                     .executes(commandRunner)
                     .then(argument("args", StringArgumentType.greedyString())
                             .suggests(CommandWrapper::suggest)

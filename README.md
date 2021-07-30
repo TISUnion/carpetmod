@@ -8,6 +8,8 @@ A fork of [gnembon's original CarpetMod for 1.13.2](https://github.com/gnembon/c
 
 Thanks to [Lithium mod](https://github.com/jellysquid3/lithium-fabric) for some of the optimizations
 
+Thanks to [World Edit mod](https://github.com/EngineHub/WorldEdit) for the powerful tool
+
 ## How to use:
 ------
 

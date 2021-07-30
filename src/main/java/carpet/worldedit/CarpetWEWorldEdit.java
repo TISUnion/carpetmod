@@ -19,6 +19,8 @@
 
 package carpet.worldedit;
 
+import carpet.settings.CarpetSettings;
+import carpet.settings.SettingsManager;
 import carpet.utils.TISCMConfig;
 import com.mojang.brigadier.CommandDispatcher;
 import com.sk89q.worldedit.LocalSession;
@@ -45,6 +47,7 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
@@ -57,6 +60,7 @@ import org.enginehub.piston.Command;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -76,9 +80,12 @@ public class CarpetWEWorldEdit
 {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
+
     public static final String MOD_ID = "worldedit";
     public static final String VERSION = "7.2.6-SNAPSHOT";
+
     public static final String CUI_PLUGIN_CHANNEL = "cui";
+    public static final ResourceLocation CUI_IDENTIFIER = new ResourceLocation(CarpetWEWorldEdit.MOD_ID, CarpetWEWorldEdit.CUI_PLUGIN_CHANNEL);
 
     public static final SimpleLifecycled<MinecraftServer> LIFECYCLED_SERVER = SimpleLifecycled.invalid();
 
@@ -93,6 +100,14 @@ public class CarpetWEWorldEdit
     private Path workingDir;
 
     public CarpetWEWorldEdit() {
+    }
+
+    public static boolean canPlayerUseWorldEdit(CommandSource source) {
+        return SettingsManager.canUseCommand(source, CarpetSettings.worldEdit);
+    }
+
+    public static boolean canPlayerUseWorldEdit(EntityPlayer playerMP) {
+        return canPlayerUseWorldEdit(playerMP.getCommandSource());
     }
 
     /*
@@ -162,7 +177,7 @@ public class CarpetWEWorldEdit
 
     // fabric-api: AttackBlockCallback.EVENT
     public EnumActionResult onLeftClickBlock(EntityPlayer playerEntity, World world, EnumHand hand, BlockPos blockPos, EnumFacing direction) {
-        if (shouldSkip() || hand == EnumHand.OFF_HAND || world.isRemote) {
+        if (!canPlayerUseWorldEdit(playerEntity) || shouldSkip() || hand == EnumHand.OFF_HAND || world.isRemote) {
             return EnumActionResult.PASS;
         }
 
@@ -189,7 +204,7 @@ public class CarpetWEWorldEdit
 
     // fabric-api: UseBlockCallback.EVENT
     public EnumActionResult onRightClickBlock(EntityPlayer playerEntity, World world, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        if (shouldSkip() || hand == EnumHand.OFF_HAND || world.isRemote) {
+        if (!canPlayerUseWorldEdit(playerEntity) || shouldSkip() || hand == EnumHand.OFF_HAND || world.isRemote) {
             return EnumActionResult.PASS;
         }
 
@@ -213,7 +228,7 @@ public class CarpetWEWorldEdit
     // fabric-api: UseItemCallback.EVENT
     public ActionResult<ItemStack> onRightClickAir(EntityPlayer playerEntity, World world, EnumHand hand) {
         ItemStack stackInHand = playerEntity.getHeldItem(hand);
-        if (shouldSkip() || hand == EnumHand.OFF_HAND || world.isRemote) {
+        if (!canPlayerUseWorldEdit(playerEntity) || shouldSkip() || hand == EnumHand.OFF_HAND || world.isRemote) {
             return new ActionResult<>(EnumActionResult.PASS, stackInHand);
         }
 
@@ -248,6 +263,13 @@ public class CarpetWEWorldEdit
                 perms.forEach(getPermissionsProvider()::registerPermission);
             }
         }
+    }
+
+    public void onCuiPacket(PacketBuffer buf, EntityPlayerMP player) {
+        LocalSession session = CarpetWEWorldEdit.inst.getSession(player);
+        String text = buf.toString(StandardCharsets.UTF_8);
+        CarpetWEPlayer actor = CarpetWEAdapter.adaptPlayer(player);
+        session.handleCUIInitializationMessage(text, actor);
     }
 
     /*
@@ -412,11 +434,16 @@ public class CarpetWEWorldEdit
 
         @Override
         public ActionResult<ItemStack> onRightClickAir(EntityPlayer playerEntity, World world, EnumHand hand) {
+            // result doesn't matter since the type is PASS
             return new ActionResult<>(EnumActionResult.PASS, ItemStack.EMPTY);
         }
 
         @Override
         public void registerCommands(CommandDispatcher<CommandSource> dispatcher) {
+        }
+
+        @Override
+        public void onCuiPacket(PacketBuffer buf, EntityPlayerMP player) {
         }
     }
 }

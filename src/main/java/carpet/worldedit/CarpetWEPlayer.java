@@ -21,7 +21,6 @@ package carpet.worldedit;
 
 import carpet.worldedit.internal.ExtendedPlayerEntity;
 import carpet.worldedit.internal.NBTConverter;
-import carpet.worldedit.net.handler.WECUIPacketHandler;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.util.StringUtil;
 import com.sk89q.worldedit.blocks.BaseItemStack;
@@ -129,7 +128,7 @@ public class CarpetWEPlayer extends AbstractPlayerActor {
         }
 
         this.player.connection.sendPacket(new SPacketCustomPayload(
-                WECUIPacketHandler.CUI_IDENTIFIER,
+                CarpetWEWorldEdit.CUI_IDENTIFIER,
                 new PacketBuffer(Unpooled.copiedBuffer(send, StandardCharsets.UTF_8))
         ));
     }

@@ -660,6 +660,14 @@ When a bedrock is deleted by piston or sticky piston, the nearest player to the 
 
 The stat name is `break_bedrock` in `custom` catalogory
 
+## World Edit mod porting
+
+Ported world-edit 7.2.6-SNAPSHOT
+
+See rule [worldEdit](#worldEdit) for its in-game switch
+
+If you really don't want to use it, you can disable it completely by modifying the constant `MOD_WORLDEDIT` in class `TISCMConfig`
+
 ------
 
 # Fixes

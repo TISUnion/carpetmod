@@ -25,6 +25,6 @@ public class TISCMConfig
 	public static final boolean CACHE_TILE_ENTITY_SERIALIZATION   = TISCM_OPTIMIZATION_ENABLE && true;
 
 	// ========== Mods ==========
-
-	public static final boolean MOD_WORLDEDIT = false;
+	// https://github.com/EngineHub/WorldEdit
+	public static final boolean MOD_WORLDEDIT = true;
 }
