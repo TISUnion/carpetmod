@@ -51,8 +51,7 @@ project(':mcp') {
     }
 }
 
-
-project(':clean') {
+def projectClean = project(':clean') {
     evaluationDependsOn(':mcp')
     apply plugin: 'eclipse'
     apply plugin: 'net.minecraftforge.gradle.forgedev.patcher'
@@ -77,7 +76,7 @@ project(':clean') {
 }
 
 
-project(':' + settings.modname) {
+def projectMod = project(':' + settings.modname) {
     evaluationDependsOn(':clean')
     apply plugin: 'java'
     apply plugin: 'eclipse'
@@ -117,11 +116,43 @@ project(':' + settings.modname) {
         canonicalizeWhitespace true
         maxFuzz 3
     }
+    configurations {
+        extraLibs
+        all {
+            resolutionStrategy {
+                // force world edit to use the same log4j as minecraft 1.13.2
+                force 'org.apache.logging.log4j:log4j-api:2.8.1'
+                force 'org.apache.logging.log4j:log4j-core:2.8.1'
+            }
+        }
+    }
+    jar {
+        from {
+            def vanillaLibs = []
+            projectClean.configurations.runtimeClasspath.each {f ->
+                vanillaLibs.add(f.name)
+//                println 'vanilla lib: ' + f.name
+            }
+            def moddedLibs = []
+            configurations.extraLibs.each {f ->
+                if (!vanillaLibs.contains(f.name)) {
+//                    println 'Added extra lib: ' + f.name
+                    moddedLibs.add(zipTree(f))
+                }
+            }
+//            println 'Total extra libs: ' + moddedLibs.size()
+            return moddedLibs
+        }
+    }
     dependencies {
         // Add extra dependencies here
         compile 'com.sk89q.worldedit:worldedit-core:7.2.6-SNAPSHOT'
-        compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
-        compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.14.1'
+        extraLibs ('com.sk89q.worldedit:worldedit-core:7.2.6-SNAPSHOT') {
+            exclude group: 'com.ibm.icu'
+            exclude group: 'org.antlr'
+            exclude group: 'org.mozilla'
+            exclude group: 'org.yaml'
+        }
     }
 
     task runclient(type: JavaExec, dependsOn: [":" + settings.modname + ":downloadAssets", ":" + settings.modname + ":extractNatives"]) {
@@ -431,8 +462,10 @@ class DistUtils {
         }
         return false
     }
-    
+
     static def classUnwanted(InputStream istream, String unwanted) {
+        if (istream == null)
+            return false
         ClassReader reader = new ClassReader(istream)
         ClassNode clazz = new ClassNode()
         reader.accept(clazz, ClassReader.SKIP_CODE)
@@ -499,7 +532,7 @@ if (settings.pipeline == 'joined') {
                     outputs.file 'build/filterDist' + dists[idx] + '/output.zip'
                     doLast {
                         JarFilter.filterJar(file(reobfJar.output), file('build/filterDist' + dists[idx] + '/output.zip')) {
-                            if (filename.endsWith('.class')) {
+                            if (!filename.contains('META-INF/') && filename.endsWith('.class')) {
                                 return DistUtils.stripDist(istream, unwantedDists[idx]) { classname ->
                                     def zip = new ZipFile(file(reobfJar.output))
                                     def entry = zip.getEntry(classname + '.class')
@@ -534,8 +567,22 @@ for (def dist : ['Client', 'Server']) {
         from(zipTree(check.getModdedFilepath())) {
             eachFile { moddedFile ->
                 def entryName = moddedFile.getRelativePath().toString()
-                if (!check.isModified(entryName))
+                if (!check.isModified(entryName) || entryName.startsWith('META-INF/') )
                     moddedFile.exclude()
+            }
+        }
+
+        // json registry and lang file in world edit
+        projectMod.configurations.extraLibs.each {file ->
+            from(zipTree(file)) {
+                eachFile { moddedFile ->
+                    def entryName = moddedFile.getRelativePath().toString()
+                    if (!(
+                            entryName.matches('com/sk89q/worldedit/world/registry/.*\\.json') ||
+                            file.name.startsWith('worldedit') && entryName.startsWith('lang/')
+                    ))
+                        moddedFile.exclude()
+                }
             }
         }
 
