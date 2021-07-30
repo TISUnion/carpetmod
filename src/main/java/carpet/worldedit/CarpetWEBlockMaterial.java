@@ -27,17 +27,12 @@ import net.minecraft.block.state.IBlockState;
 
 import javax.annotation.Nullable;
 
-/**
- * Fabric block material that pulls as much info as possible from the Minecraft
- * Material, and passes the rest to another implementation, typically the
- * bundled block info.
- */
-public class FabricBlockMaterial extends PassthroughBlockMaterial {
+public class CarpetWEBlockMaterial extends PassthroughBlockMaterial {
 
     private final Material delegate;
     private final IBlockState block;
 
-    public FabricBlockMaterial(Material delegate, IBlockState block, @Nullable BlockMaterial secondary) {
+    public CarpetWEBlockMaterial(Material delegate, IBlockState block, @Nullable BlockMaterial secondary) {
         super(secondary);
         this.delegate = delegate;
         this.block = block;

@@ -19,7 +19,7 @@
 
 package carpet.worldedit;
 
-import carpet.worldedit.internal.FabricTransmogrifier;
+import carpet.worldedit.internal.CarpetWETransmogrifier;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
@@ -29,42 +29,46 @@ import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.BundledBlockRegistry;
 import net.minecraft.block.Block;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.OptionalInt;
+import java.util.TreeMap;
 
-public class FabricBlockRegistry extends BundledBlockRegistry {
+public class CarpetWEBlockRegistry extends BundledBlockRegistry {
 
-    private final Map<net.minecraft.block.state.IBlockState, FabricBlockMaterial> materialMap = new HashMap<>();
+    private final Map<net.minecraft.block.state.IBlockState, CarpetWEBlockMaterial> materialMap = new HashMap<>();
 
     @Override
     public Component getRichName(BlockType blockType) {
-        return TranslatableComponent.of(FabricAdapter.adapt(blockType).getTranslationKey());
+        return TranslatableComponent.of(CarpetWEAdapter.adapt(blockType).getTranslationKey());
     }
 
     @Override
     public BlockMaterial getMaterial(BlockType blockType) {
-        Block block = FabricAdapter.adapt(blockType);
+        Block block = CarpetWEAdapter.adapt(blockType);
         return materialMap.computeIfAbsent(
             block.getDefaultState(),
-            m -> new FabricBlockMaterial(m.getMaterial(), m, super.getMaterial(blockType))
+            m -> new CarpetWEBlockMaterial(m.getMaterial(), m, super.getMaterial(blockType))
         );
     }
 
     @Override
     public Map<String, ? extends Property<?>> getProperties(BlockType blockType) {
-        Block block = FabricAdapter.adapt(blockType);
+        Block block = CarpetWEAdapter.adapt(blockType);
         Map<String, Property<?>> map = new TreeMap<>();
         Collection<net.minecraft.state.IProperty<?>> propertyKeys = block
                 .getDefaultState()
                 .getProperties();
         for (net.minecraft.state.IProperty<?> key : propertyKeys) {
-            map.put(key.getName(), FabricTransmogrifier.transmogToWorldEditProperty(key));
+            map.put(key.getName(), CarpetWETransmogrifier.transmogToWorldEditProperty(key));
         }
         return map;
     }
 
     @Override
     public OptionalInt getInternalBlockStateId(BlockState state) {
-        net.minecraft.block.state.IBlockState equivalent = FabricAdapter.adapt(state);
+        net.minecraft.block.state.IBlockState equivalent = CarpetWEAdapter.adapt(state);
         return OptionalInt.of(Block.getStateId(equivalent));
     }
 }

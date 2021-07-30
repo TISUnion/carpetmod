@@ -19,9 +19,9 @@
 
 package carpet.worldedit.net.handler;
 
-import carpet.worldedit.FabricAdapter;
-import carpet.worldedit.FabricPlayer;
-import carpet.worldedit.FabricWorldEdit;
+import carpet.worldedit.CarpetWEAdapter;
+import carpet.worldedit.CarpetWEPlayer;
+import carpet.worldedit.CarpetWEWorldEdit;
 import com.sk89q.worldedit.LocalSession;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
@@ -33,12 +33,12 @@ public final class WECUIPacketHandler {
     private WECUIPacketHandler() {
     }
 
-    public static final ResourceLocation CUI_IDENTIFIER = new ResourceLocation(FabricWorldEdit.MOD_ID, FabricWorldEdit.CUI_PLUGIN_CHANNEL);
+    public static final ResourceLocation CUI_IDENTIFIER = new ResourceLocation(CarpetWEWorldEdit.MOD_ID, CarpetWEWorldEdit.CUI_PLUGIN_CHANNEL);
 
     public static void onPacket(PacketBuffer buf, EntityPlayerMP player) {
-        LocalSession session = FabricWorldEdit.inst.getSession(player);
+        LocalSession session = CarpetWEWorldEdit.inst.getSession(player);
         String text = buf.toString(StandardCharsets.UTF_8);
-        FabricPlayer actor = FabricAdapter.adaptPlayer(player);
+        CarpetWEPlayer actor = CarpetWEAdapter.adaptPlayer(player);
         session.handleCUIInitializationMessage(text, actor);
     }
 }

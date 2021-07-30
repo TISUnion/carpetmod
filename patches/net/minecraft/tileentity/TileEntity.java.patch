@@ -5,7 +5,7 @@
  
  import javax.annotation.Nullable;
 +
-+import carpet.utils.TISCMOptimizationConfig;
++import carpet.utils.TISCMConfig;
  import net.minecraft.block.state.IBlockState;
  import net.minecraft.crash.CrashReportCategory;
  import net.minecraft.nbt.NBTTagCompound;
@@ -27,7 +27,7 @@
 +       // TISCM cache TileEntity Serialization
 +//        ResourceLocation resourcelocation = TileEntityType.getId(this.getType());
 +        ResourceLocation resourcelocation;
-+        if (TISCMOptimizationConfig.CACHE_TILE_ENTITY_SERIALIZATION && this.tileEntityIdCache != null)
++        if (TISCMConfig.CACHE_TILE_ENTITY_SERIALIZATION && this.tileEntityIdCache != null)
 +        {
 +            resourcelocation = this.tileEntityIdCache;
 +        }

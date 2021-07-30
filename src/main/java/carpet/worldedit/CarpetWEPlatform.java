@@ -42,18 +42,18 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Function;
 
-class FabricPlatform extends AbstractPlatform implements MultiUserPlatform {
+class CarpetWEPlatform extends AbstractPlatform implements MultiUserPlatform {
 
-    private final FabricWorldEdit mod;
-    private final FabricDataFixer dataFixer;
+    private final CarpetWEWorldEdit mod;
+    private final CarpetWEDataFixer dataFixer;
     private final Lifecycled<Optional<Watchdog>> watchdog;
     private boolean hookingEvents = false;
 
-    FabricPlatform(FabricWorldEdit mod) {
+    CarpetWEPlatform(CarpetWEWorldEdit mod) {
         this.mod = mod;
-        this.dataFixer = new FabricDataFixer(getDataVersion());
+        this.dataFixer = new CarpetWEDataFixer(getDataVersion());
 
-        this.watchdog = FabricWorldEdit.LIFECYCLED_SERVER.map(
+        this.watchdog = CarpetWEWorldEdit.LIFECYCLED_SERVER.map(
             server -> server instanceof DedicatedServer
                 ? Optional.of((Watchdog) server)
                 : Optional.empty()
@@ -66,7 +66,7 @@ class FabricPlatform extends AbstractPlatform implements MultiUserPlatform {
 
     @Override
     public Registries getRegistries() {
-        return FabricRegistries.getInstance();
+        return CarpetWERegistries.getInstance();
     }
 
     @Override
@@ -103,10 +103,10 @@ class FabricPlatform extends AbstractPlatform implements MultiUserPlatform {
 
     @Override
     public List<? extends World> getWorlds() {
-        Iterable<WorldServer> worlds = FabricWorldEdit.LIFECYCLED_SERVER.valueOrThrow().getWorlds();
+        Iterable<WorldServer> worlds = CarpetWEWorldEdit.LIFECYCLED_SERVER.valueOrThrow().getWorlds();
         List<World> ret = new ArrayList<>();
         for (WorldServer world : worlds) {
-            ret.add(new FabricWorld(world));
+            ret.add(new CarpetWEWorld(world));
         }
         return ret;
     }
@@ -114,24 +114,24 @@ class FabricPlatform extends AbstractPlatform implements MultiUserPlatform {
     @Nullable
     @Override
     public Player matchPlayer(Player player) {
-        if (player instanceof FabricPlayer) {
+        if (player instanceof CarpetWEPlayer) {
             return player;
         } else {
-            EntityPlayerMP entity = FabricWorldEdit.LIFECYCLED_SERVER.valueOrThrow()
+            EntityPlayerMP entity = CarpetWEWorldEdit.LIFECYCLED_SERVER.valueOrThrow()
                 .getPlayerList().getPlayerByUsername(player.getName());
-            return entity != null ? new FabricPlayer(entity) : null;
+            return entity != null ? new CarpetWEPlayer(entity) : null;
         }
     }
 
     @Nullable
     @Override
     public World matchWorld(World world) {
-        if (world instanceof FabricWorld) {
+        if (world instanceof CarpetWEWorld) {
             return world;
         } else {
-            for (WorldServer ws : FabricWorldEdit.LIFECYCLED_SERVER.valueOrThrow().getWorlds()) {
+            for (WorldServer ws : CarpetWEWorldEdit.LIFECYCLED_SERVER.valueOrThrow().getWorlds()) {
                 if (ws.getWorldInfo().getWorldName().equals(world.getName())) {
-                    return new FabricWorld(ws);
+                    return new CarpetWEWorld(ws);
                 }
             }
 
@@ -141,7 +141,6 @@ class FabricPlatform extends AbstractPlatform implements MultiUserPlatform {
 
     @Override
     public void registerCommands(CommandManager manager) {
-        // No-op, we register using Fabric's event
     }
 
     @Override
@@ -150,7 +149,7 @@ class FabricPlatform extends AbstractPlatform implements MultiUserPlatform {
     }
 
     @Override
-    public FabricConfiguration getConfiguration() {
+    public CarpetWEConfiguration getConfiguration() {
         return mod.getConfig();
     }
 
@@ -202,10 +201,10 @@ class FabricPlatform extends AbstractPlatform implements MultiUserPlatform {
     @Override
     public Collection<Actor> getConnectedUsers() {
         List<Actor> users = new ArrayList<>();
-        PlayerList scm = FabricWorldEdit.LIFECYCLED_SERVER.valueOrThrow().getPlayerList();
+        PlayerList scm = CarpetWEWorldEdit.LIFECYCLED_SERVER.valueOrThrow().getPlayerList();
         for (EntityPlayerMP entity : scm.getPlayers()) {
             if (entity != null) {
-                users.add(new FabricPlayer(entity));
+                users.add(new CarpetWEPlayer(entity));
             }
         }
         return users;

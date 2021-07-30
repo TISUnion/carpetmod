@@ -19,10 +19,28 @@
 
 package carpet.worldedit.internal;
 
-import com.sk89q.jnbt.*;
+import com.sk89q.jnbt.ByteArrayTag;
+import com.sk89q.jnbt.ByteTag;
+import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.jnbt.DoubleTag;
+import com.sk89q.jnbt.EndTag;
+import com.sk89q.jnbt.FloatTag;
+import com.sk89q.jnbt.IntArrayTag;
+import com.sk89q.jnbt.IntTag;
+import com.sk89q.jnbt.ListTag;
+import com.sk89q.jnbt.LongArrayTag;
+import com.sk89q.jnbt.LongTag;
+import com.sk89q.jnbt.ShortTag;
+import com.sk89q.jnbt.StringTag;
+import com.sk89q.jnbt.Tag;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * Converts between JNBT and Minecraft NBT classes.

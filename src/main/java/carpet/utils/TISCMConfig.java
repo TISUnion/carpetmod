@@ -4,10 +4,12 @@ package carpet.utils;
  * Custom optimizations which are inconvenient to make to be hot-switchable
  * But still, here's a code level configurable optimization switches
  *
+ * It's also the switch panel of other bundled mods
+ *
  * See also: {@link me.jellysquid.mods.lithium.LithiumConfig}
  */
 @SuppressWarnings("PointlessBooleanExpression")
-public class TISCMOptimizationConfig
+public class TISCMConfig
 {
 	private static final boolean TISCM_OPTIMIZATION_ENABLE = true;
 
@@ -21,4 +23,8 @@ public class TISCMOptimizationConfig
 	public static final boolean CACHE_ITEM_BURN_TIMES             = TISCM_OPTIMIZATION_ENABLE && true;
 	// TISCM cache TileEntity Serialization
 	public static final boolean CACHE_TILE_ENTITY_SERIALIZATION   = TISCM_OPTIMIZATION_ENABLE && true;
+
+	// ========== Mods ==========
+
+	public static final boolean MOD_WORLDEDIT = true;
 }

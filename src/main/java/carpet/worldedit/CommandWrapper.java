@@ -48,7 +48,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 
-import static carpet.worldedit.FabricAdapter.adaptPlayer;
+import static carpet.worldedit.CarpetWEAdapter.adaptPlayer;
 import static net.minecraft.command.Commands.argument;
 import static net.minecraft.command.Commands.literal;
 
@@ -90,7 +90,7 @@ public final class CommandWrapper {
             if (!(entity instanceof EntityPlayerMP)) {
                 return true;
             }
-            final Actor actor = FabricAdapter.adaptPlayer(((EntityPlayerMP) entity));
+            final Actor actor = CarpetWEAdapter.adaptPlayer(((EntityPlayerMP) entity));
             InjectedValueStore store = MapBackedValueStore.create();
             store.injectValue(Key.of(Actor.class), context -> Optional.of(actor));
             return mapping.getCondition().satisfied(store);
@@ -100,7 +100,7 @@ public final class CommandWrapper {
     private static CompletableFuture<Suggestions> suggest(CommandContext<CommandSource> context,
             SuggestionsBuilder builder) throws CommandSyntaxException {
         CommandSuggestionEvent event = new CommandSuggestionEvent(
-                FabricAdapter.adaptPlayer(context.getSource().asPlayer()),
+                CarpetWEAdapter.adaptPlayer(context.getSource().asPlayer()),
                 builder.getInput()
         );
         WorldEdit.getInstance().getEventBus().post(event);

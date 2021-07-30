@@ -19,19 +19,21 @@
 
 package carpet.worldedit;
 
-import com.sk89q.worldedit.world.registry.*;
+import com.sk89q.worldedit.world.registry.BiomeRegistry;
+import com.sk89q.worldedit.world.registry.BlockCategoryRegistry;
+import com.sk89q.worldedit.world.registry.BlockRegistry;
+import com.sk89q.worldedit.world.registry.BundledRegistries;
+import com.sk89q.worldedit.world.registry.ItemCategoryRegistry;
+import com.sk89q.worldedit.world.registry.ItemRegistry;
 
-/**
- * World data for the Fabric platform.
- */
-class FabricRegistries extends BundledRegistries {
+class CarpetWERegistries extends BundledRegistries {
 
-    private static final FabricRegistries INSTANCE = new FabricRegistries();
-    private final BlockRegistry blockRegistry = new FabricBlockRegistry();
-    private final BiomeRegistry biomeRegistry = new FabricBiomeRegistry();
-    private final ItemRegistry itemRegistry = new FabricItemRegistry();
-    private final BlockCategoryRegistry blockCategoryRegistry = new FabricBlockCategoryRegistry();
-    private final ItemCategoryRegistry itemCategoryRegistry = new FabricItemCategoryRegistry();
+    private static final CarpetWERegistries INSTANCE = new CarpetWERegistries();
+    private final BlockRegistry blockRegistry = new CarpetWEBlockRegistry();
+    private final BiomeRegistry biomeRegistry = new CarpetWEBiomeRegistry();
+    private final ItemRegistry itemRegistry = new CarpetWEItemRegistry();
+    private final BlockCategoryRegistry blockCategoryRegistry = new CarpetWEBlockCategoryRegistry();
+    private final ItemCategoryRegistry itemCategoryRegistry = new CarpetWEItemCategoryRegistry();
 
     @Override
     public BlockRegistry getBlockRegistry() {
@@ -63,7 +65,7 @@ class FabricRegistries extends BundledRegistries {
      *
      * @return an instance
      */
-    public static FabricRegistries getInstance() {
+    public static CarpetWERegistries getInstance() {
         return INSTANCE;
     }
 

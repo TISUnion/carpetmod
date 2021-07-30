@@ -19,7 +19,7 @@
 
 package carpet.worldedit.internal;
 
-import carpet.worldedit.FabricAdapter;
+import carpet.worldedit.CarpetWEAdapter;
 import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.registry.state.*;
 import com.sk89q.worldedit.util.Direction;
@@ -38,7 +38,8 @@ import java.util.stream.Collectors;
 /**
  * Raw, un-cached transformations.
  */
-public class FabricTransmogrifier {
+public class CarpetWETransmogrifier
+{
 
     public static Property<?> transmogToWorldEditProperty(net.minecraft.state.IProperty<?> property) {
         if (property instanceof net.minecraft.state.BooleanProperty) {
@@ -49,7 +50,7 @@ public class FabricTransmogrifier {
         }
         if (property instanceof DirectionProperty) {
             return new DirectionalProperty(property.getName(), ((DirectionProperty) property).getAllowedValues().stream()
-                .map(FabricAdapter::adaptEnumFacing)
+                .map(CarpetWEAdapter::adaptEnumFacing)
                 .collect(Collectors.toList()));
         }
         if (property instanceof net.minecraft.state.EnumProperty) {
@@ -67,7 +68,7 @@ public class FabricTransmogrifier {
         for (Map.Entry<net.minecraft.state.IProperty<?>, Comparable<?>> prop : mcProps.entrySet()) {
             Object value = prop.getValue();
             if (prop.getKey() instanceof DirectionProperty) {
-                value = FabricAdapter.adaptEnumFacing((net.minecraft.util.EnumFacing) value);
+                value = CarpetWEAdapter.adaptEnumFacing((net.minecraft.util.EnumFacing) value);
             } else if (prop.getKey() instanceof net.minecraft.state.EnumProperty) {
                 value = ((IStringSerializable) value).getName();
             }
@@ -85,7 +86,7 @@ public class FabricTransmogrifier {
             // we may need to adapt this value, depending on the source prop
             if (property instanceof DirectionProperty) {
                 Direction dir = (Direction) value;
-                value = FabricAdapter.adapt(dir);
+                value = CarpetWEAdapter.adapt(dir);
             } else if (property instanceof net.minecraft.state.EnumProperty) {
                 String enumName = (String) value;
                 value = ((net.minecraft.state.EnumProperty<?>) property).parseValue((String) value).orElseGet(() -> {
@@ -99,17 +100,17 @@ public class FabricTransmogrifier {
     }
 
     public static net.minecraft.block.state.IBlockState transmogToMinecraft(com.sk89q.worldedit.world.block.BlockState blockState) {
-        Block mcBlock = FabricAdapter.adapt(blockState.getBlockType());
+        Block mcBlock = CarpetWEAdapter.adapt(blockState.getBlockType());
         net.minecraft.block.state.IBlockState newState = mcBlock.getDefaultState();
         Map<Property<?>, Object> states = blockState.getStates();
         return transmogToMinecraftProperties(mcBlock.getStateContainer(), newState, states);
     }
 
     public static com.sk89q.worldedit.world.block.BlockState transmogToWorldEdit(net.minecraft.block.state.IBlockState blockState) {
-        BlockType blockType = FabricAdapter.adapt(blockState.getBlock());
+        BlockType blockType = CarpetWEAdapter.adapt(blockState.getBlock());
         return blockType.getState(transmogToWorldEditProperties(blockType, blockState.getValues()));
     }
 
-    private FabricTransmogrifier() {
+    private CarpetWETransmogrifier() {
     }
 }

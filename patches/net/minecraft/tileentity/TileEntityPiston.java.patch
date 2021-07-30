@@ -7,7 +7,7 @@
  import java.util.List;
 +import java.util.concurrent.ConcurrentHashMap;
 +
-+import carpet.utils.TISCMOptimizationConfig;
++import carpet.utils.TISCMConfig;
 +import carpet.helpers.CreativeNoClipHelper;
 +import carpet.settings.CarpetSettings;
 +import me.jellysquid.mods.lithium.LithiumConfig;
@@ -165,7 +165,7 @@
 +    // it's correct if TileEntityPiston will not changes its pos
 +    private void createVoxelShapeBoundingBoxListCache()
 +    {
-+        if (TISCMOptimizationConfig.CACHE_BOUNDING_BOX_LIST_CREATION)
++        if (TISCMConfig.CACHE_BOUNDING_BOX_LIST_CREATION)
 +        {
 +            VoxelShape voxelshape = this.getCollisionRelatedBlockState().getCollisionShape(this.world, this.getPos());
 +            this.voxelShapeBoundingBoxList = !voxelshape.isEmpty() ? voxelshape.toBoundingBoxList() : null;
@@ -187,7 +187,7 @@
 +//            List<AxisAlignedBB> list = voxelshape.toBoundingBoxList();
 +        boolean flagNotNull;
 +        List<AxisAlignedBB> list;
-+        if (TISCMOptimizationConfig.CACHE_BOUNDING_BOX_LIST_CREATION)
++        if (TISCMConfig.CACHE_BOUNDING_BOX_LIST_CREATION)
          {
 -            List<AxisAlignedBB> list = voxelshape.toBoundingBoxList();
 +            flagNotNull = this.voxelShapeBoundingBoxList != null;
@@ -348,7 +348,7 @@
 +       // TISCM cache TileEntity Serialization
 +//        compound.put("blockState", NBTUtil.writeBlockState(this.pistonState));
 +        NBTTagCompound blockStateNBT;
-+        if (TISCMOptimizationConfig.CACHE_TILE_ENTITY_SERIALIZATION && this.pistonStateNBTCache != null)
++        if (TISCMConfig.CACHE_TILE_ENTITY_SERIALIZATION && this.pistonStateNBTCache != null)
 +        {
 +            blockStateNBT = this.pistonStateNBTCache;
 +        }

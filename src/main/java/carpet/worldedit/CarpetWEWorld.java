@@ -19,7 +19,7 @@
 
 package carpet.worldedit;
 
-import carpet.worldedit.internal.FabricWorldNativeAccess;
+import carpet.worldedit.internal.CarpetWEWorldNativeAccess;
 import carpet.worldedit.internal.NBTConverter;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -95,11 +95,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * An adapter to Minecraft worlds for WorldEdit.
  */
-public class FabricWorld extends AbstractWorld {
+public class CarpetWEWorld extends AbstractWorld {
 
     private static final Random random = new Random();
     private final WeakReference<World> worldRef;
-    private final FabricWorldNativeAccess worldNativeAccess;
+    private final CarpetWEWorldNativeAccess worldNativeAccess;
 
     private static final IBlockState JUNGLE_LOG = Blocks.JUNGLE_LOG.getDefaultState();
     private static final IBlockState JUNGLE_LEAF = Blocks.JUNGLE_LEAVES.getDefaultState().with(BlockLeaves.PERSISTENT, Boolean.TRUE);
@@ -110,10 +110,10 @@ public class FabricWorld extends AbstractWorld {
      *
      * @param world the world
      */
-    FabricWorld(World world) {
+    CarpetWEWorld(World world) {
         checkNotNull(world);
         this.worldRef = new WeakReference<>(world);
-        this.worldNativeAccess = new FabricWorldNativeAccess(worldRef);
+        this.worldNativeAccess = new CarpetWEWorldNativeAccess(worldRef);
     }
 
     /**
@@ -158,13 +158,13 @@ public class FabricWorld extends AbstractWorld {
     @Override
     public Set<SideEffect> applySideEffects(BlockVector3 position, BlockState previousType, SideEffectSet sideEffectSet) {
         worldNativeAccess.applySideEffects(position, previousType, sideEffectSet);
-        return Sets.intersection(FabricWorldEdit.inst.getPlatform().getSupportedSideEffects(), sideEffectSet.getSideEffectsToApply());
+        return Sets.intersection(CarpetWEWorldEdit.inst.getPlatform().getSupportedSideEffects(), sideEffectSet.getSideEffectsToApply());
     }
 
     @Override
     public int getBlockLightLevel(BlockVector3 position) {
         checkNotNull(position);
-        return getWorld().getLight(FabricAdapter.toBlockPos(position));
+        return getWorld().getLight(CarpetWEAdapter.toBlockPos(position));
     }
 
     @Override
@@ -174,7 +174,7 @@ public class FabricWorld extends AbstractWorld {
             return false;
         }
 
-        TileEntity tile = getWorld().getTileEntity(FabricAdapter.toBlockPos(position));
+        TileEntity tile = getWorld().getTileEntity(CarpetWEAdapter.toBlockPos(position));
         if ((tile instanceof IInventory)) {
             ((IInventory) tile).clear();
             return true;
@@ -203,7 +203,7 @@ public class FabricWorld extends AbstractWorld {
         if (chunk.isLoaded()) {
             int i = position.getX() & 15;
             int j = position.getZ() & 15;
-            chunk.getBiomes()[j << 4 | i] = FabricAdapter.adapt(biome);
+            chunk.getBiomes()[j << 4 | i] = CarpetWEAdapter.adapt(biome);
             chunk.markDirty();
             return true;
         }
@@ -216,7 +216,7 @@ public class FabricWorld extends AbstractWorld {
 
     @Override
     public boolean useItem(BlockVector3 position, BaseItem item, Direction face) {
-        ItemStack stack = FabricAdapter.adapt(new BaseItemStack(item.getType(), item.getNbtData(), 1));
+        ItemStack stack = CarpetWEAdapter.adapt(new BaseItemStack(item.getType(), item.getNbtData(), 1));
         WorldServer world = (WorldServer) getWorld();
         final WorldEditFakePlayer fakePlayer;
         try {
@@ -227,8 +227,8 @@ public class FabricWorld extends AbstractWorld {
         fakePlayer.setHeldItem(EnumHand.MAIN_HAND, stack);
         fakePlayer.setLocationAndAngles(position.getBlockX(), position.getBlockY(), position.getBlockZ(),
                 (float) face.toVector().toYaw(), (float) face.toVector().toPitch());
-        final BlockPos blockPos = FabricAdapter.toBlockPos(position);
-        final EnumFacing enumFacing = FabricAdapter.adapt(face);
+        final BlockPos blockPos = CarpetWEAdapter.toBlockPos(position);
+        final EnumFacing enumFacing = CarpetWEAdapter.adapt(face);
         ItemUseContext itemUseContext = new ItemUseContext(fakePlayer, stack, blockPos, enumFacing, blockPos.getX(), blockPos.getY(), blockPos.getZ());
         EnumActionResult used = stack.onItemUse(itemUseContext);
         if (used != EnumActionResult.SUCCESS) {
@@ -252,24 +252,24 @@ public class FabricWorld extends AbstractWorld {
             return;
         }
 
-        EntityItem entity = new EntityItem(getWorld(), position.getX(), position.getY(), position.getZ(), FabricAdapter.adapt(item));
+        EntityItem entity = new EntityItem(getWorld(), position.getX(), position.getY(), position.getZ(), CarpetWEAdapter.adapt(item));
         entity.setPickupDelay(10);
         getWorld().spawnEntity(entity);
     }
 
     @Override
     public void simulateBlockMine(BlockVector3 position) {
-        BlockPos pos = FabricAdapter.toBlockPos(position);
+        BlockPos pos = CarpetWEAdapter.toBlockPos(position);
         getWorld().destroyBlock(pos, true);
     }
 
     @Override
     public boolean canPlaceAt(BlockVector3 position, BlockState blockState) {
-        return FabricAdapter.adapt(blockState).isValidPosition(getWorld(), FabricAdapter.toBlockPos(position));
+        return CarpetWEAdapter.adapt(blockState).isValidPosition(getWorld(), CarpetWEAdapter.toBlockPos(position));
     }
 
     private BiomeType getBiomeInChunk(BlockVector3 pos, Chunk chunk) {
-        return FabricAdapter.adapt(chunk.getBiome(FabricAdapter.toBlockPos(pos)));
+        return CarpetWEAdapter.adapt(chunk.getBiome(CarpetWEAdapter.toBlockPos(pos)));
     }
 
     @Override
@@ -289,7 +289,7 @@ public class FabricWorld extends AbstractWorld {
 
             MinecraftServer server = originalWorld.getServer();
             AnvilSaveHandler saveHandler = new AnvilSaveHandler(saveFolder, originalWorld.getSaveHandler().getWorldDirectory().getName(), server, server.getDataFixer());
-            World freshWorld = new WorldServer(server, saveHandler, originalWorld.getSavedDataStorage(), originalWorld.getWorldInfo(), originalWorld.dimension.getType(), originalWorld.profiler).init();
+            World freshWorld = new WorldServer(server, saveHandler, originalWorld.getSavedDataStorage(), originalWorld.getWorldInfo(), originalWorld.dimension.getType(), originalWorld.profiler).init(false);
 
             // Pre-gen all the chunks
             // We need to also pull one more chunk in every direction
@@ -299,9 +299,9 @@ public class FabricWorld extends AbstractWorld {
             }
 
             for (BlockVector3 vec : region) {
-                BlockPos pos = FabricAdapter.toBlockPos(vec);
+                BlockPos pos = CarpetWEAdapter.toBlockPos(vec);
                 Chunk chunk = freshWorld.getChunk(pos);
-                BlockStateHolder<?> state = FabricAdapter.adapt(chunk.getBlockState(pos));
+                BlockStateHolder<?> state = CarpetWEAdapter.adapt(chunk.getBlockState(pos));
                 TileEntity blockEntity = chunk.getTileEntity(pos);
                 if (blockEntity != null) {
                     net.minecraft.nbt.NBTTagCompound tag = new net.minecraft.nbt.NBTTagCompound();
@@ -354,12 +354,12 @@ public class FabricWorld extends AbstractWorld {
     @Override
     public boolean generateTree(TreeType type, EditSession editSession, BlockVector3 position) {
         Feature<NoFeatureConfig> generator = createTreeFeatureGenerator(type);
-        return generator != null && generator.place(getWorld(), getWorld().getChunkProvider().getChunkGenerator(), random, FabricAdapter.toBlockPos(position), new NoFeatureConfig());
+        return generator != null && generator.place(getWorld(), getWorld().getChunkProvider().getChunkGenerator(), random, CarpetWEAdapter.toBlockPos(position), new NoFeatureConfig());
     }
 
     @Override
     public void checkLoadedChunk(BlockVector3 pt) {
-        getWorld().getChunk(FabricAdapter.toBlockPos(pt));
+        getWorld().getChunk(CarpetWEAdapter.toBlockPos(pt));
     }
 
     @Override
@@ -377,7 +377,7 @@ public class FabricWorld extends AbstractWorld {
 
     @Override
     public boolean playEffect(Vector3 position, int type, int data) {
-        getWorld().playEvent(type, FabricAdapter.toBlockPos(position.toBlockPoint()), data);
+        getWorld().playEvent(type, CarpetWEAdapter.toBlockPos(position.toBlockPoint()), data);
         return true;
     }
 
@@ -435,16 +435,16 @@ public class FabricWorld extends AbstractWorld {
 
     @Override
     public BlockVector3 getSpawnPosition() {
-        return FabricAdapter.adapt(getWorld().getSpawnPoint());
+        return CarpetWEAdapter.adapt(getWorld().getSpawnPoint());
     }
 
     @Override
     public BlockState getBlock(BlockVector3 position) {
         net.minecraft.block.state.IBlockState mcState = getWorld()
                 .getChunk(position.getBlockX() >> 4, position.getBlockZ() >> 4)
-                .getBlockState(FabricAdapter.toBlockPos(position));
+                .getBlockState(CarpetWEAdapter.toBlockPos(position));
 
-        return FabricAdapter.adapt(mcState);
+        return CarpetWEAdapter.adapt(mcState);
     }
 
     @Override
@@ -469,8 +469,8 @@ public class FabricWorld extends AbstractWorld {
 
     @Override
     public boolean equals(Object o) {
-        if ((o instanceof FabricWorld)) {
-            FabricWorld other = ((FabricWorld) o);
+        if ((o instanceof CarpetWEWorld)) {
+            CarpetWEWorld other = ((CarpetWEWorld) o);
             World otherWorld = other.worldRef.get();
             World thisWorld = worldRef.get();
             return otherWorld != null && otherWorld.equals(thisWorld);
@@ -486,7 +486,7 @@ public class FabricWorld extends AbstractWorld {
         List<Entity> entities = new ArrayList<>();
         for (net.minecraft.entity.Entity entity : getWorld().loadedEntityList) {
             if (region.contains(BlockVector3.at(entity.posX, entity.posY, entity.posZ))) {
-                entities.add(new FabricEntity(entity));
+                entities.add(new CarpetWEEntity(entity));
             }
         }
         return entities;
@@ -496,7 +496,7 @@ public class FabricWorld extends AbstractWorld {
     public List<? extends Entity> getEntities() {
         List<Entity> entities = new ArrayList<>();
         for (net.minecraft.entity.Entity entity : getWorld().loadedEntityList) {
-            entities.add(new FabricEntity(entity));
+            entities.add(new CarpetWEEntity(entity));
         }
         return entities;
     }
@@ -519,7 +519,7 @@ public class FabricWorld extends AbstractWorld {
             createdEntity.setLocationAndAngles(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
 
             world.spawnEntity(createdEntity);
-            return new FabricEntity(createdEntity);
+            return new CarpetWEEntity(createdEntity);
         } else {
             return null;
         }

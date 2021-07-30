@@ -11,7 +11,6 @@ import carpet.script.CarpetScriptServer;
 import carpet.settings.CarpetSettings;
 import carpet.settings.SettingsManager;
 import carpet.utils.HUDController;
-import carpet.worldedit.FabricWorldEdit;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.command.CommandSource;
 import net.minecraft.entity.player.EntityPlayerMP;

@@ -19,26 +19,25 @@
 
 package carpet.worldedit;
 
-import com.sk89q.worldedit.blocks.BaseItemStack;
-import com.sk89q.worldedit.util.formatting.text.Component;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.item.ItemType;
-import com.sk89q.worldedit.world.registry.BundledItemRegistry;
+import com.sk89q.worldedit.world.registry.ItemCategoryRegistry;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.Tag;
+import net.minecraft.util.ResourceLocation;
 
-public class FabricItemRegistry extends BundledItemRegistry {
+import java.util.Collections;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+public class CarpetWEItemCategoryRegistry implements ItemCategoryRegistry {
     @Override
-    public Component getRichName(ItemType itemType) {
-        return TranslatableComponent.of(
-            FabricAdapter.adapt(itemType).getTranslationKey()
-        );
+    public Set<ItemType> getCategorisedByName(String category) {
+        return Optional.ofNullable(ItemTags.getCollection().get(new ResourceLocation(category)))
+            .map(Tag::getAllElements)
+            .orElse(Collections.emptyList())
+            .stream()
+            .map(CarpetWEAdapter::adapt)
+            .collect(Collectors.toSet());
     }
-
-    @Override
-    public Component getRichName(BaseItemStack itemStack) {
-        return TranslatableComponent.of(
-            FabricAdapter.adapt(itemStack).getTranslationKey()
-        );
-    }
-
 }

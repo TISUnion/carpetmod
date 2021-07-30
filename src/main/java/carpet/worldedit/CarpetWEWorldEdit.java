@@ -19,6 +19,7 @@
 
 package carpet.worldedit;
 
+import carpet.utils.TISCMConfig;
 import com.mojang.brigadier.CommandDispatcher;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -63,15 +64,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import static carpet.worldedit.FabricAdapter.adaptPlayer;
+import static carpet.worldedit.CarpetWEAdapter.adaptPlayer;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.internal.anvil.ChunkDeleter.DELCHUNKS_FILE_NAME;
 import static java.util.stream.Collectors.toList;
 
 /**
- * The Fabric implementation of WorldEdit.
+ * The TIS Carpet implementation of WorldEdit.
  */
-public class FabricWorldEdit {
+public class CarpetWEWorldEdit
+{
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     public static final String MOD_ID = "worldedit";
@@ -80,15 +82,17 @@ public class FabricWorldEdit {
 
     public static final SimpleLifecycled<MinecraftServer> LIFECYCLED_SERVER = SimpleLifecycled.invalid();
 
-    private FabricPermissionsProvider provider;
+    private CarpetWEPermissionsProvider provider;
 
-    public static final FabricWorldEdit inst = new FabricWorldEdit();
+    public static final CarpetWEWorldEdit inst = TISCMConfig.MOD_WORLDEDIT ?
+            new CarpetWEWorldEdit() :      // enabled
+            new DummyCarpetWEWorldEdit();  // disabled
 
-    private FabricPlatform platform;
-    private FabricConfiguration config;
+    private CarpetWEPlatform platform;
+    private CarpetWEConfiguration config;
     private Path workingDir;
 
-    public FabricWorldEdit() {
+    public CarpetWEWorldEdit() {
     }
 
     /*
@@ -107,14 +111,14 @@ public class FabricWorldEdit {
                 throw new UncheckedIOException(e);
             }
         }
-        this.platform = new FabricPlatform(this);
+        this.platform = new CarpetWEPlatform(this);
 
         WorldEdit.getInstance().getPlatformManager().register(platform);
 
-        config = new FabricConfiguration(this);
+        config = new CarpetWEConfiguration(this);
         this.provider = getInitialPermissionsProvider();
 
-        LOGGER.info("WorldEdit for Fabric (version " + getInternalVersion() + ") is loaded");
+        LOGGER.info("WorldEdit for TIS Carpet (version " + getInternalVersion() + ") is loaded");
     }
 
     // fabric-api: ServerLifecycleEvents.SERVER_STARTING
@@ -153,7 +157,7 @@ public class FabricWorldEdit {
     // TODO Pass empty left click to server
     // fabric-api: ServerPlayConnectionEvents.DISCONNECT
     public void onPlayerDisconnect(EntityPlayerMP player) {
-        WorldEdit.getInstance().getEventBus().post(new SessionIdleEvent(new FabricPlayer.SessionKeyImpl(player)));
+        WorldEdit.getInstance().getEventBus().post(new SessionIdleEvent(new CarpetWEPlayer.SessionKeyImpl(player)));
     }
 
     // fabric-api: AttackBlockCallback.EVENT
@@ -163,14 +167,14 @@ public class FabricWorldEdit {
         }
 
         WorldEdit we = WorldEdit.getInstance();
-        FabricPlayer player = adaptPlayer((EntityPlayerMP) playerEntity);
-        FabricWorld localWorld = getWorld(world);
+        CarpetWEPlayer player = adaptPlayer((EntityPlayerMP) playerEntity);
+        CarpetWEWorld localWorld = getWorld(world);
         Location pos = new Location(localWorld,
                 blockPos.getX(),
                 blockPos.getY(),
                 blockPos.getZ()
         );
-        com.sk89q.worldedit.util.Direction weDirection = FabricAdapter.adaptEnumFacing(direction);
+        com.sk89q.worldedit.util.Direction weDirection = CarpetWEAdapter.adaptEnumFacing(direction);
 
         if (we.handleBlockLeftClick(player, pos, weDirection)) {
             return EnumActionResult.SUCCESS;
@@ -190,10 +194,10 @@ public class FabricWorldEdit {
         }
 
         WorldEdit we = WorldEdit.getInstance();
-        FabricPlayer player = adaptPlayer((EntityPlayerMP) playerEntity);
-        FabricWorld localWorld = getWorld(world);
+        CarpetWEPlayer player = adaptPlayer((EntityPlayerMP) playerEntity);
+        CarpetWEWorld localWorld = getWorld(world);
         Location pos = new Location(localWorld, hitX, hitY, hitZ);
-        com.sk89q.worldedit.util.Direction direction = FabricAdapter.adaptEnumFacing(facing);
+        com.sk89q.worldedit.util.Direction direction = CarpetWEAdapter.adaptEnumFacing(facing);
 
         if (we.handleBlockRightClick(player, pos, direction)) {
             return EnumActionResult.SUCCESS;
@@ -214,7 +218,7 @@ public class FabricWorldEdit {
         }
 
         WorldEdit we = WorldEdit.getInstance();
-        FabricPlayer player = adaptPlayer((EntityPlayerMP) playerEntity);
+        CarpetWEPlayer player = adaptPlayer((EntityPlayerMP) playerEntity);
 
         if (we.handleRightClick(player)) {
             return new ActionResult<>(EnumActionResult.SUCCESS, stackInHand);
@@ -252,8 +256,8 @@ public class FabricWorldEdit {
      * --------------------
      */
 
-    private FabricPermissionsProvider getInitialPermissionsProvider() {
-        return new FabricPermissionsProvider.CarpetPermissionsProvider(platform);
+    private CarpetWEPermissionsProvider getInitialPermissionsProvider() {
+        return new CarpetWEPermissionsProvider.CarpetPermissionsProvider(platform);
     }
 
     private void setupRegistries(MinecraftServer server) {
@@ -261,7 +265,7 @@ public class FabricWorldEdit {
         for (ResourceLocation name : IRegistry.BLOCK.keySet()) {
             if (BlockType.REGISTRY.get(name.toString()) == null) {
                 BlockType.REGISTRY.register(name.toString(), new BlockType(name.toString(),
-                    input -> FabricAdapter.adapt(FabricAdapter.adapt(input.getBlockType()).getDefaultState())));
+                    input -> CarpetWEAdapter.adapt(CarpetWEAdapter.adapt(input.getBlockType()).getDefaultState())));
             }
         }
         // Items
@@ -305,10 +309,8 @@ public class FabricWorldEdit {
 
     /**
      * Get the configuration.
-     *
-     * @return the Fabric configuration
      */
-    FabricConfiguration getConfig() {
+    CarpetWEConfiguration getConfig() {
         return this.config;
     }
 
@@ -329,9 +331,9 @@ public class FabricWorldEdit {
      * @param world the world
      * @return the WorldEdit world
      */
-    public FabricWorld getWorld(World world) {
+    public CarpetWEWorld getWorld(World world) {
         checkNotNull(world);
-        return new FabricWorld(world);
+        return new CarpetWEWorld(world);
     }
 
     /**
@@ -353,7 +355,7 @@ public class FabricWorldEdit {
     }
 
     /**
-     * Get the version of the WorldEdit-Fabric implementation.
+     * Get the version of the WorldEdit-TISCM implementation.
      *
      * @return a version string
      */
@@ -361,11 +363,61 @@ public class FabricWorldEdit {
         return VERSION;
     }
 
-    public void setPermissionsProvider(FabricPermissionsProvider provider) {
+    public void setPermissionsProvider(CarpetWEPermissionsProvider provider) {
         this.provider = provider;
     }
 
-    public FabricPermissionsProvider getPermissionsProvider() {
+    public CarpetWEPermissionsProvider getPermissionsProvider() {
         return provider;
+    }
+
+    /**
+     * A dummy class that does nothing
+     * It's used when world edit mod is disabled
+     */
+    private static class DummyCarpetWEWorldEdit extends CarpetWEWorldEdit {
+        @Override
+        public void onInitialize() {
+        }
+
+        @Override
+        public void onStartingServer(MinecraftServer minecraftServer) {
+        }
+
+        @Override
+        public void onStartServer(MinecraftServer minecraftServer) {
+        }
+
+        @Override
+        public void onStopServer(MinecraftServer minecraftServer) {
+        }
+
+        @Override
+        public void onEndServerTick(MinecraftServer minecraftServer)
+        {
+        }
+
+        @Override
+        public void onPlayerDisconnect(EntityPlayerMP player) {
+        }
+
+        @Override
+        public EnumActionResult onLeftClickBlock(EntityPlayer playerEntity, World world, EnumHand hand, BlockPos blockPos, EnumFacing direction) {
+            return EnumActionResult.PASS;
+        }
+
+        @Override
+        public EnumActionResult onRightClickBlock(EntityPlayer playerEntity, World world, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+            return EnumActionResult.PASS;
+        }
+
+        @Override
+        public ActionResult<ItemStack> onRightClickAir(EntityPlayer playerEntity, World world, EnumHand hand) {
+            return new ActionResult<>(EnumActionResult.PASS, ItemStack.EMPTY);
+        }
+
+        @Override
+        public void registerCommands(CommandDispatcher<CommandSource> dispatcher) {
+        }
     }
 }

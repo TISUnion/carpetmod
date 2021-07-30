@@ -62,13 +62,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.UUID;
 
-public class FabricPlayer extends AbstractPlayerActor {
+public class CarpetWEPlayer extends AbstractPlayerActor {
 
     // see ClientPlayNetHandler: search for "invalid update packet", lots of hardcoded consts
     private static final int STRUCTURE_BLOCK_PACKET_ID = 7;
     private final EntityPlayerMP player;
 
-    protected FabricPlayer(EntityPlayerMP player) {
+    protected CarpetWEPlayer(EntityPlayerMP player) {
         this.player = player;
         ThreadSafeCache.getInstance().getOnlineIds().add(getUniqueId());
     }
@@ -81,7 +81,7 @@ public class FabricPlayer extends AbstractPlayerActor {
     @Override
     public BaseItemStack getItemInHand(HandSide handSide) {
         ItemStack is = this.player.getHeldItem(handSide == HandSide.MAIN_HAND ? EnumHand.MAIN_HAND : EnumHand.OFF_HAND);
-        return FabricAdapter.adapt(is);
+        return CarpetWEAdapter.adapt(is);
     }
 
     @Override
@@ -98,7 +98,7 @@ public class FabricPlayer extends AbstractPlayerActor {
     public Location getLocation() {
         Vector3 position = Vector3.at(this.player.posX, this.player.posY, this.player.posZ);
         return new Location(
-                FabricWorldEdit.inst.getWorld(this.player.world),
+                CarpetWEWorldEdit.inst.getWorld(this.player.world),
                 position,
                 this.player.rotationYaw,
                 this.player.rotationPitch);
@@ -112,12 +112,12 @@ public class FabricPlayer extends AbstractPlayerActor {
 
     @Override
     public World getWorld() {
-        return FabricWorldEdit.inst.getWorld(this.player.world);
+        return CarpetWEWorldEdit.inst.getWorld(this.player.world);
     }
 
     @Override
     public void giveItem(BaseItemStack itemStack) {
-        this.player.inventory.addItemStackToInventory(FabricAdapter.adapt(itemStack));
+        this.player.inventory.addItemStackToInventory(CarpetWEAdapter.adapt(itemStack));
     }
 
     @Override
@@ -196,7 +196,7 @@ public class FabricPlayer extends AbstractPlayerActor {
 
     @Override
     public boolean hasPermission(String perm) {
-        return FabricWorldEdit.inst.getPermissionsProvider().hasPermission(player, perm);
+        return CarpetWEWorldEdit.inst.getPermissionsProvider().hasPermission(player, perm);
     }
 
     @Nullable
@@ -221,18 +221,18 @@ public class FabricPlayer extends AbstractPlayerActor {
     @Override
     public <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, B block) {
         World world = getWorld();
-        if (!(world instanceof FabricWorld)) {
+        if (!(world instanceof CarpetWEWorld)) {
             return;
         }
-        BlockPos loc = FabricAdapter.toBlockPos(pos);
+        BlockPos loc = CarpetWEAdapter.toBlockPos(pos);
         if (block == null) {
-            final SPacketBlockChange packetOut = new SPacketBlockChange(((FabricWorld) world).getWorld(), loc);
+            final SPacketBlockChange packetOut = new SPacketBlockChange(((CarpetWEWorld) world).getWorld(), loc);
             player.connection.sendPacket(packetOut);
         } else {
             final SPacketBlockChange packetOut = new SPacketBlockChange();
             PacketBuffer buf = new PacketBuffer(Unpooled.buffer());
             buf.writeBlockPos(loc);
-            buf.writeVarInt(Block.getStateId(FabricAdapter.adapt(block.toImmutableState())));
+            buf.writeVarInt(Block.getStateId(CarpetWEAdapter.adapt(block.toImmutableState())));
             try {
                 packetOut.readPacketData(buf);
             } catch (IOException e) {

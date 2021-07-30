@@ -83,7 +83,7 @@ import java.util.stream.Collectors;
  *
  */
 @SuppressWarnings("UnnecessarilyQualifiedStaticUsage")
-class FabricDataFixer extends DataFixerBuilder implements com.sk89q.worldedit.world.DataFixer {
+class CarpetWEDataFixer extends DataFixerBuilder implements com.sk89q.worldedit.world.DataFixer {
 
     @SuppressWarnings("unchecked")
     @Override
@@ -176,7 +176,7 @@ class FabricDataFixer extends DataFixerBuilder implements com.sk89q.worldedit.wo
     private static final NBTDynamicOps OPS_NBT = NBTDynamicOps.INSTANCE;
     private static final int LEGACY_VERSION = 1343;
     private static int DATA_VERSION;
-    private static FabricDataFixer INSTANCE;
+    private static CarpetWEDataFixer INSTANCE;
 
     private final Map<LegacyType, List<DataConverter>> converters = new EnumMap<>(LegacyType.class);
     private final Map<LegacyType, List<DataInspector>> inspectors = new EnumMap<>(LegacyType.class);
@@ -207,7 +207,7 @@ class FabricDataFixer extends DataFixerBuilder implements com.sk89q.worldedit.wo
         }
     }
 
-    public FabricDataFixer(int dataVersion) {
+    public CarpetWEDataFixer(int dataVersion) {
         super(dataVersion);
         DATA_VERSION = dataVersion;
         INSTANCE = this;
@@ -245,7 +245,7 @@ class FabricDataFixer extends DataFixerBuilder implements com.sk89q.worldedit.wo
         }
 
         private NBTTagCompound convert(LegacyType type, NBTTagCompound cmp, int sourceVer, int desiredVersion) {
-            List<DataConverter> converters = FabricDataFixer.this.converters.get(type);
+            List<DataConverter> converters = CarpetWEDataFixer.this.converters.get(type);
             if (converters != null && !converters.isEmpty()) {
                 for (DataConverter converter : converters) {
                     int dataVersion = converter.getDataVersion();
@@ -255,7 +255,7 @@ class FabricDataFixer extends DataFixerBuilder implements com.sk89q.worldedit.wo
                 }
             }
 
-            List<DataInspector> inspectors = FabricDataFixer.this.inspectors.get(type);
+            List<DataInspector> inspectors = CarpetWEDataFixer.this.inspectors.get(type);
             if (inspectors != null && !inspectors.isEmpty()) {
                 for (DataInspector inspector : inspectors) {
                     cmp = inspector.inspect(cmp, sourceVer, desiredVersion);
@@ -808,7 +808,7 @@ class FabricDataFixer extends DataFixerBuilder implements com.sk89q.worldedit.wo
 
     private static class DataInspectorEntity implements DataInspector {
 
-        private static final Logger a = LogManager.getLogger(FabricDataFixer.class);
+        private static final Logger a = LogManager.getLogger(CarpetWEDataFixer.class);
 
         DataInspectorEntity() {}
 
@@ -882,7 +882,7 @@ class FabricDataFixer extends DataFixerBuilder implements com.sk89q.worldedit.wo
 
         NBTTagCompound inspectChecked(NBTTagCompound nbttagcompound, int sourceVer, int targetVer) {
             for (String s : this.keys) {
-                FabricDataFixer.convertItems(nbttagcompound, s, sourceVer, targetVer);
+                CarpetWEDataFixer.convertItems(nbttagcompound, s, sourceVer, targetVer);
             }
 
             return nbttagcompound;
@@ -899,7 +899,7 @@ class FabricDataFixer extends DataFixerBuilder implements com.sk89q.worldedit.wo
 
         NBTTagCompound inspectChecked(NBTTagCompound nbttagcompound, int sourceVer, int targetVer) {
             for (String key : this.keys) {
-                FabricDataFixer.convertItem(nbttagcompound, key, sourceVer, targetVer);
+                CarpetWEDataFixer.convertItem(nbttagcompound, key, sourceVer, targetVer);
             }
 
             return nbttagcompound;
@@ -2371,7 +2371,7 @@ class FabricDataFixer extends DataFixerBuilder implements com.sk89q.worldedit.wo
 
     private static class DataConverterBedBlock implements DataConverter {
 
-        private static final Logger a = LogManager.getLogger(FabricDataFixer.class);
+        private static final Logger a = LogManager.getLogger(CarpetWEDataFixer.class);
 
         DataConverterBedBlock() {}
 

@@ -10,7 +10,7 @@
 +import carpet.network.CarpetClient;
 +import carpet.network.CarpetServerNetworkHandler;
 +import carpet.settings.CarpetSettings;
-+import carpet.worldedit.FabricWorldEdit;
++import carpet.worldedit.CarpetWEWorldEdit;
 +import carpet.worldedit.net.handler.WECUIPacketHandler;
  import com.google.common.primitives.Doubles;
  import com.google.common.primitives.Floats;
@@ -128,7 +128,7 @@
  
 +                // CM worldedit
 +                // just like net.fabricmc.fabric.mixin.event.interaction.MixinServerPlayerInteractionManager#startBlockBreak
-+                EnumActionResult weResult = FabricWorldEdit.inst.onLeftClickBlock(this.player, worldserver, this.player.getActiveHand(), blockpos, packetIn.getFacing());
++                EnumActionResult weResult = CarpetWEWorldEdit.inst.onLeftClickBlock(this.player, worldserver, this.player.getActiveHand(), blockpos, packetIn.getFacing());
 +                if (weResult != EnumActionResult.PASS)
 +                {
 +                    this.player.connection.sendPacket(new SPacketBlockChange(worldserver, blockpos)); // in case block changes on client-side
@@ -173,7 +173,7 @@
      public void onDisconnect(ITextComponent reason)
      {
 +        // CM worldedit
-+        FabricWorldEdit.inst.onPlayerDisconnect(this.player);
++        CarpetWEWorldEdit.inst.onPlayerDisconnect(this.player);
 +
          LOGGER.info("{} lost connection: {}", this.player.getName().getString(), reason.getString());
          this.server.refreshStatusNextTick();

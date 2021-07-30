@@ -1,6 +1,6 @@
 package me.jellysquid.mods.lithium.common.util.collections;
 
-import carpet.utils.TISCMOptimizationConfig;
+import carpet.utils.TISCMConfig;
 import it.unimi.dsi.fastutil.Hash;
 import it.unimi.dsi.fastutil.longs.Long2ReferenceOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceLinkedOpenHashSet;
@@ -17,7 +17,7 @@ public class TileEntityList implements List<TileEntity> {
 
     // TISCM Smaller hashset list container load factor
     @SuppressWarnings("FieldCanBeLocal")
-    private final float COLLECTION_LOAD_FACTOR = TISCMOptimizationConfig.HASH_SET_LIST_LOAD_FACTOR ? Hash.VERY_FAST_LOAD_FACTOR : Hash.DEFAULT_LOAD_FACTOR;
+    private final float COLLECTION_LOAD_FACTOR = TISCMConfig.HASH_SET_LIST_LOAD_FACTOR ? Hash.VERY_FAST_LOAD_FACTOR : Hash.DEFAULT_LOAD_FACTOR;
 
     private final ReferenceLinkedOpenHashSet<TileEntity> allBlockEntities;
 

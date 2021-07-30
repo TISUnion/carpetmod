@@ -1,11 +1,13 @@
 package me.jellysquid.mods.lithium;
 
+import carpet.utils.TISCMConfig;
+
 /**
  * Code level configurable lithium config
  * Great thanks to lithium mod team for providing such OP optimizations
  * Lithium mod repos: https://github.com/jellysquid3/lithium-fabric
  *
- * See also: {@link carpet.utils.TISCMOptimizationConfig}
+ * See also: {@link TISCMConfig}
  */
 @SuppressWarnings("PointlessBooleanExpression")
 public class LithiumConfig

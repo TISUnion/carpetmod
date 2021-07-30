@@ -19,27 +19,25 @@
 
 package carpet.worldedit;
 
-import com.sk89q.worldedit.util.PropertiesConfiguration;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.registry.BlockCategoryRegistry;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.Tag;
+import net.minecraft.util.ResourceLocation;
 
-import java.nio.file.Path;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-public class FabricConfiguration extends PropertiesConfiguration {
-
-    public boolean creativeEnable = false;
-    public boolean cheatMode = false;
-
-    public FabricConfiguration(FabricWorldEdit mod) {
-        super(mod.getWorkingDir().resolve("worldedit.properties"));
-    }
-
+public class CarpetWEBlockCategoryRegistry implements BlockCategoryRegistry {
     @Override
-    protected void loadExtra() {
-        creativeEnable = getBool("use-in-creative", false);
-        cheatMode = getBool("cheat-mode", false);
-    }
-
-    @Override
-    public Path getWorkingDirectoryPath() {
-        return FabricWorldEdit.inst.getWorkingDir();
+    public Set<BlockType> getCategorisedByName(String category) {
+        return Optional.ofNullable(BlockTags.getCollection().get(new ResourceLocation(category)))
+            .map(Tag::getAllElements)
+            .orElse(Collections.emptyList())
+            .stream()
+            .map(CarpetWEAdapter::adapt)
+            .collect(Collectors.toSet());
     }
 }

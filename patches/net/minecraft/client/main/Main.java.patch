@@ -3,7 +3,7 @@
 @@ -1,5 +1,6 @@
  package net.minecraft.client.main;
  
-+import carpet.worldedit.FabricWorldEdit;
++import carpet.worldedit.CarpetWEWorldEdit;
  import com.google.gson.Gson;
  import com.google.gson.GsonBuilder;
  import com.mojang.authlib.properties.PropertyMap;
@@ -12,7 +12,7 @@
          }
  
 +        // CM worldedit
-+        FabricWorldEdit.inst.onInitialize();
++        CarpetWEWorldEdit.inst.onInitialize();
 +
          String s = func_206236_a(optionset, optionspec5);
          Proxy proxy = Proxy.NO_PROXY;

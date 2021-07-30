@@ -4,7 +4,7 @@
  package net.minecraft.command;
  
 +import carpet.settings.CarpetSettings;
-+import carpet.worldedit.FabricWorldEdit;
++import carpet.worldedit.CarpetWEWorldEdit;
  import com.google.common.collect.Maps;
  import com.google.common.io.Files;
  import com.google.gson.GsonBuilder;
@@ -24,7 +24,7 @@
 +        CarpetServer.registerCarpetCommands(this.dispatcher);
  
 +        // CM worldedit
-+        FabricWorldEdit.inst.registerCommands(dispatcher);
++        CarpetWEWorldEdit.inst.registerCommands(dispatcher);
 +
          this.dispatcher.findAmbiguities((p_201302_1_, p_201302_2_, p_201302_3_, p_201302_4_) ->
          {

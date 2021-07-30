@@ -19,11 +19,11 @@
 
 package carpet.worldedit;
 
-import carpet.worldedit.internal.FabricTransmogrifier;
-import carpet.worldedit.internal.NBTConverter;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.BaseItemStack;
+import carpet.worldedit.internal.CarpetWETransmogrifier;
+import carpet.worldedit.internal.NBTConverter;
 import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
@@ -48,21 +48,22 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.IRegistry;
 import net.minecraft.world.biome.Biome;
 
-import javax.annotation.Nullable;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
+import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public final class FabricAdapter {
+public final class CarpetWEAdapter
+{
 
-    private FabricAdapter() {
+    private CarpetWEAdapter() {
     }
 
     public static World adapt(net.minecraft.world.World world) {
-        return new FabricWorld(world);
+        return new CarpetWEWorld(world);
     }
 
     public static Biome adapt(BiomeType biomeType) {
@@ -126,7 +127,7 @@ public final class FabricAdapter {
      */
     @Deprecated
     public static Property<?> adaptProperty(net.minecraft.state.IProperty<?> property) {
-        return FabricTransmogrifier.transmogToWorldEditProperty(property);
+        return CarpetWETransmogrifier.transmogToWorldEditProperty(property);
     }
 
     /**
@@ -151,7 +152,7 @@ public final class FabricAdapter {
     public static net.minecraft.block.state.IBlockState adapt(BlockState blockState) {
         int blockStateId = BlockStateIdAccess.getBlockStateId(blockState);
         if (!BlockStateIdAccess.isValidInternalId(blockStateId)) {
-            return FabricTransmogrifier.transmogToMinecraft(blockState);
+            return CarpetWETransmogrifier.transmogToMinecraft(blockState);
         }
         return Block.getStateById(blockStateId);
     }
@@ -160,7 +161,7 @@ public final class FabricAdapter {
         int blockStateId = Block.getStateId(blockState);
         BlockState worldEdit = BlockStateIdAccess.getBlockStateById(blockStateId);
         if (worldEdit == null) {
-            return FabricTransmogrifier.transmogToWorldEdit(blockState);
+            return CarpetWETransmogrifier.transmogToWorldEdit(blockState);
         }
         return worldEdit;
     }
@@ -182,12 +183,12 @@ public final class FabricAdapter {
     }
 
     public static ItemStack adapt(BaseItemStack baseItemStack) {
-        net.minecraft.nbt.NBTTagCompound fabricCompound = null;
+        net.minecraft.nbt.NBTTagCompound nbtTagCompound = null;
         if (baseItemStack.getNbtData() != null) {
-            fabricCompound = NBTConverter.toNative(baseItemStack.getNbtData());
+            nbtTagCompound = NBTConverter.toNative(baseItemStack.getNbtData());
         }
         final ItemStack itemStack = new ItemStack(adapt(baseItemStack.getType()), baseItemStack.getAmount());
-        itemStack.setTag(fabricCompound);
+        itemStack.setTag(nbtTagCompound);
         return itemStack;
     }
 
@@ -212,8 +213,8 @@ public final class FabricAdapter {
      * @param player the player
      * @return the WorldEdit player
      */
-    public static FabricPlayer adaptPlayer(EntityPlayerMP player) {
+    public static CarpetWEPlayer adaptPlayer(EntityPlayerMP player) {
         checkNotNull(player);
-        return new FabricPlayer(player);
+        return new CarpetWEPlayer(player);
     }
 }

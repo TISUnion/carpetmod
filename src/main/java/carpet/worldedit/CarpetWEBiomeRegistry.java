@@ -27,10 +27,7 @@ import com.sk89q.worldedit.world.registry.BiomeRegistry;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 
-/**
- * Provides access to biome data in Fabric.
- */
-class FabricBiomeRegistry implements BiomeRegistry {
+class CarpetWEBiomeRegistry implements BiomeRegistry {
 
     @Override
     public Component getRichName(BiomeType biomeType) {
@@ -40,14 +37,14 @@ class FabricBiomeRegistry implements BiomeRegistry {
     @Deprecated
     @Override
     public BiomeData getData(BiomeType biome) {
-        return new FabricBiomeData(biome);
+        return new CarpetWEBiomeData(biome);
     }
 
     /**
      * Cached biome data information.
      */
     @Deprecated
-    private static class FabricBiomeData implements BiomeData {
+    private static class CarpetWEBiomeData implements BiomeData {
         private final BiomeType biome;
 
         /**
@@ -55,7 +52,7 @@ class FabricBiomeRegistry implements BiomeRegistry {
          *
          * @param biome the base biome
          */
-        private FabricBiomeData(BiomeType biome) {
+        private CarpetWEBiomeData(BiomeType biome) {
             this.biome = biome;
         }
 

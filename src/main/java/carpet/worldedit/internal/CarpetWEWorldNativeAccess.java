@@ -19,7 +19,7 @@
 
 package carpet.worldedit.internal;
 
-import carpet.worldedit.FabricAdapter;
+import carpet.worldedit.CarpetWEAdapter;
 import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
 import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
 import com.sk89q.worldedit.util.SideEffect;
@@ -37,14 +37,14 @@ import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.Objects;
 
-public class FabricWorldNativeAccess implements WorldNativeAccess<Chunk, IBlockState, BlockPos> {
+public class CarpetWEWorldNativeAccess implements WorldNativeAccess<Chunk, IBlockState, BlockPos> {
     private static final int UPDATE = 1;
     private static final int NOTIFY = 2;
 
     private final WeakReference<World> world;
     private SideEffectSet sideEffectSet;
 
-    public FabricWorldNativeAccess(WeakReference<World> world) {
+    public CarpetWEWorldNativeAccess(WeakReference<World> world) {
         this.world = world;
     }
 
@@ -67,7 +67,7 @@ public class FabricWorldNativeAccess implements WorldNativeAccess<Chunk, IBlockS
         int stateId = BlockStateIdAccess.getBlockStateId(state);
         return BlockStateIdAccess.isValidInternalId(stateId)
             ? Block.getStateById(stateId)
-            : FabricAdapter.adapt(state);
+            : CarpetWEAdapter.adapt(state);
     }
 
     @Override

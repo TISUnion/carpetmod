@@ -24,23 +24,25 @@ import carpet.settings.SettingsManager;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.GameType;
 
-public interface FabricPermissionsProvider {
+public interface CarpetWEPermissionsProvider
+{
 
     boolean hasPermission(EntityPlayerMP player, String permission);
 
     void registerPermission(String permission);
 
-    class VanillaPermissionsProvider implements FabricPermissionsProvider {
+    class VanillaPermissionsProvider implements CarpetWEPermissionsProvider
+    {
 
-        private final FabricPlatform platform;
+        private final CarpetWEPlatform platform;
 
-        public VanillaPermissionsProvider(FabricPlatform platform) {
+        public VanillaPermissionsProvider(CarpetWEPlatform platform) {
             this.platform = platform;
         }
 
         @Override
         public boolean hasPermission(EntityPlayerMP player, String permission) {
-            FabricConfiguration configuration = platform.getConfiguration();
+            CarpetWEConfiguration configuration = platform.getConfiguration();
             return configuration.cheatMode
                 || player.server.getPlayerList().canSendCommands(player.getGameProfile())
                 || (configuration.creativeEnable && player.interactionManager.getGameType() == GameType.CREATIVE);
@@ -52,7 +54,7 @@ public interface FabricPermissionsProvider {
     }
 
     class CarpetPermissionsProvider extends VanillaPermissionsProvider {
-        public CarpetPermissionsProvider(FabricPlatform platform) {
+        public CarpetPermissionsProvider(CarpetWEPlatform platform) {
             super(platform);
         }
 

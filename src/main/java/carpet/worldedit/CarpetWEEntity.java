@@ -19,11 +19,11 @@
 
 package carpet.worldedit;
 
-import carpet.worldedit.internal.NBTConverter;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.metadata.EntityProperties;
 import com.sk89q.worldedit.extent.Extent;
+import carpet.worldedit.internal.NBTConverter;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.NullWorld;
@@ -32,16 +32,16 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.IRegistry;
 
-import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
+import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-class FabricEntity implements Entity {
+class CarpetWEEntity implements Entity {
 
     private final WeakReference<net.minecraft.entity.Entity> entityRef;
 
-    FabricEntity(net.minecraft.entity.Entity entity) {
+    CarpetWEEntity(net.minecraft.entity.Entity entity) {
         checkNotNull(entity);
         this.entityRef = new WeakReference<>(entity);
     }
@@ -67,7 +67,7 @@ class FabricEntity implements Entity {
             float yaw = entity.rotationYaw;
             float pitch = entity.rotationPitch;
 
-            return new Location(FabricAdapter.adapt(entity.world), position, yaw, pitch);
+            return new Location(CarpetWEAdapter.adapt(entity.world), position, yaw, pitch);
         } else {
             return new Location(NullWorld.getInstance());
         }
@@ -83,7 +83,7 @@ class FabricEntity implements Entity {
     public Extent getExtent() {
         net.minecraft.entity.Entity entity = entityRef.get();
         if (entity != null) {
-            return FabricAdapter.adapt(entity.world);
+            return CarpetWEAdapter.adapt(entity.world);
         } else {
             return NullWorld.getInstance();
         }
@@ -105,7 +105,7 @@ class FabricEntity implements Entity {
         net.minecraft.entity.Entity entity = entityRef.get();
         if (entity != null) {
             if (EntityProperties.class.isAssignableFrom(cls)) {
-                return (T) new FabricEntityProperties(entity);
+                return (T) new CarpetWEEntityProperties(entity);
             } else {
                 return null;
             }
