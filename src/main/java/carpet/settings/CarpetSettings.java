@@ -3,6 +3,7 @@ package carpet.settings;
 import carpet.CarpetServer;
 import carpet.microtiming.enums.MicroTimingTarget;
 import carpet.utils.Messenger;
+import carpet.utils.TISCMConfig;
 import net.minecraft.command.CommandSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
@@ -14,14 +15,14 @@ import static carpet.settings.RuleCategory.*;
 
 public class CarpetSettings
 {
-    public static final String carpetVersion = "TISCarpet_build_undefined";
+    public static final String carpetVersion = "TISCarpet_build_worldedit_4";
     public static final Logger LOG = LogManager.getLogger();
     public static boolean skipGenerationChecks = false;
     public static boolean impendingFillSkipUpdates = false;
     public static final int SHULKERBOX_MAX_STACK_AMOUNT = 64;
     public static boolean isEpsActive = false;
-    
-    private static class ValidateVoxelOpt extends Validator<Boolean>
+
+	private static class ValidateVoxelOpt extends Validator<Boolean>
     {
         @Override
         public Boolean validate(CommandSource source, ParsedRule<Boolean> currentRule, Boolean newValue, String string)
@@ -72,6 +73,30 @@ public class CarpetSettings
             category = COMMAND
     )
     public static String commandVillage = "false";
+
+    @Rule(
+            desc = "Enables world edit operations",
+            category = COMMAND,
+            validate = ValidateWorldEdit.class
+    )
+    public static String worldEdit = "false";
+
+    private static class ValidateWorldEdit extends Validator<String>
+    {
+        @Override
+        public String validate(CommandSource source, ParsedRule<String> currentRule, String newValue, String string)
+        {
+            if (!newValue.equals("false") && !TISCMConfig.MOD_WORLDEDIT)
+            {
+                return null;
+            }
+            return newValue;
+        }
+        public String description()
+        {
+            return "You must set `TISCMConfig.MOD_WORLDEDIT` to true during mod compiling to enable world edit";
+        }
+    }
 
     @Rule(
             desc = "enable visualize projectile logger",
@@ -742,7 +767,7 @@ public class CarpetSettings
     @Rule(desc = "Alternative, persistent caching strategy for nether portals", category = {SURVIVAL, CREATIVE})
     public static boolean portalCaching = false;
 
-    @Rule(desc = "fill/clone/setblock and structure blocks cause block updates", category = CREATIVE)
+    @Rule(desc = "fill/clone/setblock, structure blocks and worldedit cause block updates", category = CREATIVE)
     public static boolean fillUpdates = true;
 
     private static class PushLimitLimits extends Validator<Integer>

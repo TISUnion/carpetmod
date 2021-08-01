@@ -8,6 +8,8 @@
 
 感谢 [Lithium mod](https://github.com/jellysquid3/lithium-fabric) 提供的一些优化
 
+感谢 [World Edit mod](https://github.com/EngineHub/WorldEdit) 提供了如此强力的一个工具
+
 ## 开始使用:
 
 ------

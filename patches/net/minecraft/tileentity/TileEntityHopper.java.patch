@@ -5,7 +5,7 @@
  import java.util.stream.Collectors;
  import javax.annotation.Nullable;
 +
-+import carpet.utils.TISCMOptimizationConfig;
++import carpet.utils.TISCMConfig;
 +import carpet.commands.lifetime.removal.LiteralRemovalReason;
 +import carpet.helpers.HopperCounter;
 +import carpet.settings.CarpetSettings;
@@ -168,7 +168,7 @@
 -        return p_200115_0_.getCollectionArea().toBoundingBoxList().stream().flatMap((p_200110_1_) ->
 +        // TISCM Cache BoundingBoxList creation
 +//        return p_200115_0_.getCollectionArea().toBoundingBoxList().stream().flatMap((p_200110_1_) ->
-+        List<AxisAlignedBB> axisAlignedBBList = TISCMOptimizationConfig.CACHE_BOUNDING_BOX_LIST_CREATION ?
++        List<AxisAlignedBB> axisAlignedBBList = TISCMConfig.CACHE_BOUNDING_BOX_LIST_CREATION ?
 +                HOPPER_COLLECTION_BOX :
 +                p_200115_0_.getCollectionArea().toBoundingBoxList();
 +        return axisAlignedBBList.stream().flatMap((p_200110_1_) ->
