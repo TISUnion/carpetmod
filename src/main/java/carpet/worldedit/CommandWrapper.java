@@ -19,8 +19,6 @@
 
 package carpet.worldedit;
 
-import carpet.settings.CarpetSettings;
-import carpet.settings.SettingsManager;
 import com.google.common.collect.ImmutableList;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
@@ -72,13 +70,13 @@ public final class CommandWrapper {
 
         for (String alias : aliases.build()) {
             LiteralArgumentBuilder<CommandSource> base = literal(alias)
-                    .requires(CarpetWEWorldEdit::canPlayerUseWorldEdit)
+                    .requires(CarpetWorldEdit::canPlayerUseWorldEdit)
                     .executes(commandRunner)
                     .then(argument("args", StringArgumentType.greedyString())
                             .suggests(CommandWrapper::suggest)
                             .executes(commandRunner));
             if (command.getCondition() != org.enginehub.piston.Command.Condition.TRUE) {
-                base.requires(requirementsFor(command));
+                base.requires(base.getRequirement().and(requirementsFor(command)));
             }
             dispatcher.register(base);
         }

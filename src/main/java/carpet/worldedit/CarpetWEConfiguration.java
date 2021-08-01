@@ -28,7 +28,7 @@ public class CarpetWEConfiguration extends PropertiesConfiguration {
     public boolean creativeEnable = false;
     public boolean cheatMode = false;
 
-    public CarpetWEConfiguration(CarpetWEWorldEdit mod) {
+    public CarpetWEConfiguration(CarpetWorldEdit mod) {
         super(mod.getWorkingDir().resolve("worldedit.properties"));
     }
 
@@ -40,6 +40,6 @@ public class CarpetWEConfiguration extends PropertiesConfiguration {
 
     @Override
     public Path getWorkingDirectoryPath() {
-        return CarpetWEWorldEdit.inst.getWorkingDir();
+        return CarpetWorldEdit.inst.getWorkingDir();
     }
 }

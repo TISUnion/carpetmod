@@ -76,7 +76,7 @@ import static java.util.stream.Collectors.toList;
 /**
  * The TIS Carpet implementation of WorldEdit.
  */
-public class CarpetWEWorldEdit
+public class CarpetWorldEdit
 {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
@@ -85,20 +85,17 @@ public class CarpetWEWorldEdit
     public static final String VERSION = "7.2.6-SNAPSHOT";
 
     public static final String CUI_PLUGIN_CHANNEL = "cui";
-    public static final ResourceLocation CUI_IDENTIFIER = new ResourceLocation(CarpetWEWorldEdit.MOD_ID, CarpetWEWorldEdit.CUI_PLUGIN_CHANNEL);
+    public static final ResourceLocation CUI_IDENTIFIER = new ResourceLocation(CarpetWorldEdit.MOD_ID, CarpetWorldEdit.CUI_PLUGIN_CHANNEL);
 
     public static final SimpleLifecycled<MinecraftServer> LIFECYCLED_SERVER = SimpleLifecycled.invalid();
 
     private CarpetWEPermissionsProvider provider;
 
-    public static final CarpetWEWorldEdit inst = new CarpetWEWorldEdit();
+    public static final CarpetWorldEdit inst = new CarpetWorldEdit();
 
     private CarpetWEPlatform platform;
     private CarpetWEConfiguration config;
     private Path workingDir;
-
-    public CarpetWEWorldEdit() {
-    }
 
     public static boolean isEnabled() {
         // carpet rule worldEdit is more like a permission lock
@@ -269,7 +266,7 @@ public class CarpetWEWorldEdit
     }
 
     public void onCuiPacket(PacketBuffer buf, EntityPlayerMP player) {
-        LocalSession session = CarpetWEWorldEdit.inst.getSession(player);
+        LocalSession session = CarpetWorldEdit.inst.getSession(player);
         String text = buf.toString(StandardCharsets.UTF_8);
         CarpetWEPlayer actor = CarpetWEAdapter.adaptPlayer(player);
         session.handleCUIInitializationMessage(text, actor);

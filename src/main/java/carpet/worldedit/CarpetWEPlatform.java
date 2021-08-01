@@ -44,16 +44,16 @@ import java.util.function.Function;
 
 class CarpetWEPlatform extends AbstractPlatform implements MultiUserPlatform {
 
-    private final CarpetWEWorldEdit mod;
+    private final CarpetWorldEdit mod;
     private final CarpetWEDataFixer dataFixer;
     private final Lifecycled<Optional<Watchdog>> watchdog;
     private boolean hookingEvents = false;
 
-    CarpetWEPlatform(CarpetWEWorldEdit mod) {
+    CarpetWEPlatform(CarpetWorldEdit mod) {
         this.mod = mod;
         this.dataFixer = new CarpetWEDataFixer(getDataVersion());
 
-        this.watchdog = CarpetWEWorldEdit.LIFECYCLED_SERVER.map(
+        this.watchdog = CarpetWorldEdit.LIFECYCLED_SERVER.map(
             server -> server instanceof DedicatedServer
                 ? Optional.of((Watchdog) server)
                 : Optional.empty()
@@ -103,7 +103,7 @@ class CarpetWEPlatform extends AbstractPlatform implements MultiUserPlatform {
 
     @Override
     public List<? extends World> getWorlds() {
-        Iterable<WorldServer> worlds = CarpetWEWorldEdit.LIFECYCLED_SERVER.valueOrThrow().getWorlds();
+        Iterable<WorldServer> worlds = CarpetWorldEdit.LIFECYCLED_SERVER.valueOrThrow().getWorlds();
         List<World> ret = new ArrayList<>();
         for (WorldServer world : worlds) {
             ret.add(new CarpetWEWorld(world));
@@ -117,7 +117,7 @@ class CarpetWEPlatform extends AbstractPlatform implements MultiUserPlatform {
         if (player instanceof CarpetWEPlayer) {
             return player;
         } else {
-            EntityPlayerMP entity = CarpetWEWorldEdit.LIFECYCLED_SERVER.valueOrThrow()
+            EntityPlayerMP entity = CarpetWorldEdit.LIFECYCLED_SERVER.valueOrThrow()
                 .getPlayerList().getPlayerByUsername(player.getName());
             return entity != null ? new CarpetWEPlayer(entity) : null;
         }
@@ -129,7 +129,7 @@ class CarpetWEPlatform extends AbstractPlatform implements MultiUserPlatform {
         if (world instanceof CarpetWEWorld) {
             return world;
         } else {
-            for (WorldServer ws : CarpetWEWorldEdit.LIFECYCLED_SERVER.valueOrThrow().getWorlds()) {
+            for (WorldServer ws : CarpetWorldEdit.LIFECYCLED_SERVER.valueOrThrow().getWorlds()) {
                 if (ws.getWorldInfo().getWorldName().equals(world.getName())) {
                     return new CarpetWEWorld(ws);
                 }
@@ -201,7 +201,7 @@ class CarpetWEPlatform extends AbstractPlatform implements MultiUserPlatform {
     @Override
     public Collection<Actor> getConnectedUsers() {
         List<Actor> users = new ArrayList<>();
-        PlayerList scm = CarpetWEWorldEdit.LIFECYCLED_SERVER.valueOrThrow().getPlayerList();
+        PlayerList scm = CarpetWorldEdit.LIFECYCLED_SERVER.valueOrThrow().getPlayerList();
         for (EntityPlayerMP entity : scm.getPlayers()) {
             if (entity != null) {
                 users.add(new CarpetWEPlayer(entity));

@@ -15,7 +15,7 @@ import static carpet.settings.RuleCategory.*;
 
 public class CarpetSettings
 {
-    public static final String carpetVersion = "TISCarpet_build_worldedit_3";
+    public static final String carpetVersion = "TISCarpet_build_worldedit_4";
     public static final Logger LOG = LogManager.getLogger();
     public static boolean skipGenerationChecks = false;
     public static boolean impendingFillSkipUpdates = false;
@@ -767,7 +767,7 @@ public class CarpetSettings
     @Rule(desc = "Alternative, persistent caching strategy for nether portals", category = {SURVIVAL, CREATIVE})
     public static boolean portalCaching = false;
 
-    @Rule(desc = "fill/clone/setblock and structure blocks cause block updates", category = CREATIVE)
+    @Rule(desc = "fill/clone/setblock, structure blocks and worldedit cause block updates", category = CREATIVE)
     public static boolean fillUpdates = true;
 
     private static class PushLimitLimits extends Validator<Integer>

@@ -10,7 +10,7 @@
 +import carpet.network.CarpetClient;
 +import carpet.network.CarpetServerNetworkHandler;
 +import carpet.settings.CarpetSettings;
-+import carpet.worldedit.CarpetWEWorldEdit;
++import carpet.worldedit.CarpetWorldEdit;
  import com.google.common.primitives.Doubles;
  import com.google.common.primitives.Floats;
  import com.google.common.util.concurrent.Futures;
@@ -127,9 +127,9 @@
  
 +                // CM worldedit
 +                // just like net.fabricmc.fabric.mixin.event.interaction.MixinServerPlayerInteractionManager#startBlockBreak
-+                if (CarpetWEWorldEdit.isEnabled())
++                if (CarpetWorldEdit.isEnabled())
 +                {
-+                    EnumActionResult weResult = CarpetWEWorldEdit.inst.onLeftClickBlock(this.player, worldserver, this.player.getActiveHand(), blockpos, packetIn.getFacing());
++                    EnumActionResult weResult = CarpetWorldEdit.inst.onLeftClickBlock(this.player, worldserver, this.player.getActiveHand(), blockpos, packetIn.getFacing());
 +                    if (weResult != EnumActionResult.PASS)
 +                    {
 +                        this.player.connection.sendPacket(new SPacketBlockChange(worldserver, blockpos)); // in case block changes on client-side
@@ -175,9 +175,9 @@
      public void onDisconnect(ITextComponent reason)
      {
 +        // CM worldedit
-+        if (CarpetWEWorldEdit.isEnabled())
++        if (CarpetWorldEdit.isEnabled())
 +        {
-+            CarpetWEWorldEdit.inst.onPlayerDisconnect(this.player);
++            CarpetWorldEdit.inst.onPlayerDisconnect(this.player);
 +        }
 +
          LOGGER.info("{} lost connection: {}", this.player.getName().getString(), reason.getString());
@@ -278,11 +278,11 @@
 +        }
 +
 +        // CM worldedit CUI
-+        if (CarpetWEWorldEdit.isEnabled())
++        if (CarpetWorldEdit.isEnabled())
 +        {
-+            if (CarpetWEWorldEdit.CUI_IDENTIFIER.equals(channel))
++            if (CarpetWorldEdit.CUI_IDENTIFIER.equals(channel))
 +            {
-+                CarpetWEWorldEdit.inst.onCuiPacket(packetIn.getData(), player);
++                CarpetWorldEdit.inst.onCuiPacket(packetIn.getData(), player);
 +                return;
 +            }
 +        }

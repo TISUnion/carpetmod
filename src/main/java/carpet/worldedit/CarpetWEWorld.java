@@ -158,7 +158,7 @@ public class CarpetWEWorld extends AbstractWorld {
     @Override
     public Set<SideEffect> applySideEffects(BlockVector3 position, BlockState previousType, SideEffectSet sideEffectSet) {
         worldNativeAccess.applySideEffects(position, previousType, sideEffectSet);
-        return Sets.intersection(CarpetWEWorldEdit.inst.getPlatform().getSupportedSideEffects(), sideEffectSet.getSideEffectsToApply());
+        return Sets.intersection(CarpetWorldEdit.inst.getPlatform().getSupportedSideEffects(), sideEffectSet.getSideEffectsToApply());
     }
 
     @Override

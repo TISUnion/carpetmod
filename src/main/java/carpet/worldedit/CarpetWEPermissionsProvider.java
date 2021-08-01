@@ -19,8 +19,6 @@
 
 package carpet.worldedit;
 
-import carpet.settings.CarpetSettings;
-import carpet.settings.SettingsManager;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.GameType;
 
@@ -60,7 +58,7 @@ public interface CarpetWEPermissionsProvider
 
         @Override
         public boolean hasPermission(EntityPlayerMP player, String permission) {
-            return super.hasPermission(player, permission) && CarpetWEWorldEdit.canPlayerUseWorldEdit(player);
+            return super.hasPermission(player, permission) && CarpetWorldEdit.canPlayerUseWorldEdit(player);
         }
     }
 }

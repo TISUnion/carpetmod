@@ -19,6 +19,7 @@
 
 package carpet.worldedit.internal;
 
+import carpet.settings.CarpetSettings;
 import carpet.worldedit.CarpetWEAdapter;
 import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
 import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
@@ -136,6 +137,9 @@ public class CarpetWEWorldNativeAccess implements WorldNativeAccess<Chunk, IBloc
 
     @Override
     public void notifyNeighbors(BlockPos pos, IBlockState oldState, IBlockState newState) {
+        if (!CarpetSettings.fillUpdates) {
+            return;
+        }
         getWorld().notifyNeighborsOfStateChange(pos, oldState.getBlock());
         if (newState.hasComparatorInputOverride()) {
             getWorld().updateComparatorOutputLevel(pos, newState.getBlock());
@@ -144,6 +148,9 @@ public class CarpetWEWorldNativeAccess implements WorldNativeAccess<Chunk, IBloc
 
     @Override
     public void updateNeighbors(BlockPos pos, IBlockState oldState, IBlockState newState, int recursionLimit) {
+        if (!CarpetSettings.fillUpdates) {
+            return;
+        }
         World world = getWorld();
         oldState.updateDiagonalNeighbors(world, pos, NOTIFY);
         newState.updateNeighbors(world, pos, NOTIFY);

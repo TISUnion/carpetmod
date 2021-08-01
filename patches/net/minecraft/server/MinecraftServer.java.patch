@@ -13,7 +13,7 @@
 +import carpet.settings.CarpetSettings;
 +import carpet.utils.CarpetProfiler;
 +import carpet.utils.Messenger;
-+import carpet.worldedit.CarpetWEWorldEdit;
++import carpet.worldedit.CarpetWorldEdit;
  import com.google.common.base.Stopwatch;
  import com.google.common.collect.Lists;
  import com.google.common.collect.Maps;
@@ -58,9 +58,9 @@
 +        CarpetServer.onServerClosed(this);
  
 +        // CM worldedit
-+        if (CarpetWEWorldEdit.isEnabled())
++        if (CarpetWorldEdit.isEnabled())
 +        {
-+            CarpetWEWorldEdit.inst.onStopServer(this);
++            CarpetWorldEdit.inst.onStopServer(this);
 +        }
 +
          if (this.getNetworkSystem() != null)
@@ -71,9 +71,9 @@
          try
          {
 +            // CM worldedit
-+            if (CarpetWEWorldEdit.isEnabled())
++            if (CarpetWorldEdit.isEnabled())
 +            {
-+                CarpetWEWorldEdit.inst.onStartingServer(this);
++                CarpetWorldEdit.inst.onStartingServer(this);
 +            }
 +
              if (this.init())
@@ -88,10 +88,10 @@
  
 -                while (this.serverRunning)
 +                // CM worldedit
-+                if (CarpetWEWorldEdit.isEnabled())
++                if (CarpetWorldEdit.isEnabled())
                  {
 -                    long i = Util.milliTime() - this.serverTime;
-+                    CarpetWEWorldEdit.inst.onStartServer(this);
++                    CarpetWorldEdit.inst.onStartServer(this);
 +                }
  
 -                    if (i > 2000L && this.serverTime - this.timeOfLastWarning >= 15000L)
@@ -209,9 +209,9 @@
 +        }
 +
 +        // CM worldedit
-+        if (CarpetWEWorldEdit.isEnabled())
++        if (CarpetWorldEdit.isEnabled())
 +        {
-+            CarpetWEWorldEdit.inst.onEndServerTick(this);
++            CarpetWorldEdit.inst.onEndServerTick(this);
 +        }
      }
  
@@ -289,9 +289,9 @@
              }
  
 +            // CM worldedit
-+            if (CarpetWEWorldEdit.isEnabled())
++            if (CarpetWorldEdit.isEnabled())
 +            {
-+                CarpetWEWorldEdit.inst.onInitialize();
++                CarpetWorldEdit.inst.onInitialize();
 +            }
 +
              YggdrasilAuthenticationService yggdrasilauthenticationservice = new YggdrasilAuthenticationService(Proxy.NO_PROXY, UUID.randomUUID().toString());

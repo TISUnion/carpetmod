@@ -97,7 +97,7 @@ public class CarpetWEPlayer extends AbstractPlayerActor {
     public Location getLocation() {
         Vector3 position = Vector3.at(this.player.posX, this.player.posY, this.player.posZ);
         return new Location(
-                CarpetWEWorldEdit.inst.getWorld(this.player.world),
+                CarpetWorldEdit.inst.getWorld(this.player.world),
                 position,
                 this.player.rotationYaw,
                 this.player.rotationPitch);
@@ -111,7 +111,7 @@ public class CarpetWEPlayer extends AbstractPlayerActor {
 
     @Override
     public World getWorld() {
-        return CarpetWEWorldEdit.inst.getWorld(this.player.world);
+        return CarpetWorldEdit.inst.getWorld(this.player.world);
     }
 
     @Override
@@ -128,7 +128,7 @@ public class CarpetWEPlayer extends AbstractPlayerActor {
         }
 
         this.player.connection.sendPacket(new SPacketCustomPayload(
-                CarpetWEWorldEdit.CUI_IDENTIFIER,
+                CarpetWorldEdit.CUI_IDENTIFIER,
                 new PacketBuffer(Unpooled.copiedBuffer(send, StandardCharsets.UTF_8))
         ));
     }
@@ -195,7 +195,7 @@ public class CarpetWEPlayer extends AbstractPlayerActor {
 
     @Override
     public boolean hasPermission(String perm) {
-        return CarpetWEWorldEdit.inst.getPermissionsProvider().hasPermission(player, perm);
+        return CarpetWorldEdit.inst.getPermissionsProvider().hasPermission(player, perm);
     }
 
     @Nullable
