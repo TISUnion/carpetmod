@@ -572,6 +572,15 @@ for (def dist : ['Client', 'Server']) {
             }
         }
 
+        // carpet mod assets
+        from(zipTree('projects/' + settings.modname + '/build/libs/' + settings.modname + '.jar')) {
+            eachFile { moddedFile ->
+                def entryName = moddedFile.getRelativePath().toString()
+                if (!entryName.startsWith('assets/carpet'))
+                    moddedFile.exclude()
+            }
+        }
+
         // json registry and lang file in world edit
         projectMod.configurations.extraLibs.each {file ->
             from(zipTree(file)) {
