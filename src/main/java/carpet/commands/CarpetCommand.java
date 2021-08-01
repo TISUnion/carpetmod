@@ -85,15 +85,15 @@ public class CarpetCommand
         }
         catch (CommandSyntaxException e)
         {
-            Messenger.m(source, "w "+rule.name +" is set to: ","wb "+rule.getAsString());
+            Messenger.m(source, "w "+rule.translatedName() +" is set to: ","wb "+rule.getAsString());
             return 1;
         }
 
         Messenger.m(player, "");
-        Messenger.m(player, "wb "+rule.name,"!/carpet "+rule.name,"^g refresh");
-        Messenger.m(player, "w "+rule.description);
+        Messenger.m(player, "wb "+rule.translatedName(),"!/carpet "+rule.name,"^g refresh");
+        Messenger.m(player, "w "+rule.translatedDescription());
 
-        rule.extraInfo.forEach(s -> Messenger.m(player, "g " + s));
+        rule.translatedExtras().forEach(s -> Messenger.m(player, "g " + s));
 
         List<ITextComponent> tags = new ArrayList<>();
         tags.add(Messenger.c("w Tags: "));
@@ -145,9 +145,9 @@ public class CarpetCommand
     private static ITextComponent displayInteractiveSetting(ParsedRule<?> e)
     {
         List<Object> args = new ArrayList<>();
-        args.add("w - "+e.name+" ");
+        args.add("w - "+e.translatedName()+" ");
         args.add("!/carpet "+e.name);
-        args.add("^y "+e.description);
+        args.add("^y "+e.translatedDescription());
         for (String option: e.options)
         {
             args.add(makeSetRuleButton(e, option, true));
