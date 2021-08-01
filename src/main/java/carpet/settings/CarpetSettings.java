@@ -3,6 +3,7 @@ package carpet.settings;
 import carpet.CarpetServer;
 import carpet.microtiming.enums.MicroTimingTarget;
 import carpet.utils.Messenger;
+import carpet.utils.TISCMConfig;
 import carpet.utils.Translations;
 import net.minecraft.command.CommandSource;
 import net.minecraft.server.MinecraftServer;
@@ -21,8 +22,8 @@ public class CarpetSettings
     public static boolean impendingFillSkipUpdates = false;
     public static final int SHULKERBOX_MAX_STACK_AMOUNT = 64;
     public static boolean isEpsActive = false;
-    
-    private static class ValidateVoxelOpt extends Validator<Boolean>
+
+	private static class ValidateVoxelOpt extends Validator<Boolean>
     {
         @Override
         public Boolean validate(CommandSource source, ParsedRule<Boolean> currentRule, Boolean newValue, String string)
@@ -61,6 +62,42 @@ public class CarpetSettings
             category = COMMAND
     )
     public static String commandPing = "true";
+
+    @Rule(
+            desc = "Enables /refresh command to refresh client desync",
+            category = COMMAND
+    )
+    public static String commandRefresh = "true";
+
+    @Rule(
+            desc = "Enables /village command to debug village stuffs",
+            category = COMMAND
+    )
+    public static String commandVillage = "false";
+
+    @Rule(
+            desc = "Enables world edit operations",
+            category = COMMAND,
+            validate = ValidateWorldEdit.class
+    )
+    public static String worldEdit = "false";
+
+    private static class ValidateWorldEdit extends Validator<String>
+    {
+        @Override
+        public String validate(CommandSource source, ParsedRule<String> currentRule, String newValue, String string)
+        {
+            if (!newValue.equals("false") && !TISCMConfig.MOD_WORLDEDIT)
+            {
+                return null;
+            }
+            return newValue;
+        }
+        public String description()
+        {
+            return "You must set `TISCMConfig.MOD_WORLDEDIT` to true during mod compiling to enable world edit";
+        }
+    }
 
     @Rule(
             desc = "enable visualize projectile logger",
@@ -493,6 +530,18 @@ public class CarpetSettings
     )
     public static boolean enchantCommandNoRestriction = false;
 
+    @Rule(
+            desc = "Fixed player might become invisible after switching between dimensions",
+            extra = {
+                    "Minecraft will make a `tickEntity` call in the previous world when changing the dimension of a player",
+                    "which causes the player entity to be added in a chunk in the new player position in the previous world",
+                    "If the player returns to the previous dimension before that chunk gets unloaded, when that chunk gets unloaded,",
+                    "the player will be removed from the world, which causes the player becomes invisible and more weird stuffs"
+            },
+            category = {BUGFIX}
+    )
+    public static boolean transDimensionInvisibleFix = false;
+
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$
     //   | $$     | $$  | $$  \__/| $$  \__/| $$$$  /$$$$
@@ -719,7 +768,7 @@ public class CarpetSettings
     @Rule(desc = "Alternative, persistent caching strategy for nether portals", category = {SURVIVAL, CREATIVE})
     public static boolean portalCaching = false;
 
-    @Rule(desc = "fill/clone/setblock and structure blocks cause block updates", category = CREATIVE)
+    @Rule(desc = "fill/clone/setblock, structure blocks and worldedit cause block updates", category = CREATIVE)
     public static boolean fillUpdates = true;
 
     private static class PushLimitLimits extends Validator<Integer>

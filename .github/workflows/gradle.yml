@@ -10,6 +10,19 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        include:
+          - name: 'Full'
+            worldedit: 'true'
+            hardcoded_optimization: 'true'
+          - name: 'Survival'
+            worldedit: 'false'
+            hardcoded_optimization: 'true'
+          - name: 'Vanilla'
+            worldedit: 'false'
+            hardcoded_optimization: 'false'
+
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK 1.8
@@ -37,8 +50,19 @@ jobs:
       run: chmod +x gradlew
     - name: Setup
       run: ./gradlew setup
+
+    - name: Disable hardcoded optimizations
+      if: matrix.hardcoded_optimization == 'false'
+      run: |
+        sed -i "s/LITHIUM_ENABLE = true/LITHIUM_ENABLE = false/g" src/main/java/me/jellysquid/mods/lithium/LithiumConfig.java
+        sed -i "s/TISCM_OPTIMIZATION_ENABLE = true/TISCM_OPTIMIZATION_ENABLE = false/g" src/main/java/carpet/utils/TISCMConfig.java
+    - name: Disable world edit
+      if: matrix.worldedit == 'false'
+      run: |
+        sed -i "s/MOD_WORLDEDIT = true/MOD_WORLDEDIT = false/g" src/main/java/carpet/utils/TISCMConfig.java
     - name: Create Release
       run: ./gradlew createRelease
+
     - name: Create Installers
       run: |
         cd installer
@@ -48,5 +72,5 @@ jobs:
 
     - uses: actions/upload-artifact@v2
       with:
-        name: TISCarpet dev installers for ${{ github.sha }}
+        name: '[${{ matrix.name }}] TISCarpet installers for ${{ github.sha }}'
         path: installer/carpet_package_*

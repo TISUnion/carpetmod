@@ -645,6 +645,15 @@
 
 统计项名为 `custom` 分类下的 `break_bedrock`
 
+## World Edit mod 移植
+
+移植了 world-edit 7.2.6-SNAPSHOT
+
+见规则 [worldEdit](#worldEdit) 以了解其的游戏内开关
+
+如果你的确不想使用它，你可以通过修改类 `TISCMConfig` 中的常量 `MOD_WORLDEDIT` 来完全禁用它
+
+
 ------
 
 # 修复
@@ -694,4 +703,4 @@ TISCM 中也有一些在 lithium mod 不包含的优化：
 - 在 `TileEntityFurnace` 中永久性地储存物品的燃烧时间以避免每次调用都重复创建时间表
 - 缓存了部分高代价的方块实体序列化用的数据
 
-如果需要，部分优化的实现可在 `TISCMOptimizationConfig` 类中手动开关
+如果需要，部分优化的实现可在 `TISCMConfig` 类中手动开关

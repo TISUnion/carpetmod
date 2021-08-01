@@ -37,8 +37,6 @@ public final class ParsedRule<T> implements Comparable<ParsedRule> {
         this.validators = new ArrayList<>();
         for (Class v : rule.validate())
             this.validators.add((Validator<T>) callConstructor(v));
-        if (categories.contains(RuleCategory.COMMAND))
-            this.validators.add(callConstructor(Validator._COMMAND.class));
         this.defaultValue = get();
         this.defaultAsString = convertToString(this.defaultValue);
         if (this.type == boolean.class)
@@ -131,6 +129,8 @@ public final class ParsedRule<T> implements Comparable<ParsedRule> {
                 if (value == null)
                 {
                     Messenger.m(source, "r Wrong value for " + name + ": " + stringValue);
+                    if (validator.description() != null)
+                        Messenger.m(source, "r " + validator.description());
                     return null;
                 }
             }
@@ -138,6 +138,10 @@ public final class ParsedRule<T> implements Comparable<ParsedRule> {
             {
                 this.field.set(null, value);
                 SettingsManager.notifyRuleChanged(source, this, stringValue);
+                if (this.categories.contains(RuleCategory.COMMAND) && CarpetServer.settingsManager != null)
+                {
+                    CarpetServer.settingsManager.notifyPlayersCommandsChanged();
+                }
             }
         }
         catch (IllegalAccessException e)

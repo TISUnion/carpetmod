@@ -1,0 +1,96 @@
+--- a/net/minecraft/command/arguments/EntitySelector.java
++++ b/net/minecraft/command/arguments/EntitySelector.java
+@@ -38,6 +38,20 @@
+     private final Class <? extends Entity > type;
+     private final boolean checkPermission;
+ 
++    // TISCM added inputText to store the command segment to create this selector
++    private String inputText;
++
++    public void setInputText(String inputText)
++    {
++        this.inputText = inputText;
++    }
++
++    public String getInputText()
++    {
++        return inputText;
++    }
++    // TISCM ends
++
+     public EntitySelector(int limitIn, boolean includeNonPlayersIn, boolean currentWorldOnlyIn, Predicate<Entity> filterIn, MinMaxBounds.FloatBound distanceIn, Function<Vec3d, Vec3d> positionGetterIn, @Nullable AxisAlignedBB aabbIn, BiConsumer < Vec3d, List <? extends Entity >> sorterIn, boolean selfIn, @Nullable String usernameIn, @Nullable UUID uuidIn, Class <? extends Entity > typeIn, boolean checkPermissionIn)
+     {
+         this.limit = limitIn;
+@@ -55,6 +69,58 @@
+         this.checkPermission = checkPermissionIn;
+     }
+ 
++    // TISCM added getters
++
++    // positionOffset in yarn
++    public Function<Vec3d, Vec3d> getPositionGetter()
++    {
++        return positionGetter;
++    }
++
++    // playerName in yarn
++    @Nullable
++    public String getUsername()
++    {
++        return username;
++    }
++
++    @Nullable
++    public UUID getUuid()
++    {
++        return uuid;
++    }
++
++    // senderOnly in yarn
++    public boolean isSelf()
++    {
++        return self;
++    }
++
++    // localWorldOnly in yarn
++    public boolean isCurrentWorldOnly()
++    {
++        return currentWorldOnly;
++    }
++
++    public Class<? extends Entity> getType()
++    {
++        return type;
++    }
++
++    // box in yarn
++    @Nullable
++    public AxisAlignedBB getAabb()
++    {
++        return aabb;
++    }
++
++    public boolean isIncludeNonPlayers()
++    {
++        return includeNonPlayers;
++    }
++
++    // TISCM getters ends
++
+     public int getLimit()
+     {
+         return this.limit;
+@@ -245,6 +311,13 @@
+         }
+     }
+ 
++    // TISCM added invoker
++    // yarn name is getPositionPredicate
++    public Predicate<Entity> invokeUpdateFilter(Vec3d vec3d)
++    {
++        return this.updateFilter(vec3d);
++    }
++
+     private Predicate<Entity> updateFilter(Vec3d pos)
+     {
+         Predicate<Entity> predicate = this.filter;

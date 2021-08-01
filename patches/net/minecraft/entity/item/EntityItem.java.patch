@@ -72,7 +72,7 @@
                          return false;
                      }
                      else if (itemstack1.hasTag() ^ itemstack.hasTag())
-@@ -229,12 +256,17 @@
+@@ -229,12 +256,23 @@
                      {
                          return false;
                      }
@@ -86,11 +86,17 @@
                          other.pickupDelay = Math.max(other.pickupDelay, this.pickupDelay);
                          other.age = Math.min(other.age, this.age);
                          other.setItem(itemstack1);
-+                        this.recordRemoval(LiteralRemovalReason.MERGE);  // TISCM lifetime tracker
++
++                        // TISCM lifetime tracker
++                        int stackCount = itemstack.getCount();
++                        itemstack.setCount(0);
++                        this.recordRemoval(LiteralRemovalReason.MERGE);
++                        itemstack.setCount(stackCount);
++
                          this.remove();
                          return true;
                      }
-@@ -282,6 +314,7 @@
+@@ -282,6 +320,7 @@
  
              if (this.health <= 0)
              {
@@ -98,15 +104,20 @@
                  this.remove();
              }
  
-@@ -354,6 +387,7 @@
+@@ -354,6 +393,12 @@
  
                  if (itemstack.isEmpty())
                  {
-+                    this.recordRemoval(new MobPickupRemovalReason(entityIn.getType()));  // TISCM lifetime tracker
++                    // TISCM lifetime tracker
++                    int stackCount = itemstack.getCount();
++                    itemstack.setCount(i);  // for recording the item amount
++                    this.recordRemoval(new MobPickupRemovalReason(entityIn.getType()));
++                    itemstack.setCount(stackCount);
++
                      this.remove();
                      itemstack.setCount(i);
                  }
-@@ -460,4 +494,44 @@
+@@ -460,4 +505,44 @@
          this.setInfinitePickupDelay();
          this.age = 5999;
      }

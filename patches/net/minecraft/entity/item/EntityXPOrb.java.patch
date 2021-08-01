@@ -125,7 +125,7 @@
                  this.remove();
              }
  
-@@ -218,7 +259,8 @@
+@@ -218,8 +259,11 @@
      {
          if (!this.world.isRemote)
          {
@@ -133,17 +133,12 @@
 +            // [CM] added ORed condition
 +            if (this.delayBeforeCanPickup == 0 && (entityIn.xpCooldown == 0 || CarpetSettings.xpNoCooldown))
              {
++                this.recordRemoval(new MobPickupRemovalReason(entityIn.getType()));  // TISCM lifetime tracker
++
                  entityIn.xpCooldown = 2;
                  entityIn.onItemPickup(this, 1);
-@@ -236,6 +278,7 @@
-                     entityIn.giveExperiencePoints(this.xpValue);
-                 }
- 
-+                this.recordRemoval(new MobPickupRemovalReason(entityIn.getType()));  // TISCM lifetime tracker
-                 this.remove();
-             }
-         }
-@@ -251,6 +294,10 @@
+                 ItemStack itemstack = EnchantmentHelper.getEnchantedItem(Enchantments.MENDING, entityIn);
+@@ -251,6 +295,10 @@
          return xp * 2;
      }
  

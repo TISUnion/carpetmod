@@ -1,21 +1,14 @@
 --- a/net/minecraft/server/management/PlayerInteractionManager.java
 +++ b/net/minecraft/server/management/PlayerInteractionManager.java
-@@ -1,5 +1,7 @@
+@@ -1,5 +1,8 @@
  package net.minecraft.server.management;
  
 +import carpet.CarpetServer;
 +import carpet.helpers.BlockRotator;
++import carpet.worldedit.CarpetWorldEdit;
  import net.minecraft.block.Block;
  import net.minecraft.block.BlockChest;
  import net.minecraft.block.BlockCommandBlock;
-@@ -8,6 +10,7 @@
- import net.minecraft.block.state.IBlockState;
- import net.minecraft.entity.player.EntityPlayer;
- import net.minecraft.entity.player.EntityPlayerMP;
-+import net.minecraft.init.Blocks;
- import net.minecraft.inventory.IInventory;
- import net.minecraft.item.ItemStack;
- import net.minecraft.item.ItemUseContext;
 @@ -241,6 +244,12 @@
          {
              iblockstate.getBlock().onPlayerDestroy(this.world, pos, iblockstate);
@@ -29,7 +22,43 @@
  
          return flag;
      }
-@@ -401,11 +410,20 @@
+@@ -312,6 +321,17 @@
+ 
+     public EnumActionResult processRightClick(EntityPlayer player, World worldIn, ItemStack stack, EnumHand hand)
+     {
++        // CM worldedit
++        if (CarpetWorldEdit.isEnabled())
++        {
++            ActionResult<ItemStack> weResult = CarpetWorldEdit.inst.onRightClickAir(player, worldIn, hand);
++            if (weResult.getType() != EnumActionResult.PASS)
++            {
++                return weResult.getType();
++            }
++        }
++        // CM worldedit ends
++
+         if (this.gameType == GameType.SPECTATOR)
+         {
+             return EnumActionResult.PASS;
+@@ -366,6 +386,17 @@
+ 
+     public EnumActionResult processRightClickBlock(EntityPlayer player, World worldIn, ItemStack stack, EnumHand hand, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ)
+     {
++        // CM worldedit
++        if (CarpetWorldEdit.isEnabled())
++        {
++            EnumActionResult weResult = CarpetWorldEdit.inst.onRightClickBlock(player, worldIn, hand, facing, pos);
++            if (weResult != EnumActionResult.PASS)
++            {
++                return weResult;
++            }
++        }
++        // CM worldedit ends
++
+         IBlockState iblockstate = worldIn.getBlockState(pos);
+ 
+         if (this.gameType == GameType.SPECTATOR)
+@@ -401,11 +432,20 @@
              boolean flag = !player.getHeldItemMainhand().isEmpty() || !player.getHeldItemOffhand().isEmpty();
              boolean flag1 = player.isSneaking() && flag;
  

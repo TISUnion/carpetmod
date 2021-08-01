@@ -8,6 +8,8 @@
 
 感谢 [Lithium mod](https://github.com/jellysquid3/lithium-fabric) 提供的一些优化
 
+感谢 [World Edit mod](https://github.com/EngineHub/WorldEdit) 提供了如此强力的一个工具
+
 ## 开始使用:
 
 ------
@@ -19,6 +21,6 @@
 
 ## CarpetMod开发：
 
-------
-
 参照此处：https://github.com/gnembon/carpetmod/blob/master/README.md
+
+除此之外，你需要从 [此处](https://files.catbox.moe/wpe6a5.zip) 下载 TISCM_libs 并解压至工程文件夹中，因为部分库提供者已无法使用

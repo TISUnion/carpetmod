@@ -28,7 +28,7 @@
      protected final int lightValue;
      protected final float blockHardness;
      protected final float blockResistance;
-@@ -175,7 +182,11 @@
+@@ -175,21 +182,42 @@
      @Deprecated
      public MaterialColor getMaterialColor(IBlockState state, IBlockReader worldIn, BlockPos pos)
      {
@@ -41,8 +41,13 @@
      }
  
      @Deprecated
-@@ -183,13 +194,25 @@
+     public void updateNeighbors(IBlockState stateIn, IWorld worldIn, BlockPos pos, int flags)
      {
++        if (carpet.settings.CarpetSettings.totallyNoBlockUpdate)
++        {
++            return;
++        }
++
          try (BlockPos.PooledMutableBlockPos blockpos$pooledmutableblockpos = BlockPos.PooledMutableBlockPos.retain())
          {
 +            // TISCM Micro Timing logger
@@ -67,7 +72,7 @@
          }
      }
  
-@@ -621,6 +644,10 @@
+@@ -621,6 +649,10 @@
              double d2 = (double)(worldIn.rand.nextFloat() * 0.5F) + 0.25D;
              EntityItem entityitem = new EntityItem(worldIn, (double)pos.getX() + d0, (double)pos.getY() + d1, (double)pos.getZ() + d2, stack);
              entityitem.setDefaultPickupDelay();
@@ -78,7 +83,7 @@
              worldIn.spawnEntity(entityitem);
          }
      }
-@@ -1764,11 +1791,17 @@
+@@ -1764,11 +1796,17 @@
              private final IBlockState adjacentState;
              private final EnumFacing side;
  
@@ -96,7 +101,7 @@
              }
  
              public boolean equals(Object p_equals_1_)
-@@ -1790,7 +1823,8 @@
+@@ -1790,7 +1828,8 @@
  
              public int hashCode()
              {

@@ -1,0 +1,16 @@
+--- a/net/minecraft/command/arguments/EntitySelectorParser.java
++++ b/net/minecraft/command/arguments/EntitySelectorParser.java
+@@ -549,7 +549,12 @@
+         }
+ 
+         this.updateFilter();
+-        return this.build();
++
++        // TISCM setting the input text
++        EntitySelector resultSelector = this.build();
++        int currentCursor = this.reader.getCursor();
++        resultSelector.setInputText(this.reader.getString().substring(this.cursorStart, currentCursor));
++        return resultSelector;
+     }
+ 
+     private static void fillSelectorSuggestions(SuggestionsBuilder suggestionBuilder)

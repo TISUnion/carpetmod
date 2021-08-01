@@ -446,6 +446,21 @@ Options: `false`, `true`
 Categories: creative
 
 
+## transDimensionInvisibleFix
+
+Fixed player might become invisible after switching between dimensions
+
+Minecraft will make a `tickEntity` call in the previous world when changing the dimension of a player, which causes the player entity to be added in a chunk in the new player position in the previous world
+
+If the player returns to the previous dimension before that chunk gets unloaded, when that chunk gets unloaded, the player will be removed from the world, which causes the player becomes invisible and more wired stuffs
+
+Default: `false`
+
+Options: `false`, `true`
+
+Categories: bugfix
+
+
 ## YEET
 
 **Warn**: all yeet options will change vanilla behaviour, they WILL NOT behave like vanilla
@@ -645,6 +660,14 @@ When a bedrock is deleted by piston or sticky piston, the nearest player to the 
 
 The stat name is `break_bedrock` in `custom` catalogory
 
+## World Edit mod porting
+
+Ported world-edit 7.2.6-SNAPSHOT
+
+See rule [worldEdit](#worldEdit) for its in-game switch
+
+If you really don't want to use it, you can disable it completely by modifying the constant `MOD_WORLDEDIT` in class `TISCMConfig`
+
 ------
 
 # Fixes
@@ -694,4 +717,4 @@ There are also a few optimizations which is not from lithium mod:
 - Permanently store item burn times in `TileEntityFurnace` to avoid costly map generating each time
 - Cache some expensive tile entity serialization data
 
-If necessary, part of the optimization implementation can be switched manually in the `TISCMOptimizationConfig` class
+If necessary, part of the optimization implementation can be switched manually in the `TISCMConfig` class
