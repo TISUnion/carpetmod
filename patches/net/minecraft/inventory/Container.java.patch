@@ -15,7 +15,7 @@
  import net.minecraft.item.ItemStack;
  import net.minecraft.item.crafting.IRecipe;
  import net.minecraft.network.play.server.SPacketSetSlot;
-@@ -423,9 +425,23 @@
+@@ -423,9 +425,24 @@
  
              if (slot2 != null && slot2.getHasStack() && slot2.canTakeStack(player))
              {
@@ -26,6 +26,7 @@
 +                if (CarpetSettings.ctrlQCraftingFix && slotId == 0 && dragType == 1)
 +                {
 +                    Item craftedItem = slot2.getStack().getItem();
++
 +                    while (slot2.getHasStack() && slot2.getStack().getItem() == craftedItem)
 +                    {
 +                        this.slotClick(slotId, 0, ClickType.THROW, player);

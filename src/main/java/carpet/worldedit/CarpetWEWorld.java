@@ -371,7 +371,7 @@ public class CarpetWEWorld extends AbstractWorld {
     public void fixLighting(Iterable<BlockVector2> chunks) {
         World world = getWorld();
         for (BlockVector2 chunk : chunks) {
-            world.getChunk(chunk.getBlockX(), chunk.getBlockZ()).resetRelightChecks();
+            world.getChunk(chunk.getBlockX(), chunk.getBlockZ()).resetRelightChecks$worldEdit();
         }
     }
 

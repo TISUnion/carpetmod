@@ -613,7 +613,20 @@
          for (TileEntity tileentity : this.tileEntities.values())
          {
              tileentity.updateContainingBlockInfo();
-@@ -1190,7 +1422,7 @@
+@@ -1165,6 +1397,12 @@
+         this.queuedLightChecks = 0;
+     }
+ 
++    // copied method for worldedit
++    public void resetRelightChecks$worldEdit()
++    {
++        this.queuedLightChecks = 0;
++    }
++
+     public void enqueueRelightChecks()
+     {
+         if (this.queuedLightChecks < 4096)
+@@ -1190,7 +1428,7 @@
  
                      if (this.sections[j] == EMPTY_SECTION && flag || this.sections[j] != EMPTY_SECTION && this.sections[j].get(k, i1, l).isAir())
                      {
@@ -622,7 +635,7 @@
                          {
                              BlockPos blockpos2 = blockpos1.offset(enumfacing);
  
-@@ -1497,4 +1729,67 @@
+@@ -1497,4 +1735,67 @@
          QUEUED,
          CHECK;
      }
