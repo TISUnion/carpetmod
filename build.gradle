@@ -146,8 +146,8 @@ def projectMod = project(':' + settings.modname) {
     }
     dependencies {
         // Add extra dependencies here
-        compile 'com.sk89q.worldedit:worldedit-core:7.2.6-SNAPSHOT'
-        extraLibs ('com.sk89q.worldedit:worldedit-core:7.2.6-SNAPSHOT') {
+        compile 'com.sk89q.worldedit:worldedit-core:7.2.6'
+        extraLibs ('com.sk89q.worldedit:worldedit-core:7.2.6') {
             exclude group: 'com.ibm.icu'
             exclude group: 'org.antlr', module: 'antlr4'
             exclude group: 'org.mozilla'
