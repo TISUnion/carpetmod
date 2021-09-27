@@ -3,19 +3,16 @@
 @@ -1,5 +1,6 @@
  package net.minecraft.client.main;
  
-+import carpet.worldedit.CarpetWorldEdit;
++import carpet.worldedit.CarpetWorldEditAccess;
  import com.google.gson.Gson;
  import com.google.gson.GsonBuilder;
  import com.mojang.authlib.properties.PropertyMap;
-@@ -70,6 +71,12 @@
+@@ -70,6 +71,9 @@
              System.out.println("Completely ignored arguments: " + list);
          }
  
 +        // CM worldedit
-+        if (CarpetWorldEdit.isEnabled())
-+        {
-+            CarpetWorldEdit.inst.onInitialize();
-+        }
++        CarpetWorldEditAccess.onInitialize();
 +
          String s = func_206236_a(optionset, optionspec5);
          Proxy proxy = Proxy.NO_PROXY;

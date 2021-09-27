@@ -95,7 +95,7 @@ public class CarpetSettings
         }
         public String description()
         {
-            return "You must set `TISCMConfig.MOD_WORLDEDIT` to true during mod compiling to enable world edit";
+            return "You must set `TISCMConfig.MOD_WORLDEDIT` to true during mod compiling and have worldedit classes included in .jar to enable world edit";
         }
     }
 

@@ -55,7 +55,7 @@ class CarpetWEPlatform extends AbstractPlatform implements MultiUserPlatform {
 
         this.watchdog = CarpetWorldEdit.LIFECYCLED_SERVER.map(
             server -> server instanceof DedicatedServer
-                ? Optional.of((Watchdog) server)
+                ? Optional.of(new CarpetWEWatchDog(server))
                 : Optional.empty()
         );
     }

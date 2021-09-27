@@ -75,6 +75,8 @@ def projectClean = project(':clean') {
     }
 }
 
+def worldEditEnabled = System.getenv("worldedit") != "false"
+
 
 def projectMod = project(':' + settings.modname) {
     evaluationDependsOn(':clean')
@@ -117,7 +119,7 @@ def projectMod = project(':' + settings.modname) {
         maxFuzz 3
     }
     configurations {
-        extraLibs
+        worldEditLibs
         all {
             resolutionStrategy {
                 // force world edit to use the same log4j as minecraft 1.13.2
@@ -131,23 +133,25 @@ def projectMod = project(':' + settings.modname) {
             def vanillaLibs = []
             projectClean.configurations.runtimeClasspath.each {f ->
                 vanillaLibs.add(f.name)
-//                println 'vanilla lib: ' + f.name
             }
             def moddedLibs = []
-            configurations.extraLibs.each {f ->
-                if (!vanillaLibs.contains(f.name)) {
-//                    println 'Added extra lib: ' + f.name
-                    moddedLibs.add(zipTree(f))
+            if (worldEditEnabled) {
+                configurations.worldEditLibs.each { f ->
+                    if (!vanillaLibs.contains(f.name)) {
+                        moddedLibs.add(zipTree(f))
+                    }
                 }
             }
-//            println 'Total extra libs: ' + moddedLibs.size()
+            else {
+                println "Worldedit is disabled by environment variable"
+            }
             return moddedLibs
         }
     }
     dependencies {
         // Add extra dependencies here
         compile 'com.sk89q.worldedit:worldedit-core:7.2.6'
-        extraLibs ('com.sk89q.worldedit:worldedit-core:7.2.6') {
+        worldEditLibs ('com.sk89q.worldedit:worldedit-core:7.2.6') {
             exclude group: 'com.ibm.icu'
             exclude group: 'org.antlr', module: 'antlr4'
             exclude group: 'org.mozilla'
@@ -582,15 +586,17 @@ for (def dist : ['Client', 'Server']) {
         }
 
         // json registry and lang file in world edit
-        projectMod.configurations.extraLibs.each {file ->
-            from(zipTree(file)) {
-                eachFile { moddedFile ->
-                    def entryName = moddedFile.getRelativePath().toString()
-                    if (!(
-                            entryName.matches('com/sk89q/worldedit/world/registry/.*\\.json') ||
-                            file.name.startsWith('worldedit') && entryName.startsWith('lang/')
-                    ))
-                        moddedFile.exclude()
+        if (worldEditEnabled) {
+            projectMod.configurations.worldEditLibs.each { file ->
+                from(zipTree(file)) {
+                    eachFile { moddedFile ->
+                        def entryName = moddedFile.getRelativePath().toString()
+                        if (!(
+                                entryName.matches('com/sk89q/worldedit/world/registry/.*\\.json') ||
+                                        file.name.startsWith('worldedit') && entryName.startsWith('lang/')
+                        ))
+                            moddedFile.exclude()
+                    }
                 }
             }
         }

@@ -21,7 +21,6 @@ package carpet.worldedit;
 
 import carpet.settings.CarpetSettings;
 import carpet.settings.SettingsManager;
-import carpet.utils.TISCMConfig;
 import com.mojang.brigadier.CommandDispatcher;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -82,7 +81,7 @@ public class CarpetWorldEdit
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     public static final String MOD_ID = "worldedit";
-    public static final String VERSION = "7.2.6-SNAPSHOT";
+    public static final String VERSION = "7.2.6";
 
     public static final String CUI_PLUGIN_CHANNEL = "cui";
     public static final ResourceLocation CUI_IDENTIFIER = new ResourceLocation(CarpetWorldEdit.MOD_ID, CarpetWorldEdit.CUI_PLUGIN_CHANNEL);
@@ -97,13 +96,8 @@ public class CarpetWorldEdit
     private CarpetWEConfiguration config;
     private Path workingDir;
 
-    public static boolean isEnabled() {
-        // carpet rule worldEdit is more like a permission lock
-        return TISCMConfig.MOD_WORLDEDIT;
-    }
-
     public static boolean canPlayerUseWorldEdit(CommandSource source) {
-        return isEnabled() && SettingsManager.canUseCommand(source, CarpetSettings.worldEdit);
+        return SettingsManager.canUseCommand(source, CarpetSettings.worldEdit);
     }
 
     public static boolean canPlayerUseWorldEdit(EntityPlayer playerMP) {
@@ -116,7 +110,7 @@ public class CarpetWorldEdit
      * ---------------
      */
 
-    public void onInitialize() {
+    void onInitialize() {
         // Setup working directory
         workingDir = Paths.get("config/worldedit");
         if (!Files.exists(workingDir)) {
@@ -137,7 +131,7 @@ public class CarpetWorldEdit
     }
 
     // fabric-api: ServerLifecycleEvents.SERVER_STARTING
-    public void onStartingServer(MinecraftServer minecraftServer) {
+    void onStartingServer(MinecraftServer minecraftServer) {
         final Path delChunks = workingDir.resolve(DELCHUNKS_FILE_NAME);
         if (Files.exists(delChunks)) {
             ChunkDeleter.runFromFile(delChunks, true);
@@ -145,7 +139,7 @@ public class CarpetWorldEdit
     }
 
     // fabric-api: ServerLifecycleEvents.SERVER_STARTED
-    public void onStartServer(MinecraftServer minecraftServer) {
+    void onStartServer(MinecraftServer minecraftServer) {
         LIFECYCLED_SERVER.newValue(minecraftServer);
 
         setupRegistries(minecraftServer);
@@ -155,7 +149,7 @@ public class CarpetWorldEdit
     }
 
     // fabric-api: ServerLifecycleEvents.SERVER_STOPPING
-    public void onStopServer(MinecraftServer minecraftServer) {
+    void onStopServer(MinecraftServer minecraftServer) {
         LIFECYCLED_SERVER.invalidate();
 
         WorldEdit worldEdit = WorldEdit.getInstance();
@@ -164,19 +158,19 @@ public class CarpetWorldEdit
     }
 
     // fabric-api: ServerLifecycleEvents.END_SERVER_TICK
-    public void onEndServerTick(MinecraftServer minecraftServer)
+    void onEndServerTick(MinecraftServer minecraftServer)
     {
         ThreadSafeCache.getInstance().onEndTick(minecraftServer);
     }
 
     // TODO Pass empty left click to server
     // fabric-api: ServerPlayConnectionEvents.DISCONNECT
-    public void onPlayerDisconnect(EntityPlayerMP player) {
+    void onPlayerDisconnect(EntityPlayerMP player) {
         WorldEdit.getInstance().getEventBus().post(new SessionIdleEvent(new CarpetWEPlayer.SessionKeyImpl(player)));
     }
 
     // fabric-api: AttackBlockCallback.EVENT
-    public EnumActionResult onLeftClickBlock(EntityPlayer playerEntity, World world, EnumHand hand, BlockPos blockPos, EnumFacing direction) {
+    EnumActionResult onLeftClickBlock(EntityPlayer playerEntity, World world, EnumHand hand, BlockPos blockPos, EnumFacing direction) {
         if (!canPlayerUseWorldEdit(playerEntity) || shouldSkip() || hand == EnumHand.OFF_HAND || world.isRemote) {
             return EnumActionResult.PASS;
         }
@@ -203,7 +197,7 @@ public class CarpetWorldEdit
     }
 
     // fabric-api: UseBlockCallback.EVENT
-    public EnumActionResult onRightClickBlock(EntityPlayer playerEntity, World world, EnumHand hand, EnumFacing facing, BlockPos blockPos) {
+    EnumActionResult onRightClickBlock(EntityPlayer playerEntity, World world, EnumHand hand, EnumFacing facing, BlockPos blockPos) {
         if (!canPlayerUseWorldEdit(playerEntity) || shouldSkip() || hand == EnumHand.OFF_HAND || world.isRemote) {
             return EnumActionResult.PASS;
         }
@@ -226,7 +220,7 @@ public class CarpetWorldEdit
     }
 
     // fabric-api: UseItemCallback.EVENT
-    public ActionResult<ItemStack> onRightClickAir(EntityPlayer playerEntity, World world, EnumHand hand) {
+    ActionResult<ItemStack> onRightClickAir(EntityPlayer playerEntity, World world, EnumHand hand) {
         ItemStack stackInHand = playerEntity.getHeldItem(hand);
         if (!canPlayerUseWorldEdit(playerEntity) || shouldSkip() || hand == EnumHand.OFF_HAND || world.isRemote) {
             return new ActionResult<>(EnumActionResult.PASS, stackInHand);
@@ -243,7 +237,7 @@ public class CarpetWorldEdit
     }
 
     // fabric-api: CommandRegistrationCallback.EVENT
-    public void registerCommands(CommandDispatcher<CommandSource> dispatcher) {
+    void registerCommands(CommandDispatcher<CommandSource> dispatcher) {
         WorldEdit.getInstance().getEventBus().post(new PlatformsRegisteredEvent());
         PlatformManager manager = WorldEdit.getInstance().getPlatformManager();
         Platform commandsPlatform = manager.queryCapability(Capability.USER_COMMANDS);
@@ -265,7 +259,7 @@ public class CarpetWorldEdit
         }
     }
 
-    public void onCuiPacket(PacketBuffer buf, EntityPlayerMP player) {
+    void onCuiPacket(PacketBuffer buf, EntityPlayerMP player) {
         LocalSession session = CarpetWorldEdit.inst.getSession(player);
         String text = buf.toString(StandardCharsets.UTF_8);
         CarpetWEPlayer actor = CarpetWEAdapter.adaptPlayer(player);

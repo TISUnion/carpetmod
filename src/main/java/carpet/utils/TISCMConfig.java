@@ -26,5 +26,18 @@ public class TISCMConfig
 
 	// ========== Mods ==========
 	// https://github.com/EngineHub/WorldEdit
-	public static final boolean MOD_WORLDEDIT = true;
+	public static final boolean MOD_WORLDEDIT = true && worldEditExists();
+
+	private static boolean worldEditExists()
+	{
+		try
+		{
+			Class.forName("com.sk89q.worldedit.WorldEdit");
+			return true;
+		}
+		catch (ClassNotFoundException e)
+		{
+			return false;
+		}
+	}
 }

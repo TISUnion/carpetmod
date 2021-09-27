@@ -62,6 +62,8 @@ jobs:
         sed -i "s/MOD_WORLDEDIT = true/MOD_WORLDEDIT = false/g" src/main/java/carpet/utils/TISCMConfig.java
     - name: Create Release
       run: ./gradlew createRelease
+      env:
+        worldedit: '{{matrix.worldedit}}'
 
     - name: Create Installers
       run: |

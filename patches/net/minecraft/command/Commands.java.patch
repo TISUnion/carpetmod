@@ -4,7 +4,7 @@
  package net.minecraft.command;
  
 +import carpet.settings.CarpetSettings;
-+import carpet.worldedit.CarpetWorldEdit;
++import carpet.worldedit.CarpetWorldEditAccess;
  import com.google.common.collect.Maps;
  import com.google.common.io.Files;
  import com.google.gson.GsonBuilder;
@@ -17,22 +17,19 @@
  public class Commands
  {
      private static final Logger LOGGER = LogManager.getLogger();
-@@ -169,7 +173,14 @@
+@@ -169,7 +173,11 @@
              StopCommand.register(this.dispatcher);
              WhitelistCommand.register(this.dispatcher);
          }
 +        CarpetServer.registerCarpetCommands(this.dispatcher);
  
 +        // CM worldedit
-+        if (CarpetWorldEdit.isEnabled())
-+        {
-+            CarpetWorldEdit.inst.registerCommands(dispatcher);
-+        }
++        CarpetWorldEditAccess.registerCommands(dispatcher);
 +
          this.dispatcher.findAmbiguities((p_201302_1_, p_201302_2_, p_201302_3_, p_201302_4_) ->
          {
              LOGGER.warn("Ambiguity between arguments {} and {} with inputs: {}", this.dispatcher.getPath(p_201302_2_), this.dispatcher.getPath(p_201302_3_), p_201302_4_);
-@@ -250,7 +261,7 @@
+@@ -250,7 +258,7 @@
                  TextComponentString textcomponentstring = new TextComponentString(exception.getMessage() == null ? exception.getClass().getName() : exception.getMessage());
                  ITextComponent itextcomponent = textcomponentstring;
  
@@ -41,7 +38,7 @@
                  {
                      StackTraceElement[] astacktraceelement = exception.getStackTrace();
  
-@@ -259,6 +270,10 @@
+@@ -259,6 +267,10 @@
                          itextcomponent.appendText("\n\n").appendText(astacktraceelement[j].getMethodName()).appendText("\n ").appendText(astacktraceelement[j].getFileName()).appendText(":").appendText(String.valueOf(astacktraceelement[j].getLineNumber()));
                      }
                  }
