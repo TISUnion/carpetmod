@@ -63,7 +63,7 @@ jobs:
     - name: Create Release
       run: ./gradlew createRelease
       env:
-        worldedit: '{{matrix.worldedit}}'
+        worldedit: '${{matrix.worldedit}}'
 
     - name: Create Installers
       run: |
@@ -74,5 +74,5 @@ jobs:
 
     - uses: actions/upload-artifact@v2
       with:
-        name: '[${{ matrix.name }}] TISCarpet installers for ${{ github.sha }}'
+        name: '[${{matrix.name}}] TISCarpet installers for ${{github.sha}}'
         path: installer/carpet_package_*
