@@ -5,6 +5,7 @@ import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.ITextComponent;
@@ -77,6 +78,10 @@ public class Messenger
         if (style.indexOf('v')>=0) comp.getStyle().setColor(TextFormatting.DARK_BLUE);
         if (style.indexOf('k')>=0) comp.getStyle().setColor(TextFormatting.BLACK);
         return comp;
+    }
+    public static Style parseStyle(String style)
+    {
+        return _applyStyleToTextComponent(s(""), style).getStyle();
     }
     public static String heatmap_color(double actual, double reference)
     {

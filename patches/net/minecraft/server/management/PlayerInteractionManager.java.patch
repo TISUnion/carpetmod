@@ -1,15 +1,16 @@
 --- a/net/minecraft/server/management/PlayerInteractionManager.java
 +++ b/net/minecraft/server/management/PlayerInteractionManager.java
-@@ -1,5 +1,8 @@
+@@ -1,5 +1,9 @@
  package net.minecraft.server.management;
  
 +import carpet.CarpetServer;
 +import carpet.helpers.BlockRotator;
++import carpet.logging.microtiming.MicroTimingLoggerManager;
 +import carpet.worldedit.CarpetWorldEditAccess;
  import net.minecraft.block.Block;
  import net.minecraft.block.BlockChest;
  import net.minecraft.block.BlockCommandBlock;
-@@ -241,6 +244,12 @@
+@@ -241,6 +245,12 @@
          {
              iblockstate.getBlock().onPlayerDestroy(this.world, pos, iblockstate);
          }
@@ -22,7 +23,7 @@
  
          return flag;
      }
-@@ -312,6 +321,14 @@
+@@ -312,6 +322,14 @@
  
      public EnumActionResult processRightClick(EntityPlayer player, World worldIn, ItemStack stack, EnumHand hand)
      {
@@ -37,7 +38,7 @@
          if (this.gameType == GameType.SPECTATOR)
          {
              return EnumActionResult.PASS;
-@@ -366,6 +383,14 @@
+@@ -366,6 +384,14 @@
  
      public EnumActionResult processRightClickBlock(EntityPlayer player, World worldIn, ItemStack stack, EnumHand hand, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ)
      {
@@ -52,7 +53,7 @@
          IBlockState iblockstate = worldIn.getBlockState(pos);
  
          if (this.gameType == GameType.SPECTATOR)
-@@ -401,11 +426,20 @@
+@@ -401,11 +427,27 @@
              boolean flag = !player.getHeldItemMainhand().isEmpty() || !player.getHeldItemOffhand().isEmpty();
              boolean flag1 = player.isSneaking() && flag;
  
@@ -66,6 +67,13 @@
 +                {
 +                    return EnumActionResult.PASS;
 +                }
++
++                // TISCM Micro Timing logger
++                if (MicroTimingLoggerManager.onPlayerRightClick(player, hand, pos))
++                {
++                    return EnumActionResult.SUCCESS;
++                }
++
 +                if (iblockstate.onBlockActivated(worldIn, pos, player, hand, facing, hitX, hitY, hitZ))
 +                {
 +                    return EnumActionResult.SUCCESS;

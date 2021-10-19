@@ -70,6 +70,8 @@ public class CarpetServerNetworkHandler
         DataBuilder data = DataBuilder.create().withTickRate();
         SettingsManager.getRules().forEach(data::withRule);
         playerEntity.connection.sendPacket(new SPacketCustomPayload(CarpetClient.CARPET_CHANNEL, data.build()));
+
+        CarpetServer.onCarpetClientHello(playerEntity);
     }
 
     private static void handleClientCommand(EntityPlayerMP player, NBTTagCompound commandData)

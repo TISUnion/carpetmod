@@ -6,17 +6,27 @@ import carpet.logging.microtiming.enums.BlockUpdateType;
 import carpet.logging.microtiming.enums.EventType;
 import carpet.logging.microtiming.enums.TickStage;
 import carpet.logging.microtiming.events.*;
+import carpet.logging.microtiming.marker.MicroTimingMarkerManager;
 import carpet.logging.microtiming.tickstages.TickStageExtraBase;
 import carpet.logging.microtiming.utils.MicroTimingUtil;
 import carpet.settings.CarpetSettings;
+import carpet.utils.Translator;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEventData;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Items;
 import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemDye;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.NextTickListEntry;
 import net.minecraft.world.TickPriority;
 import net.minecraft.world.World;
@@ -31,9 +41,9 @@ import java.util.function.Supplier;
 public class MicroTimingLoggerManager
 {
     private static MicroTimingLoggerManager instance;
+    public static final Translator TRANSLATOR = (new MicroTimingLogger(null)).getTranslator();
 
     private final Map<WorldServer, MicroTimingLogger> loggers = new Reference2ObjectArrayMap<>();
-    private final MicroTimingLogger dummyLoggerForTranslate = new MicroTimingLogger(null);
     private long lastFlushTime;
 
     public MicroTimingLoggerManager(MinecraftServer minecraftServer)
@@ -83,17 +93,17 @@ public class MicroTimingLoggerManager
 
     public static String tr(String key, String text, boolean autoFormat)
     {
-        return instance.dummyLoggerForTranslate.tr(key, text, autoFormat);
+        return TRANSLATOR.tr(key, text, autoFormat);
     }
 
     public static String tr(String key, String text)
     {
-        return instance.dummyLoggerForTranslate.tr(key, text);
+        return TRANSLATOR.tr(key, text);
     }
 
     public static String tr(String key)
     {
-        return instance.dummyLoggerForTranslate.tr(key);
+        return TRANSLATOR.tr(key);
     }
 
     /*
@@ -258,5 +268,44 @@ public class MicroTimingLoggerManager
     public static Optional<TickStage> getTickStage(World world)
     {
         return getWorldLogger(world).map(MicroTimingLogger::getTickStage);
+    }
+
+    /*
+     * ----------------
+     *   Marker Logic
+     * ----------------
+     */
+
+    public static boolean onPlayerRightClick(EntityPlayer playerEntity, EnumHand hand, BlockPos blockPos)
+    {
+        if (MicroTimingUtil.isMarkerEnabled() && playerEntity instanceof EntityPlayerMP && hand == EnumHand.MAIN_HAND && MicroTimingUtil.isPlayerSubscribed(playerEntity))
+        {
+            ItemStack itemStack = playerEntity.getHeldItemMainhand();
+            Item holdingItem = itemStack.getItem();
+            if (holdingItem instanceof ItemDye)
+            {
+                ITextComponent name = null;
+                if (itemStack.hasDisplayName())
+                {
+                    name = itemStack.getDisplayName();
+                }
+                // server-side check will be in addMarker
+                MicroTimingMarkerManager.getInstance().addMarker(playerEntity, blockPos, ((ItemDye)holdingItem).getDyeColor(), name);
+                return true;
+            }
+            if (holdingItem == Items.SLIME_BALL)
+            {
+                return MicroTimingMarkerManager.getInstance().tweakMarkerMobility(playerEntity, blockPos);
+            }
+        }
+        return false;
+    }
+
+    public static void moveMarker(World world, BlockPos blockPos, EnumFacing direction)
+    {
+        if (MicroTimingUtil.isMarkerEnabled())
+        {
+            MicroTimingMarkerManager.getInstance().moveMarker(world, blockPos, direction);
+        }
     }
 }

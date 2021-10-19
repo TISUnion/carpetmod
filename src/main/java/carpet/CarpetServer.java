@@ -6,6 +6,8 @@ import carpet.commands.lifetime.LifeTimeTracker;
 import carpet.helpers.TickSpeed;
 import carpet.logging.LoggerRegistry;
 import carpet.logging.microtiming.MicroTimingLoggerManager;
+import carpet.logging.microtiming.marker.MicroTimingMarkerManager;
+import carpet.logging.microtiming.utils.MicroTimingStandardCarpetLogger;
 import carpet.network.CarpetServerNetworkHandler;
 import carpet.script.CarpetScriptServer;
 import carpet.settings.CarpetSettings;
@@ -45,6 +47,7 @@ public class CarpetServer // static for now - easier to handle all around the co
 
         MicroTimingLoggerManager.attachServer(server);
         LifeTimeTracker.attachServer(server);
+        MicroTimingMarkerManager.getInstance().clear();
     }
     // Separate from onServerLoaded, because a server can be loaded multiple times in singleplayer
     public static void onGameStarted() {
@@ -65,6 +68,8 @@ public class CarpetServer // static for now - easier to handle all around the co
         scriptServer.events.tick(); // in 1.14 make sure its called in the aftertick
         //in case something happens
         CarpetSettings.impendingFillSkipUpdates = false;
+
+        MicroTimingMarkerManager.getInstance().tick();
     }
 
     public static void registerCarpetCommands(CommandDispatcher<CommandSource> dispatcher)
@@ -104,6 +109,11 @@ public class CarpetServer // static for now - easier to handle all around the co
     {
         CarpetServerNetworkHandler.onPlayerJoin(player);
         LoggerRegistry.playerConnected(player);
+    }
+
+    public static void onCarpetClientHello(EntityPlayerMP player)
+    {
+        MicroTimingStandardCarpetLogger.getInstance().onCarpetClientHello(player);
     }
 }
 

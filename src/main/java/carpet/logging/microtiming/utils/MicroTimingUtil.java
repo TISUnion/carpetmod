@@ -1,7 +1,12 @@
 package carpet.logging.microtiming.utils;
 
+import carpet.CarpetServer;
+import carpet.logging.LoggerRegistry;
+import carpet.logging.microtiming.MicroTimingLogger;
 import carpet.logging.microtiming.MicroTimingLoggerManager;
 import carpet.logging.microtiming.enums.MicroTimingTarget;
+import carpet.logging.microtiming.marker.MicroTimingMarkerManager;
+import carpet.logging.microtiming.marker.MicroTimingMarkerType;
 import carpet.settings.CarpetSettings;
 import carpet.utils.Messenger;
 import carpet.utils.TextUtil;
@@ -9,6 +14,8 @@ import carpet.utils.WoolTool;
 import com.google.common.collect.Maps;
 import net.minecraft.block.*;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.state.properties.AttachFace;
@@ -19,8 +26,11 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class MicroTimingUtil
 {
@@ -177,7 +187,7 @@ public class MicroTimingUtil
 				}
 			}
 		}
-		return Optional.empty();
+		return MicroTimingMarkerManager.getInstance().getColor(world, pos, MicroTimingMarkerType.END_ROD);
 	}
 
 	public static Optional<EnumDyeColor> getWoolOrEndRodWoolColor(World world, BlockPos pos)
@@ -187,25 +197,32 @@ public class MicroTimingUtil
 		{
 			optionalDyeColor = getEndRodWoolColor(world, pos);
 		}
+		boolean usingFallbackColor = false;
 		if (!optionalDyeColor.isPresent())
 		{
-			boolean useBackup;
 			switch (CarpetSettings.microTimingTarget)
 			{
 				case IN_RANGE:
-					useBackup = world.getClosestPlayer(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, MicroTimingTarget.IN_RANGE_RADIUS, player -> true) != null;
+					usingFallbackColor = world.getClosestPlayer(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, MicroTimingTarget.IN_RANGE_RADIUS, player -> true) != null;
 					break;
 				case ALL:
-					useBackup = true;
+					usingFallbackColor = true;
 					break;
 				case LABELLED:
 				default:
-					useBackup = false;
 					break;
 			}
-			if (useBackup)
+			if (usingFallbackColor)
 			{
 				optionalDyeColor = Optional.of(EnumDyeColor.LIGHT_GRAY);
+			}
+		}
+		if (!optionalDyeColor.isPresent() || usingFallbackColor)
+		{
+			Optional<EnumDyeColor> markerColor = MicroTimingMarkerManager.getInstance().getColor(world, pos, MicroTimingMarkerType.REGULAR);
+			if (markerColor.isPresent())
+			{
+				optionalDyeColor = markerColor;
 			}
 		}
 		return optionalDyeColor;
@@ -217,5 +234,25 @@ public class MicroTimingUtil
 		String translatedName = MicroTimingLoggerManager.tr("direction." + name, name);
 		char sign = direction.getAxisDirection().getOffset() > 0 ? '+' : '-';
 		return String.format("%s (%c%s)", translatedName, sign, direction.getAxis());
+	}
+
+	public static boolean isMarkerEnabled()
+	{
+		return MicroTimingLoggerManager.isLoggerActivated() && CarpetSettings.microTimingDyeMarker.equals("true");
+	}
+
+	public static boolean isPlayerSubscribed(EntityPlayer playerEntity)
+	{
+		Map<String, String> map = LoggerRegistry.getPlayerSubscriptions(playerEntity.getName().getString());
+		return map != null && map.containsKey(MicroTimingLogger.NAME);
+	}
+
+	public static List<EntityPlayerMP> getSubscribedPlayers()
+	{
+		return CarpetServer.minecraft_server == null ?
+				Collections.emptyList() :
+				CarpetServer.minecraft_server.getPlayerList().getPlayers().stream().
+						filter(MicroTimingUtil::isPlayerSubscribed).
+						collect(Collectors.toList());
 	}
 }

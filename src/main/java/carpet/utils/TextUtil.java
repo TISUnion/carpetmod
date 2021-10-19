@@ -10,6 +10,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.event.ClickEvent;
@@ -90,6 +91,11 @@ public class TextUtil
 		}
 		String uuid = entity.getUniqueID().toString();
 		return String.format("/tp %s", uuid);
+	}
+
+	public static Style parseCarpetStyle(String style)
+	{
+		return Messenger.parseStyle(style);
 	}
 
 	public static ITextComponent getFancyText(String style, ITextComponent displayText, ITextComponent hoverText, ClickEvent clickEvent)
