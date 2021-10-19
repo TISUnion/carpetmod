@@ -1,8 +1,8 @@
 package carpet.logging.logHelpers;
 
 import carpet.logging.LoggerRegistry;
-import carpet.microtiming.MicroTimingLoggerManager;
-import carpet.microtiming.enums.TickStage;
+import carpet.logging.microtiming.MicroTimingLoggerManager;
+import carpet.logging.microtiming.enums.TickStage;
 import carpet.utils.TextUtil;
 import carpet.utils.Messenger;
 import net.minecraft.util.text.ITextComponent;

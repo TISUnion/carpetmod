@@ -5,7 +5,7 @@ import carpet.commands.lifetime.LifeTimeCommand;
 import carpet.commands.lifetime.LifeTimeTracker;
 import carpet.helpers.TickSpeed;
 import carpet.logging.LoggerRegistry;
-import carpet.microtiming.MicroTimingLoggerManager;
+import carpet.logging.microtiming.MicroTimingLoggerManager;
 import carpet.network.CarpetServerNetworkHandler;
 import carpet.script.CarpetScriptServer;
 import carpet.settings.CarpetSettings;

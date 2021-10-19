@@ -5,8 +5,8 @@
  
 +import carpet.CarpetServer;
 +import carpet.helpers.TickSpeed;
-+import carpet.microtiming.MicroTimingLoggerManager;
-+import carpet.microtiming.tickstages.PlayerEntityTickStageExtra;
++import carpet.logging.microtiming.MicroTimingLoggerManager;
++import carpet.logging.microtiming.tickstages.PlayerEntityTickStageExtra;
 +import carpet.network.CarpetClient;
 +import carpet.network.CarpetServerNetworkHandler;
 +import carpet.settings.CarpetSettings;

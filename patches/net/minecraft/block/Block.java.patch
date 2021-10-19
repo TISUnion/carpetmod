@@ -4,9 +4,9 @@
  package net.minecraft.block;
  
 +import carpet.commands.lifetime.spawning.LiteralSpawningReason;
-+import carpet.microtiming.MicroTimingLoggerManager;
-+import carpet.microtiming.enums.BlockUpdateType;
-+import carpet.microtiming.enums.EventType;
++import carpet.logging.microtiming.MicroTimingLoggerManager;
++import carpet.logging.microtiming.enums.BlockUpdateType;
++import carpet.logging.microtiming.enums.EventType;
  import it.unimi.dsi.fastutil.objects.Object2ByteLinkedOpenHashMap;
  import java.util.List;
  import java.util.Objects;

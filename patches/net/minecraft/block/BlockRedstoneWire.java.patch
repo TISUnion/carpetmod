@@ -4,8 +4,8 @@
  package net.minecraft.block;
  
 +import carpet.helpers.RedstoneWireTurbo;
-+import carpet.microtiming.MicroTimingLoggerManager;
-+import carpet.microtiming.enums.EventType;
++import carpet.logging.microtiming.MicroTimingLoggerManager;
++import carpet.logging.microtiming.enums.EventType;
 +import carpet.settings.CarpetSettings;
  import com.google.common.collect.ImmutableMap;
  import com.google.common.collect.Lists;

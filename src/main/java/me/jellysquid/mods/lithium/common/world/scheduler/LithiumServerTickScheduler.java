@@ -1,7 +1,7 @@
 package me.jellysquid.mods.lithium.common.world.scheduler;
 
-import carpet.microtiming.MicroTimingLoggerManager;
-import carpet.microtiming.tickstages.TileTickTickStageExtra;
+import carpet.logging.microtiming.MicroTimingLoggerManager;
+import carpet.logging.microtiming.tickstages.TileTickTickStageExtra;
 import carpet.settings.CarpetSettings;
 import it.unimi.dsi.fastutil.longs.Long2ObjectAVLTreeMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;

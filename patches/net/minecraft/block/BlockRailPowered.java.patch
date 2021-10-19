@@ -3,8 +3,8 @@
 @@ -1,5 +1,8 @@
  package net.minecraft.block;
  
-+import carpet.microtiming.MicroTimingLoggerManager;
-+import carpet.microtiming.enums.EventType;
++import carpet.logging.microtiming.MicroTimingLoggerManager;
++import carpet.logging.microtiming.enums.EventType;
 +import carpet.settings.CarpetSettings;
  import net.minecraft.block.state.IBlockState;
  import net.minecraft.state.BooleanProperty;

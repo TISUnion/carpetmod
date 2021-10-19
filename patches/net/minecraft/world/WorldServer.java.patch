@@ -5,12 +5,12 @@
  
 +import carpet.commands.lifetime.LifeTimeWorldTracker;
 +import carpet.helpers.TickSpeed;
-+import carpet.microtiming.MicroTimingLogger;
-+import carpet.microtiming.MicroTimingLoggerManager;
-+import carpet.microtiming.enums.EventType;
-+import carpet.microtiming.enums.TickStage;
-+import carpet.microtiming.events.ExecuteBlockEventEvent;
-+import carpet.microtiming.tickstages.BlockEventTickStageExtra;
++import carpet.logging.microtiming.MicroTimingLogger;
++import carpet.logging.microtiming.MicroTimingLoggerManager;
++import carpet.logging.microtiming.enums.EventType;
++import carpet.logging.microtiming.enums.TickStage;
++import carpet.logging.microtiming.events.ExecuteBlockEventEvent;
++import carpet.logging.microtiming.tickstages.BlockEventTickStageExtra;
 +import carpet.settings.CarpetSettings;
 +import carpet.utils.CarpetProfiler;
 +import carpet.utils.TISCMConfig;

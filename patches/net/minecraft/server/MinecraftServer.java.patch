@@ -7,9 +7,9 @@
 +import carpet.commands.EpsCommand;
 +import carpet.helpers.UpdateSuppressionException;
 +import carpet.helpers.TickSpeed;
-+import carpet.microtiming.MicroTimingLoggerManager;
-+import carpet.microtiming.enums.TickStage;
-+import carpet.microtiming.tickstages.LiteralTickStageExtra;
++import carpet.logging.microtiming.MicroTimingLoggerManager;
++import carpet.logging.microtiming.enums.TickStage;
++import carpet.logging.microtiming.tickstages.LiteralTickStageExtra;
 +import carpet.settings.CarpetSettings;
 +import carpet.utils.CarpetProfiler;
 +import carpet.utils.Messenger;

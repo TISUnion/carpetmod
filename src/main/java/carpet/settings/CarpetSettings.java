@@ -1,7 +1,7 @@
 package carpet.settings;
 
 import carpet.CarpetServer;
-import carpet.microtiming.enums.MicroTimingTarget;
+import carpet.logging.microtiming.enums.MicroTimingTarget;
 import carpet.utils.Messenger;
 import carpet.utils.TISCMConfig;
 import carpet.utils.Translations;

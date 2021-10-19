@@ -5,13 +5,13 @@
  
 +import carpet.helpers.TickSpeed;
 +import carpet.helpers.UpdateSuppressionException;
-+import carpet.microtiming.MicroTimingLoggerManager;
-+import carpet.microtiming.enums.EventType;
-+import carpet.microtiming.enums.BlockUpdateType;
-+import carpet.microtiming.enums.TickStage;
-+import carpet.microtiming.tickstages.EntityTickStageExtra;
-+import carpet.microtiming.tickstages.LiteralTickStageExtra;
-+import carpet.microtiming.tickstages.TileEntityTickStageExtra;
++import carpet.logging.microtiming.MicroTimingLoggerManager;
++import carpet.logging.microtiming.enums.EventType;
++import carpet.logging.microtiming.enums.BlockUpdateType;
++import carpet.logging.microtiming.enums.TickStage;
++import carpet.logging.microtiming.tickstages.EntityTickStageExtra;
++import carpet.logging.microtiming.tickstages.LiteralTickStageExtra;
++import carpet.logging.microtiming.tickstages.TileEntityTickStageExtra;
 +import carpet.settings.CarpetSettings;
 +import carpet.utils.CarpetProfiler;
 +import carpet.utils.LightingEngine;
