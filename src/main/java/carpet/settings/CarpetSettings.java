@@ -53,6 +53,12 @@ public class CarpetSettings
     //New features added at TISCarpet goes here for easier reading please
 
     @Rule(
+            desc = "Enables /chunkRegen for regenerating chunks",
+            category = COMMAND
+    )
+    public static String commandChunkRegen = "false";
+
+    @Rule(
             desc = "Enables /epsTest for performance tests",
             category = COMMAND
     )

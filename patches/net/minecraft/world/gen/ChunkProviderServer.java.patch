@@ -1,14 +1,15 @@
 --- a/net/minecraft/world/gen/ChunkProviderServer.java
 +++ b/net/minecraft/world/gen/ChunkProviderServer.java
-@@ -1,5 +1,7 @@
+@@ -1,5 +1,8 @@
  package net.minecraft.world.gen;
  
++import carpet.commands.ChunkRegenCommand;
 +import carpet.helpers.BedrockBreakingStatHelper;
 +import carpet.settings.CarpetSettings;
  import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
  import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
  import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
-@@ -9,6 +11,7 @@
+@@ -9,6 +12,7 @@
  import java.util.Iterator;
  import java.util.List;
  import java.util.concurrent.CompletableFuture;
@@ -16,7 +17,7 @@
  import java.util.function.BooleanSupplier;
  import java.util.function.Consumer;
  import javax.annotation.Nullable;
-@@ -42,6 +45,7 @@
+@@ -42,6 +46,7 @@
      private final IChunkLoader chunkLoader;
      private final Long2ObjectMap<Chunk> loadedChunks = Long2ObjectMaps.synchronize(new ChunkCacheNeighborNotification(8192));
      private Chunk lastAccessed;
@@ -24,7 +25,7 @@
      private final ProtoChunkScheduler chunkScheduler;
      private final TaskManager<ChunkPos, ChunkStatus, ChunkPrimer> taskManager;
      private final WorldServer world;
-@@ -86,6 +90,11 @@
+@@ -86,6 +91,11 @@
      @Nullable
      public Chunk getChunk(int x, int z, boolean load, boolean generate)
      {
@@ -36,7 +37,7 @@
          Chunk chunk;
  
          synchronized (this.chunkLoader)
-@@ -215,7 +224,15 @@
+@@ -215,9 +225,20 @@
              }
  
              this.loadedChunks.put(k, chunk);
@@ -52,8 +53,13 @@
 +            }
          }
  
++        // TISCM chunk regen command
++        ChunkRegenCommand.onChunkGenerated(this.world.dimension.getType(), i, j);
++
          this.mainThread.addScheduledTask(chunk::onLoad);
-@@ -241,6 +258,9 @@
+         return chunk;
+     }
+@@ -241,6 +262,9 @@
  
      public boolean saveChunks(boolean all)
      {
@@ -63,7 +69,7 @@
          int i = 0;
          this.chunkScheduler.save(() ->
          {
-@@ -306,10 +326,24 @@
+@@ -306,10 +330,24 @@
  
                          if (chunk != null)
                          {
@@ -89,7 +95,7 @@
                              ++i;
                          }
                      }
-@@ -360,6 +394,82 @@
+@@ -360,6 +398,82 @@
  
      public boolean chunkExists(int x, int z)
      {
@@ -130,7 +136,7 @@
 +                this.chunkCache.lazySet(getChunkIndex(x, z), chunk);
 +                return chunk;
 +            }
-+            
++
 +            if (load)
 +            {
 +                try

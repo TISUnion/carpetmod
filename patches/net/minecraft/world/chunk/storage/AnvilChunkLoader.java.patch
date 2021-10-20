@@ -1,15 +1,29 @@
 --- a/net/minecraft/world/chunk/storage/AnvilChunkLoader.java
 +++ b/net/minecraft/world/chunk/storage/AnvilChunkLoader.java
-@@ -1,5 +1,8 @@
+@@ -1,5 +1,9 @@
  package net.minecraft.world.chunk.storage;
  
++import carpet.commands.ChunkRegenCommand;
 +import carpet.commands.lifetime.spawning.LiteralSpawningReason;
 +import carpet.settings.CarpetSettings;
 +import carpet.utils.LightingHooks;
  import com.google.common.collect.Maps;
  import com.mojang.datafixers.DataFixTypes;
  import com.mojang.datafixers.DataFixer;
-@@ -483,6 +486,9 @@
+@@ -86,6 +90,12 @@
+     @Nullable
+     private NBTTagCompound func_212146_a(DimensionType p_212146_1_, @Nullable WorldSavedDataStorage storage, int chunkX, int chunkZ) throws IOException
+     {
++        // TISCM chunk regen command
++        if (ChunkRegenCommand.skipLoading(p_212146_1_, chunkX, chunkZ))
++        {
++            return null;
++        }
++
+         NBTTagCompound nbttagcompound = this.chunksToSave.get(new ChunkPos(chunkX, chunkZ));
+ 
+         if (nbttagcompound != null)
+@@ -483,6 +493,9 @@
          ChunkSection[] achunksection = chunkIn.getSections();
          NBTTagList nbttaglist = this.writeChunkSectionsToNBT(worldIn, achunksection);
          compound.put("Sections", nbttaglist);
@@ -19,7 +33,7 @@
          Biome[] abiome = chunkIn.getBiomes();
          int[] aint = new int[abiome.length];
  
-@@ -616,6 +622,9 @@
+@@ -616,6 +629,9 @@
          chunk.setStatus(compound.getString("Status"));
          NBTTagList nbttaglist = compound.getList("Sections", 10);
          chunk.setSections(this.readSectionsFromNBT(worldIn, nbttaglist));
@@ -29,7 +43,7 @@
          NBTTagCompound nbttagcompound = compound.getCompound("Heightmaps");
  
          for (Heightmap.Type heightmap$type : Heightmap.Type.values())
-@@ -1007,6 +1016,10 @@
+@@ -1007,6 +1023,10 @@
  
      public static void spawnEntity(Entity entityIn, IWorld worldIn)
      {

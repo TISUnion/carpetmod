@@ -96,6 +96,7 @@ public class CarpetServer // static for now - easier to handle all around the co
 
         // TISCM
         LifeTimeCommand.getInstance().registerCommand(dispatcher);
+        ChunkRegenCommand.register(dispatcher);
     }
 
     public static void disconnect()

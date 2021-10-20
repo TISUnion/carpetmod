@@ -40,6 +40,7 @@ public class LoggerRegistry
     public static boolean __commandBlock;
     public static boolean __tickWarp;
     public static boolean __lifeTime;
+    public static boolean __savestate;
 
     public static void initLoggers()
     {
@@ -65,6 +66,7 @@ public class LoggerRegistry
         registerLogger(CommandBlockLogger.NAME, new Logger(CommandBlockLogger.NAME, "throttled", new String[]{"throttled", "all"}));
         registerLogger(TickWarpHUDLogger.NAME, new HUDLogger(TickWarpHUDLogger.NAME, "bar", new String[]{"bar", "value"}));
         registerLogger(LifeTimeHUDLogger.NAME, LifeTimeHUDLogger.getInstance().getHUDLogger());
+        registerLogger("savestate", new Logger("savestate",null, null));
     }
 
     /**

@@ -1,0 +1,26 @@
+--- a/net/minecraft/world/chunk/storage/RegionFileCache.java
++++ b/net/minecraft/world/chunk/storage/RegionFileCache.java
+@@ -1,6 +1,10 @@
+ package net.minecraft.world.chunk.storage;
+ 
++import carpet.logging.LoggerRegistry;
++import carpet.logging.logHelpers.SaveStateLogHelper;
+ import com.google.common.collect.Maps;
++import net.minecraft.util.math.ChunkPos;
++
+ import java.io.DataInputStream;
+ import java.io.DataOutputStream;
+ import java.io.File;
+@@ -70,6 +74,12 @@
+     @Nullable
+     public static DataOutputStream getChunkOutputStream(File worldDir, int chunkX, int chunkZ)
+     {
++        // TISCM save state logger
++        if (LoggerRegistry.__savestate)
++        {
++            SaveStateLogHelper.currentSavingChunkPos.set(new ChunkPos(chunkX, chunkZ));
++        }
++
+         RegionFile regionfile = createOrLoadRegionFile(worldDir, chunkX, chunkZ);
+         return regionfile.getChunkDataOutputStream(chunkX & 31, chunkZ & 31);
+     }

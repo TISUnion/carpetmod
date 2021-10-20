@@ -1,0 +1,27 @@
+--- a/net/minecraft/world/gen/tasks/ProtoChunkScheduler.java
++++ b/net/minecraft/world/gen/tasks/ProtoChunkScheduler.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.world.gen.tasks;
+ 
++import carpet.commands.ChunkRegenCommand;
+ import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+ import java.io.IOException;
+ import java.util.EnumMap;
+@@ -57,6 +58,17 @@
+     {
+         synchronized (this.chunkLoader)
+         {
++            // TISCM chunk regen command
++            if (ChunkRegenCommand.skipLoading(this.world.dimension.getType(), p_212252_1_.x, p_212252_1_.z))
++            {
++                if (p_212252_2_)
++                {
++                    // remove cache
++                    this.scheduledChunkMap.put(p_212252_1_.asLong(), new Scheduler.FutureWrapper(p_212252_1_, new ChunkPrimer(p_212252_1_, UpgradeData.EMPTY), ChunkStatus.EMPTY));
++                }
++                return this.scheduledChunkMap.get(p_212252_1_.asLong());
++            }
++
+             return p_212252_2_ ? this.scheduledChunkMap.computeIfAbsent(p_212252_1_.asLong(), (p_212539_2_) ->
+             {
+                 ChunkPrimer chunkprimer;

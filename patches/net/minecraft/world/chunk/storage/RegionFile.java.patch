@@ -1,0 +1,23 @@
+--- a/net/minecraft/world/chunk/storage/RegionFile.java
++++ b/net/minecraft/world/chunk/storage/RegionFile.java
+@@ -1,5 +1,7 @@
+ package net.minecraft.world.chunk.storage;
+ 
++import carpet.logging.LoggerRegistry;
++import carpet.logging.logHelpers.SaveStateLogHelper;
+ import com.google.common.collect.Lists;
+ import java.io.BufferedInputStream;
+ import java.io.BufferedOutputStream;
+@@ -229,6 +231,12 @@
+             int k = i & 255;
+             int l = (length + 5) / 4096 + 1;
+ 
++            // TISCM save state logger
++            if (LoggerRegistry.__savestate)
++            {
++                SaveStateLogHelper.log(length, (256 - 1) * 4096 - 5);
++            }
++
+             if (l >= 256)
+             {
+                 return;
