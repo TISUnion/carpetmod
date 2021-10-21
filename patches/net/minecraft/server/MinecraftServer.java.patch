@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1,5 +1,16 @@
+@@ -1,5 +1,17 @@
  package net.minecraft.server;
  
 +import carpet.CarpetServer;
@@ -11,13 +11,14 @@
 +import carpet.logging.microtiming.enums.TickStage;
 +import carpet.logging.microtiming.tickstages.LiteralTickStageExtra;
 +import carpet.settings.CarpetSettings;
++import carpet.spark.CarpetSparkAccess;
 +import carpet.utils.CarpetProfiler;
 +import carpet.utils.Messenger;
 +import carpet.worldedit.CarpetWorldEditAccess;
  import com.google.common.base.Stopwatch;
  import com.google.common.collect.Lists;
  import com.google.common.collect.Maps;
-@@ -178,6 +189,7 @@
+@@ -178,6 +190,7 @@
      public final Queue < FutureTask<? >> futureTaskQueue = Queues.newConcurrentLinkedQueue();
      private Thread serverThread;
      private long serverTime = Util.milliTime();
@@ -25,7 +26,7 @@
      @OnlyIn(Dist.CLIENT)
      private boolean worldIconSet;
      private final IReloadableResourceManager resourceManager = new SimpleReloadableResourceManager(ResourcePackType.SERVER_DATA);
-@@ -212,6 +224,8 @@
+@@ -212,6 +225,8 @@
          this.resourceManager.addReloadListener(this.lootTableManager);
          this.resourceManager.addReloadListener(this.functionManager);
          this.resourceManager.addReloadListener(this.advancementManager);
@@ -34,7 +35,7 @@
      }
  
      public abstract boolean init() throws IOException;
-@@ -571,7 +585,11 @@
+@@ -571,7 +586,13 @@
      public void stopServer()
      {
          LOGGER.info("Stopping server");
@@ -42,16 +43,20 @@
  
 +        // CM worldedit
 +        CarpetWorldEditAccess.onStopServer(this);
++        // CM spark
++        CarpetSparkAccess.ServerLifecycleEvents_SERVER_STOPPING(this);
 +
          if (this.getNetworkSystem() != null)
          {
              this.getNetworkSystem().terminateEndpoints();
-@@ -639,34 +657,62 @@
+@@ -639,34 +660,64 @@
      {
          try
          {
 +            // CM worldedit
 +            CarpetWorldEditAccess.onStartingServer(this);
++            // CM spark
++            CarpetSparkAccess.ServerLifecycleEvents_SERVER_STARTING(this);
 +
              if (this.init())
              {
@@ -126,7 +131,7 @@
                  }
              }
              else
-@@ -782,6 +828,12 @@
+@@ -782,7 +833,16 @@
      {
          long i = Util.nanoTime();
          ++this.tickCounter;
@@ -137,9 +142,13 @@
 +        }
 +        // [CM end]
  
++        // CM spark
++        CarpetSparkAccess.ServerTickEvents_START_SERVER_TICK(this);
++
          if (this.startProfiling)
          {
-@@ -790,6 +842,9 @@
+             this.startProfiling = false;
+@@ -790,6 +850,9 @@
          }
  
          this.profiler.startSection("root");
@@ -149,7 +158,7 @@
          this.updateTimeLightAndEntities(hasTimeLeft);
  
          if (i - this.nanoTimeSinceStatusRefresh >= 5000000000L)
-@@ -810,10 +865,16 @@
+@@ -810,10 +873,16 @@
  
          if (this.tickCounter % 900 == 0)
          {
@@ -166,7 +175,7 @@
          }
  
          this.profiler.startSection("snooper");
-@@ -829,16 +890,28 @@
+@@ -829,16 +898,30 @@
          }
  
          this.profiler.endSection();
@@ -185,6 +194,8 @@
 +
 +        // CM worldedit
 +        CarpetWorldEditAccess.onEndServerTick(this);
++        // CM spark
++        CarpetSparkAccess.ServerTickEvents_END_SERVER_TICK(this);
      }
  
      public void updateTimeLightAndEntities(BooleanSupplier hasTimeLeft)
@@ -195,7 +206,7 @@
          FutureTask<?> futuretask;
  
          while ((futuretask = this.futureTaskQueue.poll()) != null)
-@@ -847,6 +920,7 @@
+@@ -847,6 +930,7 @@
          }
  
          this.profiler.endStartSection("commandFunctions");
@@ -203,7 +214,7 @@
          this.getFunctionManager().tick();
          this.profiler.endStartSection("levels");
  
-@@ -870,6 +944,7 @@
+@@ -870,6 +954,7 @@
  
                  this.profiler.startSection("tick");
  
@@ -211,7 +222,7 @@
                  try
                  {
                      worldserver.tick(hasTimeLeft);
-@@ -878,9 +953,15 @@
+@@ -878,9 +963,15 @@
                  {
                      CrashReport crashreport = CrashReport.makeCrashReport(throwable1, "Exception ticking world");
                      worldserver.fillCrashReport(crashreport);
@@ -228,7 +239,7 @@
                  try
                  {
                      worldserver.tickEntities();
-@@ -889,7 +970,12 @@
+@@ -889,7 +980,12 @@
                  {
                      CrashReport crashreport1 = CrashReport.makeCrashReport(throwable, "Exception ticking world entities");
                      worldserver.fillCrashReport(crashreport1);
@@ -242,7 +253,7 @@
                  }
  
                  this.profiler.endSection();
-@@ -905,10 +991,13 @@
+@@ -905,10 +1001,13 @@
              }))[this.tickCounter % 100] = Util.nanoTime() - i;
          }
  
@@ -256,17 +267,19 @@
          this.profiler.endStartSection("tickables");
  
          for (int j = 0; j < this.tickables.size(); ++j)
-@@ -1004,6 +1093,9 @@
+@@ -1004,6 +1103,11 @@
                  }
              }
  
 +            // CM worldedit
 +            CarpetWorldEditAccess.onInitialize();
++            // CM spark
++            CarpetSparkAccess.onInitialize();
 +
              YggdrasilAuthenticationService yggdrasilauthenticationservice = new YggdrasilAuthenticationService(Proxy.NO_PROXY, UUID.randomUUID().toString());
              MinecraftSessionService minecraftsessionservice = yggdrasilauthenticationservice.createMinecraftSessionService();
              GameProfileRepository gameprofilerepository = yggdrasilauthenticationservice.createProfileRepository();
-@@ -1142,7 +1234,8 @@
+@@ -1142,7 +1246,8 @@
  
      public String getServerModName()
      {
@@ -276,7 +289,7 @@
      }
  
      public CrashReport addServerInfoToCrashReport(CrashReport report)
-@@ -1605,6 +1698,12 @@
+@@ -1605,6 +1710,12 @@
      {
          return this.serverTime;
      }
@@ -289,7 +302,7 @@
  
      public Thread getServerThread()
      {
-@@ -1825,4 +1924,17 @@
+@@ -1825,4 +1936,17 @@
              return 0;
          }
      }

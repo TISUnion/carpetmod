@@ -87,7 +87,7 @@ public class CarpetSettings
             category = COMMAND,
             validate = ValidateWorldEdit.class
     )
-    public static String worldEdit = "false";
+    public static String modWorldEdit = "false";
 
     private static class ValidateWorldEdit extends Validator<String>
     {
@@ -103,6 +103,30 @@ public class CarpetSettings
         public String description()
         {
             return "You must set `TISCMConfig.MOD_WORLDEDIT` to true during mod compiling and have worldedit classes included in .jar to enable world edit";
+        }
+    }
+
+    @Rule(
+            desc = "Enables spark command",
+            category = COMMAND,
+            validate = ValidateSpark.class
+    )
+    public static String modSpark = "false";
+
+    private static class ValidateSpark extends Validator<String>
+    {
+        @Override
+        public String validate(CommandSource source, ParsedRule<String> currentRule, String newValue, String string)
+        {
+            if (!newValue.equals("false") && !TISCMConfig.MOD_SPARK)
+            {
+                return null;
+            }
+            return newValue;
+        }
+        public String description()
+        {
+            return "You must set `TISCMConfig.MOD_SPARK` to true during mod compiling and have spark classes included in .jar to enable spark";
         }
     }
 

@@ -1,18 +1,21 @@
 --- a/net/minecraft/client/main/Main.java
 +++ b/net/minecraft/client/main/Main.java
-@@ -1,5 +1,6 @@
+@@ -1,5 +1,7 @@
  package net.minecraft.client.main;
  
++import carpet.spark.CarpetSparkAccess;
 +import carpet.worldedit.CarpetWorldEditAccess;
  import com.google.gson.Gson;
  import com.google.gson.GsonBuilder;
  import com.mojang.authlib.properties.PropertyMap;
-@@ -70,6 +71,9 @@
+@@ -70,6 +72,11 @@
              System.out.println("Completely ignored arguments: " + list);
          }
  
 +        // CM worldedit
 +        CarpetWorldEditAccess.onInitialize();
++        // CM spark
++        CarpetSparkAccess.onInitialize();
 +
          String s = func_206236_a(optionset, optionspec5);
          Proxy proxy = Proxy.NO_PROXY;

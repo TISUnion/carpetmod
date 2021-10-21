@@ -97,7 +97,7 @@ public class CarpetWorldEdit
     private Path workingDir;
 
     public static boolean canPlayerUseWorldEdit(CommandSource source) {
-        return SettingsManager.canUseCommand(source, CarpetSettings.worldEdit);
+        return SettingsManager.canUseCommand(source, CarpetSettings.modWorldEdit);
     }
 
     public static boolean canPlayerUseWorldEdit(EntityPlayer playerMP) {
