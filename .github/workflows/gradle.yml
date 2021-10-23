@@ -15,12 +15,19 @@ jobs:
         include:
           - name: 'Full'
             worldedit: 'true'
+            spark: 'true'
             hardcoded_optimization: 'true'
           - name: 'Survival'
             worldedit: 'false'
+            spark: 'true'
             hardcoded_optimization: 'true'
+          - name: 'Optimization Only'
+            worldedit: 'false'
+            spark: 'false'
+            hardcoded_optimization: 'false'
           - name: 'Vanilla'
             worldedit: 'false'
+            spark: 'false'
             hardcoded_optimization: 'false'
 
     steps:
@@ -64,6 +71,7 @@ jobs:
       run: ./gradlew createRelease
       env:
         worldedit: '${{matrix.worldedit}}'
+        spark: '${{matrix.spark}}'
 
     - name: Create Installers
       run: |
