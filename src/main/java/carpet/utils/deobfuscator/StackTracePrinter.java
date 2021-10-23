@@ -1,7 +1,8 @@
-package carpet.logging.microtiming.utils.stacktrace;
+package carpet.utils.deobfuscator;
 
 import carpet.utils.Messenger;
 import carpet.utils.TextUtil;
+import carpet.utils.Translator;
 import com.google.common.base.Joiner;
 import net.minecraft.util.text.ITextComponent;
 
@@ -13,6 +14,7 @@ import static java.lang.Integer.min;
 public class StackTracePrinter
 {
 	private static final int DEFAULT_MAX_STACK_TRACE_SIZE = 64;
+	private static final Translator translator = StackTraceDeobfuscator.translator;
 
 	private StackTraceElement[] stackTrace;
 	private int maxStackTraceSize;
@@ -59,6 +61,7 @@ public class StackTracePrinter
 		return this.stackTrace;
 	}
 
+	@SuppressWarnings("DeprecatedIsStillUsed")
 	@Deprecated
 	public ITextComponent toBaseText()
 	{
@@ -67,7 +70,7 @@ public class StackTracePrinter
 		String text = Joiner.on("\n").join(list);
 		if (restLineCount > 0)
 		{
-			text += "\n... " + String.format( "%d more lines", restLineCount);
+			text += "\n... " + String.format(translator.tr("n_more_lines", "%d more lines"), restLineCount);
 		}
 		return Messenger.s(text);
 	}
@@ -75,6 +78,7 @@ public class StackTracePrinter
 	// a $ symbol with hover text showing the stack trace
 	public ITextComponent toSymbolText()
 	{
-		return TextUtil.getFancyText("f", Messenger.s("$"), this.toBaseText(), null);
+		ITextComponent baseText = this.toBaseText();
+		return TextUtil.getFancyText("f", Messenger.s("$"), baseText, null);
 	}
 }
