@@ -76,11 +76,9 @@ jobs:
     - name: Create Installers
       run: |
         cd installer
-        ./create_installer_unix.sh
-        ./create_installer_win.sh
-        cd ..
+        ./create_installer_all_in_one.sh
 
     - uses: actions/upload-artifact@v2
       with:
-        name: '[${{matrix.name}}] TISCarpet installers for ${{github.sha}}'
-        path: installer/carpet_package_*
+        name: '[${{matrix.name}}] TISCarpet installer for ${{github.sha}}'
+        path: installer/TISCarpet_installer.tar.gz
