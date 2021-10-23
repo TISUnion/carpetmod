@@ -174,9 +174,9 @@ def projectMod = project(':' + settings.modname) {
             exclude group: 'org.yaml'
         }
         // spark
-        compile 'com.github.TISUnion:spark:4007cbecb9'
+        compile 'com.github.TISUnion:spark:bf70da979e'
         compileOnly 'org.checkerframework:checker-qual:3.8.0'
-        sparkLibs 'com.github.TISUnion:spark:4007cbecb9'
+        sparkLibs 'com.github.TISUnion:spark:bf70da979e'
     }
 
     task runclient(type: JavaExec, dependsOn: [":" + settings.modname + ":downloadAssets", ":" + settings.modname + ":extractNatives"]) {

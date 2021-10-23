@@ -24,6 +24,8 @@ import carpet.settings.CarpetSettings;
 import carpet.settings.SettingsManager;
 import carpet.spark.CarpetClassSourceLookup;
 import carpet.spark.CarpetSparkMod;
+import carpet.utils.deobfuscator.McpMapping;
+import com.google.common.collect.Lists;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -36,12 +38,16 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import me.lucko.spark.common.SparkPlatform;
 import me.lucko.spark.common.SparkPlugin;
 import me.lucko.spark.common.command.sender.CommandSender;
+import me.lucko.spark.common.sampler.Sampler;
 import me.lucko.spark.common.sampler.ThreadDumper;
+import me.lucko.spark.common.sampler.node.AbstractNode;
+import me.lucko.spark.common.sampler.node.StackTraceNode;
 import me.lucko.spark.common.util.ClassSourceLookup;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.ICommandSource;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -138,4 +144,37 @@ public abstract class CarpetSparkPlugin implements SparkPlugin {
         }
     }
 
+    @Override
+    public Sampler.ThreadNodeProcessor getThreadNodesProcessor() {
+        return this::updateNodeChildrenInformation;
+    }
+
+    private void updateNodeChildrenInformation(AbstractNode node)
+    {
+        List<StackTraceNode> children = Lists.newArrayList(node.getChildren());
+        node.getChildrenMap().clear();
+        children.forEach(child -> {
+            this.updateNodeChildrenInformation(child);
+            StackTraceNode.Description description = this.updateDescription(child);
+            node.getChildrenMap().put(description, child);
+        });
+    }
+
+    private StackTraceNode.Description updateDescription(StackTraceNode node)
+    {
+        StackTraceNode.Description description;
+        String className = McpMapping.remapClass(node.getClassName()).orElse(node.getClassName());
+        if (node.getMethodDescription() == null)
+        {
+            String methodName = McpMapping.remapMethod(node.getClassName(), node.getMethodName(), node.getLineNumber()).orElse(node.getMethodName());
+            description = new StackTraceNode.Description(className, methodName, node.getLineNumber(), node.getParentLineNumber());
+        }
+        else
+        {
+            String methodName = McpMapping.remapMethod(node.getClassName(), node.getMethodName(), node.getMethodDescription()).orElse(node.getMethodName());
+            description = new StackTraceNode.Description(className, methodName, node.getMethodDescription());
+        }
+        node.setDescription(description);
+        return description;
+    }
 }
