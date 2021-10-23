@@ -6,9 +6,9 @@
 
 A fork of [gnembon's original CarpetMod for 1.13.2](https://github.com/gnembon/carpetmod). Thanks for gnembon's great tool allowing us to deal with bad performance of 1.13+.
 
-Thanks to [Lithium mod](https://github.com/jellysquid3/lithium-fabric) for some of the optimizations
+Thanks to [Lithium mod](https://github.com/jellysquid3/lithium-fabric) for some epic optimizations
 
-Thanks to [World Edit mod](https://github.com/EngineHub/WorldEdit) for the powerful tool
+Thanks to [World Edit mod](https://github.com/EngineHub/WorldEdit) and [Spark mod](https://github.com/lucko/spark) for providing such powerful functionality extensions
 
 ## How to use:
 ------

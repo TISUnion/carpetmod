@@ -6,9 +6,9 @@
 
 [gnembon的1.13.2 CarpetMod](https://github.com/gnembon/carpetmod) 的分支，感谢gnembon写出了这么优秀的工具让我们能应付1.13+的菜鸡性能
 
-感谢 [Lithium mod](https://github.com/jellysquid3/lithium-fabric) 提供的一些优化
+感谢 [Lithium mod](https://github.com/jellysquid3/lithium-fabric) 提供了一些超棒的优化
 
-感谢 [World Edit mod](https://github.com/EngineHub/WorldEdit) 提供了如此强力的一个工具
+感谢 [World Edit mod](https://github.com/EngineHub/WorldEdit) 以及 [Spark mod](https://github.com/lucko/spark) 提供了非常强大的功能扩展
 
 ## 开始使用:
 
