@@ -13,6 +13,7 @@ import carpet.script.CarpetScriptServer;
 import carpet.settings.CarpetSettings;
 import carpet.settings.SettingsManager;
 import carpet.utils.HUDController;
+import carpet.utils.deobfuscator.McpMapping;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.command.CommandSource;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -30,15 +31,19 @@ public class CarpetServer // static for now - easier to handle all around the co
     public static MinecraftServer minecraft_server;
     public static CarpetScriptServer scriptServer;
     public static SettingsManager settingsManager;
+
     static
     {
         SettingsManager.parseSettingsClass(carpet.settings.CarpetSettings.class);
         //...
     }
+
     public static void init(MinecraftServer server) //aka constructor of this static singleton class
     {
         CarpetServer.minecraft_server = server;
+        McpMapping.init();
     }
+
     public static void onServerLoaded(MinecraftServer server)
     {
         settingsManager = new SettingsManager(server);
@@ -49,6 +54,7 @@ public class CarpetServer // static for now - easier to handle all around the co
         LifeTimeTracker.attachServer(server);
         MicroTimingMarkerManager.getInstance().clear();
     }
+
     // Separate from onServerLoaded, because a server can be loaded multiple times in singleplayer
     public static void onGameStarted() {
         LoggerRegistry.initLoggers();
