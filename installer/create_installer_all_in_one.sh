@@ -22,13 +22,15 @@ mkdir output
 echo "${NOCOLOR}Copying files ..."
 cp ../build/distributions/carpetmod_1.13.2_Client.zip output
 cp ../build/distributions/carpetmod_1.13.2_Server.zip output
+cp README.txt output
+cp 1.13.2-carpet.json output
+# Windows stuffs
 cp 7za.exe output
 cp win_install_server.cmd output
 cp win_install_singleplayer.cmd output
+# Unix stuffs
 cp unix_install_server.sh output
 cp unix_install_singleplayer.sh output
-cp README.txt output
-cp 1.13.2-carpet.json output
 
 echo "Zipping ..."
 [[ -f TISCarpet_installer.zip ]] && rm -f TISCarpet_installer.zip
