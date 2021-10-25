@@ -7,14 +7,19 @@ import carpet.settings.SettingsManager;
 import carpet.utils.BlockInfo;
 import carpet.utils.EntityInfo;
 import carpet.utils.Messenger;
+import carpet.utils.TntInfo;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.arguments.BlockPosArgument;
 import net.minecraft.command.arguments.EntityArgument;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityTNTPrimed;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
@@ -131,6 +136,19 @@ public class InfoCommand
     }
 
 
+    public static void printTntExplosion(Entity e, CommandSource source) {
+        if (e instanceof EntityTNTPrimed) {
+            try {
+                BlockPos pos = source.asPlayer().posToCheckRaycount;
+                if (pos == null || !SettingsManager.canUseCommand(source, CarpetSettings.commandRaycount)) {return;}
+                List<ITextComponent> messages = TntInfo.simulateTntExplosion((EntityTNTPrimed) e, pos);
+                Messenger.send(source, messages);
+            } catch (CommandSyntaxException ex) {
+                throw new CommandException(new TextComponentString("Failed to simulate explosion"));
+            }
+        }
+    }
+
 
     private static int infoEntities(CommandSource source, Collection<? extends Entity> entities, String grep)
     {
@@ -138,6 +156,7 @@ public class InfoCommand
         {
             List<ITextComponent> report = EntityInfo.entityInfo(e, source.getWorld());
             printEntity(report, source, grep);
+            printTntExplosion(e, source);
         }
         return 1;
     }
