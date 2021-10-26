@@ -9,6 +9,7 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.command.arguments.BlockPosArgument;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.world.dimension.DimensionType;
 
 import static net.minecraft.command.Commands.argument;
 import static net.minecraft.command.Commands.literal;
@@ -32,7 +33,14 @@ public class RaycountCommand
     private static int updateRaycountCheckPosition(CommandSource source, BlockPos blockPosition) {
         try
         {
-            source.asPlayer().posToCheckRaycount = blockPosition;
+            String uuid = source.asPlayer().getUniqueID().toString();
+            if (!InfoCommand.posToCheckRaycount.containsKey(uuid)) {
+                InfoCommand.posToCheckRaycount.put(uuid, new BlockPos[3]);
+            }
+            BlockPos[] posArray = InfoCommand.posToCheckRaycount.get(uuid);
+            DimensionType dim = source.asPlayer().dimension;
+            posArray[dim.getId() + 1] = blockPosition;
+            InfoCommand.posToCheckRaycount.put(uuid, posArray);
             if (blockPosition != null)
             {
                 source.asPlayer().sendMessage(new TextComponentString(

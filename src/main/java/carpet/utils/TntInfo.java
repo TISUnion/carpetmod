@@ -88,7 +88,6 @@ public class TntInfo {
             }
             probabilityOfBlockBeingBlownUp = 1D - probabilityOfBlockBeingBlownUp;
         }
-        System.out.println("1");
         List<ITextComponent> messages = new ArrayList<>();
         messages.add(Messenger.c("w  - Position: " +
                         "x=" + pos.getX() +
@@ -97,12 +96,10 @@ public class TntInfo {
                         " has been struck by",
                 "wb  " + amountOfRaysHitting,
                 "w  rays"));
-        System.out.println("2");
         messages.add(Messenger.c("w  - Probability of block being broken is",
                 "wb  " + probabilityOfBlockBeingBlownUp,
                 "w  or",
                 "wb  " + probabilityOfBlockBeingBlownUp * 100 + "%"));
-        System.out.println("3");
         return messages;
     }
 }
