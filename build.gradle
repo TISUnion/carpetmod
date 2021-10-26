@@ -168,10 +168,9 @@ def projectMod = project(':' + settings.modname) {
         // World Edit
         compile 'com.sk89q.worldedit:worldedit-core:7.2.6'
         worldEditLibs ('com.sk89q.worldedit:worldedit-core:7.2.6') {
-            exclude group: 'com.ibm.icu'
-            exclude group: 'org.antlr', module: 'antlr4'
-            exclude group: 'org.mozilla'
-            exclude group: 'org.yaml'
+            exclude group: 'com.ibm.icu'  // not used in worldedit at all
+            exclude group: 'org.antlr', module: 'antlr4'  // only reserves the runtime package
+            exclude group: 'org.yaml'  // worldedit only uses yaml stuffs in bukkit
         }
         // spark
         compile 'com.github.TISUnion:spark:bf70da979e'
