@@ -93,15 +93,15 @@ public class CarpetServer // static for now - easier to handle all around the co
         PerimeterInfoCommand.register(dispatcher);
         DrawCommand.register(dispatcher);
         ScriptCommand.register(dispatcher);
-        PingCommand.register(dispatcher);
-        EpsCommand.register(dispatcher);
-        RefreshCommand.register(dispatcher);
-        VillageCommand.register(dispatcher);
 
         //TestCommand.register(dispatcher);
 
         // TISCM
+        PingCommand.register(dispatcher);
+        EpsCommand.register(dispatcher);
+        VillageCommand.register(dispatcher);
         LifeTimeCommand.getInstance().registerCommand(dispatcher);
+        RefreshCommand.getInstance().registerCommand(dispatcher);
         ChunkRegenCommand.register(dispatcher);
         RaycountCommand.register(dispatcher);
     }

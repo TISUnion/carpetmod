@@ -1,0 +1,13 @@
+--- a/net/minecraft/server/management/PlayerChunkMap.java
++++ b/net/minecraft/server/management/PlayerChunkMap.java
+@@ -446,4 +446,10 @@
+             this.getWorld().getChunkProvider().queueUnload(chunk);
+         }
+     }
++
++    // TISCM added getter
++    public int getPlayerViewRadius()
++    {
++        return this.playerViewRadius;
++    }
+ }
