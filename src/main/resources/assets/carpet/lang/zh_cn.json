@@ -1,7 +1,4 @@
 {
-  "//comment_0": "Translation for Carpet TIS Addition",
-  "//comment_1": "from v1.20.0",
-
   "category.TIS": "TIS",
   "category.CARPET_MOD": "carpet_mod",
 
@@ -36,6 +33,9 @@
   "rule.commandRaid.name": "袭击追踪器",
   "rule.commandRaid.desc": "启用/raid命令用于列出或追踪袭击信息",
 
+  "rule.commandRefresh.name": "刷新命令开关",
+  "rule.commandRefresh.desc": "启用/refresh命令让你的客户端与服务端保持同步",
+
   "rule.creativeOpenContainerForcibly.name": "创造玩家强制打开容器",
   "rule.creativeOpenContainerForcibly.desc": "允许创造模式的玩家打开被阻挡的容器，如潜影盒",
 
@@ -52,6 +52,9 @@
   "rule.entityMomentumLoss.name": "实体速度丢失",
   "rule.entityMomentumLoss.desc": "将其设为 false 以关闭从磁盘载入时实体超过10m/gt部分的沿轴速度的丢失",
 
+  "rule.explosionPacketRange.name": "爆炸数据包广播范围",
+  "rule.explosionPacketRange.desc": "设置在爆炸发生时，爆炸数据包对玩家的广播范围",
+
   "rule.fakePlayerNamePrefix.name": "假人名称前缀",
   "rule.fakePlayerNamePrefix.desc": "为/player指令召唤出来的假人名称添加指定前缀",
   "rule.fakePlayerNamePrefix.extra.0": "将其设置为#none以阻止添加前缀",
@@ -61,13 +64,17 @@
   "rule.fakePlayerNameSuffix.desc": "为/player指令召唤出来的假人名称添加指定后缀",
   "rule.fakePlayerNameSuffix.extra.0": "将其设置为#none以阻止添加后缀",
 
+  "rule._validator.validatefakeplayernameextra.warn.found": "在应用规则 %2$s 时在值 \"%1$s\" 中发现了意料之外的字符",
+  "rule._validator.validatefakeplayernameextra.warn.blocked": "如果你真的要应用这个值，请再输入一次该指令",
+  "rule._validator.validatefakeplayernameextra.warn.applied": "接受该值，因为你坚持这样做",
+
   "rule.fluidDestructionDisabled.name": "禁用流体破坏",
   "rule.fluidDestructionDisabled.desc": "禁用流体流动造成的方块破坏",
   "rule.fluidDestructionDisabled.extra.0": "流体会简单的停留在即将破坏方块时的状态",
   "rule.fluidDestructionDisabled.extra.1": "这个规则可以用于在创造模式中防止流体意外地冲坏你的红石电路",
 
   "rule.hopperCountersUnlimitedSpeed.name": "漏斗计数器无限速度",
-  "rule.hopperCountersUnlimitedSpeed.desc": "当漏斗指向羊毛方块时，漏斗将拥有无限的物品吸取以及传输速度",
+  "rule.hopperCountersUnlimitedSpeed.desc": "当漏斗指向羊毛方块时，漏斗将拥有无限的物品吸取以及传输速度，且无冷却时间",
   "rule.hopperCountersUnlimitedSpeed.extra.0": "仅当Carpet Mod中的hopperCounters开启时有效",
 
   "rule.hopperNoItemCost.name": "漏斗不消耗物品",
@@ -82,7 +89,7 @@
 
   "rule.keepMobInLazyChunks.name": "保持弱加载区块的怪物",
   "rule.keepMobInLazyChunks.desc": "弱加载区块的怪物不再会被刷新掉",
-  "rule.keepMobInLazyChunks.extra.0": "此选项对1.15以前的版本无效",
+  "rule.keepMobInLazyChunks.extra.0": "此选项仅对1.15至1.16间的版本有效",
 
   "rule.lightQueueLoggerSamplingDuration.name": "光照队列记录器采样时长",
   "rule.lightQueueLoggerSamplingDuration.desc": "光照队列记录器的采样时长，单位为游戏刻",
@@ -103,7 +110,7 @@
   "rule.microTiming.extra.3": "末地烛会检测方块更新，红石元件会输出它们的动作",
   "rule.microTiming.extra.4": "- 侦测器、活塞、末地烛：指向羊毛块",
   "rule.microTiming.extra.5": "- 中继器、比较器、铁轨、按钮等：放置在羊毛块上",
-  "rule.microTiming.extra.6": "除此之外，一种通用的记录方块动作的收单是使用羊毛块上的末地烛指向需记录的方块",
+  "rule.microTiming.extra.6": "除此之外，一种通用的记录方块动作的手段是使用羊毛块上的末地烛指向需记录的方块",
   "rule.microTiming.extra.7": "可通过操控规则 微时序目标(microTimingTarget) 以切换记录方法",
 
   "rule.microTimingDyeMarker.name": "微时序染料记号",
@@ -116,11 +123,11 @@
   "rule.microTimingDyeMarker.extra.5": "如果客户端安装有fabric-carpet mod，被标记的方块将会显示出一个边框。如果客户端还带有carpet-tis-addition，则记号的名称还可透过方块查看",
 
   "rule.microTimingTarget.name": "微时序目标",
-  "rule.microTimingTarget.desc": "设置指定微时序记录器记录目标的方法",
+  "rule.microTimingTarget.desc": "设置指定微时序记录器记录目标的方法。被染料记号标记的方块总会被记录",
   "rule.microTimingTarget.extra.0": "labelled: 记录被羊毛块标记的事件",
   "rule.microTimingTarget.extra.1": "in_range: 记录离任意玩家32m内的事件",
   "rule.microTimingTarget.extra.2": "all: 记录所有事件。谨慎使用",
-  "rule.microTimingTarget.extra.3": "marker_only: 仅记录被染料记号的方块。将其与规则microTimingDyeMarker（微时序染料记号）一起使用",
+  "rule.microTimingTarget.extra.3": "marker_only: 仅记录被染料记号标记的方块。将其与规则microTimingDyeMarker（微时序染料记号）一起使用",
 
   "rule.microTimingTickDivision.name": "微时序游戏刻划分",
   "rule.microTimingTickDivision.desc": "设置指定微时序记录器划分两个游戏刻的方法",
@@ -180,6 +187,10 @@
   "rule.sandDupingFix.extra.0": "重力方块包括沙子、铁砧、龙蛋等",
   "rule.sandDupingFix.extra.1": "在开启后刷沙机的沙子将会仅被传送至另一个纬度",
 
+  "rule.structureBlockDoNotPreserveFluid.name": "结构方块不保留流体",
+  "rule.structureBlockDoNotPreserveFluid.desc": "结构方块在放置含水方块时，不保留已存在的流体",
+  "rule.structureBlockDoNotPreserveFluid.extra.0": "同时有着抑制 MC-130584 发生的副作用",
+
   "rule.structureBlockLimit.name": "结构方块范围限制",
   "rule.structureBlockLimit.desc": "覆写结构方块的范围限制",
   "rule.structureBlockLimit.extra.0": "当相对位置的值大于32时客户端里结构的位置可能会错误地显示",
@@ -205,6 +216,10 @@
   "rule.tntFuseDuration.desc": "覆盖TNT的默认引信时长",
   "rule.tntFuseDuration.extra.0": "这也会影响被爆炸点燃的TNT的引信时长",
 
+  "rule.tntIgnoreRedstoneSignal.name": "TNT忽略红石信号",
+  "rule.tntIgnoreRedstoneSignal.desc": "阻止TNT被红石信号点燃",
+  "rule.tntIgnoreRedstoneSignal.extra.0": "你仍可以使用爆炸等方式点燃TNT",
+
   "rule.tooledTNT.name": "工具化TNT",
   "rule.tooledTNT.desc": "由玩家引发的爆炸破坏并掉落物品时会应用玩家手上的工具",
   "rule.tooledTNT.extra.0": "因此你可以点燃TNT以采集需要特定工具或者附魔的方块，只要你在爆炸时拿着正确的工具",
@@ -217,6 +232,10 @@
 
   "rule.turtleEggTrampledDisabled.name": "禁用海龟蛋被践踏",
   "rule.turtleEggTrampledDisabled.desc": "阻止海龟蛋因实体踩踏而破坏",
+
+  "rule.visualizeProjectileLoggerEnabled.name": "可视化投掷物记录器",
+  "rule.visualizeProjectileLoggerEnabled.desc": "启用可视化投掷物记录器",
+  "rule.visualizeProjectileLoggerEnabled.extra.0": "试试/log projectiles visualize吧",
 
   "rule.xpTrackingDistance.name": "经验球追踪距离",
   "rule.xpTrackingDistance.desc": "修改经验球检测并追踪玩家的距离",
@@ -247,12 +266,13 @@
   "logger.microTiming.color": "颜色",
   "logger.microTiming.indentation": "缩进层数",
   "logger.microTiming.dimension": "维度",
-  "logger.microTiming.event_source_block": "事件源方块",
-  "logger.microTiming.block_id": "方块ID",
+  "logger.microTiming.event_source": "事件源",
+  "logger.microTiming.id": "ID",
   "logger.microTiming.player": "玩家",
   "logger.microTiming.entity": "实体",
   "logger.microTiming.type": "类型",
   "logger.microTiming.block": "方块",
+  "logger.microTiming.fluid": "流体",
   "logger.microTiming.order": "次序",
   "logger.microTiming.depth": "深度",
   "logger.microTiming.priority": "优先级",
@@ -271,8 +291,9 @@
   "logger.microTiming.direction.south": "南",
   "logger.microTiming.direction.west": "西",
   "logger.microTiming.direction.east": "东",
-  "logger.microTiming.stage.spawning": "怪物刷新",
-  "logger.microTiming.stage.spawningspecial": "特殊怪物刷新",
+  "logger.microTiming.stage.unknown": "未知",
+  "logger.microTiming.stage.spawning": "生物刷新",
+  "logger.microTiming.stage.spawningspecial": "特殊生物刷新",
   "logger.microTiming.stage.worldborder": "世界边境",
   "logger.microTiming.stage.tiletick": "计划刻",
   "logger.microTiming.stage.raid": "袭击",
@@ -291,10 +312,10 @@
   "logger.microTiming.stage_detail.thunder": "闪电",
   "logger.microTiming.stage_detail.ice&snow": "结冰&积雪",
   "logger.microTiming.stage_detail.randomtick": "随机刻",
-  "logger.microTiming.stage_extra.player_action": "执行来自客户端的玩家动作",
-  "logger.microTiming.stage_extra.ticking_weather_effect_entities": "运算天气实体",
-  "logger.microTiming.stage_extra.ticking_regular_entities": "运算普通实体",
-  "logger.microTiming.stage_extra.ticking_player_entity": "运算玩家实体",
+  "logger.microTiming.sub_stage.player_action": "执行来自客户端的玩家动作",
+  "logger.microTiming.sub_stage.ticking_weather_effect_entities": "运算天气实体",
+  "logger.microTiming.sub_stage.ticking_regular_entities": "运算普通实体",
+  "logger.microTiming.sub_stage.ticking_player_entity": "运算玩家实体",
   "logger.microTiming.block_update_type.aka": "也就是",
   "logger.microTiming.block_update_type.except": "排除",
   "logger.microTiming.block_update_type.blockupdates": "方块更新",
@@ -374,6 +395,10 @@
   "logger.tickWarp.estimated_time": "剩余时间",
   "logger.tickWarp.show_history_header": "上一次tick warp的结果 (%.2fmin前)",
 
+  "logger.projectiles.visualized.info": "可视化投掷物记录器：已可视化%d游戏刻的轨迹",
+  "logger.projectiles.visualized.not_enabled": "可视化投掷物记录器：可视化规则未启用",
+  "logger.projectiles.visualized.not_enabled.hint": "点击以启用",
+
 
   "raid_invalidate_reason.difficulty_peaceful": "难度被设为和平",
   "raid_invalidate_reason.gamerule_disable": "被游戏规则禁用",
@@ -399,6 +424,11 @@
 
 
   "command.info.ticking_order": "游戏中%d个维度的运算顺序：",
+
+  "command.refresh.inventory.done": "已刷新物品栏",
+  "command.refresh.chunk.overloaded": "刷新失败：玩家网络连接已过载",
+  "command.refresh.chunk.too_far": "选中的区块不在你的视距之内",
+  "command.refresh.chunk.done": "已刷新%1$s个区块",
 
 
   "tracker.tracker_name_full": "%s追踪器",
@@ -462,6 +492,7 @@
   "tracker.lifetime.removal_reason.mob_pickup.post": "捡起",
   "tracker.lifetime.removal_reason.hopper": "漏斗收集",
   "tracker.lifetime.removal_reason.void": "进入虚空",
+  "tracker.lifetime.removal_reason.on_vehicle": "骑上载具",
   "tracker.lifetime.removal_reason.damage_source": "伤害来源",
   "tracker.lifetime.removal_reason.trans_dimension": "跨维度",
   "tracker.lifetime.removal_reason.trans_dimension.to": "前往",
