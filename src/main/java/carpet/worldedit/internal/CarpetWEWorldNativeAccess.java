@@ -121,14 +121,7 @@ public class CarpetWEWorldNativeAccess implements WorldNativeAccess<Chunk, IBloc
 
     @Override
     public boolean isChunkTicking(Chunk chunk) {
-        for (int dx = -1; dx <= 1; dx++) {
-            for (int dz = -1; dz <= 1; dz++) {
-                if (!getWorld().isChunkLoaded(chunk.x + dx, chunk.z + dz, true)) {
-                    return false;
-                }
-            }
-        }
-        return true;
+        return getWorld().isChunkLoaded(chunk.x, chunk.z, true);
     }
 
     public void markBlockChanged(Chunk chunk, BlockPos position) {
