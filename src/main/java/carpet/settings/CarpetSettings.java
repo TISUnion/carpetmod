@@ -83,6 +83,13 @@ public class CarpetSettings
     public static String commandVillage = "false";
 
     @Rule(
+            desc = "Enables /raycount to calculate probabilities of a block being broken",
+            extra = "Takes a block position as an argument",
+            category = COMMAND
+    )
+    public static String commandRaycount = "false";
+
+    @Rule(
             desc = "Enables world edit operations",
             category = COMMAND,
             validate = ValidateWorldEdit.class

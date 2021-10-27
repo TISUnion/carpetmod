@@ -7,18 +7,25 @@ import carpet.settings.SettingsManager;
 import carpet.utils.BlockInfo;
 import carpet.utils.EntityInfo;
 import carpet.utils.Messenger;
+import carpet.utils.TntInfo;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.arguments.BlockPosArgument;
 import net.minecraft.command.arguments.EntityArgument;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityTNTPrimed;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,6 +37,8 @@ import static net.minecraft.command.Commands.literal;
 
 public class InfoCommand
 {
+    public static HashMap<String, BlockPos[]> posToCheckRaycount = new HashMap<>();
+
     public static void register(CommandDispatcher<CommandSource> dispatcher)
     {
         LiteralArgumentBuilder<CommandSource> command = literal("info").
@@ -131,6 +140,24 @@ public class InfoCommand
     }
 
 
+    public static void printTntExplosion(Entity e, CommandSource source) {
+        if (e instanceof EntityTNTPrimed) {
+            try {
+                String uuid = source.asPlayer().getUniqueID().toString();
+                if (!posToCheckRaycount.containsKey(uuid)) {
+                    return;
+                }
+                DimensionType dim = source.asPlayer().dimension;
+                BlockPos pos = posToCheckRaycount.get(uuid)[dim.getId() + 1];
+                if (pos == null || !SettingsManager.canUseCommand(source, CarpetSettings.commandRaycount)) {return;}
+                List<ITextComponent> messages = TntInfo.simulateTntExplosion((EntityTNTPrimed) e, pos);
+                Messenger.send(source, messages);
+            } catch (CommandSyntaxException ex) {
+                throw new CommandException(new TextComponentString("Failed to simulate explosion"));
+            }
+        }
+    }
+
 
     private static int infoEntities(CommandSource source, Collection<? extends Entity> entities, String grep)
     {
@@ -138,6 +165,7 @@ public class InfoCommand
         {
             List<ITextComponent> report = EntityInfo.entityInfo(e, source.getWorld());
             printEntity(report, source, grep);
+            printTntExplosion(e, source);
         }
         return 1;
     }
