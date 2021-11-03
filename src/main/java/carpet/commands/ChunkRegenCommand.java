@@ -128,6 +128,10 @@ public class ChunkRegenCommand
      */
     public static boolean skipLoading(DimensionType dimensionType, int chunkX, int chunkZ)
     {
+        if (CarpetSettings.commandChunkRegen.equals("false"))
+        {
+            return false;
+        }
         synchronized (toBeRegen)
         {
             Set<ChunkPos> chunks = toBeRegen.get(dimensionType);
@@ -137,6 +141,10 @@ public class ChunkRegenCommand
 
     public static void onChunkGenerated(DimensionType dimensionType, int chunkX, int chunkZ)
     {
+        if (CarpetSettings.commandChunkRegen.equals("false"))
+        {
+            return;
+        }
         synchronized (toBeRegen)
         {
             Set<ChunkPos> chunks = toBeRegen.get(dimensionType);
