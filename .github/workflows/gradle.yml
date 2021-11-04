@@ -24,7 +24,7 @@ jobs:
           - name: 'Optimization Only'
             worldedit: 'false'
             spark: 'false'
-            hardcoded_optimization: 'false'
+            hardcoded_optimization: 'true'
           - name: 'Vanilla'
             worldedit: 'false'
             spark: 'false'
