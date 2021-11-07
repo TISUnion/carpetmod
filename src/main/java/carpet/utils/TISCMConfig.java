@@ -13,6 +13,8 @@ public class TISCMConfig
 {
 	private static final boolean TISCM_OPTIMIZATION_ENABLE = true;
 
+	// ========== Optimizations ==========
+
 	// TISCM Cache BoundingBoxList creation
 	public static final boolean CACHE_BOUNDING_BOX_LIST_CREATION  = TISCM_OPTIMIZATION_ENABLE && true;
 	// TISCM hashset load factor
@@ -22,8 +24,11 @@ public class TISCMConfig
 	public static final boolean CACHE_ITEM_BURN_TIMES             = TISCM_OPTIMIZATION_ENABLE && true;
 	// TISCM cache TileEntity Serialization
 	public static final boolean CACHE_TILE_ENTITY_SERIALIZATION   = TISCM_OPTIMIZATION_ENABLE && true;
+	// TISCM cache block state light values
+	public static final boolean CACHE_BLOCK_STATE_LIGHT_VALUES    = TISCM_OPTIMIZATION_ENABLE && true;
 
-	// ========== Mods ==========
+	// ============== Mods ==============
+
 	// https://github.com/EngineHub/WorldEdit
 	public static final boolean MOD_WORLDEDIT = true && classExists("com.sk89q.worldedit.WorldEdit");
 

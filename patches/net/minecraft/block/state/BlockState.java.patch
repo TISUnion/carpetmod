@@ -1,0 +1,79 @@
+--- a/net/minecraft/block/state/BlockState.java
++++ b/net/minecraft/block/state/BlockState.java
+@@ -1,9 +1,12 @@
+ package net.minecraft.block.state;
+ 
++import carpet.utils.TISCMConfig;
+ import com.google.common.collect.ImmutableMap;
+ import net.minecraft.block.Block;
+ import net.minecraft.state.AbstractStateHolder;
+ import net.minecraft.state.IProperty;
++import net.minecraft.util.math.BlockPos;
++import net.minecraft.world.IBlockReader;
+ 
+ public class BlockState extends AbstractStateHolder<Block, IBlockState> implements IBlockState
+ {
+@@ -16,4 +19,63 @@
+     {
+         return this.object;
+     }
++
++    // TISCM cache block state light values starts
++
++    private Boolean cachePropagatesSkylightDown = null;
++    private Integer cacheOpacity = null;
++    private Boolean cacheOpaqueCube = null;
++
++    @Override
++    public boolean propagatesSkylightDown(IBlockReader worldIn, BlockPos pos)
++    {
++        if (TISCMConfig.CACHE_BLOCK_STATE_LIGHT_VALUES && !this.getBlock().isVariableOpacity())
++        {
++            if (this.cachePropagatesSkylightDown != null)
++            {
++                return this.cachePropagatesSkylightDown;
++            }
++            return this.cachePropagatesSkylightDown = IBlockState.super.propagatesSkylightDown(worldIn, pos);
++        }
++        else
++        {
++            return IBlockState.super.propagatesSkylightDown(worldIn, pos);
++        }
++    }
++
++    @Override
++    public int getOpacity(IBlockReader worldIn, BlockPos pos)
++    {
++        if (TISCMConfig.CACHE_BLOCK_STATE_LIGHT_VALUES && !this.getBlock().isVariableOpacity())
++        {
++            if (this.cacheOpacity != null)
++            {
++                return this.cacheOpacity;
++            }
++            return this.cacheOpacity = IBlockState.super.getOpacity(worldIn, pos);
++        }
++        else
++        {
++            return IBlockState.super.getOpacity(worldIn, pos);
++        }
++    }
++
++    @Override
++    public boolean isOpaqueCube(IBlockReader worldIn, BlockPos pos)
++    {
++        if (TISCMConfig.CACHE_BLOCK_STATE_LIGHT_VALUES && !this.getBlock().isVariableOpacity())
++        {
++            if (this.cacheOpaqueCube != null)
++            {
++                return this.cacheOpaqueCube;
++            }
++            return this.cacheOpaqueCube = IBlockState.super.isOpaqueCube(worldIn, pos);
++        }
++        else
++        {
++            return IBlockState.super.isOpaqueCube(worldIn, pos);
++        }
++    }
++
++    // TISCM cache block state light values ends
+ }

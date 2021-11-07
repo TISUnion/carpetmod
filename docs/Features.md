@@ -717,5 +717,6 @@ There are also a few optimizations which is not from lithium mod:
 - Use smaller load factor (`Hash.VERY_FAST_LOAD_FACTOR`) in TileEntityList
 - Permanently store item burn times in `TileEntityFurnace` to avoid costly map generating each time
 - Cache some expensive tile entity serialization data
+- Cache some property calculation about light in `IBlockState`
 
 If necessary, part of the optimization implementation can be switched manually in the `TISCMConfig` class
