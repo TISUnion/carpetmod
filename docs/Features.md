@@ -694,6 +694,7 @@ Ports and enable part of implementations of [Lithium mod](https://github.com/jel
 - [block.moving_block_shapes](https://github.com/jellysquid3/lithium-fabric/pull/145)
 - block.piston_shapes
 - cached_hashcode
+- entity.data_tracker.no_locks
 - entity.data_tracker.use_arrays
 - math.fast_util
 - shapes.optimized_matching

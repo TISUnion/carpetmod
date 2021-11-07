@@ -1,6 +1,6 @@
 --- a/net/minecraft/network/datasync/EntityDataManager.java
 +++ b/net/minecraft/network/datasync/EntityDataManager.java
-@@ -5,11 +5,15 @@
+@@ -5,11 +5,16 @@
  import io.netty.handler.codec.DecoderException;
  import io.netty.handler.codec.EncoderException;
  import java.io.IOException;
@@ -13,18 +13,24 @@
 +
 +import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 +import me.jellysquid.mods.lithium.LithiumConfig;
++import me.jellysquid.mods.lithium.common.util.lock.NullReadWriteLock;
  import net.minecraft.crash.CrashReport;
  import net.minecraft.crash.CrashReportCategory;
  import net.minecraft.crash.ReportedException;
-@@ -26,11 +30,18 @@
+@@ -26,11 +31,22 @@
      private static final Logger LOGGER = LogManager.getLogger();
      private static final Map < Class <? extends Entity > , Integer > NEXT_ID_MAP = Maps.newHashMap();
      private final Entity entity;
 -    private final Map < Integer, EntityDataManager.DataEntry<? >> entries = Maps.newHashMap();
+-    private final ReadWriteLock lock = new ReentrantReadWriteLock();
++
 +    // Lithium entity.data_tracker.use_arrays replaces Maps.newHashMap with Int2ObjectOpenHashMap
 +    private final Map < Integer, EntityDataManager.DataEntry<? >> entries = LithiumConfig.ENTITY_DATA_TRACKER_USE_ARRAYS ?
 +            new Int2ObjectOpenHashMap<>() : Maps.newHashMap();
-     private final ReadWriteLock lock = new ReentrantReadWriteLock();
++    // Lithium entity.data_tracker.no_locks
++    private final ReadWriteLock lock = LithiumConfig.ENTITY_DATA_TRACKER_NO_LOCKS ?
++            new NullReadWriteLock() : new ReentrantReadWriteLock();
++
      private boolean empty = true;
      private boolean dirty;
  
@@ -36,7 +42,7 @@
      public EntityDataManager(Entity entityIn)
      {
          this.entity = entityIn;
-@@ -117,11 +128,50 @@
+@@ -117,11 +133,50 @@
      {
          EntityDataManager.DataEntry<T> dataentry = new EntityDataManager.DataEntry<>(key, value);
          this.lock.writeLock().lock();
@@ -88,7 +94,7 @@
      private <T> EntityDataManager.DataEntry<T> getEntry(DataParameter<T> key)
      {
          this.lock.readLock().lock();
-@@ -129,7 +179,36 @@
+@@ -129,7 +184,36 @@
  
          try
          {
