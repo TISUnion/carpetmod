@@ -2,6 +2,7 @@ package carpet.logging.microtiming.marker;
 
 import carpet.logging.microtiming.MicroTimingLoggerManager;
 import carpet.logging.microtiming.utils.MicroTimingUtil;
+import carpet.settings.CarpetSettings;
 import carpet.utils.Messenger;
 import carpet.utils.TranslatableBase;
 import com.google.common.collect.Maps;
@@ -193,6 +194,10 @@ public class MicroTimingMarkerManager extends TranslatableBase
 	 */
 	public void tick()
 	{
+		if (!CarpetSettings.microTiming)
+		{
+			return;
+		}
 		this.sendMarkersForAll(marker -> marker.tickCounter % MicroTimingMarker.MARKER_SYNC_INTERVAL == 0);
 		this.markers.values().forEach(marker -> marker.tickCounter++);
 	}
