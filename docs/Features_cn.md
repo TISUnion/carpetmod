@@ -680,6 +680,7 @@ TISCM 中包含着一些对游戏的优化。这些优化都不太适合做成�
 - [block.moving_block_shapes](https://github.com/jellysquid3/lithium-fabric/pull/145)
 - block.piston_shapes
 - cached_hashcode
+- chunk.palette
 - entity.data_tracker.no_locks
 - entity.data_tracker.use_arrays
 - math.fast_util

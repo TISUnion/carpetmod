@@ -1,0 +1,54 @@
+--- a/net/minecraft/world/chunk/BlockStateContainer.java
++++ b/net/minecraft/world/chunk/BlockStateContainer.java
+@@ -5,6 +5,9 @@
+ import java.util.concurrent.locks.ReentrantLock;
+ import java.util.function.Function;
+ import java.util.stream.Collectors;
++
++import me.jellysquid.mods.lithium.LithiumConfig;
++import me.jellysquid.mods.lithium.common.world.chunk.LithiumHashPalette;
+ import net.minecraft.crash.CrashReport;
+ import net.minecraft.crash.CrashReportCategory;
+ import net.minecraft.crash.ReportedException;
+@@ -74,6 +77,13 @@
+ 
+     private void setBits(int bitsIn)
+     {
++        // Lithium chunk.palette
++        if (LithiumConfig.CHUNK_PALETTE)
++        {
++            this.setBits$lithium(bitsIn);
++            return;
++        }
++
+         if (bitsIn != this.bits)
+         {
+             this.bits = bitsIn;
+@@ -98,6 +108,27 @@
+         }
+     }
+ 
++    // Lithium chunk.palette
++    private void setBits$lithium(int size)
++    {
++        if (size != this.bits) {
++            this.bits = size;
++
++            if (this.bits <= 2) {
++                this.bits = 2;
++                this.palette = new BlockStatePaletteLinear<>(this.registry, this.bits, this, this.deserializer);
++            } else if (this.bits <= 8) {
++                this.palette = new LithiumHashPalette<>(this.registry, this.bits, this, this.deserializer, this.serializer);
++            } else {
++                this.palette = this.field_205521_b;
++                this.bits = MathHelper.log2DeBruijn(this.registry.size());
++            }
++
++            this.palette.idFor(this.defaultState);
++            this.storage = new BitArray(this.bits, 4096);
++        }
++    }
++
+     public int onResize(int p_onResize_1_, T p_onResize_2_)
+     {
+         this.lock();

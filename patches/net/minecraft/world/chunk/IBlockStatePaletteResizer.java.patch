@@ -1,0 +1,11 @@
+--- a/net/minecraft/world/chunk/IBlockStatePaletteResizer.java
++++ b/net/minecraft/world/chunk/IBlockStatePaletteResizer.java
+@@ -1,6 +1,7 @@
+ package net.minecraft.world.chunk;
+ 
+-interface IBlockStatePaletteResizer<T>
++// Lithium chunk.palette make public
++public interface IBlockStatePaletteResizer<T>
+ {
+     int onResize(int p_onResize_1_, T p_onResize_2_);
+ }
