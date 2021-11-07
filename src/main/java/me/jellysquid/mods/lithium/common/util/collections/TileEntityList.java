@@ -15,9 +15,9 @@ public class TileEntityList implements List<TileEntity> {
     //TileEntityList does not support double-add of the same object. But it does support multiple at the same position.
     //This collection behaves like a set with insertion order. It also provides a position->TileEntity lookup.
 
-    // TISCM Smaller hashset list container load factor
+    // TISCM hashset load factor
     @SuppressWarnings("FieldCanBeLocal")
-    private final float COLLECTION_LOAD_FACTOR = TISCMConfig.HASH_SET_LIST_LOAD_FACTOR ? Hash.VERY_FAST_LOAD_FACTOR : Hash.DEFAULT_LOAD_FACTOR;
+    private final float COLLECTION_LOAD_FACTOR = TISCMConfig.HASH_SET_LOAD_FACTOR ? Hash.VERY_FAST_LOAD_FACTOR : Hash.DEFAULT_LOAD_FACTOR;
 
     private final ReferenceLinkedOpenHashSet<TileEntity> allBlockEntities;
 

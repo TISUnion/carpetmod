@@ -1,6 +1,29 @@
 --- a/net/minecraft/server/management/PlayerChunkMap.java
 +++ b/net/minecraft/server/management/PlayerChunkMap.java
-@@ -446,4 +446,10 @@
+@@ -1,9 +1,11 @@
+ package net.minecraft.server.management;
+ 
++import carpet.utils.TISCMConfig;
+ import com.google.common.collect.AbstractIterator;
+ import com.google.common.collect.ComparisonChain;
+ import com.google.common.collect.Lists;
+ import com.google.common.collect.Sets;
++import it.unimi.dsi.fastutil.Hash;
+ import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+ import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+ import java.util.Collections;
+@@ -33,7 +35,9 @@
+     };
+     private final WorldServer world;
+     private final List<EntityPlayerMP> players = Lists.newArrayList();
+-    private final Long2ObjectMap<PlayerChunkMapEntry> entryMap = new Long2ObjectOpenHashMap<>(4096);
++
++    // TISCM hashset load factor
++    private final Long2ObjectMap<PlayerChunkMapEntry> entryMap = new Long2ObjectOpenHashMap<>(4096, TISCMConfig.HASH_SET_LOAD_FACTOR ? Hash.FAST_LOAD_FACTOR : Hash.DEFAULT_LOAD_FACTOR);
+     private final Set<PlayerChunkMapEntry> dirtyEntries = Sets.newHashSet();
+     private final List<PlayerChunkMapEntry> pendingSendToPlayers = Lists.newLinkedList();
+     private final List<PlayerChunkMapEntry> entriesWithoutChunks = Lists.newLinkedList();
+@@ -446,4 +450,10 @@
              this.getWorld().getChunkProvider().queueUnload(chunk);
          }
      }

@@ -75,9 +75,9 @@
      protected final VillageSiege villageSiege = new VillageSiege(this);
 -    ObjectLinkedOpenHashSet<BlockEventData> blockEventQueue = new ObjectLinkedOpenHashSet<>();
 +
-+    // TISCM Smaller hashset list container load factor
++    // TISCM hashset load factor
 +    ObjectLinkedOpenHashSet<BlockEventData> blockEventQueue =
-+            TISCMConfig.HASH_SET_LIST_LOAD_FACTOR ?
++            TISCMConfig.HASH_SET_LOAD_FACTOR ?
 +            new ObjectLinkedOpenHashSet<>(Hash.DEFAULT_INITIAL_SIZE, Hash.VERY_FAST_LOAD_FACTOR) :
 +            new ObjectLinkedOpenHashSet<>();
 +
