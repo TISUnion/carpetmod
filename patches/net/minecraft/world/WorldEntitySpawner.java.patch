@@ -61,7 +61,7 @@
              for (EnumCreatureType enumcreaturetype : EnumCreatureType.values())
              {
 +                //CM start
-+                String type_code = String.format("%s", enumcreaturetype);
++                String type_code = enumcreaturetype.toString();
 +                String group_code = type_code+level_suffix;
 +                if (SpawnReporter.track_spawns > 0L)
 +                {
