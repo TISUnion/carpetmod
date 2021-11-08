@@ -20,6 +20,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.WorldServer;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -121,9 +122,13 @@ public class HUDController
         double MSPT = MathHelper.average(server.tickTimeArray) * 1.0E-6D;
         double TPS = 1000.0D / Math.max((TickSpeed.time_warp_start_time != 0)?0.0:TickSpeed.mspt, MSPT);
         String color = Messenger.heatmap_color(MSPT,TickSpeed.mspt);
+        NumberFormat nf = NumberFormat.getNumberInstance();
+        nf.setMinimumFractionDigits(1);
+        nf.setMaximumFractionDigits(1);
         return new ITextComponent[]{Messenger.c(
-                "g TPS: ", String.format(Locale.US, "%s %.1f",color, TPS),
-                "g  MSPT: ", String.format(Locale.US,"%s %.1f", color, MSPT))};
+                "g TPS: ", Messenger.s(nf.format(TPS), color),
+                "g  MSPT: ", Messenger.s(nf.format(MSPT), color)
+        )};
     }
 
     private static ITextComponent [] send_mobcap_display(int dim)
