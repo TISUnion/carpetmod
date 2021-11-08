@@ -62,7 +62,7 @@ public class LoggerRegistry
         registerLogger("villagecount", new HUDLogger("villagecount", null, null));
         registerLogger("memory", new HUDLogger("memory", null, null));
         registerLogger("microTiming", MicroTimingStandardCarpetLogger.getInstance());
-        registerLogger("autosave", new HUDLogger("autosave", null, null));
+        registerLogger("autosave", new HUDLogger("autosave", "hud", new String[]{"hud", "all"}));
         registerLogger(CommandBlockLogger.NAME, new Logger(CommandBlockLogger.NAME, "throttled", new String[]{"throttled", "all"}));
         registerLogger(TickWarpHUDLogger.NAME, new HUDLogger(TickWarpHUDLogger.NAME, "bar", new String[]{"bar", "value"}));
         registerLogger(LifeTimeHUDLogger.NAME, LifeTimeHUDLogger.getInstance().getHUDLogger());

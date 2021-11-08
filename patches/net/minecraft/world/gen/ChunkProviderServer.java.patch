@@ -1,11 +1,12 @@
 --- a/net/minecraft/world/gen/ChunkProviderServer.java
 +++ b/net/minecraft/world/gen/ChunkProviderServer.java
-@@ -1,5 +1,12 @@
+@@ -1,5 +1,13 @@
  package net.minecraft.world.gen;
  
 +import carpet.commands.ChunkRegenCommand;
 +import carpet.helpers.BedrockBreakingStatHelper;
 +import carpet.settings.CarpetSettings;
++import carpet.utils.Messenger;
 +import carpet.utils.TISCMConfig;
 +import com.google.common.collect.Lists;
 +import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -13,7 +14,7 @@
  import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
  import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
  import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
-@@ -8,7 +15,8 @@
+@@ -8,7 +16,8 @@
  import java.util.Collection;
  import java.util.Iterator;
  import java.util.List;
@@ -23,7 +24,7 @@
  import java.util.function.BooleanSupplier;
  import java.util.function.Consumer;
  import javax.annotation.Nullable;
-@@ -42,11 +50,17 @@
+@@ -42,11 +51,17 @@
      private final IChunkLoader chunkLoader;
      private final Long2ObjectMap<Chunk> loadedChunks = Long2ObjectMaps.synchronize(new ChunkCacheNeighborNotification(8192));
      private Chunk lastAccessed;
@@ -41,7 +42,7 @@
      public ChunkProviderServer(WorldServer worldIn, IChunkLoader chunkLoaderIn, IChunkGenerator<?> chunkGeneratorIn, IThreadListener threadListener)
      {
          this.world = worldIn;
-@@ -86,6 +100,11 @@
+@@ -86,6 +101,11 @@
      @Nullable
      public Chunk getChunk(int x, int z, boolean load, boolean generate)
      {
@@ -53,7 +54,7 @@
          Chunk chunk;
  
          synchronized (this.chunkLoader)
-@@ -215,9 +234,20 @@
+@@ -215,9 +235,20 @@
              }
  
              this.loadedChunks.put(k, chunk);
@@ -75,7 +76,7 @@
          this.mainThread.addScheduledTask(chunk::onLoad);
          return chunk;
      }
-@@ -241,6 +271,9 @@
+@@ -241,6 +272,9 @@
  
      public boolean saveChunks(boolean all)
      {
@@ -85,7 +86,7 @@
          int i = 0;
          this.chunkScheduler.save(() ->
          {
-@@ -249,21 +282,66 @@
+@@ -249,21 +283,76 @@
  
          synchronized (this.chunkLoader)
          {
@@ -135,7 +136,12 @@
 +                {
 +                    return false;
 +                }
-+                if (i > 0) carpet.utils.Messenger.print_server_message(this.world.getServer(), String.format("%s saved %d chunks", this.world.getDimension().getType(), i));
++
++                // TISCM debug AUTO_SAVE_TIME_COST_DISPLAY
++                if (TISCMConfig.AUTO_SAVE_TIME_COST_DISPLAY && i > 0)
++                {
++                    Messenger.print_server_message(this.world.getServer(), String.format("%s saved %d chunks", this.world.getDimension().getType(), i));
++                }
              }
 +            else // vanilla
 +            {
@@ -153,13 +159,18 @@
 +                        }
 +                    }
 +                }
-+                if (i > 0) carpet.utils.Messenger.print_server_message(this.world.getServer(), String.format("%s saved %d chunks", this.world.getDimension().getType(), i));
++
++                // TISCM debug AUTO_SAVE_TIME_COST_DISPLAY
++                if (TISCMConfig.AUTO_SAVE_TIME_COST_DISPLAY && i > 0)
++                {
++                    Messenger.print_server_message(this.world.getServer(), String.format("%s saved %d chunks", this.world.getDimension().getType(), i));
++                }
 +            }
 +
              return true;
          }
      }
-@@ -306,10 +384,24 @@
+@@ -306,10 +395,24 @@
  
                          if (chunk != null)
                          {
@@ -185,7 +196,7 @@
                              ++i;
                          }
                      }
-@@ -360,6 +452,82 @@
+@@ -360,6 +463,82 @@
  
      public boolean chunkExists(int x, int z)
      {

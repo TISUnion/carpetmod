@@ -27,15 +27,15 @@ public class TISCMConfig
 	// TISCM cache block state light values
 	public static final boolean CACHE_BLOCK_STATE_LIGHT_VALUES    = TISCM_OPTIMIZATION_ENABLE && true;
 	// TISCM multi-threading chunk saving
-	public static final boolean MULTI_THREAD_CHUNK_SAVING         = TISCM_OPTIMIZATION_ENABLE && false;
+	public static final boolean MULTI_THREAD_CHUNK_SAVING         = TISCM_OPTIMIZATION_ENABLE && true;
 
 	// ============== Mods ==============
 
 	// https://github.com/EngineHub/WorldEdit
-	public static final boolean MOD_WORLDEDIT = true && classExists("com.sk89q.worldedit.WorldEdit");
+	public static final boolean MOD_WORLDEDIT    = true && classExists("com.sk89q.worldedit.WorldEdit");
 
 	// https://github.com/lucko/spark
-	public static final boolean MOD_SPARK = true && classExists("me.lucko.spark.common.SparkPlugin");
+	public static final boolean MOD_SPARK        = true && classExists("me.lucko.spark.common.SparkPlugin");
 
 	private static boolean classExists(String className)
 	{
@@ -49,4 +49,10 @@ public class TISCMConfig
 			return false;
 		}
 	}
+
+	// ============= Debug =============
+
+	private static final boolean DEBUG_SWITCH                     = false;
+
+	public static final boolean AUTO_SAVE_TIME_COST_DISPLAY       = DEBUG_SWITCH && true;
 }
