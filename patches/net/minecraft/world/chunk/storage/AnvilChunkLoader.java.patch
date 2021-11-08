@@ -1,16 +1,35 @@
 --- a/net/minecraft/world/chunk/storage/AnvilChunkLoader.java
 +++ b/net/minecraft/world/chunk/storage/AnvilChunkLoader.java
-@@ -1,5 +1,9 @@
+@@ -1,5 +1,10 @@
  package net.minecraft.world.chunk.storage;
  
 +import carpet.commands.ChunkRegenCommand;
 +import carpet.commands.lifetime.spawning.LiteralSpawningReason;
 +import carpet.settings.CarpetSettings;
 +import carpet.utils.LightingHooks;
++import carpet.utils.TISCMConfig;
  import com.google.common.collect.Maps;
  import com.mojang.datafixers.DataFixTypes;
  import com.mojang.datafixers.DataFixer;
-@@ -86,6 +90,12 @@
+@@ -14,6 +19,7 @@
+ import java.util.Iterator;
+ import java.util.Map;
+ import java.util.Map.Entry;
++import java.util.concurrent.ConcurrentHashMap;
+ import java.util.function.Consumer;
+ import java.util.function.Function;
+ import javax.annotation.Nullable;
+@@ -65,7 +71,8 @@
+ public class AnvilChunkLoader implements IChunkLoader, IThreadedFileIO
+ {
+     private static final Logger LOGGER = LogManager.getLogger();
+-    private final Map<ChunkPos, NBTTagCompound> chunksToSave = Maps.newHashMap();
++    // TISCM multi-threading chunk saving
++    private final Map<ChunkPos, NBTTagCompound> chunksToSave = TISCMConfig.MULTI_THREAD_CHUNK_SAVING ? new ConcurrentHashMap<>() : Maps.newHashMap();
+     private final File chunkSaveLocation;
+     private final DataFixer fixer;
+     private LegacyStructureDataUtil field_208031_e;
+@@ -86,6 +93,12 @@
      @Nullable
      private NBTTagCompound func_212146_a(DimensionType p_212146_1_, @Nullable WorldSavedDataStorage storage, int chunkX, int chunkZ) throws IOException
      {
@@ -23,7 +42,7 @@
          NBTTagCompound nbttagcompound = this.chunksToSave.get(new ChunkPos(chunkX, chunkZ));
  
          if (nbttagcompound != null)
-@@ -483,6 +493,9 @@
+@@ -483,6 +496,9 @@
          ChunkSection[] achunksection = chunkIn.getSections();
          NBTTagList nbttaglist = this.writeChunkSectionsToNBT(worldIn, achunksection);
          compound.put("Sections", nbttaglist);
@@ -33,7 +52,7 @@
          Biome[] abiome = chunkIn.getBiomes();
          int[] aint = new int[abiome.length];
  
-@@ -616,6 +629,9 @@
+@@ -616,6 +632,9 @@
          chunk.setStatus(compound.getString("Status"));
          NBTTagList nbttaglist = compound.getList("Sections", 10);
          chunk.setSections(this.readSectionsFromNBT(worldIn, nbttaglist));
@@ -43,7 +62,7 @@
          NBTTagCompound nbttagcompound = compound.getCompound("Heightmaps");
  
          for (Heightmap.Type heightmap$type : Heightmap.Type.values())
-@@ -1007,6 +1023,10 @@
+@@ -1007,6 +1026,10 @@
  
      public static void spawnEntity(Entity entityIn, IWorld worldIn)
      {

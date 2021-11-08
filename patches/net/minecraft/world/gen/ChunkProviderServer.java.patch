@@ -1,23 +1,29 @@
 --- a/net/minecraft/world/gen/ChunkProviderServer.java
 +++ b/net/minecraft/world/gen/ChunkProviderServer.java
-@@ -1,5 +1,8 @@
+@@ -1,5 +1,12 @@
  package net.minecraft.world.gen;
  
 +import carpet.commands.ChunkRegenCommand;
 +import carpet.helpers.BedrockBreakingStatHelper;
 +import carpet.settings.CarpetSettings;
++import carpet.utils.TISCMConfig;
++import com.google.common.collect.Lists;
++import com.google.common.util.concurrent.ThreadFactoryBuilder;
++import com.mojang.datafixers.util.Pair;
  import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
  import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
  import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
-@@ -9,6 +12,7 @@
+@@ -8,7 +15,8 @@
+ import java.util.Collection;
  import java.util.Iterator;
  import java.util.List;
- import java.util.concurrent.CompletableFuture;
+-import java.util.concurrent.CompletableFuture;
++import java.util.concurrent.*;
 +import java.util.concurrent.atomic.AtomicReferenceArray;
  import java.util.function.BooleanSupplier;
  import java.util.function.Consumer;
  import javax.annotation.Nullable;
-@@ -42,6 +46,7 @@
+@@ -42,11 +50,17 @@
      private final IChunkLoader chunkLoader;
      private final Long2ObjectMap<Chunk> loadedChunks = Long2ObjectMaps.synchronize(new ChunkCacheNeighborNotification(8192));
      private Chunk lastAccessed;
@@ -25,7 +31,17 @@
      private final ProtoChunkScheduler chunkScheduler;
      private final TaskManager<ChunkPos, ChunkStatus, ChunkPrimer> taskManager;
      private final WorldServer world;
-@@ -86,6 +91,11 @@
+     private final IThreadListener mainThread;
+ 
++    // TISCM multi-threading chunk saving
++    private static final ThreadPoolExecutor CHUNK_SAVING_THREAD_POOL = TISCMConfig.MULTI_THREAD_CHUNK_SAVING ?
++            (ThreadPoolExecutor)Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), new ThreadFactoryBuilder().setNameFormat("ChunkSaver %d").build()) :
++            null;
++
+     public ChunkProviderServer(WorldServer worldIn, IChunkLoader chunkLoaderIn, IChunkGenerator<?> chunkGeneratorIn, IThreadListener threadListener)
+     {
+         this.world = worldIn;
+@@ -86,6 +100,11 @@
      @Nullable
      public Chunk getChunk(int x, int z, boolean load, boolean generate)
      {
@@ -37,7 +53,7 @@
          Chunk chunk;
  
          synchronized (this.chunkLoader)
-@@ -215,9 +225,20 @@
+@@ -215,9 +234,20 @@
              }
  
              this.loadedChunks.put(k, chunk);
@@ -59,7 +75,7 @@
          this.mainThread.addScheduledTask(chunk::onLoad);
          return chunk;
      }
-@@ -241,6 +262,9 @@
+@@ -241,6 +271,9 @@
  
      public boolean saveChunks(boolean all)
      {
@@ -69,7 +85,81 @@
          int i = 0;
          this.chunkScheduler.save(() ->
          {
-@@ -306,10 +330,24 @@
+@@ -249,21 +282,66 @@
+ 
+         synchronized (this.chunkLoader)
+         {
+-            for (Chunk chunk : this.loadedChunks.values())
++            // TISCM multi-threading chunk saving
++            if (TISCMConfig.MULTI_THREAD_CHUNK_SAVING)
+             {
+-                if (chunk.needsSaving(all))
++                List<Pair<ChunkPos, Future<?>>> futures = Lists.newArrayList();
++                for (Chunk chunk : this.loadedChunks.values())
+                 {
+-                    this.saveChunkData(chunk);
+-                    chunk.setModified(false);
+-                    ++i;
++                    if (chunk.needsSaving(all))
++                    {
++                        futures.add(Pair.of(
++                                chunk.getPos(), CHUNK_SAVING_THREAD_POOL.submit(() -> {
++                                    this.saveChunkData(chunk);
++                                    chunk.setModified(false);
++                                })
++                        ));
+ 
+-                    if (i == 24 && !all)
++                        ++i;
++
++                        if (i == 24 && !all)
++                        {
++                            break;
++                        }
++                    }
++                }
++                for (Pair<ChunkPos, Future<?>> pair : futures)
++                {
++                    try
+                     {
+-                        return false;
++                        pair.getSecond().get();
+                     }
++                    catch (Exception e)
++                    {
++                        throw new RuntimeException("Failed to save chunk " + pair.getFirst());
++                    }
+                 }
++
++                if (i == 24 && !all)
++                {
++                    return false;
++                }
++                if (i > 0) carpet.utils.Messenger.print_server_message(this.world.getServer(), String.format("%s saved %d chunks", this.world.getDimension().getType(), i));
+             }
++            else // vanilla
++            {
++                for (Chunk chunk : this.loadedChunks.values())
++                {
++                    if (chunk.needsSaving(all))
++                    {
++                        this.saveChunkData(chunk);
++                        chunk.setModified(false);
++                        ++i;
+ 
++                        if (i == 24 && !all)
++                        {
++                            return false;
++                        }
++                    }
++                }
++                if (i > 0) carpet.utils.Messenger.print_server_message(this.world.getServer(), String.format("%s saved %d chunks", this.world.getDimension().getType(), i));
++            }
++
+             return true;
+         }
+     }
+@@ -306,10 +384,24 @@
  
                          if (chunk != null)
                          {
@@ -95,7 +185,7 @@
                              ++i;
                          }
                      }
-@@ -360,6 +398,82 @@
+@@ -360,6 +452,82 @@
  
      public boolean chunkExists(int x, int z)
      {

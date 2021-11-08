@@ -26,6 +26,8 @@ public class TISCMConfig
 	public static final boolean CACHE_TILE_ENTITY_SERIALIZATION   = TISCM_OPTIMIZATION_ENABLE && true;
 	// TISCM cache block state light values
 	public static final boolean CACHE_BLOCK_STATE_LIGHT_VALUES    = TISCM_OPTIMIZATION_ENABLE && true;
+	// TISCM multi-threading chunk saving
+	public static final boolean MULTI_THREAD_CHUNK_SAVING         = TISCM_OPTIMIZATION_ENABLE && false;
 
 	// ============== Mods ==============
 
