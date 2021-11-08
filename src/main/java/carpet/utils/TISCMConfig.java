@@ -27,7 +27,12 @@ public class TISCMConfig
 	// TISCM cache block state light values
 	public static final boolean CACHE_BLOCK_STATE_LIGHT_VALUES    = TISCM_OPTIMIZATION_ENABLE && true;
 	// TISCM multi-threading chunk saving
+	// Use multi-threading to serialize chunks to be saved into NBT tag, effectively reducing the lag spike at autosave
 	public static final boolean MULTI_THREAD_CHUNK_SAVING         = TISCM_OPTIMIZATION_ENABLE && true;
+	// TISCM merged session lock check
+	// When saving all chunks in a world, the session lock file is checked on processing each chunk and that's redundant
+	// This optimization performs the session lock check at the beginning of chunks saving and skip the following checks if it passes
+	public static final boolean MERGED_SESSION_LOCK_CHECK         = TISCM_OPTIMIZATION_ENABLE && true;
 
 	// ============== Mods ==============
 

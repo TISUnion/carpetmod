@@ -89,51 +89,66 @@
          int i = 0;
          this.chunkScheduler.save(() ->
          {
-@@ -249,21 +286,73 @@
+@@ -249,22 +286,92 @@
  
          synchronized (this.chunkLoader)
          {
 -            for (Chunk chunk : this.loadedChunks.values())
-+            // TISCM multi-threading chunk saving
-+            if (TISCMConfig.MULTI_THREAD_CHUNK_SAVING)
++            // TISCM merged session lock check
++            if (TISCMConfig.MERGED_SESSION_LOCK_CHECK)
              {
 -                if (chunk.needsSaving(all))
-+                List<Pair<ChunkPos, Future<?>>> futures = Lists.newArrayList();
-+                for (Chunk chunk : this.loadedChunks.values())
++                try
                  {
 -                    this.saveChunkData(chunk);
 -                    chunk.setModified(false);
 -                    ++i;
++                    this.world.checkSessionLock();
++                    this.world.skipSessionLockCheck = true;
++                }
++                catch (SessionLockException ignored)
++                {
++                }
++            }
++            // TISCM merged session lock check try-catch
++            try {
+ 
+-                    if (i == 24 && !all)
++            // TISCM multi-threading chunk saving
++            if (TISCMConfig.MULTI_THREAD_CHUNK_SAVING)
++            {
++                List<Pair<ChunkPos, Future<?>>> futures = Lists.newArrayList();
++                for (Chunk chunk : this.loadedChunks.values())
++                {
 +                    if (chunk.needsSaving(all))
-+                    {
+                     {
+-                        return false;
 +                        futures.add(Pair.of(
 +                                chunk.getPos(), CHUNK_SAVING_THREAD_POOL.submit(() -> {
 +                                    this.saveChunkData(chunk);
 +                                    chunk.setModified(false);
 +                                })
 +                        ));
- 
--                    if (i == 24 && !all)
++
 +                        ++i;
 +
 +                        if (i == 24 && !all)
 +                        {
 +                            break;
 +                        }
-+                    }
-+                }
+                     }
+                 }
 +                for (Pair<ChunkPos, Future<?>> pair : futures)
 +                {
 +                    try
-                     {
--                        return false;
++                    {
 +                        pair.getSecond().get();
-                     }
++                    }
 +                    catch (Exception e)
 +                    {
 +                        throw new RuntimeException("Failed to save chunk " + pair.getFirst());
 +                    }
-                 }
++                }
 +
 +                if (i == 24 && !all)
 +                {
@@ -168,9 +183,13 @@
 +            }
 +
              return true;
++
++            // TISCM merged session lock check try-catch
++            } finally {this.world.skipSessionLockCheck = false;}
          }
      }
-@@ -306,10 +395,24 @@
+ 
+@@ -306,10 +413,24 @@
  
                          if (chunk != null)
                          {
@@ -196,7 +215,7 @@
                              ++i;
                          }
                      }
-@@ -360,6 +463,82 @@
+@@ -360,6 +481,82 @@
  
      public boolean chunkExists(int x, int z)
      {
