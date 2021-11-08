@@ -52,3 +52,80 @@
      public int onResize(int p_onResize_1_, T p_onResize_2_)
      {
          this.lock();
+@@ -214,6 +245,13 @@
+ 
+     public void writeChunkPalette(NBTTagCompound compound, String paletteName, String paletteDataName)
+     {
++        // Lithium chunk.serialization
++        if (LithiumConfig.CHUNK_SERIALIZATION)
++        {
++            this.writeChunkPalette$lithium(compound, paletteName, paletteDataName);
++            return;
++        }
++
+         this.lock();
+         BlockStatePaletteHashMap<T> blockstatepalettehashmap = new BlockStatePaletteHashMap<>(this.registry, this.bits, this.field_205522_c, this.deserializer, this.serializer);
+         blockstatepalettehashmap.idFor(this.defaultState);
+@@ -243,4 +281,62 @@
+     {
+         return 1 + this.palette.getSerializedSize() + PacketBuffer.getVarIntSize(this.storage.size()) + this.storage.getBackingLongArray().length * 8;
+     }
++
++    // Lithium chunk.serialization
++    // TODO: check correctness (e.g. load in 1.18)
++
++    private static final ThreadLocal<short[]> cachedCompactionArrays = ThreadLocal.withInitial(() -> new short[4096]);
++    private static final long[] EMPTY_PALETTE_DATA = new long[(4 * 4096) / 64];
++
++    public void writeChunkPalette$lithium(NBTTagCompound rootTag, String paletteKey, String dataKey) {
++        this.lock();
++
++        // The palette that will be serialized
++        LithiumHashPalette<T> palette = null;
++        long[] dataArray = null;
++
++        if (this.palette instanceof LithiumHashPalette) {
++            palette = ((LithiumHashPalette<T>) this.palette);
++
++            // The palette only contains the default block, so don't re-pack
++            if (palette.getSize() == 1 && palette.get(0) == this.defaultState) {
++                dataArray = EMPTY_PALETTE_DATA;
++            }
++        }
++
++        // If we aren't going to use an empty data array, start a compaction
++        if (dataArray == null) {
++            LithiumHashPalette<T> compactedPalette = new LithiumHashPalette<>(this.registry, this.bits, null, this.deserializer, this.serializer);
++
++            short[] array = cachedCompactionArrays.get();
++            this.storage.compact(this.palette, compactedPalette, array);
++
++            // If the palette didn't change during compaction, do a simple copy of the data array
++            if (palette != null && palette.getSize() == compactedPalette.getSize() && this.bits == Math.max(4, MathHelper.log2DeBruijn(palette.getSize()))) { // paletteSize can de-sync from palette - see https://github.com/CaffeineMC/lithium-fabric/issues/279
++                dataArray = this.storage.getBackingLongArray().clone();
++            } else {
++                // Re-pack the integer array as the palette has changed size
++                int size = Math.max(4, MathHelper.log2DeBruijn(compactedPalette.getSize()));
++                BitArray copy = new BitArray(size, 4096);
++
++                for (int i = 0; i < array.length; ++i) {
++                    copy.setAt(i, array[i]);
++                }
++
++                // We don't need to clone the data array as we are the sole owner of it
++                dataArray = copy.getBackingLongArray();
++                palette = compactedPalette;
++            }
++        }
++
++        NBTTagList paletteTag = new NBTTagList();
++        palette.toTag(paletteTag);
++
++        rootTag.put(paletteKey, paletteTag);
++        rootTag.putLongArray(dataKey, dataArray);
++
++        this.unlock();
++    }
++
++    // Lithium chunk.serialization ends
+ }

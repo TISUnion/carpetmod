@@ -695,6 +695,7 @@ Ports and enable part of implementations of [Lithium mod](https://github.com/jel
 - block.piston_shapes
 - cached_hashcode
 - chunk.palette
+- chunk.serialization
 - entity.data_tracker.no_locks
 - entity.data_tracker.use_arrays
 - math.fast_util
