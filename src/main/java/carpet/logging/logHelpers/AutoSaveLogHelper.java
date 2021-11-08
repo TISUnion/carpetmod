@@ -8,13 +8,15 @@ import net.minecraft.util.text.ITextComponent;
 
 public class AutoSaveLogHelper
 {
+    public static int savedChunkCounter = 0;
+
     public static void onAutoSave(long gametime, long timeCostNano)
     {
         Logger logger = LoggerRegistry.getLogger("autosave");
         logger.log((option, player) -> {
             if (option.equals("all"))
             {
-                player.sendMessage(Messenger.c(String.format("g Autosave @ GameTime %d, cost %.2fms ", gametime, timeCostNano / 1e6)));
+                player.sendMessage(Messenger.c(String.format("g Autosave @ gt %d, saved %d chunks, cost %.2fms", gametime, savedChunkCounter, timeCostNano / 1e6)));
             }
             return null;
         });

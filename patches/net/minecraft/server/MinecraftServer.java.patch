@@ -160,13 +160,15 @@
          this.updateTimeLightAndEntities(hasTimeLeft);
  
          if (i - this.nanoTimeSinceStatusRefresh >= 5000000000L)
-@@ -810,10 +875,25 @@
+@@ -810,10 +875,26 @@
  
          if (this.tickCounter % 900 == 0)
          {
 +            CarpetProfiler.start_section(null, "Autosave");
 +            MicroTimingLoggerManager.setTickStage(TickStage.AUTO_SAVE); // TISCM Micro Timing logger
 +            long startTime = Util.nanoTime();
++            // TISCM autosave logger
++            AutoSaveLogHelper.savedChunkCounter = 0;
 +
              this.profiler.startSection("save");
              this.playerList.saveAllPlayerData();
@@ -179,14 +181,13 @@
 +            {
 +                Messenger.print_server_message(this, String.format("Autosave took %.2fms", timeCost / 1e6));
 +            }
-+            CarpetProfiler.end_current_section();
-+
-+            // TISCM Autosave logger
++            // TISCM autosave logger
 +            AutoSaveLogHelper.onAutoSave(this.getWorld(DimensionType.OVERWORLD).getGameTime(), timeCost);
++            CarpetProfiler.end_current_section();
          }
  
          this.profiler.startSection("snooper");
-@@ -829,16 +909,30 @@
+@@ -829,16 +910,30 @@
          }
  
          this.profiler.endSection();
@@ -217,7 +218,7 @@
          FutureTask<?> futuretask;
  
          while ((futuretask = this.futureTaskQueue.poll()) != null)
-@@ -847,6 +941,7 @@
+@@ -847,6 +942,7 @@
          }
  
          this.profiler.endStartSection("commandFunctions");
@@ -225,7 +226,7 @@
          this.getFunctionManager().tick();
          this.profiler.endStartSection("levels");
  
-@@ -870,6 +965,7 @@
+@@ -870,6 +966,7 @@
  
                  this.profiler.startSection("tick");
  
@@ -233,7 +234,7 @@
                  try
                  {
                      worldserver.tick(hasTimeLeft);
-@@ -878,9 +974,15 @@
+@@ -878,9 +975,15 @@
                  {
                      CrashReport crashreport = CrashReport.makeCrashReport(throwable1, "Exception ticking world");
                      worldserver.fillCrashReport(crashreport);
@@ -250,7 +251,7 @@
                  try
                  {
                      worldserver.tickEntities();
-@@ -889,7 +991,12 @@
+@@ -889,7 +992,12 @@
                  {
                      CrashReport crashreport1 = CrashReport.makeCrashReport(throwable, "Exception ticking world entities");
                      worldserver.fillCrashReport(crashreport1);
@@ -264,7 +265,7 @@
                  }
  
                  this.profiler.endSection();
-@@ -905,10 +1012,13 @@
+@@ -905,10 +1013,13 @@
              }))[this.tickCounter % 100] = Util.nanoTime() - i;
          }
  
@@ -278,7 +279,7 @@
          this.profiler.endStartSection("tickables");
  
          for (int j = 0; j < this.tickables.size(); ++j)
-@@ -1004,6 +1114,11 @@
+@@ -1004,6 +1115,11 @@
                  }
              }
  
@@ -290,7 +291,7 @@
              YggdrasilAuthenticationService yggdrasilauthenticationservice = new YggdrasilAuthenticationService(Proxy.NO_PROXY, UUID.randomUUID().toString());
              MinecraftSessionService minecraftsessionservice = yggdrasilauthenticationservice.createMinecraftSessionService();
              GameProfileRepository gameprofilerepository = yggdrasilauthenticationservice.createProfileRepository();
-@@ -1142,7 +1257,8 @@
+@@ -1142,7 +1258,8 @@
  
      public String getServerModName()
      {
@@ -300,7 +301,7 @@
      }
  
      public CrashReport addServerInfoToCrashReport(CrashReport report)
-@@ -1605,6 +1721,12 @@
+@@ -1605,6 +1722,12 @@
      {
          return this.serverTime;
      }
@@ -313,7 +314,7 @@
  
      public Thread getServerThread()
      {
-@@ -1825,4 +1947,17 @@
+@@ -1825,4 +1948,17 @@
              return 0;
          }
      }
