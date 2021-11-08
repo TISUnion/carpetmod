@@ -720,5 +720,7 @@ There are also a few optimizations which is not from lithium mod:
 - Permanently store item burn times in `TileEntityFurnace` to avoid costly map generating each time
 - Cache some expensive tile entity serialization data
 - Cache some property calculation about light in `IBlockState`
+- Use multi-threading for chunk serializing during world saving
+- Cache and skip redundant `session.lock` information check
 
 If necessary, part of the optimization implementation can be switched manually in the `TISCMConfig` class
