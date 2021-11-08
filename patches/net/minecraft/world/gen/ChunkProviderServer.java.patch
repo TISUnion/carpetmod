@@ -24,7 +24,7 @@
  import java.util.function.BooleanSupplier;
  import java.util.function.Consumer;
  import javax.annotation.Nullable;
-@@ -42,11 +51,17 @@
+@@ -42,11 +51,19 @@
      private final IChunkLoader chunkLoader;
      private final Long2ObjectMap<Chunk> loadedChunks = Long2ObjectMaps.synchronize(new ChunkCacheNeighborNotification(8192));
      private Chunk lastAccessed;
@@ -36,13 +36,15 @@
  
 +    // TISCM multi-threading chunk saving
 +    private static final ThreadPoolExecutor CHUNK_SAVING_THREAD_POOL = TISCMConfig.MULTI_THREAD_CHUNK_SAVING ?
-+            (ThreadPoolExecutor)Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), new ThreadFactoryBuilder().setNameFormat("ChunkSaver %d").build()) :
-+            null;
++            new ThreadPoolExecutor(
++                    0, Runtime.getRuntime().availableProcessors(), 3, TimeUnit.SECONDS,
++                    new LinkedBlockingQueue<>(), new ThreadFactoryBuilder().setNameFormat("ChunkSaver %d").build()
++            ) : null;
 +
      public ChunkProviderServer(WorldServer worldIn, IChunkLoader chunkLoaderIn, IChunkGenerator<?> chunkGeneratorIn, IThreadListener threadListener)
      {
          this.world = worldIn;
-@@ -86,6 +101,11 @@
+@@ -86,6 +103,11 @@
      @Nullable
      public Chunk getChunk(int x, int z, boolean load, boolean generate)
      {
@@ -54,7 +56,7 @@
          Chunk chunk;
  
          synchronized (this.chunkLoader)
-@@ -215,9 +235,20 @@
+@@ -215,9 +237,20 @@
              }
  
              this.loadedChunks.put(k, chunk);
@@ -76,7 +78,7 @@
          this.mainThread.addScheduledTask(chunk::onLoad);
          return chunk;
      }
-@@ -241,6 +272,9 @@
+@@ -241,6 +274,9 @@
  
      public boolean saveChunks(boolean all)
      {
@@ -86,7 +88,7 @@
          int i = 0;
          this.chunkScheduler.save(() ->
          {
-@@ -249,21 +283,76 @@
+@@ -249,21 +285,76 @@
  
          synchronized (this.chunkLoader)
          {
@@ -170,7 +172,7 @@
              return true;
          }
      }
-@@ -306,10 +395,24 @@
+@@ -306,10 +397,24 @@
  
                          if (chunk != null)
                          {
@@ -196,7 +198,7 @@
                              ++i;
                          }
                      }
-@@ -360,6 +463,82 @@
+@@ -360,6 +465,82 @@
  
      public boolean chunkExists(int x, int z)
      {
