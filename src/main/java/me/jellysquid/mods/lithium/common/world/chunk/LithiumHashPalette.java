@@ -17,6 +17,8 @@ import java.util.function.Function;
 
 import static it.unimi.dsi.fastutil.Hash.FAST_LOAD_FACTOR;
 
+// from Lithium 0.7.5
+// https://github.com/CaffeineMC/lithium-fabric/blob/mc1.17.1-0.7.5/src/main/java/me/jellysquid/mods/lithium/common/world/chunk/LithiumHashPalette.java
 /**
  * Generally provides better performance over the vanilla {@link net.minecraft.world.chunk.BlockStatePaletteHashMap}
  * (net.minecraft.world.chunk.BiMapPalette in yarn) when calling

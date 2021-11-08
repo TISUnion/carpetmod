@@ -12,12 +12,14 @@
  public class BitArray
  {
      private final long[] longArray;
-@@ -81,4 +84,70 @@
+@@ -81,4 +84,72 @@
      {
          return this.bitsPerEntry;
      }
 +
 +    // Lithium chunk.serialization
++    // from Lithium 0.5.0 (before the change for 20w18a)
++    // https://github.com/CaffeineMC/lithium-fabric/blob/b9e89eae616088eab13154d100da8ec742b7aaf0/src/main/java/me/jellysquid/mods/lithium/mixin/chunk/serialization/MixinPackedIntegerArray.java
 +    public <T> void compact(IBlockStatePalette<T> srcPalette, IBlockStatePalette<T> dstPalette, short[] out) {
 +        if (this.arraySize >= Short.MAX_VALUE) {
 +            throw new IllegalStateException("Array too large");
