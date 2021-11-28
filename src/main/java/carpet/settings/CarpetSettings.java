@@ -625,6 +625,13 @@ public class CarpetSettings
     )
     public static boolean failSoftBlockStateParsing = false;
 
+    @Rule(
+            desc = "Prevent TNT blocks from being ignited from redstone",
+            extra = "You can still use explosion etc. to ignite a tnt",
+            category = {CREATIVE}
+    )
+    public static boolean tntIgnoreRedstoneSignal = false;
+
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$
     //   | $$     | $$  | $$  \__/| $$  \__/| $$$$  /$$$$
