@@ -6,8 +6,21 @@ name: Java CI with Gradle
 on: [push, pull_request]
 
 jobs:
-  build:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
 
+      - name: Generate build number
+        id: buildnumber
+        uses: einaregilsson/build-number@v3
+        with:
+          token: ${{ secrets.github_token }}
+    outputs:
+      build_number: ${{ steps.buildnumber.outputs.build_number }}
+
+  build:
+    needs: prepare
     runs-on: ubuntu-latest
 
     strategy:
@@ -57,6 +70,9 @@ jobs:
       run: chmod +x gradlew
     - name: Setup
       run: ./gradlew setup
+
+    - name: Set build id
+      run: sed -i "s/TISCarpet_build_undefined/TISCarpet_build${{ needs.prepare.outputs.build_number }}/g" src/main/java/carpet/settings/CarpetSettings.java
 
     - name: Disable hardcoded optimizations
       if: matrix.hardcoded_optimization == 'false'
