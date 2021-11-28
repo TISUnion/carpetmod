@@ -71,7 +71,7 @@ jobs:
     - name: Setup
       run: ./gradlew setup
 
-    - name: Set build id
+    - name: Set build number
       run: sed -i "s/TISCarpet_build_undefined/TISCarpet_build${{ needs.prepare.outputs.build_number }}/g" src/main/java/carpet/settings/CarpetSettings.java
 
     - name: Disable hardcoded optimizations
@@ -96,5 +96,5 @@ jobs:
 
     - uses: actions/upload-artifact@v2
       with:
-        name: '[${{matrix.name}}] TISCarpet installer for ${{github.sha}}'
+        name: '[${{matrix.name}}] TISCarpet build ${{ needs.prepare.outputs.build_number }} installer for ${{ github.sha }}'
         path: installer/TISCarpet_installer.tar.gz
