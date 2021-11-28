@@ -96,5 +96,5 @@ jobs:
 
     - uses: actions/upload-artifact@v2
       with:
-        name: '[${{matrix.name}}] TISCarpet build ${{ needs.prepare.outputs.build_number }} installer for ${{ github.sha }}'
+        name: '[${{matrix.name}}] TISCarpet build${{ needs.prepare.outputs.build_number }} installer'
         path: installer/TISCarpet_installer.tar.gz
