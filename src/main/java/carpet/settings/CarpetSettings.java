@@ -615,6 +615,16 @@ public class CarpetSettings
     )
     public static boolean transDimensionInvisibleFix = false;
 
+    @Rule(
+            desc = "Ignore invalid property keys/values in block state arguments used in e.g. /setblock command",
+            extra = {
+                    "In vanilla invalid property keys/values cause command failure when parsing, this rule suppresses that",
+                    "Useful during cross-version litematica schematic pasting etc."
+            },
+            category = {CREATIVE}
+    )
+    public static boolean failSoftBlockStateParsing = false;
+
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$
     //   | $$     | $$  | $$  \__/| $$  \__/| $$$$  /$$$$

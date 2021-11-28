@@ -1,0 +1,56 @@
+--- a/net/minecraft/command/arguments/BlockStateParser.java
++++ b/net/minecraft/command/arguments/BlockStateParser.java
+@@ -1,5 +1,7 @@
+ package net.minecraft.command.arguments;
+ 
++import carpet.helpers.DummyPropertyEnum;
++import carpet.settings.CarpetSettings;
+ import com.google.common.collect.Maps;
+ import com.mojang.brigadier.StringReader;
+ import com.mojang.brigadier.exceptions.CommandSyntaxException;
+@@ -448,6 +450,20 @@
+                 String s = this.reader.readString();
+                 IProperty<?> iproperty = this.blockStateContainer.getProperty(s);
+ 
++                // TISCM failSoftBlockStateParsing
++                if (CarpetSettings.failSoftBlockStateParsing)
++                {
++                    /*
++                     * Replace the property field with our DUMMY_PROPERTY so the following parsing is able to continue
++                     * DUMMY_PROPERTY has no possible values (since it's an enum property with 0 enum value) so it doesn't provide
++                     * any suggestion, and it will fail in BlockStateParser.parseValue which will be suppressed in our codes
++                     */
++                    if (iproperty == null)
++                    {
++                        iproperty = DummyPropertyEnum.DUMMY_PROPERTY;
++                    }
++                }
++
+                 if (iproperty == null)
+                 {
+                     this.reader.setCursor(i);
+@@ -470,9 +486,10 @@
+ 
+                 this.reader.skip();
+                 this.reader.skipWhitespace();
++                IProperty<?> finalIproperty = iproperty;  // TISCM failSoftBlockStateParsing modifies var iproperty
+                 this.suggestor = (p_197251_1_) ->
+                 {
+-                    return suggestValue(p_197251_1_, iproperty).buildFuture();
++                    return suggestValue(p_197251_1_, finalIproperty).buildFuture();
+                 };
+                 int j = this.reader.getCursor();
+                 this.parseValue(iproperty, this.reader.readString(), j);
+@@ -598,6 +615,12 @@
+         }
+         else
+         {
++            // TISCM failSoftBlockStateParsing
++            if (CarpetSettings.failSoftBlockStateParsing)
++            {
++                return;
++            }
++
+             this.reader.setCursor(valuePosition);
+             throw STATE_INVALID_PROPERTY_VALUE.createWithContext(this.reader, this.blockID.toString(), property.getName(), value);
+         }
