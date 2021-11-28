@@ -108,6 +108,15 @@ public class CarpetWorldEditAccess
     }
 
     @Nullable
+    public static void onLeftClickAir(EntityPlayer playerEntity)
+    {
+        if (TISCMConfig.MOD_WORLDEDIT)
+        {
+            CarpetWorldEdit.inst.onLeftClickAir(playerEntity);
+        }
+    }
+
+    @Nullable
     public static ActionResult<ItemStack> onRightClickAir(EntityPlayer playerEntity, World world, EnumHand hand)
     {
         if (TISCMConfig.MOD_WORLDEDIT)

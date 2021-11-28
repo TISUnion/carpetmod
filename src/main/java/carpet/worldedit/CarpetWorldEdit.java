@@ -219,6 +219,12 @@ public class CarpetWorldEdit
         return EnumActionResult.PASS;
     }
 
+    void onLeftClickAir(EntityPlayer playerEntity) {
+        WorldEdit we = WorldEdit.getInstance();
+        CarpetWEPlayer player = adaptPlayer((EntityPlayerMP)playerEntity);
+        we.handleArmSwing(player);
+    }
+
     // fabric-api: UseItemCallback.EVENT
     ActionResult<ItemStack> onRightClickAir(EntityPlayer playerEntity, World world, EnumHand hand) {
         ItemStack stackInHand = playerEntity.getHeldItem(hand);

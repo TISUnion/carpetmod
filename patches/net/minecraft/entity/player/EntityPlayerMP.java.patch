@@ -1,15 +1,27 @@
 --- a/net/minecraft/entity/player/EntityPlayerMP.java
 +++ b/net/minecraft/entity/player/EntityPlayerMP.java
-@@ -1,5 +1,8 @@
+@@ -1,5 +1,9 @@
  package net.minecraft.entity.player;
  
 +import carpet.helpers.EntityPlayerActionPack;
 +import carpet.logging.logHelpers.DamageReporter;
++import carpet.worldedit.CarpetWorldEditAccess;
 +import carpet.worldedit.internal.ExtendedPlayerEntity;
  import com.google.common.collect.Lists;
  import com.mojang.authlib.GameProfile;
  import io.netty.buffer.Unpooled;
-@@ -112,7 +115,7 @@
+@@ -93,9 +97,7 @@
+ import net.minecraft.util.ResourceLocation;
+ import net.minecraft.util.SoundCategory;
+ import net.minecraft.util.Util;
+-import net.minecraft.util.math.BlockPos;
+-import net.minecraft.util.math.MathHelper;
+-import net.minecraft.util.math.Vec3d;
++import net.minecraft.util.math.*;
+ import net.minecraft.util.text.ChatType;
+ import net.minecraft.util.text.ITextComponent;
+ import net.minecraft.util.text.TextComponentString;
+@@ -112,7 +114,7 @@
  import org.apache.logging.log4j.LogManager;
  import org.apache.logging.log4j.Logger;
  
@@ -18,7 +30,7 @@
  {
      private static final Logger LOGGER = LogManager.getLogger();
      private String language = "en_US";
-@@ -151,6 +154,9 @@
+@@ -151,6 +153,9 @@
      public int ping;
      public boolean queuedEndExit;
  
@@ -28,7 +40,7 @@
      public EntityPlayerMP(MinecraftServer server, WorldServer worldIn, GameProfile profile, PlayerInteractionManager interactionManagerIn)
      {
          super(worldIn, profile);
-@@ -162,6 +168,9 @@
+@@ -162,6 +167,9 @@
          this.advancements = server.getPlayerList().getPlayerAdvancements(this);
          this.stepHeight = 1.0F;
          this.func_205734_a(worldIn);
@@ -38,7 +50,7 @@
      }
  
      private void func_205734_a(WorldServer p_205734_1_)
-@@ -337,6 +346,9 @@
+@@ -337,6 +345,9 @@
  
      public void tick()
      {
@@ -48,7 +60,7 @@
          this.interactionManager.tick();
          --this.respawnInvulnerabilityTicks;
  
-@@ -616,6 +628,7 @@
+@@ -616,6 +627,7 @@
  
              if (!flag && this.respawnInvulnerabilityTicks > 0 && source != DamageSource.OUT_OF_WORLD)
              {
@@ -56,7 +68,7 @@
                  return false;
              }
              else
-@@ -626,6 +639,7 @@
+@@ -626,6 +638,7 @@
  
                      if (entity instanceof EntityPlayer && !this.canAttackPlayer((EntityPlayer)entity))
                      {
@@ -64,7 +76,7 @@
                          return false;
                      }
  
-@@ -636,6 +650,7 @@
+@@ -636,6 +649,7 @@
  
                          if (entity1 instanceof EntityPlayer && !this.canAttackPlayer((EntityPlayer)entity1))
                          {
@@ -72,7 +84,26 @@
                              return false;
                          }
                      }
-@@ -1483,4 +1498,10 @@
+@@ -1413,6 +1427,18 @@
+ 
+     public void swingArm(EnumHand hand)
+     {
++        // CM worldedit
++        if (hand == EnumHand.MAIN_HAND)
++        {
++            float reach = this.isCreative() ? 5.0F : 4.5F;
++            RayTraceResult hitResult = this.rayTrace(reach, 1.0F, RayTraceFluidMode.NEVER);
++            if (hitResult != null && hitResult.type == RayTraceResult.Type.MISS)
++            {
++                CarpetWorldEditAccess.onLeftClickAir(this);
++            }
++        }
++        // CM worldedit ends
++
+         super.swingArm(hand);
+         this.resetCooldown();
+     }
+@@ -1483,4 +1509,10 @@
              this.server.getPlayerList().sendInventory(this);
          }
      }

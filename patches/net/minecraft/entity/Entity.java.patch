@@ -689,7 +689,17 @@
      protected final Vec3d getVectorForRotation(float pitch, float yaw)
      {
          float f = pitch * ((float)Math.PI / 180F);
-@@ -1762,22 +2349,27 @@
+@@ -1593,7 +2180,8 @@
+     }
+ 
+     @Nullable
+-    @OnlyIn(Dist.CLIENT)
++    // TISCM wanna use this on the server side
++//    @OnlyIn(Dist.CLIENT)
+     public RayTraceResult rayTrace(double blockReachDistance, float partialTicks, RayTraceFluidMode p_174822_4_)
+     {
+         Vec3d vec3d = this.getEyePosition(partialTicks);
+@@ -1762,22 +2350,27 @@
              this.motionX = nbttaglist2.getDouble(0);
              this.motionY = nbttaglist2.getDouble(1);
              this.motionZ = nbttaglist2.getDouble(2);
@@ -730,7 +740,7 @@
              this.posX = nbttaglist.getDouble(0);
              this.posY = nbttaglist.getDouble(1);
              this.posZ = nbttaglist.getDouble(2);
-@@ -1924,6 +2516,10 @@
+@@ -1924,6 +2517,10 @@
              EntityItem entityitem = new EntityItem(this.world, this.posX, this.posY + (double)offsetY, this.posZ, stack);
              entityitem.setDefaultPickupDelay();
              this.world.spawnEntity(entityitem);
@@ -741,7 +751,7 @@
              return entityitem;
          }
      }
-@@ -2592,6 +3188,9 @@
+@@ -2592,6 +3189,9 @@
                  this.dimension = DimensionType.OVERWORLD;
              }
  
@@ -751,7 +761,7 @@
              this.world.removeEntity(this);
              this.removed = false;
              this.world.profiler.startSection("reposition");
-@@ -2645,6 +3244,9 @@
+@@ -2645,6 +3245,9 @@
                      entity.moveToBlockPosAndAngles(blockpos, entity.rotationYaw, entity.rotationPitch);
                  }
  
@@ -761,7 +771,7 @@
                  boolean flag = entity.forceSpawn;
                  entity.forceSpawn = true;
                  worldserver1.spawnEntity(entity);
-@@ -2821,6 +3423,10 @@
+@@ -2821,6 +3424,10 @@
  
      public EnumFacing getHorizontalFacing()
      {
