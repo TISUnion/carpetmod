@@ -7,7 +7,18 @@
  import net.minecraft.block.state.BlockFaceShape;
  import net.minecraft.block.state.IBlockState;
  import net.minecraft.entity.Entity;
-@@ -97,6 +98,15 @@
+@@ -30,8 +31,9 @@
+ import net.minecraft.util.math.shapes.VoxelShapes;
+ import net.minecraft.world.IBlockReader;
+ import net.minecraft.world.World;
++import redstone.multimeter.block.MeterableBlock;
+ 
+-public class BlockHopper extends BlockContainer
++public class BlockHopper extends BlockContainer implements MeterableBlock /*RSMM*/
+ {
+     public static final DirectionProperty FACING = BlockStateProperties.FACING_EXCEPT_UP;
+     public static final BooleanProperty ENABLED = BlockStateProperties.ENABLED;
+@@ -97,6 +99,15 @@
      public IBlockState getStateForPlacement(BlockItemUseContext context)
      {
          EnumFacing enumfacing = context.getFace().getOpposite();
@@ -23,3 +34,29 @@
          return this.getDefaultState().with(FACING, enumfacing.getAxis() == EnumFacing.Axis.Y ? EnumFacing.DOWN : enumfacing).with(ENABLED, Boolean.valueOf(true));
      }
  
+@@ -160,6 +171,8 @@
+     {
+         boolean flag = !worldIn.isBlockPowered(pos);
+ 
++        logPowered(worldIn, pos, !flag);
++
+         if (flag != state.get(ENABLED))
+         {
+             worldIn.setBlockState(pos, state.with(ENABLED, Boolean.valueOf(flag)), 4);
+@@ -241,4 +254,16 @@
+     {
+         return false;
+     }
++
++    // RSMM
++    @Override
++    public boolean logPoweredOnBlockUpdate() {
++        return false;
++    }
++
++    // RSMM
++    @Override
++    public boolean isActive(World world, BlockPos pos, IBlockState state) {
++        return state.get(ENABLED);
++    }
+ }

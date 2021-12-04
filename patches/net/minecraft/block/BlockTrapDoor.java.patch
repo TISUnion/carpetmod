@@ -1,0 +1,39 @@
+--- a/net/minecraft/block/BlockTrapDoor.java
++++ b/net/minecraft/block/BlockTrapDoor.java
+@@ -23,8 +23,9 @@
+ import net.minecraft.world.IBlockReader;
+ import net.minecraft.world.IWorld;
+ import net.minecraft.world.World;
++import redstone.multimeter.block.MeterableBlock;
+ 
+-public class BlockTrapDoor extends BlockHorizontal implements IBucketPickupHandler, ILiquidContainer
++public class BlockTrapDoor extends BlockHorizontal implements IBucketPickupHandler, ILiquidContainer, MeterableBlock /*RSMM*/
+ {
+     public static final BooleanProperty OPEN = BlockStateProperties.OPEN;
+     public static final EnumProperty<Half> HALF = BlockStateProperties.HALF;
+@@ -127,6 +128,8 @@
+         {
+             boolean flag = worldIn.isBlockPowered(pos);
+ 
++            logPowered(worldIn, pos, flag); // RSMM
++
+             if (flag != state.get(POWERED))
+             {
+                 if (state.get(OPEN) != flag)
+@@ -233,4 +236,16 @@
+ 
+         return super.updatePostPlacement(stateIn, facing, facingState, worldIn, currentPos, facingPos);
+     }
++
++    // RSMM
++    @Override
++    public boolean logPoweredOnBlockUpdate() {
++        return false;
++    }
++
++    // RSMM
++    @Override
++    public boolean isActive(World world, BlockPos pos, IBlockState state) {
++        return state.get(OPEN);
++    }
+ }

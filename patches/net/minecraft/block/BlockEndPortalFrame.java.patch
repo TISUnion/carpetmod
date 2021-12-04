@@ -1,0 +1,24 @@
+--- a/net/minecraft/block/BlockEndPortalFrame.java
++++ b/net/minecraft/block/BlockEndPortalFrame.java
+@@ -24,8 +24,9 @@
+ import net.minecraft.util.math.shapes.VoxelShapes;
+ import net.minecraft.world.IBlockReader;
+ import net.minecraft.world.World;
++import redstone.multimeter.block.Meterable;
+ 
+-public class BlockEndPortalFrame extends Block
++public class BlockEndPortalFrame extends Block implements Meterable /*RSMM*/
+ {
+     public static final DirectionProperty FACING = BlockHorizontal.HORIZONTAL_FACING;
+     public static final BooleanProperty EYE = BlockStateProperties.EYE;
+@@ -104,4 +105,10 @@
+     {
+         return false;
+     }
++
++    // RSMM
++    @Override
++    public boolean isActive(World world, BlockPos pos, IBlockState state) {
++        return state.get(EYE);
++    }
+ }

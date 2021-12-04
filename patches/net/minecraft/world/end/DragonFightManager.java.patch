@@ -1,0 +1,29 @@
+--- a/net/minecraft/world/end/DragonFightManager.java
++++ b/net/minecraft/world/end/DragonFightManager.java
+@@ -48,6 +48,8 @@
+ import net.minecraft.world.gen.feature.Feature;
+ import net.minecraft.world.gen.feature.IFeatureConfig;
+ import net.minecraft.world.gen.placement.EndSpikes;
++import redstone.multimeter.common.TickTask;
++
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
+@@ -150,6 +152,8 @@
+ 
+     public void tick()
+     {
++        world.getMultimeterServer().startTickTask(TickTask.DRAGON_FIGHT); // RSMM
++
+         this.bossInfo.setVisible(!this.dragonKilled);
+ 
+         if (++this.ticksSinceLastPlayerScan >= 20)
+@@ -194,6 +198,8 @@
+                 }
+             }
+         }
++
++        world.getMultimeterServer().endTickTask(); // RSMM
+     }
+ 
+     private void func_210827_g()

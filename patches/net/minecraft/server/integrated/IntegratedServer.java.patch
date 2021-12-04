@@ -20,3 +20,14 @@
          return true;
      }
  
+@@ -354,4 +360,10 @@
+     {
+         this.playerUuid = uuid;
+     }
++
++    // RSMM
++    @Override
++    public boolean isPaused() {
++        return isGamePaused;
++    }
+ }

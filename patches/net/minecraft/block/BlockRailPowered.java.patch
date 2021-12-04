@@ -9,7 +9,18 @@
  import net.minecraft.block.state.IBlockState;
  import net.minecraft.state.BooleanProperty;
  import net.minecraft.state.EnumProperty;
-@@ -25,7 +28,8 @@
+@@ -11,8 +14,9 @@
+ import net.minecraft.util.Rotation;
+ import net.minecraft.util.math.BlockPos;
+ import net.minecraft.world.World;
++import redstone.multimeter.block.MeterableBlock;
+ 
+-public class BlockRailPowered extends BlockRailBase
++public class BlockRailPowered extends BlockRailBase implements MeterableBlock /*RSMM*/
+ {
+     public static final EnumProperty<RailShape> SHAPE = BlockStateProperties.RAIL_SHAPE_STRAIGHT;
+     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
+@@ -25,7 +29,8 @@
  
      protected boolean findPoweredRailSignal(World worldIn, BlockPos pos, IBlockState state, boolean p_176566_4_, int p_176566_5_)
      {
@@ -19,7 +30,12 @@
          {
              return false;
          }
-@@ -180,12 +184,14 @@
+@@ -177,15 +182,19 @@
+         boolean flag = state.get(POWERED);
+         boolean flag1 = worldIn.isBlockPowered(pos) || this.findPoweredRailSignal(worldIn, pos, state, true, 0) || this.findPoweredRailSignal(worldIn, pos, state, false, 0);
+ 
++        logPowered(worldIn, pos, flag1); // RSMM
++
          if (flag1 != flag)
          {
              worldIn.setBlockState(pos, state.with(POWERED, Boolean.valueOf(flag1)), 3);
@@ -34,3 +50,26 @@
          }
      }
  
+@@ -333,4 +342,22 @@
+     {
+         builder.add(SHAPE, POWERED);
+     }
++
++    // RSMM
++    @Override
++    public boolean logPoweredOnBlockUpdate() {
++        return false;
++    }
++
++    // RSMM
++    @Override
++    public boolean isPowered(World world, BlockPos pos, IBlockState state) {
++        return world.isBlockPowered(pos) || findPoweredRailSignal(world, pos, state, true, 0) || findPoweredRailSignal(world, pos, state, false, 0);
++    }
++
++    // RSMM
++    @Override
++    public boolean isActive(World world, BlockPos pos, IBlockState state) {
++        return state.get(POWERED);
++    }
+ }

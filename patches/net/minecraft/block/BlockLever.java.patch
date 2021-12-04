@@ -10,7 +10,19 @@
  import net.minecraft.block.state.BlockFaceShape;
  import net.minecraft.block.state.IBlockState;
  import net.minecraft.entity.player.EntityPlayer;
-@@ -161,8 +164,10 @@
+@@ -20,8 +23,10 @@
+ import net.minecraft.world.World;
+ import net.minecraftforge.api.distmarker.Dist;
+ import net.minecraftforge.api.distmarker.OnlyIn;
++import redstone.multimeter.block.Meterable;
++import redstone.multimeter.block.PowerSource;
+ 
+-public class BlockLever extends BlockHorizontalFace
++public class BlockLever extends BlockHorizontalFace implements Meterable /*RSMM*/, PowerSource /*RSMM*/
+ {
+     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
+     protected static final VoxelShape LEVER_NORTH_AABB = Block.makeCuboidShape(5.0D, 4.0D, 10.0D, 11.0D, 12.0D, 16.0D);
+@@ -161,8 +166,10 @@
  
      private void updateNeighbors(IBlockState p_196378_1_, World p_196378_2_, BlockPos p_196378_3_)
      {
@@ -21,3 +33,20 @@
      }
  
      protected void fillStateContainer(StateContainer.Builder<Block, IBlockState> builder)
+@@ -174,4 +181,16 @@
+     {
+         return BlockFaceShape.UNDEFINED;
+     }
++
++    // RSMM
++    @Override
++    public boolean isActive(World world, BlockPos pos, IBlockState state) {
++        return state.get(POWERED);
++    }
++
++    // RSMM
++    @Override
++    public int getPowerLevel(World world, BlockPos pos, IBlockState state) {
++        return state.get(POWERED) ? MAX_POWER : MIN_POWER;
++    }
+ }

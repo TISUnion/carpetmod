@@ -40,7 +40,16 @@
  import net.minecraft.block.Block;
  import net.minecraft.block.material.Material;
  import net.minecraft.block.state.IBlockState;
-@@ -82,10 +95,20 @@
+@@ -72,6 +85,8 @@
+ import net.minecraft.world.storage.WorldSavedDataStorage;
+ import net.minecraftforge.api.distmarker.Dist;
+ import net.minecraftforge.api.distmarker.OnlyIn;
++import redstone.multimeter.common.TickTask;
++
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
+@@ -82,10 +97,20 @@
      private int seaLevel = 63;
      public final List<Entity> loadedEntityList = Lists.newArrayList();
      protected final List<Entity> unloadedEntityList = Lists.newArrayList();
@@ -65,7 +74,7 @@
      public final List<EntityPlayer> playerEntities = Lists.newArrayList();
      public final List<Entity> weatherEffects = Lists.newArrayList();
      protected final IntHashMap<Entity> entitiesById = new IntHashMap<>();
-@@ -116,6 +139,16 @@
+@@ -116,6 +141,16 @@
      private final WorldBorder worldBorder;
      int[] lightUpdateBlockList = new int['\u8000'];
  
@@ -82,7 +91,7 @@
      protected World(ISaveHandler p_i49813_1_, @Nullable WorldSavedDataStorage p_i49813_2_, WorldInfo p_i49813_3_, Dimension p_i49813_4_, Profiler p_i49813_5_, boolean p_i49813_6_)
      {
          this.saveHandler = p_i49813_1_;
-@@ -125,6 +158,8 @@
+@@ -125,6 +160,8 @@
          this.dimension = p_i49813_4_;
          this.isRemote = p_i49813_6_;
          this.worldBorder = p_i49813_4_.createWorldBorder();
@@ -91,7 +100,7 @@
      }
  
      public Biome getBiome(BlockPos pos)
-@@ -224,8 +259,25 @@
+@@ -224,8 +261,25 @@
          }
      }
  
@@ -117,7 +126,7 @@
          if (isOutsideBuildHeight(pos))
          {
              return false;
-@@ -238,7 +290,7 @@
+@@ -238,7 +292,7 @@
          {
              Chunk chunk = this.getChunk(pos);
              Block block = newState.getBlock();
@@ -126,7 +135,7 @@
  
              if (iblockstate == null)
              {
-@@ -261,7 +313,7 @@
+@@ -261,7 +315,7 @@
                      {
                          this.markBlockRangeForRenderUpdate(pos, pos);
                      }
@@ -135,7 +144,7 @@
                      if ((flags & 2) != 0 && (!this.isRemote || (flags & 4) == 0) && chunk.isPopulated())
                      {
                          this.notifyBlockUpdate(pos, iblockstate, newState, flags);
-@@ -277,7 +329,9 @@
+@@ -277,7 +331,9 @@
                          }
                      }
  
@@ -146,7 +155,7 @@
                      {
                          int i = flags & -2;
                          iblockstate.updateDiagonalNeighbors(this, pos, i);
-@@ -372,19 +426,22 @@
+@@ -372,19 +428,22 @@
              this.eventListeners.get(i).markBlockRangeForRenderUpdate(x1, y1, z1, x2, y2, z2);
          }
      }
@@ -170,7 +179,7 @@
          if (skipSide != EnumFacing.WEST)
          {
              this.neighborChanged(pos.west(), blockType, pos);
-@@ -414,18 +471,33 @@
+@@ -414,18 +473,34 @@
          {
              this.neighborChanged(pos.south(), blockType, pos);
          }
@@ -192,6 +201,7 @@
 +             // Update suppression fix
              try
              {
++                onBlockUpdate(pos, iblockstate);
                  iblockstate.neighborChanged(this, pos, blockIn, fromPos);
              }
 +            catch (StackOverflowError e)
@@ -205,7 +215,7 @@
              catch (Throwable throwable)
              {
                  CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Exception while updating neighbours");
-@@ -1199,13 +1271,22 @@
+@@ -1199,13 +1274,25 @@
      {
          this.profiler.startSection("entities");
          this.profiler.startSection("global");
@@ -216,6 +226,8 @@
 +        // end
  
 +        MicroTimingLoggerManager.setTickStage(this, TickStage.ENTITY); // TISCM Micro Timing logger
++        startTickTask(TickTask.ENTITIES); // RSMM
++        startTickTask(TickTask.GLOBAL_ENTITIES); // RSMM
 +        int entityOrderCounter = 0;  // TISCM Micro Timing logger
 +
          for (int i = 0; i < this.weatherEffects.size(); ++i)
@@ -225,10 +237,11 @@
              try
              {
 +                MicroTimingLoggerManager.setTickStageExtra(this, new EntityTickStageExtra(entity, entityOrderCounter++));  // TISCM Micro Timing logger
++                onEntityTick(entity); // RSMM
                  ++entity.ticksExisted;
                  entity.tick();
              }
-@@ -1233,6 +1314,7 @@
+@@ -1233,6 +1320,7 @@
          }
  
          this.profiler.endStartSection("remove");
@@ -236,13 +249,14 @@
          this.loadedEntityList.removeAll(this.unloadedEntityList);
  
          for (int k = 0; k < this.unloadedEntityList.size(); ++k)
-@@ -1253,12 +1335,14 @@
+@@ -1253,12 +1341,15 @@
          }
  
          this.unloadedEntityList.clear();
 +        MicroTimingLoggerManager.setTickStageExtra(this, LiteralTickStageExtra.ENTITY_PLAYER);  // TISCM Micro Timing logger
          this.tickPlayers();
          this.profiler.endStartSection("regular");
++        swapTickTask(TickTask.REGULAR_ENTITIES); // RSMM
  
          for (int i1 = 0; i1 < this.loadedEntityList.size(); ++i1)
          {
@@ -251,7 +265,7 @@
              Entity entity3 = entity2.getRidingEntity();
  
              if (entity3 != null)
-@@ -1273,8 +1357,10 @@
+@@ -1273,8 +1364,10 @@
  
              this.profiler.startSection("tick");
  
@@ -263,7 +277,7 @@
                  try
                  {
                      this.tickEntity(entity2);
-@@ -1304,11 +1390,17 @@
+@@ -1304,11 +1397,18 @@
                  this.loadedEntityList.remove(i1--);
                  this.onEntityRemoved(entity2);
              }
@@ -278,10 +292,11 @@
          this.profiler.endStartSection("blockEntities");
 +        MicroTimingLoggerManager.setTickStageExtra(this, null); // TISCM Micro Timing logger
 +        MicroTimingLoggerManager.setTickStage(this, TickStage.TILE_ENTITY); // TISCM Micro Timing logger
++        swapTickTask(TickTask.BLOCK_ENTITIES); // RSMM
  
          if (!this.tileEntitiesToBeRemoved.isEmpty())
          {
-@@ -1316,19 +1408,22 @@
+@@ -1316,19 +1416,22 @@
              this.loadedTileEntityList.removeAll(this.tileEntitiesToBeRemoved);
              this.tileEntitiesToBeRemoved.clear();
          }
@@ -306,15 +321,16 @@
                  {
                      try
                      {
-@@ -1336,6 +1431,7 @@
+@@ -1336,6 +1439,8 @@
                          {
                              return String.valueOf((Object)TileEntityType.getId(tileentity.getType()));
                          });
 +                        MicroTimingLoggerManager.setTickStageExtra(this, new TileEntityTickStageExtra(tileentity, tickCounter++));  // TISCM Micro Timing logger
++                        onBlockEntityTick(tileentity); // RSMM
                          ((ITickable)tileentity).tick();
                          this.profiler.endSection();
                      }
-@@ -1359,13 +1455,23 @@
+@@ -1359,13 +1464,23 @@
                      this.getChunk(tileentity.getPos()).removeTileEntity(tileentity.getPos());
                  }
              }
@@ -339,7 +355,7 @@
              for (int j1 = 0; j1 < this.addedTileEntityList.size(); ++j1)
              {
                  TileEntity tileentity1 = this.addedTileEntityList.get(j1);
-@@ -1389,11 +1495,52 @@
+@@ -1389,11 +1504,55 @@
  
              this.addedTileEntityList.clear();
          }
@@ -349,6 +365,9 @@
          this.profiler.endSection();
 +
 +        MicroTimingLoggerManager.setTickStageExtra(this, null); // TISCM Micro Timing logger
++
++        endTickTask(); // RSMM
++        endTickTask(); // RSMM
      }
  
 +    private void postBlockEntityTick$lithium() {
@@ -392,7 +411,7 @@
      protected void tickPlayers()
      {
      }
-@@ -1413,7 +1560,7 @@
+@@ -1413,7 +1572,7 @@
              IBlockState iblockstate = this.getBlockState(blockpos);
              this.notifyBlockUpdate(blockpos, iblockstate, iblockstate, 2);
          }
@@ -401,7 +420,15 @@
          return flag;
      }
  
-@@ -1514,7 +1661,8 @@
+@@ -1471,6 +1630,7 @@
+                 {
+                     return IRegistry.ENTITY_TYPE.getKey(entityIn.getType()).toString();
+                 });
++                onEntityTick(entityIn); // RSMM
+                 entityIn.tick();
+                 this.profiler.endSection();
+             }
+@@ -1514,7 +1674,8 @@
                  this.getChunk(entityIn.chunkCoordX, entityIn.chunkCoordZ).removeEntityAtIndex(entityIn, entityIn.chunkCoordY);
              }
  
@@ -411,7 +438,7 @@
              {
                  entityIn.addedToChunk = false;
              }
-@@ -1834,6 +1982,14 @@
+@@ -1834,6 +1995,14 @@
      @Nullable
      private TileEntity getPendingTileEntityAt(BlockPos pos)
      {
@@ -426,7 +453,7 @@
          for (int i = 0; i < this.addedTileEntityList.size(); ++i)
          {
              TileEntity tileentity = this.addedTileEntityList.get(i);
-@@ -1856,16 +2012,26 @@
+@@ -1856,16 +2025,26 @@
                  if (this.processingLoadedTiles)
                  {
                      tileEntityIn.setPos(pos);
@@ -459,7 +486,19 @@
                          }
                      }
  
-@@ -2149,6 +2315,13 @@
+@@ -1948,8 +2127,11 @@
+ 
+     public void tick(BooleanSupplier hasTimeLeft)
+     {
++        startTickTask(TickTask.WORLD_BORDER);
+         this.worldBorder.tick();
++        swapTickTask(TickTask.WEATHER);
+         this.tickWeather();
++        endTickTask();
+     }
+ 
+     protected void calculateInitialWeather()
+@@ -2149,6 +2331,13 @@
  
      public boolean checkLightFor(EnumLightType lightType, BlockPos pos)
      {
@@ -473,7 +512,7 @@
          if (!this.isAreaLoaded(pos, 17, false))
          {
              return false;
-@@ -2284,15 +2457,15 @@
+@@ -2284,15 +2473,15 @@
          }
      }
  
@@ -493,7 +532,7 @@
          int i = MathHelper.floor((boundingBox.minX - 2.0D) / 16.0D);
          int j = MathHelper.floor((boundingBox.maxX + 2.0D) / 16.0D);
          int k = MathHelper.floor((boundingBox.minZ - 2.0D) / 16.0D);
-@@ -2304,14 +2477,33 @@
+@@ -2304,14 +2493,33 @@
              {
                  if (this.isChunkLoaded(i1, j1, true))
                  {
@@ -528,7 +567,7 @@
      public <T extends Entity> List<T> getEntities(Class <? extends T > entityType, Predicate <? super T > filter)
      {
          List<T> list = Lists.newArrayList();
-@@ -2785,6 +2977,12 @@
+@@ -2785,6 +2993,12 @@
  
      public void checkSessionLock() throws SessionLockException
      {
@@ -541,7 +580,23 @@
          this.saveHandler.checkSessionLock();
      }
  
-@@ -3204,4 +3402,17 @@
+@@ -3066,6 +3280,7 @@
+ 
+                 if (iblockstate.getBlock() == Blocks.COMPARATOR)
+                 {
++                    onComparatorUpdate(blockpos);
+                     iblockstate.neighborChanged(this, blockpos, blockIn, pos);
+                 }
+                 else if (iblockstate.isNormalCube())
+@@ -3075,6 +3290,7 @@
+ 
+                     if (iblockstate.getBlock() == Blocks.COMPARATOR)
+                     {
++                        onComparatorUpdate(blockpos);
+                         iblockstate.neighborChanged(this, blockpos, blockIn, pos);
+                     }
+                 }
+@@ -3204,4 +3420,52 @@
      public abstract RecipeManager getRecipeManager();
  
      public abstract NetworkTagManager getTags();
@@ -558,4 +613,39 @@
 +        return ocd.mcoptimizations.shapecast.IShapecaster.combine(IEntityReader.super.createShapecaster(entity, ignoredEntities, box, filter), shapecaster);
 +    }
 +    // [CM] end
++
++    // RSMM
++    public void startTickTask(TickTask task) {
++        
++    }
++
++    // RSMM
++    public void swapTickTask(TickTask task) {
++        
++    }
++
++    // RSMM
++    public void endTickTask() {
++        
++    }
++
++    // RSMM
++    public void onBlockUpdate(BlockPos pos, IBlockState state) {
++        
++    }
++
++    // RSMM
++    public void onComparatorUpdate(BlockPos pos) {
++        
++    }
++
++    // RSMM
++    public void onEntityTick(Entity entity) {
++        
++    }
++
++    // RSMM
++    public void onBlockEntityTick(TileEntity blockEntity) {
++        
++    }
  }

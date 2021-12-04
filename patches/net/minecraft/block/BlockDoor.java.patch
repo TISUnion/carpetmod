@@ -1,0 +1,54 @@
+--- a/net/minecraft/block/BlockDoor.java
++++ b/net/minecraft/block/BlockDoor.java
+@@ -35,8 +35,9 @@
+ import net.minecraft.world.World;
+ import net.minecraftforge.api.distmarker.Dist;
+ import net.minecraftforge.api.distmarker.OnlyIn;
++import redstone.multimeter.block.MeterableBlock;
+ 
+-public class BlockDoor extends Block
++public class BlockDoor extends Block implements MeterableBlock /*RSMM*/
+ {
+     public static final DirectionProperty FACING = BlockHorizontal.HORIZONTAL_FACING;
+     public static final BooleanProperty OPEN = BlockStateProperties.OPEN;
+@@ -240,6 +241,9 @@
+     {
+         boolean flag = worldIn.isBlockPowered(pos) || worldIn.isBlockPowered(pos.offset(state.get(HALF) == DoubleBlockHalf.LOWER ? EnumFacing.UP : EnumFacing.DOWN));
+ 
++        logPowered(worldIn, pos, flag); // RSMM
++        logPowered(worldIn, getOtherHalf(pos, state), flag); // RSMM
++
+         if (blockIn != this && flag != state.get(POWERED))
+         {
+             if (flag != state.get(OPEN))
+@@ -310,4 +314,30 @@
+     {
+         return BlockFaceShape.UNDEFINED;
+     }
++
++    // RSMM
++    @Override
++    public boolean logPoweredOnBlockUpdate() {
++        return false;
++    }
++
++    // RSMM
++    @Override
++    public boolean isPowered(World world, BlockPos pos, IBlockState state) {
++        return world.isBlockPowered(pos) || world.isBlockPowered(getOtherHalf(pos, state));
++    }
++
++    // RSMM
++    @Override
++    public boolean isActive(World world, BlockPos pos, IBlockState state) {
++        return state.get(OPEN);
++    }
++
++    // RSMM
++    private BlockPos getOtherHalf(BlockPos pos, IBlockState state) {
++        DoubleBlockHalf half = state.get(HALF);
++        EnumFacing dir = (half == DoubleBlockHalf.LOWER) ? EnumFacing.UP : EnumFacing.DOWN;
++
++        return pos.offset(dir);
++    }
+ }

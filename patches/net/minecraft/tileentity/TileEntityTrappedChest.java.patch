@@ -1,0 +1,41 @@
+--- a/net/minecraft/tileentity/TileEntityTrappedChest.java
++++ b/net/minecraft/tileentity/TileEntityTrappedChest.java
+@@ -1,5 +1,11 @@
+ package net.minecraft.tileentity;
+ 
++import net.minecraft.block.BlockTrappedChest;
++import net.minecraft.world.WorldServer;
++import redstone.multimeter.block.PowerSource;
++import redstone.multimeter.server.Multimeter;
++import redstone.multimeter.server.MultimeterServer;
++
+ public class TileEntityTrappedChest extends TileEntityChest
+ {
+     public TileEntityTrappedChest()
+@@ -7,9 +13,24 @@
+         super(TileEntityType.TRAPPED_CHEST);
+     }
+ 
+-    protected void onOpenOrClose()
++    // RSMM: add 'open' parameter
++    protected void onOpenOrClose(boolean open)
+     {
+-        super.onOpenOrClose();
++        // RSMM start
++        if (!world.isRemote()) {
++            MultimeterServer server = ((WorldServer)world).getMultimeterServer();
++            Multimeter multimeter = server.getMultimeter();
++
++            int oldViewerCount = numPlayersUsing + (open ? -1 : 1);
++            
++            int oldPower = BlockTrappedChest.getPowerFromViewerCount(oldViewerCount);
++            int newPower = BlockTrappedChest.getPowerFromViewerCount(numPlayersUsing);
++
++            multimeter.logPowerChange(world, pos, oldPower, newPower);
++            multimeter.logActive(world, pos, newPower > PowerSource.MIN_POWER);
++        }
++        // RSMM end
++        super.onOpenOrClose(open);
+         this.world.notifyNeighborsOfStateChange(this.pos.down(), this.getBlockState().getBlock());
+     }
+ }

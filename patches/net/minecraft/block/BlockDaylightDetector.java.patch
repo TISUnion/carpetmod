@@ -1,0 +1,31 @@
+--- a/net/minecraft/block/BlockDaylightDetector.java
++++ b/net/minecraft/block/BlockDaylightDetector.java
+@@ -18,8 +18,10 @@
+ import net.minecraft.world.EnumLightType;
+ import net.minecraft.world.IBlockReader;
+ import net.minecraft.world.World;
++import redstone.multimeter.block.Meterable;
++import redstone.multimeter.block.PowerSource;
+ 
+-public class BlockDaylightDetector extends BlockContainer
++public class BlockDaylightDetector extends BlockContainer implements Meterable /*RSMM*/, PowerSource /*RSMM*/
+ {
+     public static final IntegerProperty POWER = BlockStateProperties.POWER_0_15;
+     public static final BooleanProperty INVERTED = BlockStateProperties.INVERTED;
+@@ -120,4 +122,16 @@
+     {
+         return face == EnumFacing.DOWN ? BlockFaceShape.SOLID : BlockFaceShape.UNDEFINED;
+     }
++
++    // RSMM
++    @Override
++    public boolean isActive(World world, BlockPos pos, IBlockState state) {
++        return state.get(POWER) > MIN_POWER;
++    }
++
++    // RSMM
++    @Override
++    public int getPowerLevel(World world, BlockPos pos, IBlockState state) {
++        return state.get(POWER);
++    }
+ }

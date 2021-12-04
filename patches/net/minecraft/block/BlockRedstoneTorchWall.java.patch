@@ -1,0 +1,17 @@
+--- a/net/minecraft/block/BlockRedstoneTorchWall.java
++++ b/net/minecraft/block/BlockRedstoneTorchWall.java
+@@ -73,10 +73,13 @@
+         }
+     }
+ 
++    // RSMM: capture return value
+     protected boolean shouldBeOff(World worldIn, BlockPos pos, IBlockState state)
+     {
+         EnumFacing enumfacing = state.get(FACING).getOpposite();
+-        return worldIn.isSidePowered(pos.offset(enumfacing), enumfacing);
++        boolean powered = worldIn.isSidePowered(pos.offset(enumfacing), enumfacing);
++        logPowered(worldIn, pos, powered); // RSMM
++        return powered;
+     }
+ 
+     public int getWeakPower(IBlockState blockState, IBlockReader blockAccess, BlockPos pos, EnumFacing side)

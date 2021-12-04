@@ -20,7 +20,17 @@
  import com.google.common.base.Stopwatch;
  import com.google.common.collect.Lists;
  import com.google.common.collect.Maps;
-@@ -178,6 +192,7 @@
+@@ -118,6 +132,9 @@
+ import net.minecraft.world.storage.loot.LootTableManager;
+ import net.minecraftforge.api.distmarker.Dist;
+ import net.minecraftforge.api.distmarker.OnlyIn;
++import redstone.multimeter.common.TickTask;
++import redstone.multimeter.server.MultimeterServer;
++
+ import org.apache.commons.lang3.Validate;
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+@@ -178,6 +195,7 @@
      public final Queue < FutureTask<? >> futureTaskQueue = Queues.newConcurrentLinkedQueue();
      private Thread serverThread;
      private long serverTime = Util.milliTime();
@@ -28,16 +38,25 @@
      @OnlyIn(Dist.CLIENT)
      private boolean worldIconSet;
      private final IReloadableResourceManager resourceManager = new SimpleReloadableResourceManager(ResourcePackType.SERVER_DATA);
-@@ -212,6 +227,8 @@
+@@ -194,6 +212,7 @@
+     private boolean whitelistEnabled;
+     private boolean forceWorldUpgrade;
+     private float tickTime;
++    private final MultimeterServer multimeterServer; // RSMM
+ 
+     public MinecraftServer(@Nullable File anvilFileIn, Proxy serverProxyIn, DataFixer dataFixerIn, Commands commandManagerIn, YggdrasilAuthenticationService authServiceIn, MinecraftSessionService sessionServiceIn, GameProfileRepository profileRepoIn, PlayerProfileCache profileCacheIn)
+     {
+@@ -212,6 +231,9 @@
          this.resourceManager.addReloadListener(this.lootTableManager);
          this.resourceManager.addReloadListener(this.functionManager);
          this.resourceManager.addReloadListener(this.advancementManager);
++        this.multimeterServer = new MultimeterServer(this); // RSMM
 +        //CM
 +        CarpetServer.init(this);
      }
  
      public abstract boolean init() throws IOException;
-@@ -571,7 +588,13 @@
+@@ -571,7 +593,13 @@
      public void stopServer()
      {
          LOGGER.info("Stopping server");
@@ -51,7 +70,7 @@
          if (this.getNetworkSystem() != null)
          {
              this.getNetworkSystem().terminateEndpoints();
-@@ -639,34 +662,64 @@
+@@ -639,34 +667,64 @@
      {
          try
          {
@@ -133,7 +152,7 @@
                  }
              }
              else
-@@ -782,7 +835,16 @@
+@@ -782,7 +840,18 @@
      {
          long i = Util.nanoTime();
          ++this.tickCounter;
@@ -144,13 +163,15 @@
 +        }
 +        // [CM end]
  
++        multimeterServer.tickStart(); // RSMM
++
 +        // CM spark
 +        CarpetSparkAccess.ServerTickEvents_START_SERVER_TICK(this);
 +
          if (this.startProfiling)
          {
              this.startProfiling = false;
-@@ -790,6 +852,9 @@
+@@ -790,6 +859,9 @@
          }
  
          this.profiler.startSection("root");
@@ -160,7 +181,7 @@
          this.updateTimeLightAndEntities(hasTimeLeft);
  
          if (i - this.nanoTimeSinceStatusRefresh >= 5000000000L)
-@@ -810,10 +875,26 @@
+@@ -810,10 +882,26 @@
  
          if (this.tickCounter % 900 == 0)
          {
@@ -187,7 +208,7 @@
          }
  
          this.profiler.startSection("snooper");
-@@ -829,16 +910,30 @@
+@@ -829,16 +917,33 @@
          }
  
          this.profiler.endSection();
@@ -208,6 +229,8 @@
 +        CarpetWorldEditAccess.onEndServerTick(this);
 +        // CM spark
 +        CarpetSparkAccess.ServerTickEvents_END_SERVER_TICK(this);
++
++        multimeterServer.tickEnd(); // RSMM
      }
  
      public void updateTimeLightAndEntities(BooleanSupplier hasTimeLeft)
@@ -215,18 +238,23 @@
          this.profiler.startSection("jobs");
 +        MicroTimingLoggerManager.setTickStage(TickStage.PLAYER_ACTION);  // TISCM Micro Timing logger
 +        MicroTimingLoggerManager.setTickStageExtra(LiteralTickStageExtra.SYNC_TASKS);  // TISCM Micro Timing logger
++        multimeterServer.startTickTask(TickTask.PACKETS); // RSMM
          FutureTask<?> futuretask;
  
          while ((futuretask = this.futureTaskQueue.poll()) != null)
-@@ -847,6 +942,7 @@
+@@ -847,8 +952,11 @@
          }
  
          this.profiler.endStartSection("commandFunctions");
 +        MicroTimingLoggerManager.setTickStage(TickStage.COMMAND_FUNCTION); // TISCM Micro Timing logger
++        multimeterServer.swapTickTask(TickTask.COMMAND_FUNCTIONS); // RSMM
          this.getFunctionManager().tick();
          this.profiler.endStartSection("levels");
++        multimeterServer.endTickTask(); // RSMM
  
-@@ -870,6 +966,7 @@
+         for (WorldServer worldserver : this.getWorlds())
+         {
+@@ -870,6 +978,7 @@
  
                  this.profiler.startSection("tick");
  
@@ -234,7 +262,7 @@
                  try
                  {
                      worldserver.tick(hasTimeLeft);
-@@ -878,9 +975,15 @@
+@@ -878,9 +987,15 @@
                  {
                      CrashReport crashreport = CrashReport.makeCrashReport(throwable1, "Exception ticking world");
                      worldserver.fillCrashReport(crashreport);
@@ -251,7 +279,7 @@
                  try
                  {
                      worldserver.tickEntities();
-@@ -889,7 +992,12 @@
+@@ -889,7 +1004,12 @@
                  {
                      CrashReport crashreport1 = CrashReport.makeCrashReport(throwable, "Exception ticking world entities");
                      worldserver.fillCrashReport(crashreport1);
@@ -265,7 +293,7 @@
                  }
  
                  this.profiler.endSection();
-@@ -905,10 +1013,13 @@
+@@ -905,10 +1025,13 @@
              }))[this.tickCounter % 100] = Util.nanoTime() - i;
          }
  
@@ -279,7 +307,7 @@
          this.profiler.endStartSection("tickables");
  
          for (int j = 0; j < this.tickables.size(); ++j)
-@@ -1004,6 +1115,11 @@
+@@ -1004,6 +1127,11 @@
                  }
              }
  
@@ -291,7 +319,7 @@
              YggdrasilAuthenticationService yggdrasilauthenticationservice = new YggdrasilAuthenticationService(Proxy.NO_PROXY, UUID.randomUUID().toString());
              MinecraftSessionService minecraftsessionservice = yggdrasilauthenticationservice.createMinecraftSessionService();
              GameProfileRepository gameprofilerepository = yggdrasilauthenticationservice.createProfileRepository();
-@@ -1142,7 +1258,8 @@
+@@ -1142,7 +1270,8 @@
  
      public String getServerModName()
      {
@@ -301,7 +329,7 @@
      }
  
      public CrashReport addServerInfoToCrashReport(CrashReport report)
-@@ -1605,6 +1722,12 @@
+@@ -1605,6 +1734,12 @@
      {
          return this.serverTime;
      }
@@ -314,7 +342,15 @@
  
      public Thread getServerThread()
      {
-@@ -1825,4 +1948,17 @@
+@@ -1639,6 +1774,7 @@
+         }
+         else
+         {
++            multimeterServer.getMultimeter().reloadOptions(); // RSMM
+             this.getPlayerList().saveAllPlayerData();
+             this.resourcePacks.reloadPacksFromFinders();
+             this.loadDataPacks(this.getWorld(DimensionType.OVERWORLD).getWorldInfo());
+@@ -1825,4 +1961,26 @@
              return 0;
          }
      }
@@ -330,5 +366,14 @@
 +    // CM worldedit
 +    public void watchDogTick$worldedit() {
 +        serverTime = Util.milliTime();
++    }
++
++    public MultimeterServer getMultimeterServer() {
++        return multimeterServer;
++    }
++
++    // RSMM
++    public boolean isPaused() {
++        return false;
 +    }
  }

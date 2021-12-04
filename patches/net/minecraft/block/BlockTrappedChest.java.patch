@@ -1,0 +1,48 @@
+--- a/net/minecraft/block/BlockTrappedChest.java
++++ b/net/minecraft/block/BlockTrappedChest.java
+@@ -11,8 +11,11 @@
+ import net.minecraft.util.math.BlockPos;
+ import net.minecraft.util.math.MathHelper;
+ import net.minecraft.world.IBlockReader;
++import net.minecraft.world.World;
++import redstone.multimeter.block.Meterable;
++import redstone.multimeter.block.PowerSource;
+ 
+-public class BlockTrappedChest extends BlockChest
++public class BlockTrappedChest extends BlockChest implements Meterable /*RSMM*/, PowerSource /*RSMM*/
+ {
+     public BlockTrappedChest(Block.Properties properties)
+     {
+@@ -43,4 +46,32 @@
+     {
+         return side == EnumFacing.UP ? blockState.getWeakPower(blockAccess, pos, side) : 0;
+     }
++
++    // RSMM
++    @Override
++    public boolean isActive(World world, BlockPos pos, IBlockState state) {
++        return getPower(world, pos, state) > MIN_POWER;
++    }
++
++    // RSMM
++    @Override
++    public boolean logPowerChangeOnStateChange() {
++        return false;
++    }
++
++    // RSMM
++    @Override
++    public int getPowerLevel(World world, BlockPos pos, IBlockState state) {
++        return getPower(world, pos, state);
++    }
++
++    // RSMM
++    public static int getPower(World world, BlockPos pos, IBlockState state) {
++        return getPowerFromViewerCount(TileEntityChest.getPlayersUsing(world, pos));
++    }
++
++    // RSMM
++    public static int getPowerFromViewerCount(int viewerCount) {
++        return MathHelper.clamp(viewerCount, MIN_POWER, MAX_POWER);
++    }
+ }

@@ -41,7 +41,31 @@
      }
  
      public NBTTagCompound write(NBTTagCompound compound)
-@@ -262,6 +271,7 @@
+@@ -219,7 +228,7 @@
+             }
+ 
+             ++this.numPlayersUsing;
+-            this.onOpenOrClose();
++            this.onOpenOrClose(true);
+         }
+     }
+ 
+@@ -228,11 +237,12 @@
+         if (!player.isSpectator())
+         {
+             --this.numPlayersUsing;
+-            this.onOpenOrClose();
++            this.onOpenOrClose(false);
+         }
+     }
+ 
+-    protected void onOpenOrClose()
++    // RSMM: add 'open' parameter
++    protected void onOpenOrClose(boolean open)
+     {
+         Block block = this.getBlockState().getBlock();
+ 
+@@ -262,6 +272,7 @@
      protected void setItems(NonNullList<ItemStack> itemsIn)
      {
          this.chestContents = itemsIn;
@@ -49,7 +73,7 @@
      }
  
      @OnlyIn(Dist.CLIENT)
-@@ -293,4 +303,28 @@
+@@ -293,4 +304,28 @@
          chest.setItems(otherChest.getItems());
          otherChest.setItems(nonnulllist);
      }

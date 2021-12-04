@@ -18,7 +18,17 @@
  import net.minecraft.block.material.EnumPushReaction;
  import net.minecraft.block.material.Material;
  import net.minecraft.block.material.MaterialColor;
-@@ -79,7 +85,8 @@
+@@ -72,14 +78,17 @@
+ import net.minecraft.world.World;
+ import net.minecraftforge.api.distmarker.Dist;
+ import net.minecraftforge.api.distmarker.OnlyIn;
++import redstone.multimeter.interfaces.IBlock;
++
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
+-public class Block implements IItemProvider
++public class Block implements IItemProvider, IBlock /*RSMM*/
  {
      protected static final Logger LOGGER = LogManager.getLogger();
      public static final ObjectIntIdentityMap<IBlockState> BLOCK_STATE_IDS = new ObjectIntIdentityMap<>();
@@ -28,7 +38,7 @@
      protected final int lightValue;
      protected final float blockHardness;
      protected final float blockResistance;
-@@ -175,21 +182,42 @@
+@@ -175,21 +184,42 @@
      @Deprecated
      public MaterialColor getMaterialColor(IBlockState state, IBlockReader worldIn, BlockPos pos)
      {
@@ -72,7 +82,7 @@
          }
      }
  
-@@ -621,6 +649,10 @@
+@@ -621,6 +651,10 @@
              double d2 = (double)(worldIn.rand.nextFloat() * 0.5F) + 0.25D;
              EntityItem entityitem = new EntityItem(worldIn, (double)pos.getX() + d0, (double)pos.getY() + d1, (double)pos.getZ() + d2, stack);
              entityitem.setDefaultPickupDelay();
@@ -83,7 +93,7 @@
              worldIn.spawnEntity(entityitem);
          }
      }
-@@ -1764,11 +1796,17 @@
+@@ -1764,11 +1798,17 @@
              private final IBlockState adjacentState;
              private final EnumFacing side;
  
@@ -101,7 +111,7 @@
              }
  
              public boolean equals(Object p_equals_1_)
-@@ -1790,7 +1828,8 @@
+@@ -1790,7 +1830,8 @@
  
              public int hashCode()
              {
