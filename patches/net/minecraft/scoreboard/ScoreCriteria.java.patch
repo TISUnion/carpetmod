@@ -5,7 +5,7 @@
      private final ScoreCriteria.RenderType renderType;
  
 +    // TISCM: Added block placed total criteria
-+    public static final ScoreCriteria BLOCK_PLACED = new ScoreCriteria("blockPlaced");
++    public static final ScoreCriteria BLOCK_PLACED_COUNT = new ScoreCriteria("blockPlacedCount");
 +
      public ScoreCriteria(String p_i47676_1_)
      {

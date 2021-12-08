@@ -41,8 +41,8 @@
 +                        // TISCM break_bedrock stat
 +                        BedrockBreakingStatHelper.onPlayerPlacedBlock(block, world, blockpos, entityplayer);
 +
-+                        // TISCM blockPlaced criteria
-+                        entityplayer.getWorldScoreboard().forAllObjectives(ScoreCriteria.BLOCK_PLACED, entityplayer.getScoreboardName(), Score::incrementScore);
++                        // TISCM blockPlacedCount criteria
++                        entityplayer.getWorldScoreboard().forAllObjectives(ScoreCriteria.BLOCK_PLACED_COUNT, entityplayer.getScoreboardName(), Score::incrementScore);
                      }
                  }
  
