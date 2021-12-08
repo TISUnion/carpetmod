@@ -13,7 +13,16 @@
  import net.minecraft.advancements.CriteriaTriggers;
  import net.minecraft.block.Block;
  import net.minecraft.block.SoundType;
-@@ -22,6 +23,10 @@
+@@ -11,6 +12,8 @@
+ import net.minecraft.entity.player.EntityPlayer;
+ import net.minecraft.entity.player.EntityPlayerMP;
+ import net.minecraft.nbt.NBTTagCompound;
++import net.minecraft.scoreboard.Score;
++import net.minecraft.scoreboard.ScoreCriteria;
+ import net.minecraft.server.MinecraftServer;
+ import net.minecraft.tileentity.TileEntity;
+ import net.minecraft.util.EnumActionResult;
+@@ -22,6 +25,10 @@
  import net.minecraftforge.api.distmarker.Dist;
  import net.minecraftforge.api.distmarker.OnlyIn;
  
@@ -24,17 +33,20 @@
  public class ItemBlock extends Item
  {
      @Deprecated
-@@ -73,6 +78,9 @@
+@@ -73,6 +80,12 @@
                      if (entityplayer instanceof EntityPlayerMP)
                      {
                          CriteriaTriggers.PLACED_BLOCK.trigger((EntityPlayerMP)entityplayer, blockpos, itemstack);
 +
 +                        // TISCM break_bedrock stat
 +                        BedrockBreakingStatHelper.onPlayerPlacedBlock(block, world, blockpos, entityplayer);
++
++                        // TISCM blockPlaced criteria
++                        entityplayer.getWorldScoreboard().forAllObjectives(ScoreCriteria.BLOCK_PLACED, entityplayer.getScoreboardName(), Score::incrementScore);
                      }
                  }
  
-@@ -92,13 +100,44 @@
+@@ -92,13 +105,44 @@
      @Nullable
      protected IBlockState getStateForPlacement(BlockItemUseContext context)
      {
