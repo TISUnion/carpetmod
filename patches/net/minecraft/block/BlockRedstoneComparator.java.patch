@@ -10,28 +10,16 @@
  import net.minecraft.block.state.IBlockState;
  import net.minecraft.entity.item.EntityItemFrame;
  import net.minecraft.entity.player.EntityPlayer;
-@@ -21,6 +23,7 @@
- import net.minecraft.world.IBlockReader;
- import net.minecraft.world.TickPriority;
- import net.minecraft.world.World;
-+import net.minecraft.world.WorldServer;
- 
- public class BlockRedstoneComparator extends BlockRedstoneDiode implements ITileEntityProvider
- {
-@@ -101,7 +104,11 @@
+@@ -101,7 +103,7 @@
                  }
              }
          }
 -
-+        // RSMM start
-+        if (!worldIn.isRemote()) {
-+            ((WorldServer)worldIn).getMultimeter().logPowered(worldIn, blockpos, i > MIN_POWER);
-+        }
-+        // RSMM end
++        logPowered(worldIn, blockpos, i > MIN_POWER); // RSMM
          return i;
      }
  
-@@ -200,4 +207,22 @@
+@@ -200,4 +202,22 @@
      {
          builder.add(HORIZONTAL_FACING, MODE, POWERED);
      }

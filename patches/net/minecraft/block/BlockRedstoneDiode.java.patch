@@ -86,7 +86,7 @@
      {
 -        return this.calculateInputStrength(worldIn, pos, state) > 0;
 +        boolean powered = this.calculateInputStrength(worldIn, pos, state) > 0;
-+        if (!worldIn.isRemote()) ((WorldServer)worldIn).getMultimeter().logPowered(worldIn, pos, powered); // RSMM
++        logPowered(worldIn, pos, powered); // RSMM
 +        return powered;
      }
  

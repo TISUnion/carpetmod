@@ -348,15 +348,19 @@
              chunksection.set(i, j & 15, k, state);
              this.heightMap.get(Heightmap.Type.MOTION_BLOCKING).update(i, j, k, state);
              this.heightMap.get(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES).update(i, j, k, state);
-@@ -529,6 +611,7 @@
+@@ -529,6 +611,11 @@
  
              if (!this.world.isRemote)
              {
-+                ((WorldServer)world).getMultimeter().onBlockChange(world, pos, iblockstate, state); // RSMM
++                // RSMM start
++                if (CarpetSettings.redstoneMultimeter) {
++                    ((WorldServer)world).getMultimeter().onBlockChange(world, pos, iblockstate, state);
++                }
++                // RSMM end
                  iblockstate.onReplaced(this.world, pos, state, isMoving);
              }
              else if (block1 != block && block1 instanceof ITileEntityProvider)
-@@ -551,10 +634,14 @@
+@@ -551,10 +638,14 @@
                      int i1 = state.getOpacity(this.world, pos);
                      int j1 = iblockstate.getOpacity(this.world, pos);
                      this.relightBlock(i, j, k, state);
@@ -374,7 +378,7 @@
                      }
                  }
  
-@@ -570,12 +657,48 @@
+@@ -570,12 +661,48 @@
  
                  if (!this.world.isRemote)
                  {
@@ -425,7 +429,7 @@
  
                      if (tileentity1 == null)
                      {
-@@ -596,6 +719,9 @@
+@@ -596,6 +723,9 @@
  
      public int getLightFor(EnumLightType type, BlockPos pos)
      {
@@ -435,7 +439,7 @@
          return this.getLight(type, pos, this.world.getDimension().hasSkyLight());
      }
  
-@@ -651,10 +777,18 @@
+@@ -651,10 +781,18 @@
                  {
                      return;
                  }
@@ -456,7 +460,7 @@
              }
  
              if (light == EnumLightType.SKY)
-@@ -680,6 +814,9 @@
+@@ -680,6 +818,9 @@
  
      public int getLightSubtracted(BlockPos pos, int amount, boolean hasSkylight)
      {
@@ -466,7 +470,7 @@
          int i = pos.getX() & 15;
          int j = pos.getY();
          int k = pos.getZ() & 15;
-@@ -742,6 +879,18 @@
+@@ -742,6 +883,18 @@
          entityIn.chunkCoordY = k;
          entityIn.chunkCoordZ = this.z;
          this.entityLists[k].add(entityIn);
@@ -485,7 +489,7 @@
      }
  
      public void setHeightmap(Heightmap.Type type, long[] data)
-@@ -767,6 +916,12 @@
+@@ -767,6 +920,12 @@
          }
  
          this.entityLists[index].remove(entityIn);
@@ -498,7 +502,7 @@
      }
  
      public boolean canSeeSky(BlockPos pos)
-@@ -869,7 +1024,7 @@
+@@ -869,7 +1028,7 @@
          this.deferredTileEntities.put(new BlockPos(nbt.getInt("x"), nbt.getInt("y"), nbt.getInt("z")), nbt);
      }
  
@@ -507,7 +511,7 @@
      {
          if (this.loaded)
          {
-@@ -894,10 +1049,24 @@
+@@ -894,10 +1053,24 @@
                  return !(p_212383_0_ instanceof EntityPlayer);
              }));
          }
@@ -532,7 +536,7 @@
          this.loaded = false;
  
          for (TileEntity tileentity : this.tileEntities.values())
-@@ -907,8 +1076,38 @@
+@@ -907,8 +1080,38 @@
  
          for (ClassInheritanceMultiMap<Entity> classinheritancemultimap : this.entityLists)
          {
@@ -572,7 +576,7 @@
      }
  
      public void markDirty()
-@@ -916,7 +1115,8 @@
+@@ -916,7 +1119,8 @@
          this.dirty = true;
      }
  
@@ -582,7 +586,7 @@
      {
          int i = MathHelper.floor((aabb.minY - 2.0D) / 16.0D);
          int j = MathHelper.floor((aabb.maxY + 2.0D) / 16.0D);
-@@ -925,9 +1125,9 @@
+@@ -925,9 +1129,9 @@
  
          for (int k = i; k <= j; ++k)
          {
@@ -594,7 +598,7 @@
                  {
                      if (entity.getBoundingBox().intersects(aabb) && entity != entityIn)
                      {
-@@ -954,6 +1154,21 @@
+@@ -954,6 +1158,21 @@
          }
      }
  
@@ -616,7 +620,7 @@
      public <T extends Entity> void getEntitiesOfTypeWithinAABB(Class <? extends T > entityClass, AxisAlignedBB aabb, List<T> listToFill, @Nullable Predicate <? super T > filter)
      {
          int i = MathHelper.floor((aabb.minY - 2.0D) / 16.0D);
-@@ -997,6 +1212,9 @@
+@@ -997,6 +1216,9 @@
  
      public void tick(boolean skipRecheckGaps)
      {
@@ -626,7 +630,7 @@
          if (this.isGapLightingUpdated && this.world.dimension.hasSkyLight() && !skipRecheckGaps)
          {
              this.recheckGaps(this.world.isRemote);
-@@ -1138,9 +1356,28 @@
+@@ -1138,9 +1360,28 @@
                  this.sections[l].recalculateRefCounts();
              }
          }
@@ -657,7 +661,7 @@
          for (TileEntity tileentity : this.tileEntities.values())
          {
              tileentity.updateContainingBlockInfo();
-@@ -1165,6 +1402,12 @@
+@@ -1165,6 +1406,12 @@
          this.queuedLightChecks = 0;
      }
  
@@ -670,7 +674,7 @@
      public void enqueueRelightChecks()
      {
          if (this.queuedLightChecks < 4096)
-@@ -1190,7 +1433,7 @@
+@@ -1190,7 +1437,7 @@
  
                      if (this.sections[j] == EMPTY_SECTION && flag || this.sections[j] != EMPTY_SECTION && this.sections[j].get(k, i1, l).isAir())
                      {
@@ -679,7 +683,7 @@
                          {
                              BlockPos blockpos2 = blockpos1.offset(enumfacing);
  
-@@ -1497,4 +1740,67 @@
+@@ -1497,4 +1744,67 @@
          QUEUED,
          CHECK;
      }

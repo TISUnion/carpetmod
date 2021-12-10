@@ -15,7 +15,7 @@
      {
          if (!worldIn.isRemote)
          {
-+            logPowered(worldIn, pos, isPowered(worldIn, pos, state)); // RSMM
++            logPowered(worldIn, pos, state); // RSMM
              if (state.get(LIT) && !worldIn.isBlockPowered(pos))
              {
                  worldIn.setBlockState(pos, state.cycle(LIT), 2);

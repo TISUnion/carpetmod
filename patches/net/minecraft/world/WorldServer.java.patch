@@ -417,11 +417,15 @@
          }
      }
  
-@@ -619,18 +796,24 @@
+@@ -619,18 +796,32 @@
  
          if (ifluidstate.getFluid() == fluidTickEntry.getTarget())
          {
-+            getMultimeter().logScheduledTick(this, fluidTickEntry); // RSMM
++            // RSMM start
++            if (CarpetSettings.redstoneMultimeter) {
++                getMultimeter().logScheduledTick(this, fluidTickEntry);
++            }
++            // RSMM end
              ifluidstate.tick(this, fluidTickEntry.position);
          }
      }
@@ -434,7 +438,11 @@
  
          if (iblockstate.getBlock() == blockTickEntry.getTarget())
          {
-+            getMultimeter().logScheduledTick(this, blockTickEntry); // RSMM
++            // RSMM start
++            if (CarpetSettings.redstoneMultimeter) {
++                getMultimeter().logScheduledTick(this, blockTickEntry);
++            }
++            // RSMM end
              iblockstate.tick(this, blockTickEntry.position, this.rand);
          }
 +
@@ -442,7 +450,7 @@
      }
  
      public void tickEntity(Entity entityIn, boolean forceUpdate)
-@@ -1021,26 +1204,59 @@
+@@ -1021,26 +1212,59 @@
  
      public void addBlockEvent(BlockPos pos, Block blockIn, int eventID, int eventParam)
      {
@@ -494,7 +502,7 @@
          IBlockState iblockstate = this.getBlockState(event.getPosition());
 -        return iblockstate.getBlock() == event.getBlock() ? iblockstate.onBlockEventReceived(this, event.getPosition(), event.getEventID(), event.getEventParameter()) : false;
 +        // RSMM start
-+        if (iblockstate.getBlock() == event.getBlock()) {
++        if (CarpetSettings.redstoneMultimeter && iblockstate.getBlock() == event.getBlock()) {
 +            getMultimeter().logBlockEvent(this, event); // RSMM
 +        }
 +        // RSMM end
@@ -505,7 +513,7 @@
      }
  
      public void close()
-@@ -1194,4 +1410,63 @@
+@@ -1194,4 +1418,77 @@
      {
          return this.server.getNetworkTagManager();
      }
@@ -513,50 +521,64 @@
 +    // RSMM
 +    @Override
 +    public void startTickTask(TickTask task) {
-+        getMultimeterServer().startTickTask(task);
++        if (CarpetSettings.redstoneMultimeter) {
++            getMultimeterServer().startTickTask(task);
++        }
 +    }
 +
 +    // RSMM
 +    @Override
 +    public void swapTickTask(TickTask task) {
-+        getMultimeterServer().swapTickTask(task);
++        if (CarpetSettings.redstoneMultimeter) {
++            getMultimeterServer().swapTickTask(task);
++        }
 +    }
 +
 +    // RSMM
 +    @Override
 +    public void endTickTask() {
-+        getMultimeterServer().endTickTask();
++        if (CarpetSettings.redstoneMultimeter) {
++            getMultimeterServer().endTickTask();
++        }
 +    }
 +
 +    // RSMM
 +    @Override
 +    public void onBlockUpdate(BlockPos pos, IBlockState state) {
-+        MultimeterServer server = getMultimeterServer();
-+        Multimeter multimeter = server.getMultimeter();
++        if (CarpetSettings.redstoneMultimeter) {
++            MultimeterServer server = getMultimeterServer();
++            Multimeter multimeter = server.getMultimeter();
 +
-+        multimeter.logBlockUpdate(this, pos);
++            multimeter.logBlockUpdate(this, pos);
 +
-+        if (state.getBlock().logPoweredOnBlockUpdate()) {
-+            multimeter.logPowered(this, pos, state);
++            if (state.getBlock().logPoweredOnBlockUpdate()) {
++                multimeter.logPowered(this, pos, state);
++            }
 +        }
 +    }
 +
 +    // RSMM
 +    @Override
 +    public void onComparatorUpdate(BlockPos pos) {
-+        getMultimeter().logComparatorUpdate(this, pos);
++        if (CarpetSettings.redstoneMultimeter) {
++            getMultimeter().logComparatorUpdate(this, pos);
++        }
 +    }
 +
 +    // RSMM
 +    @Override
 +    public void onEntityTick(Entity entity) {
-+        getMultimeter().logEntityTick(this, entity);
++        if (CarpetSettings.redstoneMultimeter) {
++            getMultimeter().logEntityTick(this, entity);
++        }
 +    }
 +
 +    // RSMM
 +    @Override
 +    public void onBlockEntityTick(TileEntity blockEntity) {
-+        getMultimeter().logBlockEntityTick(this, blockEntity);
++        if (CarpetSettings.redstoneMultimeter) {
++            getMultimeter().logBlockEntityTick(this, blockEntity);
++        }
 +    }
 +
 +    // RSMM

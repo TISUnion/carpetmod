@@ -1,6 +1,15 @@
 --- a/net/minecraft/block/BlockDoor.java
 +++ b/net/minecraft/block/BlockDoor.java
-@@ -35,8 +35,9 @@
+@@ -1,6 +1,8 @@
+ package net.minecraft.block;
+ 
+ import javax.annotation.Nullable;
++
++import carpet.settings.CarpetSettings;
+ import net.minecraft.block.material.EnumPushReaction;
+ import net.minecraft.block.material.Material;
+ import net.minecraft.block.state.BlockFaceShape;
+@@ -35,8 +37,9 @@
  import net.minecraft.world.World;
  import net.minecraftforge.api.distmarker.Dist;
  import net.minecraftforge.api.distmarker.OnlyIn;
@@ -11,17 +20,21 @@
  {
      public static final DirectionProperty FACING = BlockHorizontal.HORIZONTAL_FACING;
      public static final BooleanProperty OPEN = BlockStateProperties.OPEN;
-@@ -240,6 +241,9 @@
+@@ -239,7 +242,12 @@
+     public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos)
      {
          boolean flag = worldIn.isBlockPowered(pos) || worldIn.isBlockPowered(pos.offset(state.get(HALF) == DoubleBlockHalf.LOWER ? EnumFacing.UP : EnumFacing.DOWN));
- 
-+        logPowered(worldIn, pos, flag); // RSMM
-+        logPowered(worldIn, getOtherHalf(pos, state), flag); // RSMM
-+
+-
++        // RSMM start
++        if (CarpetSettings.redstoneMultimeter) {
++            logPowered(worldIn, pos, flag);
++            logPowered(worldIn, getOtherHalf(pos, state), flag);
++        }
++        // RSMM end
          if (blockIn != this && flag != state.get(POWERED))
          {
              if (flag != state.get(OPEN))
-@@ -310,4 +314,30 @@
+@@ -310,4 +318,30 @@
      {
          return BlockFaceShape.UNDEFINED;
      }

@@ -9,8 +9,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
-import carpet.settings.CarpetSettings;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEventData;
 import net.minecraft.block.state.IBlockState;
@@ -524,7 +522,7 @@ public class Multimeter {
 	}
 	
 	private void tryLogEvent(World world, BlockPos blockPos, MeterEventPredicate predicate, MeterEventSupplier supplier) {
-		if (CarpetSettings.redstoneMultimeter && options.hasEventType(supplier.type())) {
+		if (options.hasEventType(supplier.type())) {
 			DimPos pos = new DimPos(world, blockPos);
 			
 			for (ServerMeterGroup meterGroup : meterGroups.values()) {

@@ -1,8 +1,9 @@
 --- a/net/minecraft/tileentity/TileEntityTrappedChest.java
 +++ b/net/minecraft/tileentity/TileEntityTrappedChest.java
-@@ -1,5 +1,11 @@
+@@ -1,5 +1,12 @@
  package net.minecraft.tileentity;
  
++import carpet.settings.CarpetSettings;
 +import net.minecraft.block.BlockTrappedChest;
 +import net.minecraft.world.WorldServer;
 +import redstone.multimeter.block.PowerSource;
@@ -12,7 +13,7 @@
  public class TileEntityTrappedChest extends TileEntityChest
  {
      public TileEntityTrappedChest()
-@@ -7,9 +13,24 @@
+@@ -7,9 +14,24 @@
          super(TileEntityType.TRAPPED_CHEST);
      }
  
@@ -22,7 +23,7 @@
      {
 -        super.onOpenOrClose();
 +        // RSMM start
-+        if (!world.isRemote()) {
++        if (CarpetSettings.redstoneMultimeter && !world.isRemote()) {
 +            MultimeterServer server = ((WorldServer)world).getMultimeterServer();
 +            Multimeter multimeter = server.getMultimeter();
 +

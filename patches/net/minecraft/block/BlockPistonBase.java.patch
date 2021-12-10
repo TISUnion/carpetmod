@@ -187,7 +187,7 @@
                  BlockPos blockpos3 = list.get(l);
                  IBlockState iblockstate3 = worldIn.getBlockState(blockpos3);
 +                // RSMM start
-+                if (!worldIn.isRemote()) {
++                if (CarpetSettings.redstoneMultimeter && !worldIn.isRemote()) {
 +                    Multimeter multimeter = ((WorldServer)worldIn).getMultimeter();
 +                    multimeter.logMoved(worldIn, blockpos3, enumfacing);
 +                    multimeter.moveMeters(worldIn, blockpos3, enumfacing);
