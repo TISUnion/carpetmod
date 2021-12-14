@@ -490,11 +490,11 @@
  
      public void tick(BooleanSupplier hasTimeLeft)
      {
-+        startTickTask(TickTask.WORLD_BORDER);
++        startTickTask(TickTask.WORLD_BORDER); // RSMM
          this.worldBorder.tick();
-+        swapTickTask(TickTask.WEATHER);
++        swapTickTask(TickTask.WEATHER); // RSMM
          this.tickWeather();
-+        endTickTask();
++        endTickTask(); // RSMM
      }
  
      protected void calculateInitialWeather()
