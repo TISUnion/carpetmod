@@ -7,17 +7,33 @@ on: [push, pull_request]
 
 jobs:
   prepare:
+    concurrency: ci
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
 
-      - name: Generate build number
+      - name: Generate build number for push
         id: buildnumber
+        if: ${{ github.event_name == 'push' }}
         uses: einaregilsson/build-number@v3
         with:
           token: ${{ secrets.github_token }}
+          
+      - name: Generate build number
+        id: generate
+        run: |
+          if [ $GITHUB_EVENT_NAME == 'push' ]
+          then
+              echo "::set-output name=build_number::${{ steps.buildnumber.outputs.build_number }}"
+          else
+              echo "::set-output name=build_number::PR"
+          fi
+
+      - name: Display build number
+        run: echo ${{ steps.generate.outputs.build_number }}
+
     outputs:
-      build_number: ${{ steps.buildnumber.outputs.build_number }}
+      build_number: ${{ steps.generate.outputs.build_number }}
 
   build:
     needs: prepare

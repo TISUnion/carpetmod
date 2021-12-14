@@ -1,0 +1,12 @@
+--- a/net/minecraft/scoreboard/ScoreCriteria.java
++++ b/net/minecraft/scoreboard/ScoreCriteria.java
+@@ -30,6 +30,9 @@
+     private final boolean readOnly;
+     private final ScoreCriteria.RenderType renderType;
+ 
++    // TISCM: Added block placed total criteria
++    public static final ScoreCriteria BLOCK_PLACED_COUNT = new ScoreCriteria("blockPlacedCount");
++
+     public ScoreCriteria(String p_i47676_1_)
+     {
+         this(p_i47676_1_, false, ScoreCriteria.RenderType.INTEGER);

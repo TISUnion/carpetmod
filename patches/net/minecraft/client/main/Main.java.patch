@@ -1,14 +1,15 @@
 --- a/net/minecraft/client/main/Main.java
 +++ b/net/minecraft/client/main/Main.java
-@@ -1,5 +1,7 @@
+@@ -1,5 +1,8 @@
  package net.minecraft.client.main;
  
 +import carpet.spark.CarpetSparkAccess;
++import carpet.utils.Log4j2JndiPatch;
 +import carpet.worldedit.CarpetWorldEditAccess;
  import com.google.gson.Gson;
  import com.google.gson.GsonBuilder;
  import com.mojang.authlib.properties.PropertyMap;
-@@ -70,6 +72,11 @@
+@@ -70,6 +73,11 @@
              System.out.println("Completely ignored arguments: " + list);
          }
  
@@ -20,3 +21,13 @@
          String s = func_206236_a(optionset, optionspec5);
          Proxy proxy = Proxy.NO_PROXY;
  
+@@ -162,6 +170,9 @@
+ 
+     static
+     {
++        // TISCM LOG4J2-3201 PATCH
++        Log4j2JndiPatch.patch();
++
+         System.setProperty("java.awt.headless", "true");
+     }
+ }
