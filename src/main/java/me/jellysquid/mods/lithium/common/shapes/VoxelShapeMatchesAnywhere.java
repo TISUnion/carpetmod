@@ -90,21 +90,22 @@ public class VoxelShapeMatchesAnywhere
                 //all of the positions of +1e-7 and -1e-7 and >, >=, <, <= are carefully chosen:
                 //for example for the following line:                       >= here fails the test
                 //                                        moving the - 1e-7 here to the other side of > as + 1e-7 fails the test
-                boolean simpleCubeIntersectsXSlice = (simpleCubeMaxX - 1e-7 > pointPositionsX.getDouble(x) && simpleCubeMinX < pointPositionsX.getDouble(x + 1) - 1e-7);
+                // seems like in 1.13 it should be >= instead of >, same as below and <=, <
+                boolean simpleCubeIntersectsXSlice = (simpleCubeMaxX - 1e-7 >= pointPositionsX.getDouble(x) && simpleCubeMinX <= pointPositionsX.getDouble(x + 1) - 1e-7);
                 if (!acceptOtherShapeAlone && !simpleCubeIntersectsXSlice) {
                     //if we cannot return when the simple cube is not intersecting the area, skip forward
                     continue;
                 }
                 boolean xSliceExceedsCube = acceptOtherShapeAlone && !((simpleCubeMaxX >= pointPositionsX.getDouble(x + 1) - 1e-7 && simpleCubeMinX - 1e-7 <= pointPositionsX.getDouble(x)));
                 for (int y = voxelSet.getStart(Y); y < yMax; y++) {
-                    boolean simpleCubeIntersectsYSlice = (simpleCubeMaxY - 1e-7 > pointPositionsY.getDouble(y) && simpleCubeMinY < pointPositionsY.getDouble(y + 1) - 1e-7);
+                    boolean simpleCubeIntersectsYSlice = (simpleCubeMaxY - 1e-7 >= pointPositionsY.getDouble(y) && simpleCubeMinY <= pointPositionsY.getDouble(y + 1) - 1e-7);
                     if (!acceptOtherShapeAlone && !simpleCubeIntersectsYSlice) {
                         //if we cannot return when the simple cube is not intersecting the area, skip forward
                         continue;
                     }
                     boolean ySliceExceedsCube = acceptOtherShapeAlone && !((simpleCubeMaxY >= pointPositionsY.getDouble(y + 1) - 1e-7 && simpleCubeMinY - 1e-7 <= pointPositionsY.getDouble(y)));
                     for (int z = voxelSet.getStart(Z); z < zMax; z++) {
-                        boolean simpleCubeIntersectsZSlice = (simpleCubeMaxZ - 1e-7 > pointPositionsZ.getDouble(z) && simpleCubeMinZ < pointPositionsZ.getDouble(z + 1) - 1e-7);
+                        boolean simpleCubeIntersectsZSlice = (simpleCubeMaxZ - 1e-7 >= pointPositionsZ.getDouble(z) && simpleCubeMinZ <= pointPositionsZ.getDouble(z + 1) - 1e-7);
                         if (!acceptOtherShapeAlone && !simpleCubeIntersectsZSlice) {
                             //if we cannot return when the simple cube is not intersecting the area, skip forward
                             continue;
