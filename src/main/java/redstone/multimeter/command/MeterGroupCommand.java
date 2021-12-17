@@ -23,7 +23,6 @@ import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.command.arguments.EntityArgument;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 
 import redstone.multimeter.RedstoneMultimeter;
@@ -37,7 +36,7 @@ public class MeterGroupCommand {
 	public static void register(CommandDispatcher<CommandSource> dispatcher) {
 		LiteralArgumentBuilder<CommandSource> builder = Commands.
 			literal("metergroup").
-			requires(source -> isMultimeterClient(source)).
+			requires(source -> CarpetSettings.redstoneMultimeter && isMultimeterClient(source)).
 			then(Commands.
 				literal("clear").
 				executes(context -> clear(context.getSource()))).
@@ -136,10 +135,7 @@ public class MeterGroupCommand {
 	
 	private static int subscribe(CommandSource source, String name) {
 		return command(source, (multimeter, player) -> {
-			if (!CarpetSettings.redstoneMultimeter) {
-			    ITextComponent message = new TextComponentString("Please enable the 'redstoneMultimeter' carpet rule first!");
-                source.sendFeedback(message, false);
-			} else if (name == null) {
+			if (name == null) {
 				multimeter.subscribeToDefaultMeterGroup(player);
 				source.sendFeedback(new TextComponentString("Subscribed to default meter group"), false);
 			} else if (multimeter.hasMeterGroup(name)) {
@@ -282,14 +278,7 @@ public class MeterGroupCommand {
 	
 	private static int command(CommandSource source, MeterGroupCommandExecutor command) {
 		return command(source, (multimeter, player) -> {
-			if (!CarpetSettings.redstoneMultimeter) {
-			    ITextComponent message = new TextComponentString("Please enable the 'redstoneMultimeter' carpet rule first!");
-	            source.sendFeedback(message, false);
-	            
-			    return;
-			}
-		    
-		    ServerMeterGroup meterGroup = multimeter.getSubscription(player);
+			ServerMeterGroup meterGroup = multimeter.getSubscription(player);
 			
 			if (meterGroup == null) {
 				source.sendFeedback(new TextComponentString("Please subscribe to a meter group first!"), false);

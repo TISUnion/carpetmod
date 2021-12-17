@@ -1143,7 +1143,10 @@ public class CarpetSettings
     // RSMM
     @Rule(
             desc = "Enable server-side Redstone Multimeter support.",
-            category = CREATIVE
+            category = {
+                    CREATIVE,
+                    COMMAND
+            }
     )
     public static boolean redstoneMultimeter;
 }
