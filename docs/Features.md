@@ -596,59 +596,7 @@ Use `/carpet commandEPSTest` to enable / disable this command
 
 A tracker to track lifetime and spawn / removal reasons from all newly spawned and dead entities
 
-This tracker is mostly used to debug mobfarms. It aims to track the process from mob starting affecting the mobcap to mob being removed from the mobcap. The spawning tracking part of it doesn't cover every kind of mob spawning reasons
-
-Other than being removed from the world, if a mob becomes persistent for the first time like nametagged or item pickup, it will be marked as removal too. If a mob doesn't count towards the mobcap when it spawns, it will not be tracked
-
-This tracker also tracks lifetime of items and xp orbs from mob and block drops as an additional functionality. Note that it doesn't track all item / xp orb spawning, so you'd better have a test before actually using it
-
-Adding a `realtime` suffix to the command will turn the rate result from in-game time based to realtime based
-
-### tracking
-
-`/raid tracking [<start|stop|restart>]`
-
-Control the lifetime tracker
-
-Tracked entity types:
-- All kinds of mob (MobEntity)
-- Item Entity
-- Experience Orb Entity
-
-Tracked entity spawning reasons
-- Natural spawning
-- Portal pigman spawning
-- Trans-dimension from portal
-- Spawned by item (spawn eggs etc.)
-- Slime division (for slime and magma cube)
-- Zombie Reinforce
-- `/summon` command
-- Mob drop (item and xp orb only)
-- Block drop (item only)
-
-Note that only entities that have been tracked spawning will be counted to the statistic 
-
-Tracked entity removal reasons
-- Despawn, including immediately despawn, random despawn, difficulty despawn and timeout despawn
-- Damaged to death
-- Becomes persistent. Note that the entity is still not removed from the world
-- Trans-dimension through portal
-- Entity merged (item and xp orb only)
-- Picked up by player (item and xp orb only)
-- Collected up by hopper or hopper minecart (item only)
-- Other (anything else not in the list)
-
-The definition of lifetime is: **The amount of spawning stage passing between entity spawning and entity removal**, in other words, how many gameticks does the entity counts towards mobcap. Technically the invoking point for the passing spawning stage counter increment is at the beginning of the method `WorldEntitySpawner#findChunksForSpawning`
-
-Statistics are sorted by the proportion of the amount 
-
-### <entity_type>
-
-`/lifetime <entity_type> [<life_time|removal|spawning>]`
-
-Show the detail statistic of specific entity type. You can specify which part of the statistic will be output
-
-For example, `/lifetime creeper` shows all statistic of creeper in detail, and `/lifetime creeper removal` only shows removal statistic of creeper in detail 
+See [the document](https://github.com/TISUnion/Carpet-TIS-Addition/blob/master/docs/commands.md#lifetime) of Carpet TIS Addition for more information
 
 ------
 

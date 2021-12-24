@@ -1,0 +1,33 @@
+--- a/net/minecraft/block/BlockCarvedPumpkin.java
++++ b/net/minecraft/block/BlockCarvedPumpkin.java
+@@ -1,6 +1,8 @@
+ package net.minecraft.block;
+ 
+ import java.util.function.Predicate;
++
++import carpet.commands.lifetime.spawning.LiteralSpawningReason;
+ import net.minecraft.advancements.CriteriaTriggers;
+ import net.minecraft.block.material.Material;
+ import net.minecraft.block.state.BlockWorldState;
+@@ -68,6 +70,10 @@
+             EntitySnowman entitysnowman = new EntitySnowman(p_196358_1_);
+             BlockPos blockpos1 = blockpattern$patternhelper.translateOffset(0, 2, 0).getPos();
+             entitysnowman.setLocationAndAngles((double)blockpos1.getX() + 0.5D, (double)blockpos1.getY() + 0.05D, (double)blockpos1.getZ() + 0.5D, 0.0F, 0.0F);
++
++            // TISCM lifetime tracker
++            entitysnowman.recordSpawning(LiteralSpawningReason.SUMMON);
++
+             p_196358_1_.spawnEntity(entitysnowman);
+ 
+             for (EntityPlayerMP entityplayermp : p_196358_1_.getEntitiesWithinAABB(EntityPlayerMP.class, entitysnowman.getBoundingBox().grow(5.0D)))
+@@ -103,6 +109,10 @@
+                 EntityIronGolem entityirongolem = new EntityIronGolem(p_196358_1_);
+                 entityirongolem.setPlayerCreated(true);
+                 entityirongolem.setLocationAndAngles((double)blockpos.getX() + 0.5D, (double)blockpos.getY() + 0.05D, (double)blockpos.getZ() + 0.5D, 0.0F, 0.0F);
++
++                // TISCM lifetime tracker
++                entityirongolem.recordSpawning(LiteralSpawningReason.SUMMON);
++
+                 p_196358_1_.spawnEntity(entityirongolem);
+ 
+                 for (EntityPlayerMP entityplayermp1 : p_196358_1_.getEntitiesWithinAABB(EntityPlayerMP.class, entityirongolem.getBoundingBox().grow(5.0D)))

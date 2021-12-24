@@ -1,0 +1,20 @@
+--- a/net/minecraft/entity/ai/EntityAIVillagerMate.java
++++ b/net/minecraft/entity/ai/EntityAIVillagerMate.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.entity.ai;
+ 
++import carpet.commands.lifetime.spawning.LiteralSpawningReason;
+ import net.minecraft.entity.Entity;
+ import net.minecraft.entity.passive.EntityVillager;
+ import net.minecraft.util.math.BlockPos;
+@@ -120,6 +121,10 @@
+         this.villager.setIsWillingToMate(false);
+         entityvillager.setGrowingAge(-24000);
+         entityvillager.setLocationAndAngles(this.villager.posX, this.villager.posY, this.villager.posZ, 0.0F, 0.0F);
++
++        // TISCM lifetime tracker
++        entityvillager.recordSpawning(LiteralSpawningReason.BREEDING);
++
+         this.world.spawnEntity(entityvillager);
+         this.world.setEntityState(entityvillager, (byte)12);
+     }
