@@ -55,11 +55,11 @@ public class Messenger
     private static ITextComponent _applyStyleToTextComponent(ITextComponent comp, String style)
     {
         //could be rewritten to be more efficient
-        comp.getStyle().setItalic(style.indexOf('i')>=0);
-        comp.getStyle().setStrikethrough(style.indexOf('s')>=0);
-        comp.getStyle().setUnderlined(style.indexOf('u')>=0);
-        comp.getStyle().setBold(style.indexOf('b')>=0);
-        comp.getStyle().setObfuscated(style.indexOf('o')>=0);
+        if (style.indexOf('i')>=0) comp.getStyle().setItalic(true);
+        if (style.indexOf('s')>=0) comp.getStyle().setStrikethrough(true);
+        if (style.indexOf('u')>=0) comp.getStyle().setUnderlined(true);
+        if (style.indexOf('b')>=0) comp.getStyle().setBold(true);
+        if (style.indexOf('o')>=0) comp.getStyle().setObfuscated(true);
         comp.getStyle().setColor(TextFormatting.WHITE);
         if (style.indexOf('w')>=0) comp.getStyle().setColor(TextFormatting.WHITE); // not needed
         if (style.indexOf('y')>=0) comp.getStyle().setColor(TextFormatting.YELLOW);

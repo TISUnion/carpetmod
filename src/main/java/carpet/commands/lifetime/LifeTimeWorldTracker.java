@@ -169,12 +169,10 @@ public class LifeTimeWorldTracker extends TranslatableBase
 							TextUtil.getFancyText(
 									null,
 									Messenger.c("e " + data.getSpawningCount()),
-									Messenger.s(
-											Messenger.c(
-													data.getSpawningCountText(ticks),
-													"w " + (spawningReasons.isEmpty() ? "" : "\n"),
-													Messenger.c(spawningReasons.toArray(new Object[0]))
-											).getString()  // to reduce network load
+									Messenger.c(
+											data.getSpawningCountText(ticks),
+											"w " + (spawningReasons.isEmpty() ? "" : "\n"),
+											Messenger.c(spawningReasons.toArray(new Object[0]))
 									),
 									new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, String.format("%s %s", currentCommandBase, SpecificDetailMode.SPAWNING))
 							),
@@ -182,12 +180,10 @@ public class LifeTimeWorldTracker extends TranslatableBase
 							TextUtil.getFancyText(
 									null,
 									Messenger.c("r " + data.getRemovalCount()),
-									Messenger.s(
-											Messenger.c(
-													data.getRemovalCountText(ticks),
-													"w " + (removalReasons.isEmpty() ? "" : "\n"),
-													Messenger.c(removalReasons.toArray(new Object[0]))
-											).getString()  // to reduce network load
+									Messenger.c(
+											data.getRemovalCountText(ticks),
+											"w " + (removalReasons.isEmpty() ? "" : "\n"),
+											Messenger.c(removalReasons.toArray(new Object[0]))
 									),
 									new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, String.format("%s %s", currentCommandBase, SpecificDetailMode.REMOVAL))
 							),
@@ -198,11 +194,9 @@ public class LifeTimeWorldTracker extends TranslatableBase
 											"q L", "g : ",
 											data.lifeTimeStatistic.getCompressedResult(true)
 									),
-									Messenger.s(
-											Messenger.c(
-													String.format("q %s\n", this.tr("Life Time Overview")),
-													data.lifeTimeStatistic.getResult("", true)
-											).getString()  // to reduce network load
+									Messenger.c(
+											String.format("q %s\n", this.tr("Life Time Overview")),
+											data.lifeTimeStatistic.getResult("", true)
 									),
 									new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, String.format("%s %s", currentCommandBase, SpecificDetailMode.LIFE_TIME))
 							)
