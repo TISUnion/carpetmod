@@ -9,7 +9,7 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -49,7 +49,7 @@ public class Translations
             return null;
         }
         Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
-        return gson.fromJson(dataJSON, new TypeToken<Map<String, String>>() {}.getType());
+        return gson.fromJson(dataJSON, new TypeToken<LinkedHashMap<String, String>>() {}.getType());
     }
 
 
@@ -60,21 +60,7 @@ public class Translations
             translationMap = null;
             return;
         }
-        Map<String, String> translations = new HashMap<>();
-        Map<String, String> trans = getTranslationFromResourcePath(String.format("assets/carpet/lang/%s.json", CarpetSettings.language));
-        if (trans != null) trans.forEach(translations::put);
-
-//        for (CarpetExtension ext : CarpetServer.extensions)
-//        {
-//            Map<String, String> extMappings = ext.canHasTranslations(CarpetSettings.language);
-//            if (extMappings != null)
-//            {
-//                extMappings.forEach((key, value) ->
-//                {
-//                    if (!translations.containsKey(key)) translations.put(key, value);
-//                });
-//            }
-//        }
+        Map<String, String> translations = getTranslationFromResourcePath(String.format("assets/carpet/lang/%s.json", CarpetSettings.language));
         translations.entrySet().removeIf(e -> e.getKey().startsWith("//"));
         if (translations.isEmpty())
         {
