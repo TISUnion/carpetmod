@@ -1,0 +1,23 @@
+--- a/net/minecraft/tileentity/TileEntityComparator.java
++++ b/net/minecraft/tileentity/TileEntityComparator.java
+@@ -1,6 +1,8 @@
+ package net.minecraft.tileentity;
+ 
++import carpet.settings.CarpetSettings;
+ import net.minecraft.nbt.NBTTagCompound;
++import net.minecraft.world.WorldServer;
+ 
+ public class TileEntityComparator extends TileEntity
+ {
+@@ -31,6 +33,11 @@
+ 
+     public void setOutputSignal(int outputSignalIn)
+     {
++        // RSMM start
++        if (CarpetSettings.redstoneMultimeter && !world.isRemote()) {
++            ((WorldServer)world).getMultimeter().logPowerChange(world, pos, outputSignal, outputSignalIn);
++        }
++        // RSMM end
+         this.outputSignal = outputSignalIn;
+     }
+ }

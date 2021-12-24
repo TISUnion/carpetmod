@@ -1,19 +1,48 @@
 --- a/net/minecraft/world/chunk/Chunk.java
 +++ b/net/minecraft/world/chunk/Chunk.java
-@@ -1,5 +1,12 @@
+@@ -1,11 +1,5 @@
  package net.minecraft.world.chunk;
  
+-import com.google.common.collect.Maps;
+-import com.google.common.collect.Queues;
+-import com.google.common.collect.Sets;
+-import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+-import it.unimi.dsi.fastutil.longs.LongSet;
+-import it.unimi.dsi.fastutil.shorts.ShortList;
+ import java.util.BitSet;
+ import java.util.HashSet;
+ import java.util.Iterator;
+@@ -15,7 +9,29 @@
+ import java.util.concurrent.ConcurrentLinkedQueue;
+ import java.util.concurrent.atomic.AtomicInteger;
+ import java.util.function.Predicate;
++
+ import javax.annotation.Nullable;
++
++import org.apache.logging.log4j.LogManager;
++import org.apache.logging.log4j.Logger;
++
++import com.google.common.collect.Lists;
++import com.google.common.collect.Maps;
++import com.google.common.collect.Queues;
++import com.google.common.collect.Sets;
++
++//TISCM: add chunk debug
++import carpet.logging.LoggerRegistry;
++import carpet.logging.logHelpers.ChunkLogHelper;
 +import carpet.settings.CarpetSettings;
 +import carpet.utils.LightInitHooks;
 +import carpet.utils.LightingHooks;
 +import carpet.utils.portalsearcher.PortalSearcherAbstract;
 +import carpet.utils.portalsearcher.SuperCacheHandler;
 +import carpet.worldedit.internal.ExtendedChunk;
-+import com.google.common.collect.Lists;
- import com.google.common.collect.Maps;
- import com.google.common.collect.Queues;
- import com.google.common.collect.Sets;
-@@ -23,6 +30,7 @@
++import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
++import it.unimi.dsi.fastutil.longs.LongSet;
++import it.unimi.dsi.fastutil.shorts.ShortList;
+ import net.minecraft.block.Block;
+ import net.minecraft.block.ITileEntityProvider;
+ import net.minecraft.block.state.IBlockState;
+@@ -23,6 +39,7 @@
  import net.minecraft.crash.CrashReportCategory;
  import net.minecraft.crash.ReportedException;
  import net.minecraft.entity.Entity;
@@ -21,7 +50,7 @@
  import net.minecraft.entity.player.EntityPlayer;
  import net.minecraft.fluid.Fluid;
  import net.minecraft.fluid.IFluidState;
-@@ -30,6 +38,7 @@
+@@ -30,6 +47,7 @@
  import net.minecraft.init.Fluids;
  import net.minecraft.nbt.NBTTagCompound;
  import net.minecraft.network.PacketBuffer;
@@ -29,20 +58,27 @@
  import net.minecraft.tileentity.TileEntity;
  import net.minecraft.util.ClassInheritanceMultiMap;
  import net.minecraft.util.EnumFacing;
-@@ -55,7 +64,11 @@
- import org.apache.logging.log4j.LogManager;
- import org.apache.logging.log4j.Logger;
+@@ -43,6 +61,7 @@
+ import net.minecraft.world.EnumLightType;
+ import net.minecraft.world.ITickList;
+ import net.minecraft.world.World;
++import net.minecraft.world.WorldServer;
+ import net.minecraft.world.WorldType;
+ import net.minecraft.world.biome.Biome;
+ import net.minecraft.world.chunk.storage.AnvilChunkLoader;
+@@ -52,10 +71,8 @@
+ import net.minecraft.world.gen.feature.structure.StructureStart;
+ import net.minecraftforge.api.distmarker.Dist;
+ import net.minecraftforge.api.distmarker.OnlyIn;
+-import org.apache.logging.log4j.LogManager;
+-import org.apache.logging.log4j.Logger;
  
 -public class Chunk implements IChunk
-+//TISCM: add chunk debug
-+import carpet.logging.LoggerRegistry;
-+import carpet.logging.logHelpers.ChunkLogHelper;
-+
 +public class Chunk implements IChunk, /* CM worldedit */ ExtendedChunk
  {
      private static final Logger LOGGER = LogManager.getLogger();
      public static final ChunkSection EMPTY_SECTION = null;
-@@ -89,7 +102,25 @@
+@@ -89,7 +106,25 @@
      private int neighborCount;
      private final AtomicInteger field_205757_F = new AtomicInteger();
      private final ChunkPos field_212816_F;
@@ -68,7 +104,7 @@
      @OnlyIn(Dist.CLIENT)
      public Chunk(World worldIn, int cx, int cz, Biome[] biomesIn)
      {
-@@ -99,6 +130,12 @@
+@@ -99,6 +134,12 @@
      public Chunk(World worldIn, int cx, int cz, Biome[] biomesIn, UpgradeData upgradeDataIn, ITickList<Block> blocksToBeTickedIn, ITickList<Fluid> fluidsToBeTickedIn, long inhabitedTimeIn)
      {
          this.entityLists = new ClassInheritanceMultiMap[16];
@@ -81,7 +117,7 @@
          this.world = worldIn;
          this.x = cx;
          this.z = cz;
-@@ -116,6 +153,9 @@
+@@ -116,6 +157,9 @@
          for (int i = 0; i < this.entityLists.length; ++i)
          {
              this.entityLists[i] = new ClassInheritanceMultiMap<>(Entity.class);
@@ -91,7 +127,7 @@
          }
  
          this.blockBiomeArray = biomesIn;
-@@ -212,37 +252,45 @@
+@@ -212,37 +256,45 @@
              {
                  if (this.world.dimension.hasSkyLight())
                  {
@@ -163,7 +199,7 @@
                      }
                  }
              }
-@@ -339,40 +387,52 @@
+@@ -339,40 +391,52 @@
              int j = heightmap.getHeight(x & 15, z & 15);
              int k = this.x * 16 + x;
              int l = this.z * 16 + z;
@@ -242,7 +278,7 @@
                  }
              }
  
-@@ -380,19 +440,23 @@
+@@ -380,19 +444,23 @@
              {
                  this.heightMapMinimum = j;
              }
@@ -276,7 +312,7 @@
              }
  
              this.dirty = true;
-@@ -489,9 +553,17 @@
+@@ -489,9 +557,17 @@
          }
      }
  
@@ -294,7 +330,7 @@
          int i = pos.getX() & 15;
          int j = pos.getY();
          int k = pos.getZ() & 15;
-@@ -517,10 +589,16 @@
+@@ -517,10 +593,16 @@
                  }
  
                  chunksection = new ChunkSection(j >> 4 << 4, this.world.dimension.hasSkyLight());
@@ -312,7 +348,19 @@
              chunksection.set(i, j & 15, k, state);
              this.heightMap.get(Heightmap.Type.MOTION_BLOCKING).update(i, j, k, state);
              this.heightMap.get(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES).update(i, j, k, state);
-@@ -551,10 +629,14 @@
+@@ -529,6 +611,11 @@
+ 
+             if (!this.world.isRemote)
+             {
++                // RSMM start
++                if (CarpetSettings.redstoneMultimeter) {
++                    ((WorldServer)world).getMultimeter().onBlockChange(world, pos, iblockstate, state);
++                }
++                // RSMM end
+                 iblockstate.onReplaced(this.world, pos, state, isMoving);
+             }
+             else if (block1 != block && block1 instanceof ITileEntityProvider)
+@@ -551,10 +638,14 @@
                      int i1 = state.getOpacity(this.world, pos);
                      int j1 = iblockstate.getOpacity(this.world, pos);
                      this.relightBlock(i, j, k, state);
@@ -330,7 +378,7 @@
                      }
                  }
  
-@@ -570,12 +652,48 @@
+@@ -570,12 +661,48 @@
  
                  if (!this.world.isRemote)
                  {
@@ -381,7 +429,7 @@
  
                      if (tileentity1 == null)
                      {
-@@ -596,6 +714,9 @@
+@@ -596,6 +723,9 @@
  
      public int getLightFor(EnumLightType type, BlockPos pos)
      {
@@ -391,7 +439,7 @@
          return this.getLight(type, pos, this.world.getDimension().hasSkyLight());
      }
  
-@@ -651,10 +772,18 @@
+@@ -651,10 +781,18 @@
                  {
                      return;
                  }
@@ -412,7 +460,7 @@
              }
  
              if (light == EnumLightType.SKY)
-@@ -680,6 +809,9 @@
+@@ -680,6 +818,9 @@
  
      public int getLightSubtracted(BlockPos pos, int amount, boolean hasSkylight)
      {
@@ -422,7 +470,7 @@
          int i = pos.getX() & 15;
          int j = pos.getY();
          int k = pos.getZ() & 15;
-@@ -742,6 +874,18 @@
+@@ -742,6 +883,18 @@
          entityIn.chunkCoordY = k;
          entityIn.chunkCoordZ = this.z;
          this.entityLists[k].add(entityIn);
@@ -441,7 +489,7 @@
      }
  
      public void setHeightmap(Heightmap.Type type, long[] data)
-@@ -767,6 +911,12 @@
+@@ -767,6 +920,12 @@
          }
  
          this.entityLists[index].remove(entityIn);
@@ -454,7 +502,7 @@
      }
  
      public boolean canSeeSky(BlockPos pos)
-@@ -869,7 +1019,7 @@
+@@ -869,7 +1028,7 @@
          this.deferredTileEntities.put(new BlockPos(nbt.getInt("x"), nbt.getInt("y"), nbt.getInt("z")), nbt);
      }
  
@@ -463,7 +511,7 @@
      {
          if (this.loaded)
          {
-@@ -894,10 +1044,24 @@
+@@ -894,10 +1053,24 @@
                  return !(p_212383_0_ instanceof EntityPlayer);
              }));
          }
@@ -488,7 +536,7 @@
          this.loaded = false;
  
          for (TileEntity tileentity : this.tileEntities.values())
-@@ -907,8 +1071,38 @@
+@@ -907,8 +1080,38 @@
  
          for (ClassInheritanceMultiMap<Entity> classinheritancemultimap : this.entityLists)
          {
@@ -528,7 +576,7 @@
      }
  
      public void markDirty()
-@@ -916,7 +1110,8 @@
+@@ -916,7 +1119,8 @@
          this.dirty = true;
      }
  
@@ -538,7 +586,7 @@
      {
          int i = MathHelper.floor((aabb.minY - 2.0D) / 16.0D);
          int j = MathHelper.floor((aabb.maxY + 2.0D) / 16.0D);
-@@ -925,9 +1120,9 @@
+@@ -925,9 +1129,9 @@
  
          for (int k = i; k <= j; ++k)
          {
@@ -550,7 +598,7 @@
                  {
                      if (entity.getBoundingBox().intersects(aabb) && entity != entityIn)
                      {
-@@ -954,6 +1149,21 @@
+@@ -954,6 +1158,21 @@
          }
      }
  
@@ -572,7 +620,7 @@
      public <T extends Entity> void getEntitiesOfTypeWithinAABB(Class <? extends T > entityClass, AxisAlignedBB aabb, List<T> listToFill, @Nullable Predicate <? super T > filter)
      {
          int i = MathHelper.floor((aabb.minY - 2.0D) / 16.0D);
-@@ -997,6 +1207,9 @@
+@@ -997,6 +1216,9 @@
  
      public void tick(boolean skipRecheckGaps)
      {
@@ -582,7 +630,7 @@
          if (this.isGapLightingUpdated && this.world.dimension.hasSkyLight() && !skipRecheckGaps)
          {
              this.recheckGaps(this.world.isRemote);
-@@ -1138,9 +1351,28 @@
+@@ -1138,9 +1360,28 @@
                  this.sections[l].recalculateRefCounts();
              }
          }
@@ -613,7 +661,7 @@
          for (TileEntity tileentity : this.tileEntities.values())
          {
              tileentity.updateContainingBlockInfo();
-@@ -1165,6 +1397,12 @@
+@@ -1165,6 +1406,12 @@
          this.queuedLightChecks = 0;
      }
  
@@ -626,7 +674,7 @@
      public void enqueueRelightChecks()
      {
          if (this.queuedLightChecks < 4096)
-@@ -1190,7 +1428,7 @@
+@@ -1190,7 +1437,7 @@
  
                      if (this.sections[j] == EMPTY_SECTION && flag || this.sections[j] != EMPTY_SECTION && this.sections[j].get(k, i1, l).isAir())
                      {
@@ -635,7 +683,7 @@
                          {
                              BlockPos blockpos2 = blockpos1.offset(enumfacing);
  
-@@ -1497,4 +1735,67 @@
+@@ -1497,4 +1744,67 @@
          QUEUED,
          CHECK;
      }

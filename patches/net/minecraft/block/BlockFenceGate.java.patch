@@ -1,0 +1,39 @@
+--- a/net/minecraft/block/BlockFenceGate.java
++++ b/net/minecraft/block/BlockFenceGate.java
+@@ -17,8 +17,9 @@
+ import net.minecraft.world.IBlockReader;
+ import net.minecraft.world.IWorld;
+ import net.minecraft.world.World;
++import redstone.multimeter.block.MeterableBlock;
+ 
+-public class BlockFenceGate extends BlockHorizontal
++public class BlockFenceGate extends BlockHorizontal implements MeterableBlock /*RSMM*/
+ {
+     public static final BooleanProperty OPEN = BlockStateProperties.OPEN;
+     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
+@@ -157,6 +158,8 @@
+         {
+             boolean flag = worldIn.isBlockPowered(pos);
+ 
++            logPowered(worldIn, pos, flag); // RSMM
++
+             if (state.get(POWERED) != flag)
+             {
+                 worldIn.setBlockState(pos, state.with(POWERED, Boolean.valueOf(flag)).with(OPEN, Boolean.valueOf(flag)), 2);
+@@ -185,4 +188,16 @@
+             return BlockFaceShape.UNDEFINED;
+         }
+     }
++
++    // RSMM
++    @Override
++    public boolean logPoweredOnBlockUpdate() {
++        return false;
++    }
++
++    // RSMM
++    @Override
++    public boolean isActive(World world, BlockPos pos, IBlockState state) {
++        return state.get(OPEN);
++    }
+ }

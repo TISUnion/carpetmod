@@ -42,17 +42,19 @@
          nethandlerplayserver.sendPacket(new SPacketJoinGame(playerIn.getEntityId(), playerIn.interactionManager.getGameType(), worldinfo.isHardcore(), worldserver.dimension.getType(), worldserver.getDifficulty(), this.getMaxPlayers(), worldinfo.getGenerator(), worldserver.getGameRules().getBoolean("reducedDebugInfo")));
          nethandlerplayserver.sendPacket(new SPacketCustomPayload(SPacketCustomPayload.BRAND, (new PacketBuffer(Unpooled.buffer())).writeString(this.getServer().getServerModName())));
          nethandlerplayserver.sendPacket(new SPacketServerDifficulty(worldinfo.getDifficulty(), worldinfo.isDifficultyLocked()));
-@@ -201,6 +205,9 @@
+@@ -201,6 +205,11 @@
          }
  
          playerIn.addSelfToInternalCraftingInventory();
 +
 +        // Carpet protocol
 +        CarpetServer.onPlayerLoggedIn(playerIn);
++
++        server.getMultimeterServer().onPlayerJoin(playerIn); // RSMM
      }
  
      protected void sendScoreboard(ServerScoreboard scoreboardIn, EntityPlayerMP playerIn)
-@@ -306,6 +313,10 @@
+@@ -306,6 +315,10 @@
          {
              nbttagcompound1 = this.playerDataManager.readPlayerData(playerIn);
          }
@@ -63,7 +65,16 @@
  
          return nbttagcompound1;
      }
-@@ -454,6 +465,12 @@
+@@ -352,6 +365,8 @@
+ 
+     public void playerLoggedOut(EntityPlayerMP playerIn)
+     {
++        server.getMultimeterServer().onPlayerLeave(playerIn);
++
+         WorldServer worldserver = playerIn.getServerWorld();
+         playerIn.addStat(StatList.LEAVE_GAME);
+         this.writePlayerData(playerIn);
+@@ -454,6 +469,12 @@
  
          for (EntityPlayerMP entityplayermp1 : list)
          {

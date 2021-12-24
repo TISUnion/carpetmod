@@ -1,0 +1,39 @@
+--- a/net/minecraft/block/BlockNote.java
++++ b/net/minecraft/block/BlockNote.java
+@@ -17,8 +17,9 @@
+ import net.minecraft.util.math.BlockPos;
+ import net.minecraft.world.IWorld;
+ import net.minecraft.world.World;
++import redstone.multimeter.block.MeterableBlock;
+ 
+-public class BlockNote extends Block
++public class BlockNote extends Block implements MeterableBlock /*RSMM*/
+ {
+     public static final EnumProperty<NoteBlockInstrument> INSTRUMENT = BlockStateProperties.NOTE_BLOCK_INSTRUMENT;
+     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
+@@ -44,6 +45,8 @@
+     {
+         boolean flag = worldIn.isBlockPowered(pos);
+ 
++        logPowered(worldIn, pos, flag); // RSMM
++
+         if (flag != state.get(POWERED))
+         {
+             if (flag)
+@@ -101,4 +104,16 @@
+     {
+         builder.add(INSTRUMENT, POWERED, NOTE);
+     }
++
++    // RSMM
++    @Override
++    public boolean logPoweredOnBlockUpdate() {
++        return false;
++    }
++
++    // RSMM
++    @Override
++    public boolean isActive(World world, BlockPos pos, IBlockState state) {
++        return state.get(POWERED);
++    }
+ }

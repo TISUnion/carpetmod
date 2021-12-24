@@ -1,0 +1,33 @@
+--- a/net/minecraft/block/BlockPressurePlate.java
++++ b/net/minecraft/block/BlockPressurePlate.java
+@@ -15,8 +15,10 @@
+ import net.minecraft.util.math.BlockPos;
+ import net.minecraft.world.IWorld;
+ import net.minecraft.world.World;
++import redstone.multimeter.block.Meterable;
++import redstone.multimeter.block.PowerSource;
+ 
+-public class BlockPressurePlate extends BlockBasePressurePlate
++public class BlockPressurePlate extends BlockBasePressurePlate implements Meterable /*RSMM*/, PowerSource /*RSMM*/
+ {
+     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
+     private final BlockPressurePlate.Sensitivity sensitivity;
+@@ -98,6 +100,18 @@
+         builder.add(POWERED);
+     }
+ 
++    // RSMM
++    @Override
++    public boolean isActive(World world, BlockPos pos, IBlockState state) {
++        return state.get(POWERED);
++    }
++
++    // RSMM
++    @Override
++    public int getPowerLevel(World world, BlockPos pos, IBlockState state) {
++        return state.get(POWERED) ? MAX_POWER : MIN_POWER;
++    }
++
+     public static enum Sensitivity
+     {
+         EVERYTHING,

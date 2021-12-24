@@ -10,7 +10,19 @@
  import net.minecraft.block.state.IBlockState;
  import net.minecraft.item.BlockItemUseContext;
  import net.minecraft.state.BooleanProperty;
-@@ -74,10 +77,12 @@
+@@ -13,8 +16,10 @@
+ import net.minecraft.world.IBlockReader;
+ import net.minecraft.world.IWorld;
+ import net.minecraft.world.World;
++import redstone.multimeter.block.Meterable;
++import redstone.multimeter.block.PowerSource;
+ 
+-public class BlockObserver extends BlockDirectional
++public class BlockObserver extends BlockDirectional implements Meterable /*RSMM*/, PowerSource /*RSMM*/
+ {
+     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
+ 
+@@ -74,10 +79,12 @@
  
      protected void updateNeighborsInFront(World worldIn, BlockPos pos, IBlockState state)
      {
@@ -23,3 +35,20 @@
      }
  
      public boolean canProvidePower(IBlockState state)
+@@ -123,4 +130,16 @@
+     {
+         return this.getDefaultState().with(FACING, context.getNearestLookingDirection().getOpposite().getOpposite());
+     }
++
++    // RSMM
++    @Override
++    public boolean isActive(World world, BlockPos pos, IBlockState state) {
++        return state.get(POWERED);
++    }
++
++    // RSMM
++    @Override
++    public int getPowerLevel(World world, BlockPos pos, IBlockState state) {
++        return state.get(POWERED) ? MAX_POWER : MIN_POWER;
++    }
+ }

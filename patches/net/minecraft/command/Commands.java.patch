@@ -8,7 +8,12 @@
  import com.google.common.collect.Maps;
  import com.google.common.io.Files;
  import com.google.gson.GsonBuilder;
-@@ -95,6 +97,8 @@
+@@ -92,9 +94,13 @@
+ import net.minecraft.util.text.TextFormatting;
+ import net.minecraft.util.text.event.ClickEvent;
+ import net.minecraft.util.text.event.HoverEvent;
++import redstone.multimeter.command.MeterGroupCommand;
++
  import org.apache.logging.log4j.LogManager;
  import org.apache.logging.log4j.Logger;
  
@@ -17,7 +22,7 @@
  public class Commands
  {
      private static final Logger LOGGER = LogManager.getLogger();
-@@ -169,7 +173,11 @@
+@@ -169,7 +175,13 @@
              StopCommand.register(this.dispatcher);
              WhitelistCommand.register(this.dispatcher);
          }
@@ -26,10 +31,12 @@
 +        // CM worldedit
 +        CarpetWorldEditAccess.registerCommands(dispatcher);
 +
++        MeterGroupCommand.register(dispatcher); // RSMM
++
          this.dispatcher.findAmbiguities((p_201302_1_, p_201302_2_, p_201302_3_, p_201302_4_) ->
          {
              LOGGER.warn("Ambiguity between arguments {} and {} with inputs: {}", this.dispatcher.getPath(p_201302_2_), this.dispatcher.getPath(p_201302_3_), p_201302_4_);
-@@ -250,7 +258,7 @@
+@@ -250,7 +262,7 @@
                  TextComponentString textcomponentstring = new TextComponentString(exception.getMessage() == null ? exception.getClass().getName() : exception.getMessage());
                  ITextComponent itextcomponent = textcomponentstring;
  
@@ -38,7 +45,7 @@
                  {
                      StackTraceElement[] astacktraceelement = exception.getStackTrace();
  
-@@ -259,6 +267,10 @@
+@@ -259,6 +271,10 @@
                          itextcomponent.appendText("\n\n").appendText(astacktraceelement[j].getMethodName()).appendText("\n ").appendText(astacktraceelement[j].getFileName()).appendText(":").appendText(String.valueOf(astacktraceelement[j].getLineNumber()));
                      }
                  }

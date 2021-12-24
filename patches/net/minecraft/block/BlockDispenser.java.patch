@@ -1,13 +1,29 @@
 --- a/net/minecraft/block/BlockDispenser.java
 +++ b/net/minecraft/block/BlockDispenser.java
-@@ -1,5 +1,6 @@
+@@ -1,8 +1,10 @@
  package net.minecraft.block;
  
-+import carpet.settings.CarpetSettings;
- import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
  import java.util.Map;
  import java.util.Random;
-@@ -119,7 +120,21 @@
++
++import carpet.settings.CarpetSettings;
++import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+ import net.minecraft.block.state.IBlockState;
+ import net.minecraft.dispenser.BehaviorDefaultDispenseItem;
+ import net.minecraft.dispenser.BlockSourceImpl;
+@@ -36,8 +38,9 @@
+ import net.minecraft.world.IBlockReader;
+ import net.minecraft.world.IWorldReaderBase;
+ import net.minecraft.world.World;
++import redstone.multimeter.block.MeterableBlock;
+ 
+-public class BlockDispenser extends BlockContainer
++public class BlockDispenser extends BlockContainer implements MeterableBlock /*RSMM*/
+ {
+     public static final DirectionProperty FACING = BlockDirectional.FACING;
+     public static final BooleanProperty TRIGGERED = BlockStateProperties.TRIGGERED;
+@@ -119,7 +122,23 @@
  
      public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos)
      {
@@ -27,6 +43,31 @@
 +        }
 +     // [CM] End
 +
++        logPowered(worldIn, pos, flag); // RSMM
++
          boolean flag1 = state.get(TRIGGERED);
  
          if (flag && !flag1)
+@@ -218,4 +237,22 @@
+     {
+         builder.add(FACING, TRIGGERED);
+     }
++
++    // RSMM
++    @Override
++    public boolean logPoweredOnBlockUpdate() {
++        return false;
++    }
++
++    // RSMM
++    @Override
++    public boolean isPowered(World world, BlockPos pos, IBlockState state) {
++        return world.isBlockPowered(pos) || (CarpetSettings.quasiConnectivity && world.isBlockPowered(pos.up()));
++    }
++
++    // RSMM
++    @Override
++    public boolean isActive(World world, BlockPos pos, IBlockState state) {
++        return state.get(TRIGGERED);
++    }
+ }

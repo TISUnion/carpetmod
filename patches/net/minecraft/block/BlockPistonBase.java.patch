@@ -21,17 +21,22 @@
  import net.minecraft.tileentity.TileEntity;
  import net.minecraft.tileentity.TileEntityPiston;
  import net.minecraft.util.EnumFacing;
-@@ -32,6 +34,9 @@
+@@ -31,8 +33,13 @@
+ import net.minecraft.world.IBlockReader;
  import net.minecraft.world.World;
  import net.minecraft.world.WorldServer;
++import redstone.multimeter.block.MeterableBlock;
++import redstone.multimeter.server.Multimeter;
  
+-public class BlockPistonBase extends BlockDirectional
 +import java.util.List;
 +import java.util.Set;
 +
- public class BlockPistonBase extends BlockDirectional
++public class BlockPistonBase extends BlockDirectional implements MeterableBlock /*RSMM*/
  {
      public static final BooleanProperty EXTENDED = BlockStateProperties.EXTENDED;
-@@ -43,6 +48,9 @@
+     protected static final VoxelShape PISTON_BASE_EAST_AABB = Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 12.0D, 16.0D, 16.0D);
+@@ -43,6 +50,9 @@
      protected static final VoxelShape PISTON_BASE_DOWN_AABB = Block.makeCuboidShape(0.0D, 4.0D, 0.0D, 16.0D, 16.0D, 16.0D);
      private final boolean isSticky;
  
@@ -41,9 +46,19 @@
      public BlockPistonBase(boolean sticky, Block.Properties properties)
      {
          super(properties);
-@@ -158,7 +166,8 @@
+@@ -156,9 +166,17 @@
+         }
+     }
  
-     private boolean shouldBeExtended(World worldIn, BlockPos pos, EnumFacing facing)
+-    private boolean shouldBeExtended(World worldIn, BlockPos pos, EnumFacing facing)
++    // RSMM wrapped method
++    private boolean shouldBeExtended(World world, BlockPos pos, EnumFacing facing) {
++        boolean powered = _shouldBeExtended(world, pos, facing);
++        logPowered(world, pos, powered);
++        return powered;
++    }
++
++    private boolean _shouldBeExtended(World worldIn, BlockPos pos, EnumFacing facing)
      {
 -        for (EnumFacing enumfacing : EnumFacing.values())
 +        // Lithium alloc.enum_values
@@ -51,7 +66,7 @@
          {
              if (enumfacing != facing && worldIn.isSidePowered(pos.offset(enumfacing), enumfacing))
              {
-@@ -172,9 +181,17 @@
+@@ -172,9 +190,17 @@
          }
          else
          {
@@ -70,7 +85,7 @@
              {
                  if (enumfacing1 != EnumFacing.DOWN && worldIn.isSidePowered(blockpos.offset(enumfacing1), enumfacing1))
                  {
-@@ -186,6 +203,15 @@
+@@ -186,6 +212,15 @@
          }
      }
  
@@ -86,7 +101,7 @@
      public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int id, int param)
      {
          EnumFacing enumfacing = state.get(FACING);
-@@ -255,6 +281,9 @@
+@@ -255,6 +290,9 @@
                  {
                      if (id != 1 || iblockstate.isAir() || !canPush(iblockstate, worldIn, blockpos, enumfacing.getOpposite(), false, enumfacing) || iblockstate.getPushReaction() != EnumPushReaction.NORMAL && block != Blocks.PISTON && block != Blocks.STICKY_PISTON)
                      {
@@ -96,7 +111,7 @@
                          worldIn.removeBlock(pos.offset(enumfacing));
                      }
                      else
-@@ -265,12 +294,14 @@
+@@ -265,12 +303,14 @@
              }
              else
              {
@@ -112,7 +127,7 @@
          return true;
      }
  
-@@ -316,8 +347,14 @@
+@@ -316,8 +356,14 @@
                  {
                      return false;
                  }
@@ -129,7 +144,7 @@
              }
              else
              {
-@@ -329,6 +366,14 @@
+@@ -329,6 +375,14 @@
              return false;
          }
      }
@@ -144,7 +159,7 @@
  
      private boolean doMove(World worldIn, BlockPos pos, EnumFacing direction, boolean extending)
      {
-@@ -371,6 +416,24 @@
+@@ -371,15 +425,55 @@
                  --k;
                  aiblockstate[k] = iblockstate;
              }
@@ -169,7 +184,15 @@
  
              for (int l = list.size() - 1; l >= 0; --l)
              {
-@@ -379,7 +442,22 @@
+                 BlockPos blockpos3 = list.get(l);
+                 IBlockState iblockstate3 = worldIn.getBlockState(blockpos3);
++                // RSMM start
++                if (CarpetSettings.redstoneMultimeter && !worldIn.isRemote()) {
++                    Multimeter multimeter = ((WorldServer)worldIn).getMultimeter();
++                    multimeter.logMoved(worldIn, blockpos3, enumfacing);
++                    multimeter.moveMeters(worldIn, blockpos3, enumfacing);
++                }
++                // RSMM end
                  blockpos3 = blockpos3.offset(enumfacing);
                  set.remove(blockpos3);
                  worldIn.setBlockState(blockpos3, Blocks.MOVING_PISTON.getDefaultState().with(FACING, direction), 68);
@@ -193,3 +216,26 @@
                  --k;
                  aiblockstate[k] = iblockstate3;
              }
+@@ -450,4 +544,22 @@
+     {
+         return false;
+     }
++
++    // RSMM
++    @Override
++    public boolean logPoweredOnBlockUpdate() {
++        return false;
++    }
++
++    // RSMM
++    @Override
++    public boolean isPowered(World world, BlockPos pos, IBlockState state) {
++        return shouldBeExtended(world, pos, state.get(FACING));
++    }
++
++    // RSMM
++    @Override
++    public boolean isActive(World world, BlockPos pos, IBlockState state) {
++        return state.get(EXTENDED);
++    }
+ }

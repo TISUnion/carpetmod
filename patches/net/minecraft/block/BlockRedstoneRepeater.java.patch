@@ -1,0 +1,48 @@
+--- a/net/minecraft/block/BlockRedstoneRepeater.java
++++ b/net/minecraft/block/BlockRedstoneRepeater.java
+@@ -1,6 +1,8 @@
+ package net.minecraft.block;
+ 
+ import java.util.Random;
++
++import carpet.settings.CarpetSettings;
+ import net.minecraft.block.state.IBlockState;
+ import net.minecraft.entity.player.EntityPlayer;
+ import net.minecraft.item.BlockItemUseContext;
+@@ -15,6 +17,7 @@
+ import net.minecraft.world.IWorld;
+ import net.minecraft.world.IWorldReaderBase;
+ import net.minecraft.world.World;
++import net.minecraft.world.WorldServer;
+ import net.minecraftforge.api.distmarker.Dist;
+ import net.minecraftforge.api.distmarker.OnlyIn;
+ 
+@@ -58,9 +61,16 @@
+         return !worldIn.isRemote() && facing.getAxis() != stateIn.get(HORIZONTAL_FACING).getAxis() ? stateIn.with(LOCKED, Boolean.valueOf(this.isLocked(worldIn, currentPos, stateIn))) : super.updatePostPlacement(stateIn, facing, facingState, worldIn, currentPos, facingPos);
+     }
+ 
++    // RSMM: capture return value
+     public boolean isLocked(IWorldReaderBase worldIn, BlockPos pos, IBlockState state)
+     {
+-        return this.getPowerOnSides(worldIn, pos, state) > 0;
++        boolean locked = this.getPowerOnSides(worldIn, pos, state) > 0;
++        // RSMM start
++        if (locked && worldIn instanceof WorldServer) {
++            logPowered((WorldServer)worldIn, pos, state);
++        }
++        // RSMM end
++        return locked;
+     }
+ 
+     protected boolean isAlternateInput(IBlockState state)
+@@ -95,4 +105,10 @@
+     {
+         builder.add(HORIZONTAL_FACING, DELAY, LOCKED, POWERED);
+     }
++
++    // RSMM
++    @Override
++    public int getPowerLevel(World world, BlockPos pos, IBlockState state) {
++        return state.get(POWERED) ? MAX_POWER : MIN_POWER;
++    }
+ }

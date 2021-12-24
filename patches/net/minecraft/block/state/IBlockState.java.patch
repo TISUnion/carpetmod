@@ -1,0 +1,59 @@
+--- a/net/minecraft/block/state/IBlockState.java
++++ b/net/minecraft/block/state/IBlockState.java
+@@ -1,8 +1,10 @@
+ package net.minecraft.block.state;
+ 
++import java.util.Random;
++
++import carpet.settings.CarpetSettings;
+ import it.unimi.dsi.fastutil.objects.Object2ByteMap;
+ import it.unimi.dsi.fastutil.objects.Object2ByteOpenHashMap;
+-import java.util.Random;
+ import net.minecraft.block.Block;
+ import net.minecraft.block.material.EnumPushReaction;
+ import net.minecraft.block.material.Material;
+@@ -27,6 +29,7 @@
+ import net.minecraft.world.IWorldReader;
+ import net.minecraft.world.IWorldReaderBase;
+ import net.minecraft.world.World;
++import net.minecraft.world.WorldServer;
+ import net.minecraftforge.api.distmarker.Dist;
+ import net.minecraftforge.api.distmarker.OnlyIn;
+ 
+@@ -324,6 +327,11 @@
+ 
+ default void randomTick(World worldIn, BlockPos pos, Random random)
+     {
++        // RSMM start
++        if (CarpetSettings.redstoneMultimeter && !worldIn.isRemote()) {
++            ((WorldServer)worldIn).getMultimeter().logRandomTick(worldIn, pos);
++        }
++        // RSMM end
+         this.getBlock().randomTick(this, worldIn, pos, random);
+     }
+ 
+@@ -344,6 +352,11 @@
+ 
+ default boolean onBlockActivated(World worldIn, BlockPos pos, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
+     {
++        // RSMM start
++        if (CarpetSettings.redstoneMultimeter && !worldIn.isRemote()) {
++            ((WorldServer)worldIn).getMultimeter().logInteractBlock(worldIn, pos);
++        }
++        // RSMM end
+         return this.getBlock().onBlockActivated(this, worldIn, pos, player, hand, side, hitX, hitY, hitZ);
+     }
+ 
+@@ -364,6 +377,12 @@
+ 
+ default IBlockState updatePostPlacement(EnumFacing face, IBlockState queried, IWorld worldIn, BlockPos currentPos, BlockPos offsetPos)
+     {
++        // RSMM start
++        if (CarpetSettings.redstoneMultimeter && worldIn instanceof WorldServer) {
++            WorldServer world = (WorldServer)worldIn;
++            world.getMultimeter().logShapeUpdate(world, currentPos, face);
++        }
++        // RSMM end
+         return this.getBlock().updatePostPlacement(this, face, queried, worldIn, currentPos, offsetPos);
+     }
+ 

@@ -31,7 +31,25 @@
  import net.minecraft.block.Block;
  import net.minecraft.block.BlockEventData;
  import net.minecraft.block.state.IBlockState;
-@@ -93,21 +108,43 @@
+@@ -52,6 +67,7 @@
+ import net.minecraft.server.management.PlayerChunkMap;
+ import net.minecraft.tags.BlockTags;
+ import net.minecraft.tags.NetworkTagManager;
++import net.minecraft.tileentity.TileEntity;
+ import net.minecraft.util.DamageSource;
+ import net.minecraft.util.IProgressUpdate;
+ import net.minecraft.util.IThreadListener;
+@@ -83,6 +99,9 @@
+ import net.minecraft.world.storage.WorldSavedDataStorage;
+ import net.minecraftforge.api.distmarker.Dist;
+ import net.minecraftforge.api.distmarker.OnlyIn;
++import redstone.multimeter.common.TickTask;
++import redstone.multimeter.server.Multimeter;
++import redstone.multimeter.server.MultimeterServer;
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
+@@ -93,21 +112,43 @@
      private final EntityTracker entityTracker;
      private final PlayerChunkMap playerChunkMap;
      private final Map<UUID, Entity> entitiesByUuid = Maps.newHashMap();
@@ -84,7 +102,7 @@
      private boolean insideTick;
  
      public WorldServer(MinecraftServer server, ISaveHandler p_i49819_2_, WorldSavedDataStorage p_i49819_3_, WorldInfo p_i49819_4_, DimensionType p_i49819_5_, Profiler p_i49819_6_)
-@@ -122,13 +159,37 @@
+@@ -122,13 +163,37 @@
          this.calculateInitialSkylight();
          this.calculateInitialWeather();
          this.getWorldBorder().setSize(server.getMaxWorldSize());
@@ -123,7 +141,7 @@
          if (villagecollection == null)
          {
              this.villageCollection = new VillageCollection(this);
-@@ -140,7 +201,9 @@
+@@ -140,7 +205,9 @@
              this.villageCollection.setWorld(this);
          }
  
@@ -134,7 +152,7 @@
  
          if (scoreboardsavedata == null)
          {
-@@ -191,15 +254,28 @@
+@@ -191,15 +258,31 @@
              this.wakeAllPlayers();
          }
  
@@ -148,6 +166,8 @@
 -        {
 -            this.entitySpawner.findChunksForSpawning(this, this.spawnHostileMobs, this.spawnPeacefulMobs, this.worldInfo.getGameTime() % 400L == 0L);
 -            this.getChunkProvider().spawnMobs(this, this.spawnHostileMobs, this.spawnPeacefulMobs);
++        startTickTask(TickTask.MOB_SPAWNING); // RSMM
++
 +        if (TickSpeed.process_entities)
 +        { // [CM] extra indent to skip processing of entities
 +            this.profiler.startSection("spawner");
@@ -165,30 +185,34 @@
  
          this.profiler.endStartSection("chunkSource");
 +        MicroTimingLoggerManager.setTickStage(this, TickStage.CHUNK_UNLOADING); // TISCM Micro Timing logger
++        swapTickTask(TickTask.CHUNK_SOURCE); // RSMM
          this.chunkProvider.tick(hasTimeLeft);
          int j = this.calculateSkylightSubtracted(1.0F);
  
-@@ -208,26 +284,64 @@
+@@ -208,26 +291,73 @@
              this.setSkylightSubtracted(j);
          }
  
 -        this.worldInfo.setGameTime(this.worldInfo.getGameTime() + 1L);
-+        if (TickSpeed.process_entities)
-+        { // CM extra indent to skip processing of entities
++        swapTickTask(TickTask.SCHEDULED_TICKS); // RSMM
  
 -        if (this.getGameRules().getBoolean("doDaylightCycle"))
 -        {
 -            this.worldInfo.setDayTime(this.worldInfo.getDayTime() + 1L);
 -        }
++        if (TickSpeed.process_entities)
++        { // CM extra indent to skip processing of entities
+ 
+-        this.profiler.endStartSection("tickPending");
+-        this.tickPending();
 +            // TISCM Micro Timing logger
 +            // Flushes messages right before overworld gametime increases
 +            if (this.getDimension().getType() == DimensionType.OVERWORLD)
 +            {
++                getMultimeterServer().onOverworldTickTime(); // RSMM
 +                MicroTimingLoggerManager.flushMessages(this.getGameTime());
 +            }
- 
--        this.profiler.endStartSection("tickPending");
--        this.tickPending();
++
 +            this.worldInfo.setGameTime(this.worldInfo.getGameTime() + 1L);
 +            if (this.getGameRules().getBoolean("doDaylightCycle"))
 +            {
@@ -204,12 +228,14 @@
 +
          this.profiler.endStartSection("tickBlocks");
 +        CarpetProfiler.start_section(world_name, "Chunk Tick");
++        swapTickTask(TickTask.TICK_CHUNKS); // RSMM
          this.tickBlocks();
 +        CarpetProfiler.end_current_section();
 +
          this.profiler.endStartSection("chunkMap");
 +        CarpetProfiler.start_section(world_name, "Player Chunk Map");
 +        MicroTimingLoggerManager.setTickStage(this, TickStage.PLAYER_CHUNK_MAP); // TISCM Micro Timing logger
++        swapTickTask(TickTask.CHUNK_MAP); // RSMM
          this.playerChunkMap.tick();
 +        CarpetProfiler.end_current_section();
 +
@@ -218,11 +244,13 @@
          this.profiler.endStartSection("village");
 +        CarpetProfiler.start_section(world_name, "Villages");
 +        MicroTimingLoggerManager.setTickStage(this, TickStage.VILLAGE); // TISCM Micro Timing logger
++        swapTickTask(TickTask.VILLAGES); // RSMM
          this.villageCollection.tick();
          this.villageSiege.tick();
 +        CarpetProfiler.end_current_section();
          this.profiler.endStartSection("portalForcer");
 +        MicroTimingLoggerManager.setTickStage(this, TickStage.PORTAL_FORCER); // TISCM Micro Timing logger
++        swapTickTask(TickTask.PORTALS); // RSMM
          this.worldTeleporter.tick(this.getGameTime());
 +        }
 +        // [TISCM] Newlight
@@ -235,12 +263,14 @@
          this.profiler.endSection();
 +        CarpetProfiler.start_section(world_name, "Block Events");
 +        MicroTimingLoggerManager.setTickStage(this, TickStage.BLOCK_EVENT); // TISCM Micro Timing logger
++        swapTickTask(TickTask.BLOCK_EVENTS); // RSMM
          this.sendQueuedBlockEvents();
 +        CarpetProfiler.end_current_section();
++        endTickTask(); // RSMM
          this.insideTick = false;
      }
  
-@@ -270,7 +384,7 @@
+@@ -270,7 +400,7 @@
                  }
              }
  
@@ -249,7 +279,23 @@
          }
      }
  
-@@ -306,6 +420,13 @@
+@@ -281,6 +411,7 @@
+ 
+     protected void wakeAllPlayers()
+     {
++        startTickTask(TickTask.WAKE_SLEEPING_PLAYERS); // RSMM
+         this.allPlayersSleeping = false;
+ 
+         for (EntityPlayer entityplayer : this.playerEntities.stream().filter(EntityPlayer::isPlayerSleeping).collect(Collectors.toList()))
+@@ -292,6 +423,7 @@
+         {
+             this.resetRainAndThunder();
+         }
++        endTickTask(); // RSMM
+     }
+ 
+     private void resetRainAndThunder()
+@@ -306,6 +438,13 @@
      {
          if (this.allPlayersSleeping && !this.isRemote)
          {
@@ -263,7 +309,7 @@
              for (EntityPlayer entityplayer : this.playerEntities)
              {
                  if (!entityplayer.isSpectator() && !entityplayer.isPlayerFullyAsleep())
-@@ -397,9 +518,11 @@
+@@ -397,9 +536,12 @@
              boolean flag1 = this.isThundering();
              this.profiler.startSection("pollingChunks");
  
@@ -272,10 +318,11 @@
              {
                  this.profiler.startSection("getChunk");
 +                MicroTimingLoggerManager.setTickStageDetail(this, "TickChunk"); // TISCM Micro Timing logger
++                startTickTask(TickTask.TICK_CHUNK); // RSMM
                  Chunk chunk = iterator.next();
                  int j = chunk.x * 16;
                  int k = chunk.z * 16;
-@@ -407,7 +530,20 @@
+@@ -407,7 +549,21 @@
                  chunk.enqueueRelightChecks();
                  this.profiler.endStartSection("tickChunk");
                  chunk.tick(false);
@@ -293,32 +340,39 @@
 +
                  this.profiler.endStartSection("thunder");
 +                MicroTimingLoggerManager.setTickStageDetail(this, "Thunder"); // TISCM Micro Timing logger
++                startTickTask(TickTask.THUNDER); // RSMM
  
                  if (flag && flag1 && this.rand.nextInt(100000) == 0)
                  {
-@@ -434,6 +570,7 @@
+@@ -434,6 +590,8 @@
                  }
  
                  this.profiler.endStartSection("iceandsnow");
 +                MicroTimingLoggerManager.setTickStageDetail(this, "Ice&Snow"); // TISCM Micro Timing logger
++                swapTickTask(TickTask.PRECIPITATION); // RSMM
  
                  if (this.rand.nextInt(16) == 0)
                  {
-@@ -460,6 +597,7 @@
+@@ -460,6 +618,8 @@
                  }
  
                  this.profiler.endStartSection("tickBlocks");
 +                MicroTimingLoggerManager.setTickStageDetail(this, "RandomTick"); // TISCM Micro Timing logger
++                swapTickTask(TickTask.RANDOM_TICKS); // RSMM
  
                  if (i > 0)
                  {
-@@ -493,13 +631,21 @@
+@@ -493,13 +653,25 @@
                          }
                      }
                  }
 +
++                endTickTask(); // RSMM
++
 +                // TISCM chunkTickSpeed bracket ends
 +                }
++
++                endTickTask(); // RSMM
              }
  
              this.profiler.endSection();
@@ -335,7 +389,46 @@
      {
          BlockPos blockpos = this.getHeight(Heightmap.Type.MOTION_BLOCKING, pos);
          AxisAlignedBB axisalignedbb = (new AxisAlignedBB(blockpos, new BlockPos(blockpos.getX(), this.getHeight(), blockpos.getZ()))).grow(3.0D);
-@@ -625,12 +771,16 @@
+@@ -543,6 +715,7 @@
+ 
+     protected void tickPlayers()
+     {
++        startTickTask(TickTask.PLAYERS); // RSMM
+         super.tickPlayers();
+         this.profiler.endStartSection("players");
+ 
+@@ -597,6 +770,7 @@
+ 
+             this.profiler.endSection();
+         }
++        endTickTask(); // RSMM
+     }
+ 
+     public void resetUpdateEntityTick()
+@@ -608,8 +782,11 @@
+     {
+         if (this.worldInfo.getGenerator() != WorldType.DEBUG_ALL_BLOCK_STATES)
+         {
++            startTickTask(TickTask.BLOCK_TICKS); // RSMM
+             this.pendingBlockTicks.tick();
++            swapTickTask(TickTask.FLUID_TICKS); // RSMM
+             this.pendingFluidTicks.tick();
++            endTickTask(); // RSMM
+         }
+     }
+ 
+@@ -619,18 +796,32 @@
+ 
+         if (ifluidstate.getFluid() == fluidTickEntry.getTarget())
+         {
++            // RSMM start
++            if (CarpetSettings.redstoneMultimeter) {
++                getMultimeter().logScheduledTick(this, fluidTickEntry);
++            }
++            // RSMM end
+             ifluidstate.tick(this, fluidTickEntry.position);
+         }
+     }
  
      private void tickBlock(NextTickListEntry<Block> blockTickEntry)
      {
@@ -345,6 +438,11 @@
  
          if (iblockstate.getBlock() == blockTickEntry.getTarget())
          {
++            // RSMM start
++            if (CarpetSettings.redstoneMultimeter) {
++                getMultimeter().logScheduledTick(this, blockTickEntry);
++            }
++            // RSMM end
              iblockstate.tick(this, blockTickEntry.position, this.rand);
          }
 +
@@ -352,7 +450,7 @@
      }
  
      public void tickEntity(Entity entityIn, boolean forceUpdate)
-@@ -1021,26 +1171,54 @@
+@@ -1021,26 +1212,59 @@
  
      public void addBlockEvent(BlockPos pos, Block blockIn, int eventID, int eventParam)
      {
@@ -403,6 +501,11 @@
 +
          IBlockState iblockstate = this.getBlockState(event.getPosition());
 -        return iblockstate.getBlock() == event.getBlock() ? iblockstate.onBlockEventReceived(this, event.getPosition(), event.getEventID(), event.getEventParameter()) : false;
++        // RSMM start
++        if (CarpetSettings.redstoneMultimeter && iblockstate.getBlock() == event.getBlock()) {
++            getMultimeter().logBlockEvent(this, event); // RSMM
++        }
++        // RSMM end
 +        boolean returnValue = iblockstate.getBlock() == event.getBlock() ? iblockstate.onBlockEventReceived(this, event.getPosition(), event.getEventID(), event.getEventParameter()) : false;
 +
 +        MicroTimingLoggerManager.onExecuteBlockEvent(this, event, returnValue, new ExecuteBlockEventEvent.FailInfo(iblockstate.getBlock() != event.getBlock() ? ExecuteBlockEventEvent.FailReason.BLOCK_CHANGED : ExecuteBlockEventEvent.FailReason.EVENT_FAIL, iblockstate.getBlock()), EventType.ACTION_END);
@@ -410,3 +513,81 @@
      }
  
      public void close()
+@@ -1194,4 +1418,77 @@
+     {
+         return this.server.getNetworkTagManager();
+     }
++
++    // RSMM
++    @Override
++    public void startTickTask(TickTask task) {
++        if (CarpetSettings.redstoneMultimeter) {
++            getMultimeterServer().startTickTask(task);
++        }
++    }
++
++    // RSMM
++    @Override
++    public void swapTickTask(TickTask task) {
++        if (CarpetSettings.redstoneMultimeter) {
++            getMultimeterServer().swapTickTask(task);
++        }
++    }
++
++    // RSMM
++    @Override
++    public void endTickTask() {
++        if (CarpetSettings.redstoneMultimeter) {
++            getMultimeterServer().endTickTask();
++        }
++    }
++
++    // RSMM
++    @Override
++    public void onBlockUpdate(BlockPos pos, IBlockState state) {
++        if (CarpetSettings.redstoneMultimeter) {
++            MultimeterServer server = getMultimeterServer();
++            Multimeter multimeter = server.getMultimeter();
++
++            multimeter.logBlockUpdate(this, pos);
++
++            if (state.getBlock().logPoweredOnBlockUpdate()) {
++                multimeter.logPowered(this, pos, state);
++            }
++        }
++    }
++
++    // RSMM
++    @Override
++    public void onComparatorUpdate(BlockPos pos) {
++        if (CarpetSettings.redstoneMultimeter) {
++            getMultimeter().logComparatorUpdate(this, pos);
++        }
++    }
++
++    // RSMM
++    @Override
++    public void onEntityTick(Entity entity) {
++        if (CarpetSettings.redstoneMultimeter) {
++            getMultimeter().logEntityTick(this, entity);
++        }
++    }
++
++    // RSMM
++    @Override
++    public void onBlockEntityTick(TileEntity blockEntity) {
++        if (CarpetSettings.redstoneMultimeter) {
++            getMultimeter().logBlockEntityTick(this, blockEntity);
++        }
++    }
++
++    // RSMM
++    public MultimeterServer getMultimeterServer() {
++        return server.getMultimeterServer();
++    }
++
++    // RSMM
++    public Multimeter getMultimeter() {
++        return getMultimeterServer().getMultimeter();
++    }
+ }

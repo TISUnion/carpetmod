@@ -1,6 +1,17 @@
 --- a/net/minecraft/block/BlockRedstoneOre.java
 +++ b/net/minecraft/block/BlockRedstoneOre.java
-@@ -107,7 +107,7 @@
+@@ -15,8 +15,9 @@
+ import net.minecraft.world.World;
+ import net.minecraftforge.api.distmarker.Dist;
+ import net.minecraftforge.api.distmarker.OnlyIn;
++import redstone.multimeter.block.Meterable;
+ 
+-public class BlockRedstoneOre extends Block
++public class BlockRedstoneOre extends Block implements Meterable /*RSMM*/
+ {
+     public static final BooleanProperty LIT = BlockRedstoneTorch.LIT;
+ 
+@@ -107,7 +108,7 @@
          double d0 = 0.5625D;
          Random random = p_180691_0_.rand;
  
@@ -9,3 +20,14 @@
          {
              BlockPos blockpos = worldIn.offset(enumfacing);
  
+@@ -126,4 +127,10 @@
+     {
+         builder.add(LIT);
+     }
++
++    // RSMM
++    @Override
++    public boolean isActive(World world, BlockPos pos, IBlockState state) {
++        return state.get(LIT);
++    }
+ }

@@ -1,0 +1,59 @@
+--- a/net/minecraft/block/BlockRedstoneTorch.java
++++ b/net/minecraft/block/BlockRedstoneTorch.java
+@@ -21,8 +21,10 @@
+ import net.minecraft.world.World;
+ import net.minecraftforge.api.distmarker.Dist;
+ import net.minecraftforge.api.distmarker.OnlyIn;
++import redstone.multimeter.block.MeterableBlock;
++import redstone.multimeter.block.PowerSource;
+ 
+-public class BlockRedstoneTorch extends BlockTorch
++public class BlockRedstoneTorch extends BlockTorch implements MeterableBlock /*RSMM*/, PowerSource /*RSMM*/
+ {
+     public static final BooleanProperty LIT = BlockStateProperties.LIT;
+     private static final Map<IBlockReader, List<BlockRedstoneTorch.Toggle>> BURNED_TORCHES = Maps.newHashMap();
+@@ -62,9 +64,12 @@
+         return blockState.get(LIT) && EnumFacing.UP != side ? 15 : 0;
+     }
+ 
++    // RSMM: capture return value
+     protected boolean shouldBeOff(World worldIn, BlockPos pos, IBlockState state)
+     {
+-        return worldIn.isSidePowered(pos.down(), EnumFacing.DOWN);
++        boolean powered = worldIn.isSidePowered(pos.down(), EnumFacing.DOWN);
++        logPowered(worldIn, pos, powered); // RSMM
++        return powered;
+     }
+ 
+     public void tick(IBlockState state, World worldIn, BlockPos pos, Random random)
+@@ -149,6 +154,30 @@
+         builder.add(LIT);
+     }
+ 
++    // RSMM
++    @Override
++    public boolean logPoweredOnBlockUpdate() {
++        return false;
++    }
++
++    // RSMM
++    @Override
++    public boolean isPowered(World world, BlockPos pos, IBlockState state) {
++        return shouldBeOff(world, pos, state);
++    }
++
++    // RSMM
++    @Override
++    public boolean isActive(World world, BlockPos pos, IBlockState state) {
++        return state.get(LIT);
++    }
++
++    // RSMM
++    @Override
++    public int getPowerLevel(World world, BlockPos pos, IBlockState state) {
++        return state.get(LIT) ? MAX_POWER : MIN_POWER;
++    }
++
+     private static boolean isBurnedOut(World p_176598_0_, BlockPos worldIn, boolean pos)
+     {
+         List<BlockRedstoneTorch.Toggle> list = BURNED_TORCHES.get(p_176598_0_);

@@ -1,25 +1,30 @@
 --- a/net/minecraft/block/BlockRedstoneDiode.java
 +++ b/net/minecraft/block/BlockRedstoneDiode.java
-@@ -1,6 +1,8 @@
+@@ -1,6 +1,10 @@
  package net.minecraft.block;
  
--import java.util.Random;
+ import java.util.Random;
++
 +import carpet.logging.microtiming.MicroTimingLoggerManager;
 +import carpet.logging.microtiming.enums.EventType;
 +import carpet.settings.CarpetSettings;
  import net.minecraft.block.state.BlockFaceShape;
  import net.minecraft.block.state.IBlockState;
  import net.minecraft.entity.EntityLivingBase;
-@@ -18,6 +20,8 @@
+@@ -17,8 +21,11 @@
+ import net.minecraft.world.IWorldReaderBase;
  import net.minecraft.world.TickPriority;
  import net.minecraft.world.World;
++import net.minecraft.world.WorldServer;
++import redstone.multimeter.block.MeterableBlock;
++import redstone.multimeter.block.PowerSource;
  
-+import java.util.Random;
-+
- public abstract class BlockRedstoneDiode extends BlockHorizontal
+-public abstract class BlockRedstoneDiode extends BlockHorizontal
++public abstract class BlockRedstoneDiode extends BlockHorizontal implements MeterableBlock /*RSMM*/, PowerSource /*RSMM*/
  {
      protected static final VoxelShape SHAPE = Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 2.0D, 16.0D);
-@@ -43,6 +47,21 @@
+     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
+@@ -43,6 +50,21 @@
          return worldIn.getBlockState(pos.down()).isTopSolid();
      }
  
@@ -41,7 +46,7 @@
      public void tick(IBlockState state, World worldIn, BlockPos pos, Random random)
      {
          if (!this.isLocked(worldIn, pos, state))
-@@ -60,7 +79,9 @@
+@@ -60,7 +82,9 @@
  
                  if (!flag1)
                  {
@@ -52,7 +57,7 @@
                  }
              }
          }
-@@ -94,7 +115,7 @@
+@@ -94,7 +118,7 @@
              state.dropBlockAsItem(worldIn, pos, 0);
              worldIn.removeBlock(pos);
  
@@ -61,7 +66,7 @@
              {
                  worldIn.notifyNeighborsOfStateChange(pos.offset(enumfacing), this);
              }
-@@ -121,7 +142,9 @@
+@@ -121,7 +145,9 @@
                      tickpriority = TickPriority.VERY_HIGH;
                  }
  
@@ -72,7 +77,21 @@
              }
          }
      }
-@@ -222,10 +245,12 @@
+@@ -131,9 +157,12 @@
+         return false;
+     }
+ 
++    // RSMM: capture return value
+     protected boolean shouldBePowered(World worldIn, BlockPos pos, IBlockState state)
+     {
+-        return this.calculateInputStrength(worldIn, pos, state) > 0;
++        boolean powered = this.calculateInputStrength(worldIn, pos, state) > 0;
++        logPowered(worldIn, pos, powered); // RSMM
++        return powered;
+     }
+ 
+     protected int calculateInputStrength(World worldIn, BlockPos pos, IBlockState state)
+@@ -222,10 +251,12 @@
  
      protected void notifyNeighbors(World worldIn, BlockPos pos, IBlockState state)
      {
@@ -85,3 +104,26 @@
      }
  
      protected boolean isAlternateInput(IBlockState state)
+@@ -266,4 +297,22 @@
+     {
+         return face == EnumFacing.DOWN ? BlockFaceShape.SOLID : BlockFaceShape.UNDEFINED;
+     }
++
++    // RSMM
++    @Override
++    public boolean logPoweredOnBlockUpdate() {
++        return false;
++    }
++
++    // RSMM
++    @Override
++    public boolean isPowered(World world, BlockPos pos, IBlockState state) {
++        return shouldBePowered(world, pos, state);
++    }
++
++    // RSMM
++    @Override
++    public boolean isActive(World world, BlockPos pos, IBlockState state) {
++        return state.get(POWERED);
++    }
+ }

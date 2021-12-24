@@ -1,0 +1,24 @@
+--- a/net/minecraft/block/BlockTripWire.java
++++ b/net/minecraft/block/BlockTripWire.java
+@@ -21,8 +21,9 @@
+ import net.minecraft.world.IBlockReader;
+ import net.minecraft.world.IWorld;
+ import net.minecraft.world.World;
++import redstone.multimeter.block.Meterable;
+ 
+-public class BlockTripWire extends Block
++public class BlockTripWire extends Block implements Meterable /*RSMM*/
+ {
+     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
+     public static final BooleanProperty ATTACHED = BlockStateProperties.ATTACHED;
+@@ -228,4 +229,10 @@
+     {
+         return BlockFaceShape.UNDEFINED;
+     }
++
++    // RSMM
++    @Override
++    public boolean isActive(World world, BlockPos pos, IBlockState state) {
++        return state.get(POWERED);
++    }
+ }

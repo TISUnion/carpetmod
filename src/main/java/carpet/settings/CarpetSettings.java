@@ -1139,4 +1139,14 @@ public class CarpetSettings
             category = YEET
     )
     public static boolean yeetUpdateSuppressionCrash;
+
+    // RSMM
+    @Rule(
+            desc = "Enable server-side Redstone Multimeter support.",
+            category = {
+                    CREATIVE,
+                    COMMAND
+            }
+    )
+    public static boolean redstoneMultimeter;
 }
