@@ -722,5 +722,6 @@ There are also a few optimizations which is not from lithium mod:
 - Cache some property calculation about light in `IBlockState`
 - Use multi-threading for chunk serializing during world saving
 - Cache and skip redundant `session.lock` information check
+- Make DataFixerUpper lazy like [Lazy DFU](https://github.com/astei/lazydfu)
 
 If necessary, part of the optimization implementation can be switched manually in the `TISCMConfig` class

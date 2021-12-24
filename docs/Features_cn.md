@@ -708,5 +708,6 @@ TISCM 中也有一些在 lithium mod 不包含的优化：
 - 缓存了部分 `IBlockState` 中关于光照属性计算
 - 在保存世界时使用多线程进行区块序列化操作
 - 缓存并跳过冗余的 `session.lock` 信息检查
+- 与 [Lazy DFU](https://github.com/astei/lazydfu) 模组类似地让 DataFixerUpper 延后执行
 
 如果需要，部分优化的实现可在 `TISCMConfig` 类中手动开关

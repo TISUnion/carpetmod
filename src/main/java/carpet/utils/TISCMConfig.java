@@ -33,6 +33,9 @@ public class TISCMConfig
 	// When saving all chunks in a world, the session lock file is checked on processing each chunk and that's redundant
 	// This optimization performs the session lock check at the beginning of chunks saving and skip the following checks if it passes
 	public static final boolean MERGED_SESSION_LOCK_CHECK         = TISCM_OPTIMIZATION_ENABLE && true;
+	// Lazy DFU Switch (https://github.com/astei/lazydfu)
+	// Not necessary to be under Mods since the code change is tiny
+	public static final boolean LAZY_DFU                          = TISCM_OPTIMIZATION_ENABLE && true;
 
 	// ============== Mods ==============
 

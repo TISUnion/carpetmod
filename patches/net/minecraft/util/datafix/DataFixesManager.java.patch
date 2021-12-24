@@ -1,0 +1,22 @@
+--- a/net/minecraft/util/datafix/DataFixesManager.java
++++ b/net/minecraft/util/datafix/DataFixesManager.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.util.datafix;
+ 
++import carpet.utils.TISCMConfig;
+ import com.google.common.collect.ImmutableMap;
+ import com.mojang.datafixers.DSL;
+ import com.mojang.datafixers.DataFixer;
+@@ -133,7 +134,11 @@
+     {
+         DataFixerBuilder datafixerbuilder = new DataFixerBuilder(1631);
+         addFixers(datafixerbuilder);
+-        return datafixerbuilder.build(ForkJoinPool.commonPool());
++
++        // TISCM Lazy DFU
++//        return datafixerbuilder.build(ForkJoinPool.commonPool());
++        //noinspection ConstantConditions
++        return datafixerbuilder.build(TISCMConfig.LAZY_DFU ? r -> {} : ForkJoinPool.commonPool());
+     }
+ 
+     public static DataFixer getDataFixer()
