@@ -632,6 +632,16 @@ public class CarpetSettings
     )
     public static boolean tntIgnoreRedstoneSignal = false;
 
+    @Rule(
+            desc = "Strategy for lifetime tracker to deal with mob that doesn't count towards mobcap",
+            extra = {
+                    "true: Don't track mobs that don't count towards mobcap, and treat mobs as removal as soon as they don't affect mobcap e.g. right when they pick up some items. Good for mob farm designing",
+                    "false: Tracks everything it can track and mark mobs as removal when they actually get removed. Good for raid testing Good for raid testing or non-mobfarms"
+            },
+            category = {CREATIVE}
+    )
+    public static boolean lifeTimeTrackerConsidersMobcap = true;
+
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$
     //   | $$     | $$  | $$  \__/| $$  \__/| $$$$  /$$$$
