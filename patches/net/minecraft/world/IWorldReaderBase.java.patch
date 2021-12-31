@@ -40,7 +40,7 @@
      {
          int i = MathHelper.floor(area.getStart(EnumFacing.Axis.X)) - 1;
          int j = MathHelper.ceil(area.getEnd(EnumFacing.Axis.X)) + 1;
-@@ -168,8 +179,20 @@
+@@ -168,8 +179,24 @@
  
                  VoxelShape voxelshape1 = entityShape.withOffset((double)(-k1), (double)(-l1), (double)(-i2));
  
@@ -50,7 +50,11 @@
 +                if (entityAABB != null && voxelshape instanceof VoxelShapeCaster)
                  {
 +                    flagCompare = ((VoxelShapeCaster) voxelshape).intersects(entityAABB, k1, l1, i2);
-+//                    assert flagCompare == VoxelShapes.compare(voxelshape1, voxelshape, IBooleanFunction.AND);
++//                    boolean bl = VoxelShapes.compare(voxelshape1, voxelshape, IBooleanFunction.AND);
++//                    if (flagCompare != bl)
++//                    {
++//                        System.err.println("notvanilla");
++//                    }
 +                }
 +                else
 +                {
@@ -62,7 +66,7 @@
                      return VoxelShapes.empty();
                  }
                  else if (voxelshape == VoxelShapes.fullCube())
-@@ -204,7 +227,7 @@
+@@ -204,7 +231,7 @@
          VoxelShape voxelshape = VoxelShapes.create(entityBB);
          VoxelShape voxelshape1 = VoxelShapes.create(entityBB.offset(dx > 0.0D ? -1.0E-7D : 1.0E-7D, dy > 0.0D ? -1.0E-7D : 1.0E-7D, dz > 0.0D ? -1.0E-7D : 1.0E-7D));
          VoxelShape voxelshape2 = VoxelShapes.combine(VoxelShapes.create(entityBB.expand(dx, dy, dz).grow(1.0E-7D)), voxelshape1, IBooleanFunction.ONLY_FIRST);
@@ -71,7 +75,7 @@
      }
  
  default Stream<VoxelShape> getCollisionBoxes(@Nullable Entity movingEntity, AxisAlignedBB area)
-@@ -212,7 +235,8 @@
+@@ -212,7 +239,8 @@
          return this.getCollisionBoxes(movingEntity, VoxelShapes.create(area), VoxelShapes.empty(), Collections.emptySet());
      }
  
@@ -81,7 +85,7 @@
      {
          boolean flag = movingEntity != null && movingEntity.isOutsideBorder();
          boolean flag1 = movingEntity != null && this.isInsideWorldBorder(movingEntity);
-@@ -222,11 +246,17 @@
+@@ -222,11 +250,17 @@
              movingEntity.setOutsideBorder(!flag1);
          }
  
@@ -101,7 +105,7 @@
          WorldBorder worldborder = this.getWorldBorder();
          double d0 = worldborder.minX();
          double d1 = worldborder.minZ();
-@@ -253,7 +283,9 @@
+@@ -253,7 +287,9 @@
  
  default boolean isCollisionBoxesEmpty(@Nullable Entity entityIn, AxisAlignedBB aabb, Set<Entity> entitiesToIgnore)
      {
@@ -112,7 +116,7 @@
      }
  
  default boolean isCollisionBoxesEmpty(@Nullable Entity entityIn, AxisAlignedBB aabb)
-@@ -417,4 +449,227 @@
+@@ -417,4 +453,227 @@
      }
  
      Dimension getDimension();
