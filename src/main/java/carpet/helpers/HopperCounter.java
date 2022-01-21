@@ -11,12 +11,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.server.MinecraftServer;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class HopperCounter
@@ -125,7 +120,9 @@ public class HopperCounter
                 color, ticks*1.0/(20*60), (realTime?" - real time":""), total, total*1.0*(20*60*60)/ticks),
                 "nb [X]", "^g reset", "!/counter "+color+" reset"
         ));
-        items.addAll(counter.object2LongEntrySet().stream().map(e ->
+        items.addAll(counter.object2LongEntrySet().stream().
+                sorted(Collections.reverseOrder(Comparator.comparingLong(Object2LongMap.Entry::getLongValue))).
+                map(e ->
         {
             ITextComponent itemName = new TextComponentTranslation(e.getKey().getTranslationKey());
             long count = e.getLongValue();
