@@ -329,15 +329,20 @@ public class SpawnReporter
                 {
                     there_are_mobs_to_list = true;
                     double hours = overall_spawn_ticks.get(code)/72000.0;
-                    report.add(Messenger.s(String.format(" > %s (%.1f min), %.1f m/t, {%.1f%%F / %.1f%%- / %.1f%%+}; %.2f s/att",
-                        code,
-                        60*hours,
-                        (1.0D*spawn_cap_count.get(code))/ spawn_attempts.get(code),
-                        (100.0D*spawn_ticks_full.get(code))/ spawn_attempts.get(code),
-                        (100.0D*spawn_ticks_fail.get(code))/ spawn_attempts.get(code),
-                        (100.0D*spawn_ticks_succ.get(code))/ spawn_attempts.get(code),
-                        (1.0D*spawn_ticks_spawns.get(code))/(spawn_ticks_fail.get(code)+spawn_ticks_succ.get(code))
-                    )));
+                    double full = (100.0D*spawn_ticks_full.get(code))/ spawn_attempts.get(code);
+                    double fail = (100.0D*spawn_ticks_fail.get(code))/ spawn_attempts.get(code);
+                    double succ = (100.0D*spawn_ticks_succ.get(code))/ spawn_attempts.get(code);
+                    report.add(Messenger.c(
+                            String.format("w  > %s (%.1f min), %.1f m/t, {", code, 60*hours, (1.0D*spawn_cap_count.get(code))/ spawn_attempts.get(code)),
+                            Messenger.c(
+                                    TextUtil.getFancyText(null, Messenger.s(String.format("%.1f%%F", full)), Messenger.s(String.format("%.6f%% Full", full)), null),
+                                    "w  / ",
+                                    TextUtil.getFancyText(null, Messenger.s(String.format("%.1f%%-", fail)), Messenger.s(String.format("%.6f%% Fail", fail)), null),
+                                    "w  / ",
+                                    TextUtil.getFancyText(null, Messenger.s(String.format("%.1f%%+", succ)), Messenger.s(String.format("%.6f%% Success", succ)), null)
+                            ),
+                            String.format("w }; %.2f s/att", (1.0D*spawn_ticks_spawns.get(code))/(spawn_ticks_fail.get(code)+spawn_ticks_succ.get(code)))
+                    ));
                 }
             }
             if (there_are_mobs_to_list)
