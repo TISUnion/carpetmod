@@ -42,6 +42,11 @@ public class TickWarpHUDLogger extends AbstractHUDLogger
 		return this.getTotalTicks() - this.getRemainingTicks();
 	}
 
+	private long getCurrentTime()
+	{
+		return this.info.getCurrentTime();
+	}
+
 	private long getStartTime()
 	{
 		return this.info.getStartTime();
@@ -54,7 +59,7 @@ public class TickWarpHUDLogger extends AbstractHUDLogger
 
 	private double getAverageMSPT()
 	{
-		double milliSeconds = Math.max(System.nanoTime() - this.getStartTime(), 1) / 1e6;
+		double milliSeconds = Math.max(this.getCurrentTime() - this.getStartTime(), 1) / 1e6;
 		return milliSeconds / this.getCompletedTicks();
 	}
 
