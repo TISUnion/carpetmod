@@ -11,10 +11,14 @@ public interface RSMMPacket {
 	
 	public void decode(NBTTagCompound data);
 	
+	public void execute(MultimeterServer server, EntityPlayerMP player);
+	
+	/**
+	 * Most RSMM packets are ignored if the redstoneMultimeter carpet
+	 * rule is not enabled. Some packets are handled anyway in order
+	 * to keep RSMM working properly when the carpet rule is toggled.
+	 */
 	default boolean force() {
 	    return false;
 	}
-	
-	public void execute(MultimeterServer server, EntityPlayerMP player);
-	
 }

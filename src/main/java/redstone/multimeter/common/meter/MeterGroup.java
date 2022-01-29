@@ -142,13 +142,14 @@ public abstract class MeterGroup {
 	}
 	
 	protected void moveMeter(Meter meter, DimPos newPos) {
+		long id = meter.getId();
 		DimPos pos = meter.getPos();
 		
 		if (pos.equals(newPos)) {
 			return;
 		}
 		
-		int index = posToIndex.getOrDefault(pos, -1);
+		int index = idToIndex.getOrDefault(id, -1);
 		
 		if (index < 0 || index >= meters.size()) {
 			return;
@@ -191,7 +192,7 @@ public abstract class MeterGroup {
 		NBTTagList list = nbt.getList("meters", NbtUtils.TYPE_COMPOUND);
 		
 		for (int index = 0; index < list.size(); index++) {
-		    NBTTagCompound meterNbt = list.getCompound(index);
+			NBTTagCompound meterNbt = list.getCompound(index);
 			Meter meter = Meter.fromNbt(meterNbt);
 			
 			addMeter(meter);

@@ -1,10 +1,7 @@
 package redstone.multimeter.common.meter.event;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.text.ITextComponent;
+
 
 public class MeterEvent {
 	
@@ -20,26 +17,6 @@ public class MeterEvent {
 		this.metadata = metadata;
 	}
 	
-	@Override
-	public String toString() {
-		String string = type.getName();
-		
-		List<ITextComponent> lines = new ArrayList<>();
-		type.addTextForTooltip(lines, metadata);
-		
-		if (!lines.isEmpty()) {
-			String[] args = new String[lines.size()];
-			
-			for (int index = 0; index < lines.size(); index++) {
-				args[index] = lines.get(index).getString();
-			}
-			
-			string += "[" + String.join(", ", args) + "]";
-		}
-		
-		return string;
-	}
-	
 	public EventType getType() {
 		return type;
 	}
@@ -49,7 +26,7 @@ public class MeterEvent {
 	}
 	
 	public NBTTagCompound toNbt() {
-	    NBTTagCompound nbt = new NBTTagCompound();
+		NBTTagCompound nbt = new NBTTagCompound();
 		
 		nbt.put("type", type.toNbt());
 		nbt.putInt("metadata", metadata);

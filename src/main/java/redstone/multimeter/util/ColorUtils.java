@@ -103,7 +103,7 @@ public class ColorUtils {
 			hex = "0" + hex;
 		}
 		
-		return hex;
+		return hex.toUpperCase();
 	}
 	
 	public static String toARGBString(int color) {
@@ -113,6 +113,6 @@ public class ColorUtils {
 			hex = "0" + hex;
 		}
 		
-		return hex;
+		return hex.toUpperCase();
 	}
 }

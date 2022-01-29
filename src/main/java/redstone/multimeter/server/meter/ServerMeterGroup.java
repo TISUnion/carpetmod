@@ -1,6 +1,7 @@
 package redstone.multimeter.server.meter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -17,6 +18,7 @@ import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.MeterGroup;
 import redstone.multimeter.common.meter.MeterProperties;
+import redstone.multimeter.common.meter.MeterProperties.MutableMeterProperties;
 import redstone.multimeter.common.meter.event.MeterEvent;
 import redstone.multimeter.common.network.packets.MeterUpdatesPacket;
 import redstone.multimeter.server.Multimeter;
@@ -54,7 +56,7 @@ public class ServerMeterGroup extends MeterGroup {
 		this.meterUpdates = new LinkedHashMap<>();
 		
 		this.isPrivate = false;
-		this.idle = false;
+		this.idle = true;
 		this.idleTime = 0L;
 	}
 	
@@ -106,7 +108,7 @@ public class ServerMeterGroup extends MeterGroup {
 		return multimeter;
 	}
 	
-	public boolean addMeter(MeterProperties properties) {
+	public boolean addMeter(MutableMeterProperties properties) {
 		return addMeter(new Meter(properties));
 	}
 	
@@ -137,6 +139,10 @@ public class ServerMeterGroup extends MeterGroup {
 		return limit >= 0 && getMeters().size() >= limit;
 	}
 	
+	public UUID getOwner() {
+		return owner;
+	}
+	
 	public boolean isOwnedBy(EntityPlayerMP player) {
 		return isOwnedBy(player.getUniqueID());
 	}
@@ -149,8 +155,8 @@ public class ServerMeterGroup extends MeterGroup {
 		return !members.isEmpty();
 	}
 	
-	public Set<UUID> getMembers() {
-		return Collections.unmodifiableSet(members);
+	public Collection<UUID> getMembers() {
+		return Collections.unmodifiableCollection(members);
 	}
 	
 	public boolean hasMember(EntityPlayerMP player) {
@@ -177,8 +183,8 @@ public class ServerMeterGroup extends MeterGroup {
 		return !subscribers.isEmpty();
 	}
 	
-	public Set<UUID> getSubscribers() {
-		return Collections.unmodifiableSet(subscribers);
+	public Collection<UUID> getSubscribers() {
+		return Collections.unmodifiableCollection(subscribers);
 	}
 	
 	public boolean hasSubscriber(EntityPlayerMP player) {
@@ -221,13 +227,19 @@ public class ServerMeterGroup extends MeterGroup {
 		return idleTime;
 	}
 	
-	public void updateIdleState() {
+	public boolean updateIdleState() {
 		boolean wasIdle = idle;
 		idle = !hasSubscribers();
 		
 		if (wasIdle && !idle) {
 			idleTime = 0L;
 		}
+		
+		return wasIdle != idle;
+	}
+	
+	public boolean isPastIdleTimeLimit() {
+		return idle && multimeter.options.meter_group.max_idle_time >= 0 && idleTime > multimeter.options.meter_group.max_idle_time;
 	}
 	
 	public void tick() {

@@ -1,78 +1,28 @@
 package redstone.multimeter.common.meter.event;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import net.minecraft.nbt.INBTBase;
 import net.minecraft.nbt.NBTTagByte;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.text.ITextComponent;
 
 import redstone.multimeter.util.NbtUtils;
-import redstone.multimeter.util.TextUtils;
 
 public enum EventType {
 	
 	UNKNOWN(-1, "unknown"),
-	POWERED(0, "powered") {
-		
-		@Override
-		public void addTextForTooltip(List<ITextComponent> lines, int metadata) {
-			TextUtils.addFancyText(lines, "became powered", metadata == 1);
-		}
-	},
-	ACTIVE(1, "active") {
-		
-		@Override
-		public void addTextForTooltip(List<ITextComponent> lines, int metadata) {
-			TextUtils.addFancyText(lines, "became active", metadata == 1);
-		}
-	},
-	MOVED(2, "moved") {
-		
-		@Override
-		public void addTextForTooltip(List<ITextComponent> lines, int metadata) {
-			TextUtils.addFancyText(lines, "EnumFacing", EnumFacing.byIndex(metadata).getName());
-		}
-	},
-	POWER_CHANGE(3, "power_change") {
-		
-		@Override
-		public void addTextForTooltip(List<ITextComponent> lines, int metadata) {
-			int oldPower = (metadata >> 8) & 0xFF;
-			int newPower =  metadata       & 0xFF;
-			
-			TextUtils.addFancyText(lines, "old power", oldPower);
-			TextUtils.addFancyText(lines, "new power", newPower);
-		}
-	},
+	POWERED(0, "powered"),
+	ACTIVE(1, "active"),
+	MOVED(2, "moved"),
+	POWER_CHANGE(3, "power_change"),
 	RANDOM_TICK(4, "random_tick"),
-	SCHEDULED_TICK(5, "scheduled_tick") {
-		
-		@Override
-		public void addTextForTooltip(List<ITextComponent> lines, int metadata) {
-			TextUtils.addFancyText(lines, "priority", metadata);
-		}
-	},
-	BLOCK_EVENT(6, "block_event") {
-		
-		@Override
-		public void addTextForTooltip(List<ITextComponent> lines, int metadata) {
-			TextUtils.addFancyText(lines, "type", metadata);
-		}
-	},
+	SCHEDULED_TICK(5, "scheduled_tick"),
+	BLOCK_EVENT(6, "block_event"),
 	ENTITY_TICK(7, "entity_tick"),
 	BLOCK_ENTITY_TICK(8, "block_entity_tick"),
 	BLOCK_UPDATE(9, "block_update"),
 	COMPARATOR_UPDATE(10, "comparator_update"),
-	SHAPE_UPDATE(11, "shape_update") {
-		
-		@Override
-		public void addTextForTooltip(List<ITextComponent> lines, int metadata) {
-			TextUtils.addFancyText(lines, "EnumFacing", EnumFacing.byIndex(metadata).getName());
-		}
-	},
+	SHAPE_UPDATE(11, "shape_update"),
 	OBSERVER_UPDATE(12, "observer_update"),
 	INTERACT_BLOCK(13, "interact_block");
 	
@@ -125,10 +75,6 @@ public enum EventType {
 		return 1 << index;
 	}
 	
-	public void addTextForTooltip(List<ITextComponent> lines, int metadata) {
-		
-	}
-	
 	public INBTBase toNbt() {
 		return new NBTTagByte((byte)index);
 	}
@@ -138,8 +84,8 @@ public enum EventType {
 			return UNKNOWN;
 		}
 		
-		NBTTagByte byteTag = (NBTTagByte)nbt;
-		int index = byteTag.getByte();
+		NBTTagByte NBTTagByte = (NBTTagByte)nbt;
+		int index = NBTTagByte.getByte();
 		
 		return fromIndex(index);
 	}

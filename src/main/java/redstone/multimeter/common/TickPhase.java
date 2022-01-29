@@ -1,23 +1,19 @@
 package redstone.multimeter.common;
 
 import java.util.Arrays;
-import java.util.List;
 
 import net.minecraft.nbt.INBTBase;
 import net.minecraft.nbt.NBTTagByteArray;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
 
 import redstone.multimeter.util.NbtUtils;
-import redstone.multimeter.util.TextUtils;
 
 public class TickPhase {
 	
-	public static final TickPhase UNKNOWN = new TickPhase(new TickTask[] { TickTask.UNKNOWN });
+	public static final TickPhase UNKNOWN = new TickPhase(TickTask.UNKNOWN);
 	
 	private final TickTask[] tasks;
 	
-	public TickPhase(TickTask[] tasks) {
+	public TickPhase(TickTask... tasks) {
 		this.tasks = tasks;
 	}
 	
@@ -41,23 +37,9 @@ public class TickPhase {
 		return string;
 	}
 	
-	public void addTextForTooltip(List<ITextComponent> lines) {
-		TextUtils.addFancyText(lines, "tick phase", tasks[0].getName());
-		
-		// used to indent subsequent lines
-		String whitespace = "              ";
-		
-		for (int index = 1; index < tasks.length; index++) {
-			String text = whitespace + "> " + tasks[index].getName();
-			lines.add(new TextComponentString(text));
-			
-			whitespace += "  ";
-		}
-	}
-	
 	public TickPhase startTask(TickTask task) {
-		if (this == UNKNOWN) {
-			return new TickPhase(new TickTask[] { task });
+		if (this == UNKNOWN || tasks.length == 0) {
+			return new TickPhase(task);
 		}
 		
 		TickTask[] array = new TickTask[tasks.length + 1];
@@ -118,12 +100,12 @@ public class TickPhase {
 			return UNKNOWN;
 		}
 		
-		NBTTagByteArray array = (NBTTagByteArray)nbt;
-		TickTask[] tasks = new TickTask[array.size()];
+		NBTTagByteArray nbtArray = (NBTTagByteArray)nbt;
+		byte[] array = nbtArray.getByteArray();
+		TickTask[] tasks = new TickTask[array.length];
 		
 		for (int index = 0; index < tasks.length; index++) {
-			int taskIndex = array.get(index).getByte();
-			tasks[index] = TickTask.fromIndex(taskIndex);
+			tasks[index] = TickTask.fromIndex(array[index]);
 		}
 		
 		return new TickPhase(tasks);

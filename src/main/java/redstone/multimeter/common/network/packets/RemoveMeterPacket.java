@@ -30,6 +30,6 @@ public class RemoveMeterPacket implements RSMMPacket {
 	
 	@Override
 	public void execute(MultimeterServer server, EntityPlayerMP player) {
-	    
+		server.getMultimeter().removeMeter(player, id);
 	}
 }
