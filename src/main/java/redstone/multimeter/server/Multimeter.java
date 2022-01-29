@@ -42,7 +42,6 @@ import redstone.multimeter.common.network.packets.ClearMeterGroupPacket;
 import redstone.multimeter.common.network.packets.MeterGroupDefaultPacket;
 import redstone.multimeter.common.network.packets.MeterGroupRefreshPacket;
 import redstone.multimeter.common.network.packets.MeterGroupSubscriptionPacket;
-import redstone.multimeter.interfaces.IBlock;
 import redstone.multimeter.server.meter.ServerMeterGroup;
 import redstone.multimeter.server.meter.ServerMeterPropertiesManager;
 import redstone.multimeter.server.meter.event.MeterEventPredicate;
