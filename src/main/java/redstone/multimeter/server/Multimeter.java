@@ -473,12 +473,12 @@ public class Multimeter {
 		Block oldBlock = oldState.getBlock();
 		Block newBlock = newState.getBlock();
 		
-		if (oldBlock == newBlock && ((IBlock)newBlock).isPowerSource() && ((PowerSource)newBlock).logPowerChangeOnStateChange()) {
+		if (oldBlock == newBlock && newBlock.isPowerSource() && ((PowerSource)newBlock).logPowerChangeOnStateChange()) {
 			logPowerChange(world, pos, oldState, newState);
 		}
 		
-		boolean wasMeterable = ((IBlock)oldBlock).isMeterable();
-		boolean isMeterable = ((IBlock)newBlock).isMeterable();
+		boolean wasMeterable = oldBlock.isMeterable();
+		boolean isMeterable = newBlock.isMeterable();
 		
 		if (wasMeterable || isMeterable) {
 			logActive(world, pos, newState);
