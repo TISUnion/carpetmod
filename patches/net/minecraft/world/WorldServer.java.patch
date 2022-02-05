@@ -477,7 +477,7 @@
      }
  
      public void tickEntity(Entity entityIn, boolean forceUpdate)
-@@ -1021,26 +1228,59 @@
+@@ -1021,26 +1228,60 @@
  
      public void addBlockEvent(BlockPos pos, Block blockIn, int eventID, int eventParam)
      {
@@ -504,6 +504,12 @@
 +            MicroTimingLoggerManager.setTickStageExtra(this, new BlockEventTickStageExtra(this, blockeventdata, eventCounter++, depth));
 +            // end TISCM Micro Timing logger
 +
++            // RSMM start
++            if (CarpetSettings.redstoneMultimeter) {
++                getMultimeter().logBlockEvent(this, blockeventdata, depth);
++            }
++            // RSMM end
++
              if (this.fireBlockEvent(blockeventdata))
              {
 -                this.server.getPlayerList().sendToAllNearExcept((EntityPlayer)null, (double)blockeventdata.getPosition().getX(), (double)blockeventdata.getPosition().getY(), (double)blockeventdata.getPosition().getZ(), 64.0D, this.dimension.getType(), new SPacketBlockAction(blockeventdata.getPosition(), blockeventdata.getBlock(), blockeventdata.getEventID(), blockeventdata.getEventParameter()));
@@ -528,11 +534,6 @@
 +
          IBlockState iblockstate = this.getBlockState(event.getPosition());
 -        return iblockstate.getBlock() == event.getBlock() ? iblockstate.onBlockEventReceived(this, event.getPosition(), event.getEventID(), event.getEventParameter()) : false;
-+        // RSMM start
-+        if (CarpetSettings.redstoneMultimeter && iblockstate.getBlock() == event.getBlock()) {
-+            getMultimeter().logBlockEvent(this, event);
-+        }
-+        // RSMM end
 +        boolean returnValue = iblockstate.getBlock() == event.getBlock() ? iblockstate.onBlockEventReceived(this, event.getPosition(), event.getEventID(), event.getEventParameter()) : false;
 +
 +        MicroTimingLoggerManager.onExecuteBlockEvent(this, event, returnValue, new ExecuteBlockEventEvent.FailInfo(iblockstate.getBlock() != event.getBlock() ? ExecuteBlockEventEvent.FailReason.BLOCK_CHANGED : ExecuteBlockEventEvent.FailReason.EVENT_FAIL, iblockstate.getBlock()), EventType.ACTION_END);
@@ -540,7 +541,7 @@
      }
  
      public void close()
-@@ -1194,4 +1434,54 @@
+@@ -1194,4 +1435,54 @@
      {
          return this.server.getNetworkTagManager();
      }

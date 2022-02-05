@@ -6,7 +6,7 @@ import org.apache.logging.log4j.Logger;
 public class RedstoneMultimeter {
 	
 	public static final String MOD_NAME = "Redstone Multimeter";
-	public static final String MOD_VERSION = "1.5.0";
+	public static final String MOD_VERSION = "1.6.0";
 	public static final String NAMESPACE = "redstone_multimeter";
 	public static final String MINECRAFT_NAMESPACE = "minecraft";
 	public static final String CONFIG_PATH = "config/" + NAMESPACE;
