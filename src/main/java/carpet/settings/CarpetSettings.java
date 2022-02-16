@@ -803,6 +803,16 @@ public class CarpetSettings
     )
     public static boolean debugNoteBlocks = false;
 
+    @Rule(
+            desc = "Let /teleport and /tp command supports teleporting to another dimension",
+            extra = {
+                    "Let the command targets destination's dimension instead of command source's dimension",
+                    "When enabled, the command behavior is the same as mc1.14+"
+            },
+            category = {CREATIVE}
+    )
+    public static boolean teleportCommandCrossDimensionSupport = false;
+
     /*
     @Rule(
             desc = "If a beacon receives an NC update when a purpur block is adjacent, " +

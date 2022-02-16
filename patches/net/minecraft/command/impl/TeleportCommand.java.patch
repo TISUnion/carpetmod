@@ -1,13 +1,14 @@
 --- a/net/minecraft/command/impl/TeleportCommand.java
 +++ b/net/minecraft/command/impl/TeleportCommand.java
-@@ -1,5 +1,6 @@
+@@ -1,5 +1,7 @@
  package net.minecraft.command.impl;
  
 +import carpet.helpers.CommandPermissionHelper;
++import carpet.settings.CarpetSettings;
  import com.mojang.brigadier.CommandDispatcher;
  import com.mojang.brigadier.exceptions.CommandSyntaxException;
  import com.mojang.brigadier.tree.LiteralCommandNode;
-@@ -30,11 +31,10 @@
+@@ -30,11 +32,10 @@
  {
      public static void register(CommandDispatcher<CommandSource> dispatcher)
      {
@@ -22,7 +23,7 @@
              return teleportToPos(p_198807_0_.getSource(), EntityArgument.getEntities(p_198807_0_, "targets"), p_198807_0_.getSource().getWorld(), Vec3Argument.getLocation(p_198807_0_, "location"), (ILocationArgument)null, (TeleportCommand.Facing)null);
          }).then(Commands.argument("rotation", RotationArgument.rotation()).executes((p_198811_0_) ->
          {
-@@ -58,10 +58,9 @@
+@@ -58,17 +59,21 @@
          {
              return teleportToEntity(p_200562_0_.getSource(), Collections.singleton(p_200562_0_.getSource().assertIsEntity()), EntityArgument.getEntity(p_200562_0_, "destination"));
          })));
@@ -36,3 +37,16 @@
      }
  
      private static int teleportToEntity(CommandSource source, Collection <? extends Entity > targets, Entity destination)
+     {
+         for (Entity entity : targets)
+         {
+-            teleport(source, entity, source.getWorld(), destination.posX, destination.posY, destination.posZ, EnumSet.noneOf(SPacketPlayerPosLook.EnumFlags.class), destination.rotationYaw, destination.rotationPitch, (TeleportCommand.Facing)null);
++            // TISCM teleportCommandCrossDimensionSupport
++            WorldServer destWorld = CarpetSettings.teleportCommandCrossDimensionSupport ?
++                    (WorldServer)destination.world :  // modded
++                    source.getWorld();  // vanilla
++
++            teleport(source, entity, destWorld, destination.posX, destination.posY, destination.posZ, EnumSet.noneOf(SPacketPlayerPosLook.EnumFlags.class), destination.rotationYaw, destination.rotationPitch, (TeleportCommand.Facing)null);
+         }
+ 
+         if (targets.size() == 1)
