@@ -1150,6 +1150,19 @@ public class CarpetSettings
     )
     public static boolean yeetUpdateSuppressionCrash;
 
+    //////////////////////////////////
+    //  TISCM bundled mod switches  //
+    //////////////////////////////////
+
+    // Litematica Server Paster
+    // https://github.com/Fallen-Breath/litematica-server-paster
+    @Rule(
+            desc = "Enable server-side Litematica Server Paster protocol support.",
+            extra = "https://github.com/Fallen-Breath/litematica-server-paster",
+            category = CREATIVE
+    )
+    public static boolean litematicaServerPaster = false;
+
     // RSMM
     @Rule(
             desc = "Enable server-side Redstone Multimeter support.",
@@ -1158,5 +1171,5 @@ public class CarpetSettings
                     COMMAND
             }
     )
-    public static boolean redstoneMultimeter;
+    public static boolean redstoneMultimeter = false;
 }
