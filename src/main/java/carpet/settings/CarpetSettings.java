@@ -682,6 +682,33 @@ public class CarpetSettings
     )
     public static int snowMeltMinLightLevel = VANILLA_SNOW_MELT_MIN_LIGHT_LEVEL;
 
+    @Rule(
+            desc = "The maximum horizontal chebyshev distance (in chunks) for the server to sync entities information to the client",
+            extra = {
+                    "Basically this works as a \"entity view distance\", but will still be limited to the server view distance",
+                    "Set it to a value not less than the server view distance to make the server sync all entities within the view distance to the client",
+                    "Set it to a non-positive value to use vanilla logic",
+                    "Requires chunk reloading to set the new rule value to entities"
+            },
+            options = {"-1", "16", "64"},
+            strict = false,
+            category = {CREATIVE}
+    )
+    public static int entityTrackerDistance = -1;
+
+    @Rule(
+            desc = "The time interval (in gametick) for the server to sync entities information to the client",
+            extra = {
+                    "With a small number e.g. 1, entity information will be synced to the client every 1 gametick, resulting in less-likely client-side entity desync",
+                    "Set it to a non-positive value to use vanilla logic",
+                    "Requires chunk reloading to set the new rule value to entities"
+            },
+            options = {"-1", "1"},
+            strict = false,
+            category = {CREATIVE}
+    )
+    public static int entityTrackerInterval = -1;
+
 
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$

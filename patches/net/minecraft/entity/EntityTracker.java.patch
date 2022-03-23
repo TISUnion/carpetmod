@@ -1,0 +1,47 @@
+--- a/net/minecraft/entity/EntityTracker.java
++++ b/net/minecraft/entity/EntityTracker.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.entity;
+ 
++import carpet.settings.CarpetSettings;
+ import com.google.common.collect.Lists;
+ import com.google.common.collect.Sets;
+ import java.util.List;
+@@ -214,6 +215,19 @@
+ 
+     public void track(Entity entityIn, int trackingRange, int updateInterval, boolean sendVelocityUpdates)
+     {
++        // TISCM entityTrackerDistance
++        if (CarpetSettings.entityTrackerDistance > 0)
++        {
++            // trackingRange is in meter, but the rule value is in chunk, so *16 is needed
++            trackingRange = CarpetSettings.entityTrackerDistance * 16;
++        }
++
++        // TISCM entityTrackerInterval
++        if (CarpetSettings.entityTrackerInterval > 0)
++        {
++            updateInterval = CarpetSettings.entityTrackerInterval;
++        }
++
+         try
+         {
+             if (this.trackedEntityHashTable.containsItem(entityIn.getEntityId()))
+@@ -231,11 +245,15 @@
+             CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Adding entity to track");
+             CrashReportCategory crashreportcategory = crashreport.makeCategory("Entity To Track");
+             crashreportcategory.addDetail("Tracking range", trackingRange + " blocks");
++
++            // TISCM added a final version of the local var updateInterval, since rule entityTrackerInterval modifies that
++            final int finalUpdateInterval = updateInterval;
++
+             crashreportcategory.addDetail("Update interval", () ->
+             {
+-                String s = "Once per " + updateInterval + " ticks";
++                String s = "Once per " + finalUpdateInterval + " ticks";
+ 
+-                if (updateInterval == Integer.MAX_VALUE)
++                if (finalUpdateInterval == Integer.MAX_VALUE)
+                 {
+                     s = "Maximum (" + s + ")";
+                 }
