@@ -1,6 +1,11 @@
 --- a/net/minecraft/server/integrated/IntegratedServer.java
 +++ b/net/minecraft/server/integrated/IntegratedServer.java
-@@ -38,6 +38,8 @@
+@@ -35,9 +35,13 @@
+ import net.minecraft.world.storage.WorldSavedDataStorage;
+ import net.minecraftforge.api.distmarker.Dist;
+ import net.minecraftforge.api.distmarker.OnlyIn;
++import redstone.multimeter.common.TickTask;
++
  import org.apache.logging.log4j.LogManager;
  import org.apache.logging.log4j.Logger;
  
@@ -9,7 +14,7 @@
  @OnlyIn(Dist.CLIENT)
  public class IntegratedServer extends MinecraftServer
  {
-@@ -103,6 +105,10 @@
+@@ -103,6 +107,10 @@
          this.setKeyPair(CryptManager.generateKeyPair());
          this.loadAllWorlds(this.getFolderName(), this.getWorldName(), this.worldSettings.getSeed(), this.worldSettings.getTerrainType(), this.worldSettings.getGeneratorOptions());
          this.setMOTD(this.getServerOwner() + " - " + this.getWorld(DimensionType.OVERWORLD).getWorldInfo().getWorldName());
@@ -20,7 +25,30 @@
          return true;
      }
  
-@@ -354,4 +360,10 @@
+@@ -122,10 +130,22 @@
+ 
+         if (this.isGamePaused)
+         {
++            // RSMM start
++            multimeterServer.tickStart();
++            startTickTask(TickTask.TICK);
++            startTickTask(TickTask.PACKETS);
++            // RSMM end
++
+             while ((futuretask = this.futureTaskQueue.poll()) != null)
+             {
+                 Util.runTask(futuretask, LOGGER);
+             }
++
++            // RSMM start
++            endTickTask();
++            endTickTask();
++            multimeterServer.tickEnd();
++            // RSMM end
+         }
+         else
+         {
+@@ -354,4 +374,10 @@
      {
          this.playerUuid = uuid;
      }

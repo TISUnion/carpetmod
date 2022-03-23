@@ -69,7 +69,7 @@
  
      public void playerLoggedOut(EntityPlayerMP playerIn)
      {
-+        server.getMultimeterServer().onPlayerLeave(playerIn);
++        server.getMultimeterServer().onPlayerLeave(playerIn); // RSMM
 +
          WorldServer worldserver = playerIn.getServerWorld();
          playerIn.addStat(StatList.LEAVE_GAME);

@@ -38,7 +38,7 @@
      {
          boolean flag = !worldIn.isBlockPowered(pos);
  
-+        logPowered(worldIn, pos, !flag);
++        logPowered(worldIn, pos, !flag); // RSMM
 +
          if (flag != state.get(ENABLED))
          {

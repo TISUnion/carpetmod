@@ -4,10 +4,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import redstone.multimeter.common.DimPos;
+import redstone.multimeter.common.meter.MeterProperties.MutableMeterProperties;
 
 public abstract class MeterPropertiesManager {
 	
-	public boolean validate(MeterProperties properties) {
+	public boolean validate(MutableMeterProperties properties) {
 		DimPos pos = properties.getPos();
 		
 		if (pos == null) {
@@ -27,6 +28,6 @@ public abstract class MeterPropertiesManager {
 	
 	protected abstract World getWorldOf(DimPos pos);
 	
-	protected abstract void postValidation(MeterProperties properties, World world, BlockPos pos);
+	protected abstract void postValidation(MutableMeterProperties properties, World world, BlockPos pos);
 	
 }

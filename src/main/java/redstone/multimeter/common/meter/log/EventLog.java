@@ -1,15 +1,9 @@
 package redstone.multimeter.common.meter.log;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.text.ITextComponent;
 
 import redstone.multimeter.common.TickPhase;
-import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.common.meter.event.MeterEvent;
-import redstone.multimeter.util.TextUtils;
 
 public class EventLog {
 	
@@ -22,9 +16,9 @@ public class EventLog {
 		
 	}
 	
-	public EventLog(long tick, int subTick, TickPhase tickPhase, MeterEvent event) {
+	public EventLog(long tick, int subtick, TickPhase tickPhase, MeterEvent event) {
 		this.tick = tick;
-		this.subtick = subTick;
+		this.subtick = subtick;
 		this.tickPhase = tickPhase;
 		this.event = event;
 	}
@@ -85,23 +79,8 @@ public class EventLog {
 		return event;
 	}
 	
-	public List<ITextComponent> getTextForTooltip() {
-		EventType type = event.getType();
-		int data = event.getMetadata();
-		
-		List<ITextComponent> lines = new ArrayList<>();
-		
-		TextUtils.addFancyText(lines, "event type", type.getName());
-		type.addTextForTooltip(lines, data);
-		TextUtils.addFancyText(lines, "tick", tick);
-		TextUtils.addFancyText(lines, "subtick", subtick);
-		tickPhase.addTextForTooltip(lines);
-		
-		return lines;
-	}
-	
 	public NBTTagCompound toNbt() {
-	    NBTTagCompound nbt = new NBTTagCompound();
+		NBTTagCompound nbt = new NBTTagCompound();
 		
 		nbt.put("meter event", event.toNbt());
 		nbt.putLong("tick", tick);

@@ -4,7 +4,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import redstone.multimeter.common.DimPos;
-import redstone.multimeter.common.meter.MeterProperties;
+import redstone.multimeter.common.meter.MeterProperties.MutableMeterProperties;
 import redstone.multimeter.common.meter.MeterPropertiesManager;
 import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.server.Multimeter;
@@ -24,7 +24,7 @@ public class ServerMeterPropertiesManager extends MeterPropertiesManager {
 	}
 	
 	@Override
-	protected void postValidation(MeterProperties properties, World world, BlockPos pos) {
+	protected void postValidation(MutableMeterProperties properties, World world, BlockPos pos) {
 		// These are the backup values for if the saved defaults
 		// do not fully populate the meter settings.
 		

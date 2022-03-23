@@ -68,9 +68,9 @@ public class TextUtils {
 		lines.add(formatFancyText(title, info));
 	}
 	
-	public static ITextComponent formatFancyText(String title, String info) {
+	public static ITextComponent formatFancyText(String title, Object info) {
 		return new TextComponentString("").
 			appendSibling(new TextComponentString(title + ": ").applyTextStyle(TextFormatting.GOLD)).
-			appendSibling(new TextComponentString(info));
+			appendSibling(new TextComponentString(info.toString()));
 	}
 }

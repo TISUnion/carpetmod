@@ -136,7 +136,7 @@ public class MeterLogs {
 	}
 	
 	public NBTTagCompound toNbt() {
-	    NBTTagCompound nbt = new NBTTagCompound();
+		NBTTagCompound nbt = new NBTTagCompound();
 		
 		for (EventType type : EventType.ALL) {
 			NBTTagList logs = toNbt(type);
@@ -150,7 +150,7 @@ public class MeterLogs {
 	}
 	
 	private NBTTagList toNbt(EventType type) {
-	    NBTTagList list = new NBTTagList();
+		NBTTagList list = new NBTTagList();
 		
 		for (EventLog log : getLogs(type)) {
 			list.add(log.toNbt());
@@ -171,7 +171,7 @@ public class MeterLogs {
 	
 	public void updateFromNbt(EventType type, NBTTagList logs) {
 		for (int index = 0; index < logs.size(); index++) {
-		    NBTTagCompound nbt = logs.getCompound(index);
+			NBTTagCompound nbt = logs.getCompound(index);
 			EventLog log = EventLog.fromNbt(nbt);
 			
 			add(log);

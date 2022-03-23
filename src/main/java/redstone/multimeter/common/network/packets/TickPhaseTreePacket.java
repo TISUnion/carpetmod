@@ -3,35 +3,33 @@ package redstone.multimeter.common.network.packets;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 
-import redstone.multimeter.RedstoneMultimeter;
 import redstone.multimeter.common.network.RSMMPacket;
 import redstone.multimeter.server.MultimeterServer;
 
-public class HandshakePacket implements RSMMPacket {
+public class TickPhaseTreePacket implements RSMMPacket {
 	
-	private String modVersion;
+	private NBTTagCompound nbt;
 	
-	public HandshakePacket() {
-		modVersion = RedstoneMultimeter.MOD_VERSION;
+	public TickPhaseTreePacket() {
+		
+	}
+	
+	public TickPhaseTreePacket(NBTTagCompound nbt) {
+		this.nbt = nbt;
 	}
 	
 	@Override
 	public void encode(NBTTagCompound data) {
-		data.putString("mod version", modVersion);
+		data.put("tick phase tree", nbt);
 	}
 	
 	@Override
 	public void decode(NBTTagCompound data) {
-		modVersion = data.getString("mod version");
+		nbt = data.getCompound("tick phase tree");
 	}
 	
 	@Override
 	public void execute(MultimeterServer server, EntityPlayerMP player) {
-		server.onHandshake(player, modVersion);
-	}
-	
-	@Override
-	public boolean force() {
-	    return true;
+		server.refreshTickPhaseTree(player);
 	}
 }

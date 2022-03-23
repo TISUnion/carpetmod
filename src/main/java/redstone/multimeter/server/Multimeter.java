@@ -4,9 +4,12 @@ import java.text.NumberFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import net.minecraft.block.Block;
@@ -33,6 +36,7 @@ import redstone.multimeter.common.DimPos;
 import redstone.multimeter.common.meter.Meter;
 import redstone.multimeter.common.meter.MeterGroup;
 import redstone.multimeter.common.meter.MeterProperties;
+import redstone.multimeter.common.meter.MeterProperties.MutableMeterProperties;
 import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.common.network.packets.ClearMeterGroupPacket;
 import redstone.multimeter.common.network.packets.MeterGroupDefaultPacket;
@@ -48,9 +52,13 @@ import redstone.multimeter.util.TextUtils;
 
 public class Multimeter {
 	
+	private static final NumberFormat NUMBER_FORMAT = NumberFormat.getNumberInstance(Locale.US);
+	
 	private final MultimeterServer server;
 	private final Map<String, ServerMeterGroup> meterGroups;
 	private final Map<UUID, ServerMeterGroup> subscriptions;
+	private final Set<ServerMeterGroup> activeMeterGroups;
+	private final Set<ServerMeterGroup> idleMeterGroups;
 	private final ServerMeterPropertiesManager meterPropertiesManager;
 	
 	public Options options;
@@ -59,6 +67,8 @@ public class Multimeter {
 		this.server = server;
 		this.meterGroups = new LinkedHashMap<>();
 		this.subscriptions = new HashMap<>();
+		this.activeMeterGroups = new HashSet<>();
+		this.idleMeterGroups = new HashSet<>();
 		this.meterPropertiesManager = new ServerMeterPropertiesManager(this);
 		
 		reloadOptions();
@@ -103,11 +113,7 @@ public class Multimeter {
 	
 	public void tickStart(boolean paused) {
 		if (!paused) {
-			if (options.meter_group.max_idle_time >= 0) {
-				meterGroups.values().removeIf(meterGroup -> {
-					return meterGroup.isIdle() && (!meterGroup.hasMeters() || meterGroup.getIdleTime() > options.meter_group.max_idle_time);
-				});
-			}
+			removeIdleMeterGroups();
 			
 			for (ServerMeterGroup meterGroup : meterGroups.values()) {
 				meterGroup.tick();
@@ -120,6 +126,42 @@ public class Multimeter {
 		
 		if (!paused) {
 			broadcastMeterLogs();
+		}
+	}
+	
+	private void removeIdleMeterGroups() {
+		Iterator<ServerMeterGroup> it = idleMeterGroups.iterator();
+		
+		while (it.hasNext()) {
+			ServerMeterGroup meterGroup = it.next();
+			
+			if (tryRemoveMeterGroup(meterGroup)) {
+				it.remove();
+			}
+		}
+	}
+	
+	private boolean tryRemoveMeterGroup(ServerMeterGroup meterGroup) {
+		if (meterGroup.hasMeters() && !meterGroup.isPastIdleTimeLimit()) {
+			return false;
+		}
+		
+		meterGroups.remove(meterGroup.getName(), meterGroup);
+		
+		if (meterGroup.hasMeters()) {
+			notifyOwnerOfRemoval(meterGroup);
+		}
+		
+		return true;
+	}
+	
+	private void notifyOwnerOfRemoval(ServerMeterGroup meterGroup) {
+		UUID ownerUUID = meterGroup.getOwner();
+		EntityPlayerMP owner = server.getPlayer(ownerUUID);
+		
+		if (owner != null) {
+			ITextComponent message = new TextComponentString(String.format("One of your meter groups, \'%s\', was idle for more than %d ticks and has been removed.", meterGroup.getName(), options.meter_group.max_idle_time));
+			server.sendMessage(owner, message, false);
 		}
 	}
 	
@@ -160,7 +202,9 @@ public class Multimeter {
 		}
 	}
 	
-	public boolean addMeter(ServerMeterGroup meterGroup, MeterProperties properties) {
+	public boolean addMeter(ServerMeterGroup meterGroup, MeterProperties meterProperties) {
+		MutableMeterProperties properties = meterProperties.toMutable();
+		
 		if (!meterPropertiesManager.validate(properties) || !meterGroup.addMeter(properties)) {
 			return false;
 		}
@@ -196,11 +240,15 @@ public class Multimeter {
 		ServerMeterGroup meterGroup = getSubscription(player);
 		
 		if (meterGroup != null) {
-			meterGroup.clear();
-			
-			ClearMeterGroupPacket packet = new ClearMeterGroupPacket();
-			server.getPacketHandler().sendToSubscribers(packet, meterGroup);
+			clearMeterGroup(meterGroup);
 		}
+	}
+	
+	public void clearMeterGroup(ServerMeterGroup meterGroup) {
+		meterGroup.clear();
+		
+		ClearMeterGroupPacket packet = new ClearMeterGroupPacket();
+		server.getPacketHandler().sendToSubscribers(packet, meterGroup);
 	}
 	
 	public void createMeterGroup(EntityPlayerMP player, String name) {
@@ -239,7 +287,19 @@ public class Multimeter {
 		
 		subscriptions.put(playerUUID, meterGroup);
 		meterGroup.addSubscriber(playerUUID);
-		meterGroup.updateIdleState();
+		
+		if (meterGroup.updateIdleState()) {
+			activeMeterGroups.add(meterGroup);
+			idleMeterGroups.remove(meterGroup);
+		}
+	}
+	
+	public void unsubscribeFromMeterGroup(EntityPlayerMP player) {
+		ServerMeterGroup meterGroup = getSubscription(player);
+		
+		if (meterGroup != null) {
+			unsubscribeFromMeterGroup(meterGroup, player);
+		}
 	}
 	
 	public void unsubscribeFromMeterGroup(ServerMeterGroup meterGroup, EntityPlayerMP player) {
@@ -254,7 +314,11 @@ public class Multimeter {
 		
 		subscriptions.remove(playerUUID, meterGroup);
 		meterGroup.removeSubscriber(playerUUID);
-		meterGroup.updateIdleState();
+		
+		if (meterGroup.updateIdleState()) {
+			activeMeterGroups.remove(meterGroup);
+			idleMeterGroups.add(meterGroup);
+		}
 	}
 	
 	private void onSubscriptionChanged(EntityPlayerMP player, ServerMeterGroup prevSubscription, ServerMeterGroup newSubscription) {
@@ -267,7 +331,7 @@ public class Multimeter {
 		}
 		
 		server.getPacketHandler().sendToPlayer(packet, player);
-		server.getMinecraftServer().getPlayerList().updatePermissionLevel(player);
+		server.getPlayerManager().updatePermissionLevel(player);
 	}
 	
 	public void clearMembersOfMeterGroup(ServerMeterGroup meterGroup) {
@@ -309,7 +373,7 @@ public class Multimeter {
 		meterGroup.removeMember(playerUUID);
 		
 		if (meterGroup.isPrivate()) {
-		    EntityPlayerMP player = server.getPlayer(playerUUID);
+			EntityPlayerMP player = server.getPlayer(playerUUID);
 			
 			if (player != null && meterGroup.hasSubscriber(playerUUID)) {
 				unsubscribeFromMeterGroup(meterGroup, player);
@@ -365,6 +429,10 @@ public class Multimeter {
 					float pitch = player.rotationPitch;
 					
 					player.teleport(newWorld, newX, newY, newZ, yaw, pitch);
+					
+					ITextComponent text = new TextComponentString(String.format("Teleported to meter \"%s\"", meter.getName()));
+					server.sendMessage(player, text, false);
+					
 					sendClickableReturnMessage(oldWorld, oldX, oldY, oldZ, yaw, pitch, player);
 				}
 			}
@@ -377,17 +445,15 @@ public class Multimeter {
 	 * a meter.
 	 */
 	private void sendClickableReturnMessage(WorldServer world, double _x, double _y, double _z, float _yaw, float _pitch, EntityPlayerMP player) {
-		NumberFormat f = NumberFormat.getNumberInstance(Locale.US); // use . as decimal separator
-		
 		String dimensionId = DimensionType.getKey(world.dimension.getType()).toString();
-		String x = f.format(_x);
-		String y = f.format(_y);
-		String z = f.format(_z);
-		String yaw = f.format(_yaw);
-		String pitch = f.format(_pitch);
+		String x = NUMBER_FORMAT.format(_x);
+		String y = NUMBER_FORMAT.format(_y);
+		String z = NUMBER_FORMAT.format(_z);
+		String yaw = NUMBER_FORMAT.format(_yaw);
+		String pitch = NUMBER_FORMAT.format(_pitch);
 		
 		ITextComponent message = new TextComponentString("Click ").
-		        appendSibling(new TextComponentString("[here]").applyTextStyle(style -> {
+			appendSibling(new TextComponentString("[here]").applyTextStyle((style) -> {
 				style.
 					setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString("Teleport to").
 						appendSibling(TextUtils.formatFancyText("\n  dimension", dimensionId)).
@@ -397,7 +463,7 @@ public class Multimeter {
 					setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, String.format("/execute in %s run tp @s %s %s %s %s %s", dimensionId, x, y, z, yaw, pitch))).
 					setColor(TextFormatting.GREEN);
 			})).
-		        appendSibling(new TextComponentString(" to return to your previous location"));
+			appendSibling(new TextComponentString(" to return to your previous location"));
 		
 		server.sendMessage(player, message, false);
 	}
@@ -446,7 +512,7 @@ public class Multimeter {
 	public void moveMeters(World world, BlockPos blockPos, EnumFacing dir) {
 		DimPos pos = new DimPos(world, blockPos);
 		
-		for (ServerMeterGroup meterGroup : meterGroups.values()) {
+		for (ServerMeterGroup meterGroup : activeMeterGroups) {
 			meterGroup.tryMoveMeter(pos, dir);
 		}
 	}
@@ -481,8 +547,8 @@ public class Multimeter {
 		tryLogEvent(world, scheduledTick.position, EventType.SCHEDULED_TICK, scheduledTick.priority.getPriority());
 	}
 	
-	public void logBlockEvent(World world, BlockEventData blockEvent) {
-		tryLogEvent(world, blockEvent.getPosition(), EventType.BLOCK_EVENT, blockEvent.getEventID());
+	public void logBlockEvent(World world, BlockEventData blockEvent, int depth) {
+		tryLogEvent(world, blockEvent.getPosition(), EventType.BLOCK_EVENT, (depth << 4) | blockEvent.getEventID());
 	}
 	
 	public void logEntityTick(World world, Entity entity) {
@@ -525,11 +591,15 @@ public class Multimeter {
 		if (options.hasEventType(supplier.type())) {
 			DimPos pos = new DimPos(world, blockPos);
 			
-			for (ServerMeterGroup meterGroup : meterGroups.values()) {
-				if (!meterGroup.isIdle()) {
-					meterGroup.tryLogEvent(pos, predicate, supplier);
-				}
+			for (ServerMeterGroup meterGroup : activeMeterGroups) {
+				meterGroup.tryLogEvent(pos, predicate, supplier);
 			}
 		}
+	}
+	
+	static {
+		
+		NUMBER_FORMAT.setGroupingUsed(false);
+		
 	}
 }

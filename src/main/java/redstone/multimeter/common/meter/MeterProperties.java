@@ -22,7 +22,7 @@ public class MeterProperties {
 		
 	}
 	
-	public MeterProperties(DimPos pos, String name, int color, boolean movable, int eventTypes) {
+	public MeterProperties(DimPos pos, String name, Integer color, Boolean movable, Integer eventTypes) {
 		this.pos = pos;
 		this.name = name;
 		this.color = color;
@@ -39,44 +39,16 @@ public class MeterProperties {
 		return pos;
 	}
 	
-	public boolean setPos(DimPos pos) {
-		DimPos prevPos = this.pos;
-		this.pos = pos;
-		
-		return prevPos == null || !prevPos.equals(pos);
-	}
-	
 	public String getName() {
 		return name;
-	}
-	
-	public boolean setName(String name) {
-		String prevName = this.name;
-		this.name = name;
-		
-		return prevName == null || !prevName.equals(name);
 	}
 	
 	public Integer getColor() {
 		return color;
 	}
 	
-	public boolean setColor(int color) {
-		Integer prevColor = this.color;
-		this.color = color;
-		
-		return prevColor == null || !prevColor.equals(color);
-	}
-	
 	public Boolean getMovable() {
 		return movable;
-	}
-	
-	public boolean setMovable(boolean movable) {
-		Boolean prevMovable = this.movable;
-		this.movable = movable;
-		
-		return prevMovable == null || !prevMovable.equals(movable);
 	}
 	
 	public Integer getEventTypes() {
@@ -87,47 +59,56 @@ public class MeterProperties {
 		return eventTypes != null && (eventTypes & type.flag()) != 0;
 	}
 	
-	public boolean setEventTypes(int eventTypes) {
-		Integer prevEventTypes = this.eventTypes;
-		this.eventTypes = eventTypes;
-		
-		return prevEventTypes == null || !prevEventTypes.equals(eventTypes);
+	public MutableMeterProperties toMutable() {
+		return new MutableMeterProperties().fill(this);
 	}
 	
-	public boolean toggleEventType(EventType type) {
-		if (eventTypes == null) {
-			eventTypes = 0;
-		}
-		
-		return setEventTypes(eventTypes ^ type.flag());
-	}
-	
-	public MeterProperties copy() {
-		return new MeterProperties().fill(this);
-	}
-	
-	/**
-	 * If a property does not yet have a value, copy the value
-	 * from the given properties.
-	 */
-	public MeterProperties fill(MeterProperties properties) {
-		if (pos == null) {
-			pos = properties.pos;
-		}
-		if (name == null) {
-			name = properties.name;
-		}
-		if (color == null) {
-			color = properties.color;
-		}
-		if (movable == null) {
-			movable = properties.movable;
-		}
-		if (eventTypes == null) {
-			eventTypes = properties.eventTypes;
-		}
-		
+	public MeterProperties toImmutable() {
 		return this;
+	}
+	
+	public NBTTagCompound toNbt() {
+		NBTTagCompound nbt = new NBTTagCompound();
+		
+		if (pos != null) {
+			nbt.put("pos", pos.toNbt());
+		}
+		if (name != null) {
+			nbt.putString("name", name);
+		}
+		if (color != null) {
+			nbt.putInt("color", color);
+		}
+		if (movable != null) {
+			nbt.putBoolean("movable", movable);
+		}
+		if (eventTypes != null) {
+			nbt.putInt("event types", eventTypes);
+		}
+		
+		return nbt;
+	}
+	
+	public static MeterProperties fromNbt(NBTTagCompound nbt) {
+		MeterProperties properties = new MeterProperties();
+		
+		if (nbt.contains("pos")) {
+			properties.pos = DimPos.fromNbt(nbt.getCompound("pos"));
+		}
+		if (nbt.contains("name")) {
+			properties.name = nbt.getString("name");
+		}
+		if (nbt.contains("color")) {
+			properties.color = nbt.getInt("color");
+		}
+		if (nbt.contains("movable")) {
+			properties.movable = nbt.getBoolean("movable");
+		}
+		if (nbt.contains("event types")) {
+			properties.eventTypes = nbt.getInt("event types");
+		}
+		
+		return properties;
 	}
 	
 	public JsonObject toJson() {
@@ -210,47 +191,85 @@ public class MeterProperties {
 		return properties;
 	}
 	
-	public NBTTagCompound toNbt() {
-	    NBTTagCompound nbt = new NBTTagCompound();
+	public static class MutableMeterProperties extends MeterProperties {
 		
-		if (pos != null) {
-			nbt.put("pos", pos.toNbt());
-		}
-		if (name != null) {
-			nbt.putString("name", name);
-		}
-		if (color != null) {
-			nbt.putInt("color", color);
-		}
-		if (movable != null) {
-			nbt.putBoolean("movable", movable);
-		}
-		if (eventTypes != null) {
-			nbt.putInt("event types", eventTypes);
+		public boolean setPos(DimPos pos) {
+			DimPos prevPos = super.pos;
+			super.pos = pos;
+			
+			return prevPos == null || !prevPos.equals(pos);
 		}
 		
-		return nbt;
-	}
-	
-	public static MeterProperties fromNbt(NBTTagCompound nbt) {
-		MeterProperties properties = new MeterProperties();
-		
-		if (nbt.contains("pos")) {
-			properties.pos = DimPos.fromNbt(nbt.getCompound("pos"));
-		}
-		if (nbt.contains("name")) {
-			properties.name = nbt.getString("name");
-		}
-		if (nbt.contains("color")) {
-			properties.color = nbt.getInt("color");
-		}
-		if (nbt.contains("movable")) {
-			properties.movable = nbt.getBoolean("movable");
-		}
-		if (nbt.contains("event types")) {
-			properties.eventTypes = nbt.getInt("event types");
+		public boolean setName(String name) {
+			String prevName = super.name;
+			super.name = name;
+			
+			return prevName == null || !prevName.equals(name);
 		}
 		
-		return properties;
+		public boolean setColor(Integer color) {
+			Integer prevColor = super.color;
+			super.color = color;
+			
+			return prevColor == null || !prevColor.equals(color);
+		}
+		
+		public boolean setMovable(Boolean movable) {
+			Boolean prevMovable = super.movable;
+			super.movable = movable;
+			
+			return prevMovable == null || !prevMovable.equals(movable);
+		}
+		
+		public boolean setEventTypes(Integer eventTypes) {
+			Integer prevEventTypes = super.eventTypes;
+			super.eventTypes = eventTypes;
+			
+			return prevEventTypes == null || !prevEventTypes.equals(eventTypes);
+		}
+		
+		public boolean toggleEventType(EventType type) {
+			if (super.eventTypes == null) {
+				super.eventTypes = 0;
+			}
+			
+			return setEventTypes(super.eventTypes ^ type.flag());
+		}
+		
+		public MutableMeterProperties toMutable() {
+			return this;
+		}
+		
+		public MeterProperties toImmutable() {
+			return new MeterProperties(super.pos, super.name, super.color, super.movable, super.eventTypes);
+		}
+		
+		/**
+		 * If a property does not yet have a value, copy the value
+		 * from the given properties.
+		 */
+		public MutableMeterProperties fill(MeterProperties properties) {
+			if (properties == null) {
+				return this;
+			}
+			
+			if (super.pos == null) {
+				super.pos = properties.pos;
+			}
+			if (super.name == null) {
+				super.name = properties.name;
+			}
+			if (super.color == null) {
+				super.color = properties.color;
+			}
+			if (super.movable == null) {
+				super.movable = properties.movable;
+			}
+			if (super.eventTypes == null) {
+				super.eventTypes = properties.eventTypes;
+			}
+			
+			return this;
+		}
 	}
 }

@@ -34,7 +34,7 @@ public class MeterUpdatesPacket implements RSMMPacket {
 	
 	@Override
 	public void encode(NBTTagCompound data) {
-	    NBTTagList list = new NBTTagList();
+		NBTTagList list = new NBTTagList();
 		
 		for (Entry<MeterProperties> entry : meterUpdates.long2ObjectEntrySet()) {
 			long id = entry.getLongKey();
@@ -58,7 +58,7 @@ public class MeterUpdatesPacket implements RSMMPacket {
 			removedMeters.add(id);
 		}
 		for (int index = 0; index < list.size(); index++) {
-		    NBTTagCompound nbt = list.getCompound(index);
+			NBTTagCompound nbt = list.getCompound(index);
 			
 			long id = nbt.getLong("id");
 			MeterProperties update = MeterProperties.fromNbt(nbt);

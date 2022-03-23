@@ -13,7 +13,7 @@
  
      public void tick()
      {
-+        world.getMultimeterServer().startTickTask(TickTask.DRAGON_FIGHT); // RSMM
++        world.getMultimeterServer().startTickTask(true, TickTask.DRAGON_FIGHT); // RSMM
 +
          this.bossInfo.setVisible(!this.dragonKilled);
  
@@ -23,7 +23,7 @@
              }
          }
 +
-+        world.getMultimeterServer().endTickTask(); // RSMM
++        world.getMultimeterServer().endTickTask(true); // RSMM
      }
  
      private void func_210827_g()

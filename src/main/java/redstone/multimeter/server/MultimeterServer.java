@@ -9,9 +9,11 @@ import java.util.Set;
 import java.util.UUID;
 
 import carpet.helpers.TickSpeed;
+import carpet.settings.CarpetSettings;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.management.PlayerList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
@@ -19,11 +21,13 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.dimension.DimensionType;
 
 import redstone.multimeter.RedstoneMultimeter;
-import redstone.multimeter.common.TickPhase;
-import redstone.multimeter.common.TickTask;
 import redstone.multimeter.common.DimPos;
+import redstone.multimeter.common.TickPhase;
+import redstone.multimeter.common.TickPhaseTree;
+import redstone.multimeter.common.TickTask;
 import redstone.multimeter.common.network.packets.HandshakePacket;
 import redstone.multimeter.common.network.packets.ServerTickPacket;
+import redstone.multimeter.common.network.packets.TickPhaseTreePacket;
 import redstone.multimeter.server.meter.ServerMeterGroup;
 
 public class MultimeterServer {
@@ -33,6 +37,7 @@ public class MultimeterServer {
 	private final Multimeter multimeter;
 	private final Map<UUID, String> connectedPlayers;
 	private final Map<UUID, String> playerNameCache;
+	private final TickPhaseTree tickPhaseTree;
 	
 	private TickPhase tickPhase;
 	/** true if the OverWorld already ticked time */
@@ -44,6 +49,7 @@ public class MultimeterServer {
 		this.multimeter = new Multimeter(this);
 		this.connectedPlayers = new HashMap<>();
 		this.playerNameCache = new HashMap<>();
+		this.tickPhaseTree = new TickPhaseTree();
 		
 		this.tickPhase = TickPhase.UNKNOWN;
 		this.tickedTime = false;
@@ -61,6 +67,10 @@ public class MultimeterServer {
 		return multimeter;
 	}
 	
+	public TickPhaseTree getTickPhaseTree() {
+		return tickPhaseTree;
+	}
+	
 	public boolean isDedicated() {
 		return server.isDedicatedServer();
 	}
@@ -73,16 +83,25 @@ public class MultimeterServer {
 		return tickPhase;
 	}
 	
-	public void startTickTask(TickTask task) {
+	public void startTickTask(boolean updateTree, TickTask task, String... args) {
 		tickPhase = tickPhase.startTask(task);
+		if (updateTree) {
+			tickPhaseTree.startTask(task, args);
+		}
 	}
 	
-	public void endTickTask() {
+	public void endTickTask(boolean updateTree) {
 		tickPhase = tickPhase.endTask();
+		if (updateTree) {
+			tickPhaseTree.endTask();
+		}
 	}
 	
-	public void swapTickTask(TickTask task) {
+	public void swapTickTask(boolean updateTree, TickTask task, String... args) {
 		tickPhase = tickPhase.swapTask(task);
+		if (updateTree) {
+			tickPhaseTree.swapTask(task, args);
+		}
 	}
 	
 	public void onOverworldTickTime() {
@@ -100,7 +119,7 @@ public class MultimeterServer {
 	}
 	
 	public boolean isPaused() {
-		return !TickSpeed.process_entities || server.isPaused();
+		return server.isPaused() || !TickSpeed.process_entities;
 	}
 	
 	public void tickStart() {
@@ -111,6 +130,9 @@ public class MultimeterServer {
 			
 			if (server.getTickCounter() % 72000 == 0) {
 				cleanPlayerNameCache();
+			}
+			if (shouldBuildTickPhaseTree()) {
+				tickPhaseTree.start();
 			}
 		}
 		
@@ -130,6 +152,10 @@ public class MultimeterServer {
 		});
 	}
 	
+	private boolean shouldBuildTickPhaseTree() {
+		return CarpetSettings.redstoneMultimeter && !tickPhaseTree.isComplete() && !tickPhaseTree.isBuilding();
+	}
+	
 	public void tickEnd() {
 		boolean paused = isPaused();
 		
@@ -141,6 +167,9 @@ public class MultimeterServer {
 					packetHandler.sendToPlayer(packet, player);
 				}
 			}
+		}
+		if (tickPhaseTree.isBuilding()) {
+			tickPhaseTree.end();
 		}
 		
 		tickPhase = TickPhase.UNKNOWN;
@@ -161,6 +190,15 @@ public class MultimeterServer {
 	public void onHandshake(EntityPlayerMP player, String modVersion) {
 		if (connectedPlayers.put(player.getUniqueID(), modVersion) == null) {
 			HandshakePacket packet = new HandshakePacket();
+			packetHandler.sendToPlayer(packet, player);
+			
+			refreshTickPhaseTree(player);
+		}
+	}
+	
+	public void refreshTickPhaseTree(EntityPlayerMP player) {
+		if (tickPhaseTree.isComplete()) {
+			TickPhaseTreePacket packet = new TickPhaseTreePacket(tickPhaseTree.toNbt());
 			packetHandler.sendToPlayer(packet, player);
 		}
 	}
@@ -184,12 +222,16 @@ public class MultimeterServer {
 		return null;
 	}
 	
+	public PlayerList getPlayerManager() {
+		return server.getPlayerList();
+	}
+	
 	public EntityPlayerMP getPlayer(UUID playerUUID) {
 		return server.getPlayerList().getPlayerByUUID(playerUUID);
 	}
 	
 	public String getPlayerName(UUID playerUUID) {
-	    EntityPlayerMP player = getPlayer(playerUUID);
+		EntityPlayerMP player = getPlayer(playerUUID);
 		return player == null ? playerNameCache.get(playerUUID) : player.getScoreboardName();
 	}
 	

@@ -29,7 +29,7 @@ public class ServerPacketHandler extends AbstractPacketHandler {
 	@Override
 	public <P extends RSMMPacket> void send(P packet) {
 		Packet<?> mcPacket = encode(packet);
-		server.getMinecraftServer().getPlayerList().sendPacketToAllPlayers(mcPacket);
+		server.getPlayerManager().sendPacketToAllPlayers(mcPacket);
 	}
 	
 	public <P extends RSMMPacket> void sendToPlayer(P packet, EntityPlayerMP player) {

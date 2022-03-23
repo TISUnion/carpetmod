@@ -7,6 +7,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 
 import redstone.multimeter.common.DimPos;
+import redstone.multimeter.common.meter.MeterProperties.MutableMeterProperties;
 import redstone.multimeter.common.meter.event.EventType;
 import redstone.multimeter.common.meter.log.MeterLogs;
 
@@ -15,7 +16,7 @@ public class Meter {
 	private static final AtomicLong ID_COUNTER = new AtomicLong(0);
 	
 	private final long id;
-	private final MeterProperties properties;
+	private final MutableMeterProperties properties;
 	private final MeterLogs logs;
 	
 	/** true if the block at this position is receiving power */
@@ -26,13 +27,13 @@ public class Meter {
 	/** This property is used on the client to hide a meter in the HUD */
 	private boolean hidden;
 	
-	public Meter(long id, MeterProperties properties) {
+	public Meter(long id, MutableMeterProperties properties) {
 		this.id = id;
-		this.properties = properties;
+		this.properties = properties.toMutable();
 		this.logs = new MeterLogs();
 	}
 	
-	public Meter(MeterProperties properties) {
+	public Meter(MutableMeterProperties properties) {
 		this(ID_COUNTER.getAndIncrement(), properties);
 	}
 	
@@ -51,14 +52,14 @@ public class Meter {
 	}
 	
 	public MeterProperties getProperties() {
-		return properties;
+		return properties.toImmutable();
 	}
 	
 	public MeterLogs getLogs() {
 		return logs;
 	}
 	
-	public void applyUpdate(Consumer<MeterProperties> update) {
+	public void applyUpdate(Consumer<MutableMeterProperties> update) {
 		update.accept(properties);
 	}
 	
@@ -125,7 +126,7 @@ public class Meter {
 	}
 	
 	public NBTTagCompound toNbt() {
-	    NBTTagCompound nbt = new NBTTagCompound();
+		NBTTagCompound nbt = new NBTTagCompound();
 		
 		nbt.putLong("id", id);
 		nbt.put("properties", properties.toNbt());
@@ -141,7 +142,7 @@ public class Meter {
 		boolean powered = nbt.getBoolean("powered");
 		boolean active = nbt.getBoolean("active");
 		
-		Meter meter = new Meter(id, properties);
+		Meter meter = new Meter(id, properties.toMutable());
 		meter.setPowered(powered);
 		meter.setActive(active);
 		
