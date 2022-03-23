@@ -483,6 +483,7 @@
   "tracker.lifetime.spawn_reason.spawner": "刷怪笼",
   "tracker.lifetime.spawn_reason.summon": "被生物或方块召唤",
   "tracker.lifetime.spawn_reason.breeding": "繁殖",
+  "tracker.lifetime.spawn_reason.dispensed": "被方块投出",
   "tracker.lifetime.spawn_reason.mob_drop.pre": "由",
   "tracker.lifetime.spawn_reason.mob_drop.post": "掉落",
   "tracker.lifetime.spawn_reason.trans_dimension": "跨维度",

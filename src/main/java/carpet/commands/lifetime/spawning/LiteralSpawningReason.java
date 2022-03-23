@@ -15,6 +15,7 @@ public class LiteralSpawningReason extends SpawningReason
 	public static final LiteralSpawningReason SPAWNER = new LiteralSpawningReason("spawner", "Spawned by spawner");
 	public static final LiteralSpawningReason SUMMON = new LiteralSpawningReason("summon", "Be summoned by entity or block");
 	public static final LiteralSpawningReason BREEDING = new LiteralSpawningReason("breeding", "Breeding");
+	public static final LiteralSpawningReason DISPENSED = new LiteralSpawningReason("dispensed", "Dispensed by block");
 
 	private final String translationKey;
 	private final String name;

@@ -1,0 +1,20 @@
+--- a/net/minecraft/dispenser/BehaviorDefaultDispenseItem.java
++++ b/net/minecraft/dispenser/BehaviorDefaultDispenseItem.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.dispenser;
+ 
++import carpet.commands.lifetime.spawning.LiteralSpawningReason;
+ import net.minecraft.block.BlockDispenser;
+ import net.minecraft.entity.item.EntityItem;
+ import net.minecraft.item.ItemStack;
+@@ -48,6 +49,10 @@
+         entityitem.motionX += worldIn.rand.nextGaussian() * (double)0.0075F * (double)speed;
+         entityitem.motionY += worldIn.rand.nextGaussian() * (double)0.0075F * (double)speed;
+         entityitem.motionZ += worldIn.rand.nextGaussian() * (double)0.0075F * (double)speed;
++
++        // TISCM lifetime tracker
++        entityitem.recordSpawning(LiteralSpawningReason.DISPENSED);
++
+         worldIn.spawnEntity(entityitem);
+     }
+ 
