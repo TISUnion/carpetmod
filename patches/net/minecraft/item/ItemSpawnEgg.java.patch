@@ -1,0 +1,44 @@
+--- a/net/minecraft/item/ItemSpawnEgg.java
++++ b/net/minecraft/item/ItemSpawnEgg.java
+@@ -1,5 +1,7 @@
+ package net.minecraft.item;
+ 
++import carpet.settings.CarpetSettings;
++import carpet.utils.PreciseEntityPlacer;
+ import com.google.common.collect.Iterables;
+ import com.google.common.collect.Maps;
+ import java.util.Map;
+@@ -22,6 +24,7 @@
+ import net.minecraft.util.EnumHand;
+ import net.minecraft.util.math.BlockPos;
+ import net.minecraft.util.math.RayTraceResult;
++import net.minecraft.util.math.Vec3d;
+ import net.minecraft.world.World;
+ import net.minecraftforge.api.distmarker.Dist;
+ import net.minecraftforge.api.distmarker.OnlyIn;
+@@ -92,6 +95,12 @@
+ 
+             EntityType<?> entitytype = this.getType(itemstack.getTag());
+ 
++            // TISCM preciseEntityPlacement records player pointing pos for spawning egg mob spawning
++            if (CarpetSettings.preciseEntityPlacement)
++            {
++                PreciseEntityPlacer.spawnEggTargetPos.set(PreciseEntityPlacer.vec3dFromContext(context));
++            }
++
+             if (entitytype == null || entitytype.spawn(world, itemstack, context.getPlayer(), blockpos1, true, !Objects.equals(blockpos, blockpos1) && enumfacing == EnumFacing.UP) != null)
+             {
+                 itemstack.shrink(1);
+@@ -125,6 +134,12 @@
+                 {
+                     EntityType<?> entitytype = this.getType(itemstack.getTag());
+ 
++                    // TISCM preciseEntityPlacement records player pointing pos for spawning egg mob spawning
++                    if (CarpetSettings.preciseEntityPlacement)
++                    {
++                        PreciseEntityPlacer.spawnEggTargetPos.set(raytraceresult.hitVec);
++                    }
++
+                     if (entitytype != null && entitytype.spawn(worldIn, itemstack, playerIn, blockpos, false, false) != null)
+                     {
+                         if (!playerIn.abilities.isCreativeMode)

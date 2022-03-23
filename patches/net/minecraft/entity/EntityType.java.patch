@@ -1,13 +1,15 @@
 --- a/net/minecraft/entity/EntityType.java
 +++ b/net/minecraft/entity/EntityType.java
-@@ -1,5 +1,6 @@
+@@ -1,5 +1,8 @@
  package net.minecraft.entity;
  
 +import carpet.commands.lifetime.spawning.LiteralSpawningReason;
++import carpet.settings.CarpetSettings;
++import carpet.utils.PreciseEntityPlacer;
  import com.mojang.datafixers.DataFixUtils;
  import com.mojang.datafixers.types.Type;
  import java.util.UUID;
-@@ -263,7 +264,14 @@
+@@ -263,7 +266,14 @@
      @Nullable
      public Entity spawn(World worldIn, @Nullable ItemStack itemIn, @Nullable EntityPlayer player, BlockPos pos, boolean p_208049_5_, boolean p_208049_6_)
      {
@@ -23,3 +25,16 @@
      }
  
      @Nullable
+@@ -299,6 +309,12 @@
+ 
+             t.setLocationAndAngles((double)pos.getX() + 0.5D, (double)pos.getY() + d0, (double)pos.getZ() + 0.5D, MathHelper.wrapDegrees(worldIn.rand.nextFloat() * 360.0F), 0.0F);
+ 
++            // TISCM preciseEntityPlacement
++            if (CarpetSettings.preciseEntityPlacement)
++            {
++                PreciseEntityPlacer.adjustEntityFromSpawnEgg(t);
++            }
++
+             if (t instanceof EntityLiving)
+             {
+                 EntityLiving entityliving = (EntityLiving)t;

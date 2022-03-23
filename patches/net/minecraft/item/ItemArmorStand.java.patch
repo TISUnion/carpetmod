@@ -1,0 +1,60 @@
+--- a/net/minecraft/item/ItemArmorStand.java
++++ b/net/minecraft/item/ItemArmorStand.java
+@@ -2,6 +2,9 @@
+ 
+ import java.util.List;
+ import java.util.Random;
++
++import carpet.settings.CarpetSettings;
++import carpet.utils.PreciseEntityPlacer;
+ import net.minecraft.entity.Entity;
+ import net.minecraft.entity.EntityType;
+ import net.minecraft.entity.item.EntityArmorStand;
+@@ -38,13 +41,20 @@
+             BlockPos blockpos = blockitemusecontext.getPos();
+             BlockPos blockpos1 = blockpos.up();
+ 
+-            if (blockitemusecontext.canPlace() && world.getBlockState(blockpos1).isReplaceable(blockitemusecontext))
++            // TISCM entityPlacementIgnoreCollision remove block placement check
++            if ((blockitemusecontext.canPlace() && world.getBlockState(blockpos1).isReplaceable(blockitemusecontext) || CarpetSettings.entityPlacementIgnoreCollision))
+             {
+                 double d0 = (double)blockpos.getX();
+                 double d1 = (double)blockpos.getY();
+                 double d2 = (double)blockpos.getZ();
+                 List<Entity> list = world.getEntitiesWithinAABBExcludingEntity((Entity)null, new AxisAlignedBB(d0, d1, d2, d0 + 1.0D, d1 + 2.0D, d2 + 1.0D));
+ 
++                // TISCM entityPlacementIgnoreCollision removes entity collision check
++                if (CarpetSettings.entityPlacementIgnoreCollision)
++                {
++                    list.clear();
++                }
++
+                 if (!list.isEmpty())
+                 {
+                     return EnumActionResult.FAIL;
+@@ -55,13 +65,23 @@
+ 
+                     if (!world.isRemote)
+                     {
+-                        world.removeBlock(blockpos);
+-                        world.removeBlock(blockpos1);
++                        // TISCM entityPlacementIgnoreCollision wraps block removing with condition
++                        if (!CarpetSettings.entityPlacementIgnoreCollision || world.getBlockState(blockpos).isReplaceable(blockitemusecontext)) world.removeBlock(blockpos);
++                        if (!CarpetSettings.entityPlacementIgnoreCollision || world.getBlockState(blockpos1).isReplaceable(blockitemusecontext)) world.removeBlock(blockpos1);
++                        // TISCM entityPlacementIgnoreCollision wraps block removing with condition ends
++
+                         EntityArmorStand entityarmorstand = new EntityArmorStand(world, d0 + 0.5D, d1, d2 + 0.5D);
+                         float f = (float)MathHelper.floor((MathHelper.wrapDegrees(context.getPlacementYaw() - 180.0F) + 22.5F) / 45.0F) * 45.0F;
+                         entityarmorstand.setLocationAndAngles(d0 + 0.5D, d1, d2 + 0.5D, f, 0.0F);
+                         this.applyRandomRotations(entityarmorstand, world.rand);
+                         EntityType.applyItemNBT(world, context.getPlayer(), entityarmorstand, itemstack.getTag());
++
++                        // TISCM preciseEntityPlacement
++                        if (CarpetSettings.preciseEntityPlacement)
++                        {
++                            PreciseEntityPlacer.adjustEntity(entityarmorstand, context);
++                        }
++
+                         world.spawnEntity(entityarmorstand);
+                         world.playSound((EntityPlayer)null, entityarmorstand.posX, entityarmorstand.posY, entityarmorstand.posZ, SoundEvents.ENTITY_ARMOR_STAND_PLACE, SoundCategory.BLOCKS, 0.75F, 0.8F);
+                     }

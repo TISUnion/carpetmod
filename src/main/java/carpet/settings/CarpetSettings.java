@@ -642,6 +642,23 @@ public class CarpetSettings
     )
     public static boolean lifeTimeTrackerConsidersMobcap = true;
 
+    @Rule(
+            desc = "Disable block and entity collision check during entity placement with items",
+            extra = {
+                    "Affected items: armorstand, end crystal, all kinds of boat",
+                    "Spawn egg items are not affected"
+            },
+            category = {CREATIVE}
+    )
+    public static boolean entityPlacementIgnoreCollision = false;
+
+    @Rule(
+            desc = "When placing / summoning entity with item, place the entity at the exact position of player's cursor target position",
+            extra = "Affected items: Spawn eggs, armorstand, ender crystal",
+            category = {CREATIVE}
+    )
+    public static boolean preciseEntityPlacement = false;
+
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$
     //   | $$     | $$  | $$  \__/| $$  \__/| $$$$  /$$$$

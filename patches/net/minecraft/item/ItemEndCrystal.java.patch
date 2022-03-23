@@ -1,0 +1,49 @@
+--- a/net/minecraft/item/ItemEndCrystal.java
++++ b/net/minecraft/item/ItemEndCrystal.java
+@@ -1,6 +1,9 @@
+ package net.minecraft.item;
+ 
+ import java.util.List;
++
++import carpet.settings.CarpetSettings;
++import carpet.utils.PreciseEntityPlacer;
+ import net.minecraft.block.state.IBlockState;
+ import net.minecraft.entity.Entity;
+ import net.minecraft.entity.item.EntityEnderCrystal;
+@@ -35,7 +38,8 @@
+         {
+             BlockPos blockpos1 = blockpos.up();
+ 
+-            if (!world.isAirBlock(blockpos1))
++            // TISCM entityPlacementIgnoreCollision removes air block check
++            if (!world.isAirBlock(blockpos1) && !CarpetSettings.entityPlacementIgnoreCollision)
+             {
+                 return EnumActionResult.FAIL;
+             }
+@@ -46,6 +50,12 @@
+                 double d2 = (double)blockpos1.getZ();
+                 List<Entity> list = world.getEntitiesWithinAABBExcludingEntity((Entity)null, new AxisAlignedBB(d0, d1, d2, d0 + 1.0D, d1 + 2.0D, d2 + 1.0D));
+ 
++                // TISCM entityPlacementIgnoreCollision removes entity collision check
++                if (CarpetSettings.entityPlacementIgnoreCollision)
++                {
++                    list.clear();
++                }
++
+                 if (!list.isEmpty())
+                 {
+                     return EnumActionResult.FAIL;
+@@ -56,6 +66,13 @@
+                     {
+                         EntityEnderCrystal entityendercrystal = new EntityEnderCrystal(world, d0 + 0.5D, d1, d2 + 0.5D);
+                         entityendercrystal.setShowBottom(false);
++
++                        // TISCM preciseEntityPlacement
++                        if (CarpetSettings.preciseEntityPlacement)
++                        {
++                            PreciseEntityPlacer.adjustEntity(entityendercrystal, context);
++                        }
++
+                         world.spawnEntity(entityendercrystal);
+ 
+                         if (world.dimension instanceof EndDimension)
