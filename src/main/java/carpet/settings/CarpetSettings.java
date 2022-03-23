@@ -661,6 +661,11 @@ public class CarpetSettings
     )
     public static int entityTrackerInterval = -1;
 
+    @Rule(
+            desc = "Disable the wither spawned sound emitted when a wither fully reset its health after summoned",
+            category = {CREATIVE}
+    )
+    public static boolean witherSpawnedSoundDisabled = false;
 
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$
