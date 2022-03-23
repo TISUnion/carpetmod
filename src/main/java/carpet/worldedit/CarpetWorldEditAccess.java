@@ -107,7 +107,6 @@ public class CarpetWorldEditAccess
         return EnumActionResult.PASS;
     }
 
-    @Nullable
     public static void onLeftClickAir(EntityPlayer playerEntity)
     {
         if (TISCMConfig.MOD_WORLDEDIT)
