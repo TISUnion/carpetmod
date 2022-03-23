@@ -14,6 +14,10 @@
   "rule.blockPlacementIgnoreEntity.desc": "方块可放置时无视实体碰撞检测，也就是你可以将方块放在实体内",
   "rule.blockPlacementIgnoreEntity.extra.0": "仅对创造模式玩家有效",
 
+  "rule.cauldronBlockItemInteractFix.name": "炼药锅方块类物品交互修复",
+  "rule.cauldronBlockItemInteractFix.desc": "让玩家可以对着填充有水的炼药锅放置方块",
+  "rule.cauldronBlockItemInteractFix.extra.0": "仅对Minecraft <= 1.16.x有效。这个烦人的机制已经在1.17+中被修复了",
+
   "rule.chunkUpdatePacketThreshold.name": "区块更新数据包阈值",
   "rule.chunkUpdatePacketThreshold.desc": "如果方块变化的数量大于这个阈值，则游戏将仅发送区块更新数据包而非若干个方块变更数据包",
   "rule.chunkUpdatePacketThreshold.extra.0": "增加该数值或许可以减小网络带宽用量，并在子区段同时存在不少方块实体与方块变化时提升客户端的帧数",
@@ -51,6 +55,24 @@
 
   "rule.entityMomentumLoss.name": "实体速度丢失",
   "rule.entityMomentumLoss.desc": "将其设为 false 以关闭从磁盘载入时实体超过10m/gt部分的沿轴速度的丢失",
+
+  "rule.entityPlacementIgnoreCollision.name": "实体放置无视碰撞",
+  "rule.entityPlacementIgnoreCollision.desc": "在使用物品放置实体时禁用相关的方块与实体的碰撞检测",
+  "rule.entityPlacementIgnoreCollision.extra.0": "受影响的物品：盔甲架、末影水晶、所有种类的船",
+  "rule.entityPlacementIgnoreCollision.extra.1": "刷怪蛋物品不在作用范围内",
+
+  "rule.entityTrackerDistance.name": "实体同步距离",
+  "rule.entityTrackerDistance.desc": "服务器同步实体信息至客户端的最大水平切比雪夫距离（单位: 区块）",
+  "rule.entityTrackerDistance.extra.0": "基本上这就是服务端的“实体渲染视距”，不过这个距离依旧会被服务端视距所约束",
+  "rule.entityTrackerDistance.extra.1": "将其设为一个不小于服务端视距的数值，就能令服务端将玩家视距内的所有实体都同步至客户端",
+  "rule.entityTrackerDistance.extra.2": "将其设为一个非正值以使用原版逻辑",
+  "rule.entityTrackerDistance.extra.3": "需要重新加载区块以将新的规则数值应用到实体上",
+
+  "rule.entityTrackerInterval.name": "实体同步间隔",
+  "rule.entityTrackerInterval.desc": "服务器同步实体信息至客户端的时间间隔（单位: gt）",
+  "rule.entityTrackerInterval.extra.0": "如果设为一个较小的数值，如1，服务器将每1gt都同步实体信息至客户端，这能减小客户端发生实体不同步现象的概率",
+  "rule.entityTrackerInterval.extra.1": "将其设为一个非正值以使用原版逻辑",
+  "rule.entityTrackerInterval.extra.2": "需要重新加载区块以将新的规则数值应用到实体上",
 
   "rule.explosionPacketRange.name": "爆炸数据包广播范围",
   "rule.explosionPacketRange.desc": "设置在爆炸发生时，爆炸数据包对玩家的广播范围",
@@ -164,6 +186,10 @@
   "rule.poiUpdates.desc": "方块变化时是否会更新POI",
   "rule.poiUpdates.extra.0": "将其设为false以禁用POI更新",
 
+  "rule.preciseEntityPlacement.name": "精准实体放置",
+  "rule.preciseEntityPlacement.desc": "当使用物品放置/召唤实体时，将实体准确地放置在玩家指针指向的坐标点",
+  "rule.preciseEntityPlacement.extra.0": "受影响的物品：刷怪蛋、盔甲架、末影水晶",
+
   "rule.railDupingFix.name": "刷铁轨机修复",
   "rule.railDupingFix.desc": "禁用老式的移动点亮的充能或激活铁轨的刷铁轨机",
 
@@ -191,6 +217,13 @@
   "rule.sandDupingFix.desc": "禁用使用末地门的刷沙机以及刷重力方块机",
   "rule.sandDupingFix.extra.0": "重力方块包括沙子、铁砧、龙蛋等",
   "rule.sandDupingFix.extra.1": "在开启后刷沙机的沙子将会仅被传送至另一个纬度",
+
+  "rule.snowMeltMinLightLevel.name": "融雪最小亮度",
+  "rule.snowMeltMinLightLevel.desc": "雪片融化所需的最小亮度等级",
+  "rule.snowMeltMinLightLevel.extra.0": "在原版里这个值为12，意味着雪片将在亮度等级>=12时于随机刻中融化",
+  "rule.snowMeltMinLightLevel.extra.1": "将其设为0以将所有位于你建筑上的烦人的雪片融化",
+  "rule.snowMeltMinLightLevel.extra.2": "将其设为与防止降雪的最小亮度等级(12)来方便地测试你的建筑是否能借助亮度来防降雪",
+  "rule.snowMeltMinLightLevel.extra.3": "你可以修改游戏规则randomTickSpeed来加速雪的融化，也可以修改地毯规则chunkTickSpeed来加速降雪的过程",
 
   "rule.structureBlockDoNotPreserveFluid.name": "结构方块不保留流体",
   "rule.structureBlockDoNotPreserveFluid.desc": "结构方块在放置含水方块时，不保留已存在的流体",
@@ -241,6 +274,9 @@
   "rule.visualizeProjectileLoggerEnabled.name": "可视化投掷物记录器",
   "rule.visualizeProjectileLoggerEnabled.desc": "启用可视化投掷物记录器",
   "rule.visualizeProjectileLoggerEnabled.extra.0": "试试/log projectiles visualize吧",
+
+  "rule.witherSpawnedSoundDisabled.name": "禁用凋灵生成音效",
+  "rule.witherSpawnedSoundDisabled.desc": "禁用凋灵在召唤后生命值回满时发出的世界中所有玩家都能听到的音效",
 
   "rule.xpTrackingDistance.name": "经验球追踪距离",
   "rule.xpTrackingDistance.desc": "修改经验球检测并追踪玩家的距离",
