@@ -1,0 +1,21 @@
+--- a/net/minecraft/block/BlockCauldron.java
++++ b/net/minecraft/block/BlockCauldron.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.block;
+ 
++import carpet.settings.CarpetSettings;
+ import net.minecraft.block.state.BlockFaceShape;
+ import net.minecraft.block.state.IBlockState;
+ import net.minecraft.entity.Entity;
+@@ -245,6 +246,11 @@
+                         this.setWaterLevel(worldIn, pos, state, i - 1);
+                         player.addStat(StatList.CLEAN_SHULKER_BOX);
+                     }
++                    // TISCM cauldronBlockItemInteractFix adds else-if branch
++                    else if (CarpetSettings.cauldronBlockItemInteractFix)
++                    {
++                        return false;
++                    }
+ 
+                     return true;
+                 }

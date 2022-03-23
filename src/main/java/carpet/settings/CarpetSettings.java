@@ -659,6 +659,13 @@ public class CarpetSettings
     )
     public static boolean preciseEntityPlacement = false;
 
+    @Rule(
+            desc = "Make player be able to place block against cauldron block with any filled level",
+            extra = "Affected Minecraft <= 1.16.x. This annoying behavior is already been fixed in 1.17+",
+            category = {BUGFIX}
+    )
+    public static boolean cauldronBlockItemInteractFix = false;
+
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$
     //   | $$     | $$  | $$  \__/| $$  \__/| $$$$  /$$$$
