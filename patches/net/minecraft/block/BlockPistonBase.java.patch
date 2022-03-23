@@ -13,15 +13,7 @@
  import net.minecraft.block.material.EnumPushReaction;
  import net.minecraft.block.state.BlockFaceShape;
  import net.minecraft.block.state.BlockPistonStructureHelper;
-@@ -19,6 +20,7 @@
- import net.minecraft.state.StateContainer;
- import net.minecraft.state.properties.BlockStateProperties;
- import net.minecraft.state.properties.PistonType;
-+import net.minecraft.stats.StatList;
- import net.minecraft.tileentity.TileEntity;
- import net.minecraft.tileentity.TileEntityPiston;
- import net.minecraft.util.EnumFacing;
-@@ -31,8 +33,13 @@
+@@ -31,8 +32,13 @@
  import net.minecraft.world.IBlockReader;
  import net.minecraft.world.World;
  import net.minecraft.world.WorldServer;
@@ -36,7 +28,7 @@
  {
      public static final BooleanProperty EXTENDED = BlockStateProperties.EXTENDED;
      protected static final VoxelShape PISTON_BASE_EAST_AABB = Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 12.0D, 16.0D, 16.0D);
-@@ -43,6 +50,9 @@
+@@ -43,6 +49,9 @@
      protected static final VoxelShape PISTON_BASE_DOWN_AABB = Block.makeCuboidShape(0.0D, 4.0D, 0.0D, 16.0D, 16.0D, 16.0D);
      private final boolean isSticky;
  
@@ -46,7 +38,7 @@
      public BlockPistonBase(boolean sticky, Block.Properties properties)
      {
          super(properties);
-@@ -156,9 +166,17 @@
+@@ -156,9 +165,17 @@
          }
      }
  
@@ -66,7 +58,7 @@
          {
              if (enumfacing != facing && worldIn.isSidePowered(pos.offset(enumfacing), enumfacing))
              {
-@@ -172,9 +190,17 @@
+@@ -172,9 +189,17 @@
          }
          else
          {
@@ -85,7 +77,7 @@
              {
                  if (enumfacing1 != EnumFacing.DOWN && worldIn.isSidePowered(blockpos.offset(enumfacing1), enumfacing1))
                  {
-@@ -186,6 +212,15 @@
+@@ -186,6 +211,15 @@
          }
      }
  
@@ -101,7 +93,7 @@
      public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int id, int param)
      {
          EnumFacing enumfacing = state.get(FACING);
-@@ -255,6 +290,9 @@
+@@ -255,6 +289,9 @@
                  {
                      if (id != 1 || iblockstate.isAir() || !canPush(iblockstate, worldIn, blockpos, enumfacing.getOpposite(), false, enumfacing) || iblockstate.getPushReaction() != EnumPushReaction.NORMAL && block != Blocks.PISTON && block != Blocks.STICKY_PISTON)
                      {
@@ -111,7 +103,7 @@
                          worldIn.removeBlock(pos.offset(enumfacing));
                      }
                      else
-@@ -265,12 +303,14 @@
+@@ -265,12 +302,14 @@
              }
              else
              {
@@ -127,7 +119,7 @@
          return true;
      }
  
-@@ -316,8 +356,14 @@
+@@ -316,8 +355,14 @@
                  {
                      return false;
                  }
@@ -144,7 +136,7 @@
              }
              else
              {
-@@ -329,6 +375,14 @@
+@@ -329,6 +374,14 @@
              return false;
          }
      }
@@ -159,7 +151,7 @@
  
      private boolean doMove(World worldIn, BlockPos pos, EnumFacing direction, boolean extending)
      {
-@@ -371,15 +425,55 @@
+@@ -371,15 +424,55 @@
                  --k;
                  aiblockstate[k] = iblockstate;
              }
@@ -187,7 +179,7 @@
                  BlockPos blockpos3 = list.get(l);
                  IBlockState iblockstate3 = worldIn.getBlockState(blockpos3);
 +                // RSMM start
-+                if (CarpetSettings.redstoneMultimeter && !worldIn.isRemote()) {
++                if (CarpetSettings.modRedstoneMultimeter && !worldIn.isRemote()) {
 +                    Multimeter multimeter = ((WorldServer)worldIn).getMultimeter();
 +                    multimeter.logMoved(worldIn, blockpos3, enumfacing);
 +                    multimeter.moveMeters(worldIn, blockpos3, enumfacing);
@@ -216,7 +208,7 @@
                  --k;
                  aiblockstate[k] = iblockstate3;
              }
-@@ -450,4 +544,22 @@
+@@ -450,4 +543,22 @@
      {
          return false;
      }

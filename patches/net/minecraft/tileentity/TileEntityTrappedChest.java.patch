@@ -23,7 +23,7 @@
      {
 -        super.onOpenOrClose();
 +        // RSMM start
-+        if (CarpetSettings.redstoneMultimeter && !world.isRemote()) {
++        if (CarpetSettings.modRedstoneMultimeter && !world.isRemote()) {
 +            MultimeterServer server = ((WorldServer)world).getMultimeterServer();
 +            Multimeter multimeter = server.getMultimeter();
 +

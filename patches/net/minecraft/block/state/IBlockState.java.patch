@@ -25,7 +25,7 @@
  default void randomTick(World worldIn, BlockPos pos, Random random)
      {
 +        // RSMM start
-+        if (CarpetSettings.redstoneMultimeter && !worldIn.isRemote()) {
++        if (CarpetSettings.modRedstoneMultimeter && !worldIn.isRemote()) {
 +            ((WorldServer)worldIn).getMultimeter().logRandomTick(worldIn, pos);
 +        }
 +        // RSMM end
@@ -37,7 +37,7 @@
  default boolean onBlockActivated(World worldIn, BlockPos pos, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
      {
 +        // RSMM start
-+        if (CarpetSettings.redstoneMultimeter && !worldIn.isRemote()) {
++        if (CarpetSettings.modRedstoneMultimeter && !worldIn.isRemote()) {
 +            ((WorldServer)worldIn).getMultimeter().logInteractBlock(worldIn, pos);
 +        }
 +        // RSMM end
@@ -49,7 +49,7 @@
  default IBlockState updatePostPlacement(EnumFacing face, IBlockState queried, IWorld worldIn, BlockPos currentPos, BlockPos offsetPos)
      {
 +        // RSMM start
-+        if (CarpetSettings.redstoneMultimeter && worldIn instanceof WorldServer) {
++        if (CarpetSettings.modRedstoneMultimeter && worldIn instanceof WorldServer) {
 +            WorldServer world = (WorldServer)worldIn;
 +            world.getMultimeter().logShapeUpdate(world, currentPos, face);
 +        }

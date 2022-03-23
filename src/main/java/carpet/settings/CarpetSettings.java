@@ -90,54 +90,6 @@ public class CarpetSettings
     public static String commandRaycount = "false";
 
     @Rule(
-            desc = "Enables world edit operations",
-            category = COMMAND,
-            validate = ValidateWorldEdit.class
-    )
-    public static String modWorldEdit = "false";
-
-    private static class ValidateWorldEdit extends Validator<String>
-    {
-        @Override
-        public String validate(CommandSource source, ParsedRule<String> currentRule, String newValue, String string)
-        {
-            if (!newValue.equals("false") && !TISCMConfig.MOD_WORLDEDIT)
-            {
-                return null;
-            }
-            return newValue;
-        }
-        public String description()
-        {
-            return "You must set `TISCMConfig.MOD_WORLDEDIT` to true during mod compiling and have worldedit classes included in .jar to enable world edit";
-        }
-    }
-
-    @Rule(
-            desc = "Enables spark command",
-            category = COMMAND,
-            validate = ValidateSpark.class
-    )
-    public static String modSpark = "false";
-
-    private static class ValidateSpark extends Validator<String>
-    {
-        @Override
-        public String validate(CommandSource source, ParsedRule<String> currentRule, String newValue, String string)
-        {
-            if (!newValue.equals("false") && !TISCMConfig.MOD_SPARK)
-            {
-                return null;
-            }
-            return newValue;
-        }
-        public String description()
-        {
-            return "You must set `TISCMConfig.MOD_SPARK` to true during mod compiling and have spark classes included in .jar to enable spark";
-        }
-    }
-
-    @Rule(
             desc = "enable visualize projectile logger",
             category = SURVIVAL
     )
@@ -1229,7 +1181,7 @@ public class CarpetSettings
             extra = "https://github.com/Fallen-Breath/litematica-server-paster",
             category = CREATIVE
     )
-    public static boolean litematicaServerPaster = false;
+    public static boolean modLitematicaServerPaster = false;
 
     // RSMM
     @Rule(
@@ -1239,5 +1191,53 @@ public class CarpetSettings
                     COMMAND
             }
     )
-    public static boolean redstoneMultimeter = false;
+    public static boolean modRedstoneMultimeter = false;
+
+    @Rule(
+            desc = "Enables spark command",
+            category = COMMAND,
+            validate = ValidateSpark.class
+    )
+    public static String modSpark = "false";
+
+    private static class ValidateSpark extends Validator<String>
+    {
+        @Override
+        public String validate(CommandSource source, ParsedRule<String> currentRule, String newValue, String string)
+        {
+            if (!newValue.equals("false") && !TISCMConfig.MOD_SPARK)
+            {
+                return null;
+            }
+            return newValue;
+        }
+        public String description()
+        {
+            return "You must set `TISCMConfig.MOD_SPARK` to true during mod compiling and have spark classes included in .jar to enable spark";
+        }
+    }
+
+    @Rule(
+            desc = "Enables world edit operations",
+            category = COMMAND,
+            validate = ValidateWorldEdit.class
+    )
+    public static String modWorldEdit = "false";
+
+    private static class ValidateWorldEdit extends Validator<String>
+    {
+        @Override
+        public String validate(CommandSource source, ParsedRule<String> currentRule, String newValue, String string)
+        {
+            if (!newValue.equals("false") && !TISCMConfig.MOD_WORLDEDIT)
+            {
+                return null;
+            }
+            return newValue;
+        }
+        public String description()
+        {
+            return "You must set `TISCMConfig.MOD_WORLDEDIT` to true during mod compiling and have worldedit classes included in .jar to enable world edit";
+        }
+    }
 }

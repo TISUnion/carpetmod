@@ -14,7 +14,7 @@ public class LitematicaServerPasterAccess
 {
 	public static void onPacket(CPacketCustomPayload packetIn, EntityPlayerMP player)
 	{
-		if (!CarpetSettings.litematicaServerPaster)
+		if (!CarpetSettings.modLitematicaServerPaster)
 		{
 			return;
 		}

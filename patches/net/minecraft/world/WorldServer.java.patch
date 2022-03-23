@@ -449,7 +449,7 @@
          if (ifluidstate.getFluid() == fluidTickEntry.getTarget())
          {
 +            // RSMM start
-+            if (CarpetSettings.redstoneMultimeter) {
++            if (CarpetSettings.modRedstoneMultimeter) {
 +                getMultimeter().logScheduledTick(this, fluidTickEntry);
 +            }
 +            // RSMM end
@@ -466,7 +466,7 @@
          if (iblockstate.getBlock() == blockTickEntry.getTarget())
          {
 +            // RSMM start
-+            if (CarpetSettings.redstoneMultimeter) {
++            if (CarpetSettings.modRedstoneMultimeter) {
 +                getMultimeter().logScheduledTick(this, blockTickEntry);
 +            }
 +            // RSMM end
@@ -505,7 +505,7 @@
 +            // end TISCM Micro Timing logger
 +
 +            // RSMM start
-+            if (CarpetSettings.redstoneMultimeter) {
++            if (CarpetSettings.modRedstoneMultimeter) {
 +                getMultimeter().logBlockEvent(this, blockeventdata, depth);
 +            }
 +            // RSMM end
@@ -549,7 +549,7 @@
 +    // RSMM
 +    @Override
 +    public void onBlockUpdate(BlockPos pos, IBlockState state) {
-+        if (CarpetSettings.redstoneMultimeter) {
++        if (CarpetSettings.modRedstoneMultimeter) {
 +            MultimeterServer server = getMultimeterServer();
 +            Multimeter multimeter = server.getMultimeter();
 +
@@ -564,7 +564,7 @@
 +    // RSMM
 +    @Override
 +    public void onComparatorUpdate(BlockPos pos) {
-+        if (CarpetSettings.redstoneMultimeter) {
++        if (CarpetSettings.modRedstoneMultimeter) {
 +            getMultimeter().logComparatorUpdate(this, pos);
 +        }
 +    }
@@ -572,7 +572,7 @@
 +    // RSMM
 +    @Override
 +    public void onEntityTick(Entity entity) {
-+        if (CarpetSettings.redstoneMultimeter) {
++        if (CarpetSettings.modRedstoneMultimeter) {
 +            getMultimeter().logEntityTick(this, entity);
 +        }
 +    }
@@ -580,7 +580,7 @@
 +    // RSMM
 +    @Override
 +    public void onBlockEntityTick(TileEntity blockEntity) {
-+        if (CarpetSettings.redstoneMultimeter) {
++        if (CarpetSettings.modRedstoneMultimeter) {
 +            getMultimeter().logBlockEntityTick(this, blockEntity);
 +        }
 +    }

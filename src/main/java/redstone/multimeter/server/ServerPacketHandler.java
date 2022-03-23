@@ -52,7 +52,7 @@ public class ServerPacketHandler extends AbstractPacketHandler {
 		try {
 			RSMMPacket packet = decode(buffer);
 			
-			if (CarpetSettings.redstoneMultimeter || packet.force()) {
+			if (CarpetSettings.modRedstoneMultimeter || packet.force()) {
 			    packet.execute(server, player);
 			}
 		} catch (Exception e) {

@@ -26,7 +26,7 @@
          boolean flag = worldIn.isBlockPowered(pos) || worldIn.isBlockPowered(pos.offset(state.get(HALF) == DoubleBlockHalf.LOWER ? EnumFacing.UP : EnumFacing.DOWN));
 -
 +        // RSMM start
-+        if (CarpetSettings.redstoneMultimeter) {
++        if (CarpetSettings.modRedstoneMultimeter) {
 +            logPowered(worldIn, pos, flag);
 +            logPowered(worldIn, getOtherHalf(pos, state), flag);
 +        }

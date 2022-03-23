@@ -24,7 +24,7 @@
  default void randomTick(World worldIn, BlockPos pos, Random random)
      {
 +        // RSMM start    
-+        if (CarpetSettings.redstoneMultimeter && !worldIn.isRemote()) {
++        if (CarpetSettings.modRedstoneMultimeter && !worldIn.isRemote()) {
 +            ((WorldServer)worldIn).getMultimeter().logRandomTick(worldIn, pos);
 +        }
 +        // RSMM end

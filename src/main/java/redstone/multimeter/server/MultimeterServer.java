@@ -153,7 +153,7 @@ public class MultimeterServer {
 	}
 	
 	private boolean shouldBuildTickPhaseTree() {
-		return CarpetSettings.redstoneMultimeter && !tickPhaseTree.isComplete() && !tickPhaseTree.isBuilding();
+		return CarpetSettings.modRedstoneMultimeter && !tickPhaseTree.isComplete() && !tickPhaseTree.isBuilding();
 	}
 	
 	public void tickEnd() {

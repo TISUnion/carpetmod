@@ -14,7 +14,7 @@ public interface RSMMPacket {
 	public void execute(MultimeterServer server, EntityPlayerMP player);
 	
 	/**
-	 * Most RSMM packets are ignored if the redstoneMultimeter carpet
+	 * Most RSMM packets are ignored if the modRedstoneMultimeter carpet
 	 * rule is not enabled. Some packets are handled anyway in order
 	 * to keep RSMM working properly when the carpet rule is toggled.
 	 */

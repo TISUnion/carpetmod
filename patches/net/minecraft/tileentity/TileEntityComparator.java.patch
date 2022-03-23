@@ -14,7 +14,7 @@
      public void setOutputSignal(int outputSignalIn)
      {
 +        // RSMM start
-+        if (CarpetSettings.redstoneMultimeter && !world.isRemote()) {
++        if (CarpetSettings.modRedstoneMultimeter && !world.isRemote()) {
 +            ((WorldServer)world).getMultimeter().logPowerChange(world, pos, outputSignal, outputSignalIn);
 +        }
 +        // RSMM end

@@ -9,13 +9,13 @@ import net.minecraft.world.WorldServer;
 public interface MeterableBlock extends Meterable {
 	
 	default void logPowered(World world, BlockPos pos, boolean powered) {
-		if (CarpetSettings.redstoneMultimeter && !world.isRemote()) {
+		if (CarpetSettings.modRedstoneMultimeter && !world.isRemote()) {
 			((WorldServer)world).getMultimeter().logPowered(world, pos, powered);
 		}
 	}
 	
 	default void logPowered(World world, BlockPos pos, IBlockState state) {
-	    if (CarpetSettings.redstoneMultimeter && !world.isRemote()) {
+	    if (CarpetSettings.modRedstoneMultimeter && !world.isRemote()) {
 	        ((WorldServer)world).getMultimeter().logPowered(world, pos, state);
 	    }
 	}

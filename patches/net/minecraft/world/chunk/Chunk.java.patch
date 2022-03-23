@@ -353,7 +353,7 @@
              if (!this.world.isRemote)
              {
 +                // RSMM start
-+                if (CarpetSettings.redstoneMultimeter) {
++                if (CarpetSettings.modRedstoneMultimeter) {
 +                    ((WorldServer)world).getMultimeter().onBlockChange(world, pos, iblockstate, state);
 +                }
 +                // RSMM end
