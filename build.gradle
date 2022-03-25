@@ -127,10 +127,6 @@ def projectMod = project(':' + settings.modname) {
         all {
             resolutionStrategy {
                 // force world edit to use the same lib as minecraft 1.13.2
-                force 'com.google.code.findbugs:jsr305:3.0.1'
-                force 'com.google.code.gson:gson:2.8.0'
-                force 'com.google.guava:guava:21.0'
-                force 'it.unimi.dsi:fastutil:8.2.1'
                 force 'org.apache.logging.log4j:log4j-api:2.8.1'
                 force 'org.apache.logging.log4j:log4j-core:2.8.1'
             }
@@ -170,8 +166,8 @@ def projectMod = project(':' + settings.modname) {
     }
     dependencies {
         // World Edit
-        compile 'com.sk89q.worldedit:worldedit-core:7.2.10'
-        worldEditLibs ('com.sk89q.worldedit:worldedit-core:7.2.10') {
+        compile 'com.sk89q.worldedit:worldedit-core:7.2.7'
+        worldEditLibs ('com.sk89q.worldedit:worldedit-core:7.2.7') {
             exclude group: 'com.ibm.icu'  // not used in worldedit at all
             exclude group: 'org.antlr', module: 'antlr4'  // only reserves the runtime package
             exclude group: 'org.yaml'  // worldedit only uses yaml stuffs in bukkit
