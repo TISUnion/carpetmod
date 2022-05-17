@@ -1,0 +1,29 @@
+--- a/net/minecraft/entity/item/EntityMinecart.java
++++ b/net/minecraft/entity/item/EntityMinecart.java
+@@ -4,6 +4,8 @@
+ import java.util.Comparator;
+ import java.util.List;
+ import javax.annotation.Nullable;
++
++import carpet.settings.CarpetSettings;
+ import net.minecraft.block.Block;
+ import net.minecraft.block.BlockRailBase;
+ import net.minecraft.block.BlockRailPowered;
+@@ -357,8 +359,16 @@
+ 
+             this.setRotation(this.rotationYaw, this.rotationPitch);
+ 
+-            if (this.getMinecartType() == EntityMinecart.Type.RIDEABLE && this.motionX * this.motionX + this.motionZ * this.motionZ > 0.01D)
++            // TISCM minecartTakePassengerMinVelocity
++            double squaredThreshold = 0.01D;
++            if (CarpetSettings.minecartTakePassengerMinVelocity != CarpetSettings.VANILLA_MINECART_TAKE_PASSENGER_MIN_VELOCITY)
+             {
++                squaredThreshold = Math.nextDown(CarpetSettings.minecartTakePassengerMinVelocity);
++            }
++//            if (this.getMinecartType() == EntityMinecart.Type.RIDEABLE && this.motionX * this.motionX + this.motionZ * this.motionZ > 0.01D)
++
++            if (this.getMinecartType() == EntityMinecart.Type.RIDEABLE && this.motionX * this.motionX + this.motionZ * this.motionZ > squaredThreshold)
++            {
+                 List<Entity> list = this.world.getEntitiesInAABBexcluding(this, this.getBoundingBox().grow((double)0.2F, 0.0D, (double)0.2F), EntitySelectors.pushableBy(this));
+ 
+                 if (!list.isEmpty())

@@ -161,6 +161,11 @@
   "rule.microTimingTickDivision.extra.0": "world_timer: 划分于世界计时器自增时",
   "rule.microTimingTickDivision.extra.1": "player_action: 划分于玩家操作阶段开始前",
 
+  "rule.minecartTakePassengerMinVelocity.name": "矿车搭载乘客最小速度",
+  "rule.minecartTakePassengerMinVelocity.desc": "决定矿车将其附近实体作为乘客搭载上车所需的最低水平方向速度",
+  "rule.minecartTakePassengerMinVelocity.extra.0": "将其设为0以让矿车忽略速度，像船一样总能将附件实体载上车",
+  "rule.minecartTakePassengerMinVelocity.extra.1": "将其设为NaN以让矿车永远不能把实体载上车",
+
   "rule.opPlayerNoCheat.name": "op玩家不准作弊",
   "rule.opPlayerNoCheat.desc": "禁用部分指令以避免op玩家意外地作弊",
   "rule.opPlayerNoCheat.extra.0": "影响的指令列表：/gamemode, /tp, /teleport, /give, /setblock, /summon",
