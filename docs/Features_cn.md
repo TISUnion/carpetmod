@@ -4,7 +4,10 @@
 
 [English](https://github.com/TISUnion/TISCarpet113/blob/TIS-Server/docs/Features.md)
 
-**注意**：此处的功能列表并不完整，可能有原版 carpet 或者正在开发中的功能没有增加
+**注意**：
+
+- 此处的功能列表并不完整，可能有原版 carpet 或者正在开发中的功能没有增加
+- 不少来自 [Carpet TIS Addition](https://github.com/TISUnion/Carpet-TIS-Addition) 的功能并未在此处列出。你可以参考 Carpet TIS Addition 的文档以了解更多
 
 ------
 
