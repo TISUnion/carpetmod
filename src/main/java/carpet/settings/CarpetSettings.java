@@ -680,6 +680,15 @@ public class CarpetSettings
     )
     public static double minecartTakePassengerMinVelocity = VANILLA_MINECART_TAKE_PASSENGER_MIN_VELOCITY;
 
+    @Rule(
+            desc = "Fixed stored client settings are not migrated from the old player entity during player respawn or entering end portal in the end",
+            extra = {
+                    "So mods relies on client settings are always able to work correctly, e.g. serverside translation of this mod and worldedit mod"
+            },
+            category = {BUGFIX}
+    )
+    public static boolean clientSettingsLostOnRespawnFix = false;
+
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$
     //   | $$     | $$  | $$  \__/| $$  \__/| $$$$  /$$$$
