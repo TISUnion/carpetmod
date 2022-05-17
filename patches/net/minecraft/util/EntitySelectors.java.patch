@@ -1,0 +1,26 @@
+--- a/net/minecraft/util/EntitySelectors.java
++++ b/net/minecraft/util/EntitySelectors.java
+@@ -1,5 +1,7 @@
+ package net.minecraft.util;
+ 
++import carpet.helpers.CreativeNoClipHelper;
++import carpet.settings.CarpetSettings;
+ import com.google.common.base.Predicates;
+ import java.util.function.Predicate;
+ import javax.annotation.Nullable;
+@@ -31,7 +33,14 @@
+     };
+     public static final Predicate<Entity> NOT_SPECTATING = (p_200818_0_) ->
+     {
+-        return !(p_200818_0_ instanceof EntityPlayer) || !((EntityPlayer)p_200818_0_).isSpectator();
++        // TISCM creativeNoClip extra
++//        return !(p_200818_0_ instanceof EntityPlayer) || !((EntityPlayer)p_200818_0_).isSpectator();
++        boolean ret = !(p_200818_0_ instanceof EntityPlayer) || !((EntityPlayer) p_200818_0_).isSpectator();
++        if (CarpetSettings.creativeNoClip && CreativeNoClipHelper.ignoreNoClipPlayersFlag.get())
++        {
++            ret &= !CreativeNoClipHelper.canEntityIgnoreClip(p_200818_0_);
++        }
++        return ret;
+     };
+ 
+     public static Predicate<Entity> withinRange(double x, double y, double z, double range)

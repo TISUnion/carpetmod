@@ -6,6 +6,8 @@ import net.minecraft.entity.player.EntityPlayer;
 
 public class CreativeNoClipHelper
 {
+	public static final ThreadLocal<Boolean> ignoreNoClipPlayersFlag = ThreadLocal.withInitial(() -> false);
+
 	public static boolean canEntityIgnoreClip(Entity entity)
 	{
 		if (CarpetSettings.creativeNoClip && entity instanceof EntityPlayer)

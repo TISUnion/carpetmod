@@ -1,15 +1,16 @@
 --- a/net/minecraft/entity/item/EntityXPOrb.java
 +++ b/net/minecraft/entity/item/EntityXPOrb.java
-@@ -1,5 +1,8 @@
+@@ -1,5 +1,9 @@
  package net.minecraft.entity.item;
  
 +import carpet.commands.lifetime.removal.LiteralRemovalReason;
 +import carpet.commands.lifetime.removal.MobPickupRemovalReason;
++import carpet.helpers.CreativeNoClipHelper;
 +import carpet.settings.CarpetSettings;
  import net.minecraft.enchantment.EnchantmentHelper;
  import net.minecraft.entity.Entity;
  import net.minecraft.entity.EntityType;
-@@ -17,11 +20,14 @@
+@@ -17,11 +21,14 @@
  import net.minecraftforge.api.distmarker.Dist;
  import net.minecraftforge.api.distmarker.OnlyIn;
  
@@ -24,7 +25,7 @@
      private int xpOrbHealth = 5;
      private int xpValue;
      private EntityPlayer closestPlayer;
-@@ -37,8 +43,26 @@
+@@ -37,8 +44,26 @@
          this.motionY = (double)((float)(Math.random() * 0.2D) * 2.0F);
          this.motionZ = (double)((float)(Math.random() * (double)0.2F - (double)0.1F) * 2.0F);
          this.xpValue = expValue;
@@ -51,7 +52,7 @@
      public EntityXPOrb(World worldIn)
      {
          super(EntityType.EXPERIENCE_ORB, worldIn);
-@@ -103,28 +127,28 @@
+@@ -103,28 +128,40 @@
          }
  
          this.pushOutOfBlocks(this.posX, (this.getBoundingBox().minY + this.getBoundingBox().maxY) / 2.0D, this.posZ);
@@ -64,7 +65,19 @@
 +            if (this.closestPlayer == null || this.closestPlayer.getDistanceSq(this) > d0 * d0)
              {
 -                this.closestPlayer = this.world.getClosestPlayerToEntity(this, 8.0D);
++                // TISCM creativeNoClip extra
++                if (CarpetSettings.creativeNoClip)
++                {
++                    CreativeNoClipHelper.ignoreNoClipPlayersFlag.set(true);
++                }
++
 +                this.closestPlayer = this.world.getClosestPlayerToEntity(this, d0);
++
++                // TISCM creativeNoClip extra
++                if (CarpetSettings.creativeNoClip)
++                {
++                    CreativeNoClipHelper.ignoreNoClipPlayersFlag.set(false);
++                }
              }
  
              this.xpTargetColor = this.xpColor;
@@ -87,7 +100,7 @@
              double d4 = Math.sqrt(d1 * d1 + d2 * d2 + d3 * d3);
              double d5 = 1.0D - d4;
  
-@@ -138,6 +162,21 @@
+@@ -138,6 +175,21 @@
          }
  
          this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
@@ -109,7 +122,7 @@
          float f = 0.98F;
  
          if (this.onGround)
-@@ -159,6 +198,7 @@
+@@ -159,6 +211,7 @@
  
          if (this.xpOrbAge >= 6000)
          {
@@ -117,7 +130,7 @@
              this.remove();
          }
      }
-@@ -193,6 +233,7 @@
+@@ -193,6 +246,7 @@
  
              if (this.xpOrbHealth <= 0)
              {
@@ -125,7 +138,7 @@
                  this.remove();
              }
  
-@@ -218,8 +259,11 @@
+@@ -218,8 +272,11 @@
      {
          if (!this.world.isRemote)
          {
@@ -138,7 +151,7 @@
                  entityIn.xpCooldown = 2;
                  entityIn.onItemPickup(this, 1);
                  ItemStack itemstack = EnchantmentHelper.getEnchantedItem(Enchantments.MENDING, entityIn);
-@@ -251,6 +295,10 @@
+@@ -251,6 +308,10 @@
          return xp * 2;
      }
  
