@@ -528,7 +528,7 @@
 
 记录元件的微时序，元件所在区块的加载票等级需至少为弱加载 (加载票等级 32)
 
-见规则 [microTiming](#microTiming) 以获得详细信息，记得使用 `/carpet microTiming true` 启用监视器功能
+见规则 [microTiming](#microTiming) 以获得详细信息，记得使用 `/carpet microTiming true` 启用记录器功能
 
 可用的类型选项: 
 - `all`: 默认值，输出所有事件
