@@ -18,6 +18,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.state.properties.AttachFace;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.EnumFacing;
@@ -114,7 +115,7 @@ public class MicroTimingUtil
 		return world.isAreaLoaded(pos, 0);
 	}
 
-	public static Optional<EnumDyeColor> getWoolColor(World world, BlockPos pos)
+	private static Optional<EnumDyeColor> getWoolColor(World world, BlockPos pos)
 	{
 		if (!MicroTimingLoggerManager.isLoggerActivated())
 		{
@@ -167,7 +168,7 @@ public class MicroTimingUtil
 		return Optional.ofNullable(WoolTool.getWoolColorAtPosition(world, woolPos));
 	}
 
-	public static Optional<EnumDyeColor> getEndRodWoolColor(World world, BlockPos pos)
+	private static Optional<EnumDyeColor> getEndRodWoolColor(World world, BlockPos pos)
 	{
 		if (!MicroTimingLoggerManager.isLoggerActivated() || !isPositionAvailable(world, pos))
 		{
@@ -190,31 +191,48 @@ public class MicroTimingUtil
 		return MicroTimingMarkerManager.getInstance().getColor(world, pos, MicroTimingMarkerType.END_ROD);
 	}
 
-	public static Optional<EnumDyeColor> getWoolOrEndRodWoolColor(World world, BlockPos pos)
+	public static Optional<EnumDyeColor> blockUpdateColorGetter(World world, BlockPos pos)
 	{
-		Optional<EnumDyeColor> optionalDyeColor = getWoolColor(world, pos);
-		if (!optionalDyeColor.isPresent())
+		Optional<EnumDyeColor> optionalDyeColor = Optional.empty();
+		if (CarpetSettings.microTimingTarget != MicroTimingTarget.MARKER_ONLY)
 		{
 			optionalDyeColor = getEndRodWoolColor(world, pos);
 		}
-		boolean usingFallbackColor = false;
 		if (!optionalDyeColor.isPresent())
 		{
-			switch (CarpetSettings.microTimingTarget)
+			optionalDyeColor = MicroTimingMarkerManager.getInstance().getColor(world, pos, MicroTimingMarkerType.END_ROD);
+		}
+		return optionalDyeColor;
+	}
+
+	public static Optional<EnumDyeColor> defaultColorGetter(World world, BlockPos pos)
+	{
+		Optional<EnumDyeColor> optionalDyeColor = Optional.empty();
+		boolean usingFallbackColor = false;
+		if (CarpetSettings.microTimingTarget != MicroTimingTarget.MARKER_ONLY)
+		{
+			optionalDyeColor = getWoolColor(world, pos);
+			if (!optionalDyeColor.isPresent())
 			{
-				case IN_RANGE:
-					usingFallbackColor = world.getClosestPlayer(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, MicroTimingTarget.IN_RANGE_RADIUS, player -> true) != null;
-					break;
-				case ALL:
-					usingFallbackColor = true;
-					break;
-				case LABELLED:
-				default:
-					break;
+				optionalDyeColor = getEndRodWoolColor(world, pos);
 			}
-			if (usingFallbackColor)
+			if (!optionalDyeColor.isPresent())
 			{
-				optionalDyeColor = Optional.of(EnumDyeColor.LIGHT_GRAY);
+				switch (CarpetSettings.microTimingTarget)
+				{
+					case IN_RANGE:
+						usingFallbackColor = world.getClosestPlayer(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, MicroTimingTarget.IN_RANGE_RADIUS, player -> true) != null;
+						break;
+					case ALL:
+						usingFallbackColor = true;
+						break;
+					default:
+						break;
+				}
+				if (usingFallbackColor)
+				{
+					optionalDyeColor = Optional.of(EnumDyeColor.LIGHT_GRAY);
+				}
 			}
 		}
 		if (!optionalDyeColor.isPresent() || usingFallbackColor)

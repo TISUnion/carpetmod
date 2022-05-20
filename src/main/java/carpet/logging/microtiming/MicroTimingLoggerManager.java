@@ -136,7 +136,7 @@ public class MicroTimingLoggerManager
 
     public static void onBlockUpdate(World world, BlockPos pos, Block fromBlock, BlockUpdateType updateType, EnumFacing exceptSide, EventType eventType)
     {
-        onEvent(world, pos, () -> new DetectBlockUpdateEvent(eventType, fromBlock, updateType, () -> updateType.getUpdateOrderList(exceptSide)), MicroTimingUtil::getEndRodWoolColor);
+        onEvent(world, pos, () -> new DetectBlockUpdateEvent(eventType, fromBlock, updateType, () -> updateType.getUpdateOrderList(exceptSide)), MicroTimingUtil::blockUpdateColorGetter);
     }
 
     public static void onSetBlockState(World world, BlockPos pos, IBlockState oldState, IBlockState newState, Boolean returnValue, int flags, EventType eventType)

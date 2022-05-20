@@ -104,7 +104,7 @@ public class MicroTimingLogger extends AbstractLogger
 			{
 				if (color == null)
 				{
-					Optional<EnumDyeColor> optionalDyeColor = MicroTimingUtil.getWoolOrEndRodWoolColor(world, pos);
+					Optional<EnumDyeColor> optionalDyeColor = MicroTimingUtil.defaultColorGetter(world, pos);
 					if (!optionalDyeColor.isPresent())
 					{
 						break;
@@ -141,7 +141,7 @@ public class MicroTimingLogger extends AbstractLogger
 
 	public void addMessage(World world, BlockPos pos, BaseEvent event)
 	{
-		this.addMessage(world, pos, event, MicroTimingUtil::getWoolOrEndRodWoolColor);
+		this.addMessage(world, pos, event, MicroTimingUtil::defaultColorGetter);
 	}
 
 	private ITextComponent getMergedResult(int count, IndentedMessage previousMessage)
