@@ -38,16 +38,7 @@
  import net.minecraft.world.biome.Biome;
  import net.minecraft.world.chunk.Chunk;
  import net.minecraft.world.gen.Heightmap;
-@@ -38,6 +39,8 @@
- 
-     public int findChunksForSpawning(WorldServer worldServerIn, boolean spawnHostileMobs, boolean spawnPeacefulMobs, boolean spawnOnSetTickRate)
-     {
-+        worldServerIn.getLifeTimeWorldTracker().increaseSpawnStageCounter();  // TISCM lifetime tracker
-+
-         if (!spawnHostileMobs && !spawnPeacefulMobs)
-         {
-             return 0;
-@@ -84,16 +87,49 @@
+@@ -84,16 +85,49 @@
              int k4 = 0;
              BlockPos blockpos1 = worldServerIn.getSpawnPoint();
  
@@ -99,7 +90,7 @@
                          label158:
  
                          for (ChunkPos chunkpos1 : this.eligibleChunksForSpawning)
-@@ -157,7 +193,16 @@
+@@ -157,7 +191,16 @@
  
                                                          try
                                                          {
@@ -117,7 +108,7 @@
                                                          }
                                                          catch (Exception exception)
                                                          {
-@@ -169,13 +214,36 @@
+@@ -169,13 +212,36 @@
  
                                                          if ((d0 <= 16384.0D || !entityliving.canDespawn()) && entityliving.canSpawn(worldServerIn, false) && entityliving.isNotColliding(worldServerIn))
                                                          {
@@ -155,7 +146,7 @@
                                                              }
                                                              else
                                                              {
-@@ -202,7 +270,30 @@
+@@ -202,7 +268,30 @@
                                  }
                              }
                          }
@@ -186,7 +177,7 @@
                  }
              }
  
-@@ -244,12 +335,20 @@
+@@ -244,12 +333,20 @@
      {
          if (entityTypeIn != null && worldIn.getWorldBorder().contains(pos))
          {
@@ -209,7 +200,7 @@
                      return ifluidstate.isTagged(FluidTags.WATER) && worldIn.getFluidState(pos.down()).isTagged(FluidTags.WATER) && !worldIn.getBlockState(pos.up()).isNormalCube();
                  case ON_GROUND:
                  default:
-@@ -259,7 +358,21 @@
+@@ -259,7 +356,21 @@
                      {
                          Block block = iblockstate1.getBlock();
                          boolean flag = block != Blocks.BEDROCK && block != Blocks.BARRIER;
