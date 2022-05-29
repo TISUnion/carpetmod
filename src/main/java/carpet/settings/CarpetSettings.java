@@ -689,6 +689,15 @@ public class CarpetSettings
     )
     public static boolean clientSettingsLostOnRespawnFix = false;
 
+    @Rule(
+            desc = "Modify the related altitude between the bottom of the world and the void where entities will receive void damages",
+            options = {"-64", "-512", "-4096"},
+            validate = Validator.NEGATIVE.class,
+            strict = false,
+            category = CREATIVE
+    )
+    public static double voidRelatedAltitude = -64.0D;
+
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$
     //   | $$     | $$  | $$  \__/| $$  \__/| $$$$  /$$$$

@@ -86,4 +86,17 @@ public abstract class Validator<T>
         @Override
         public String description() { return "Must be a positive number";}
     }
+
+    public static class NEGATIVE extends Validator<Number>
+    {
+        @Override
+        public Number validate(CommandSource source, ParsedRule<Number> currentRule, Number newValue, String string)
+        {
+            return newValue.doubleValue() < 0.0D ? newValue : null;
+        }
+        public String description()
+        {
+            return "You must choose a negative value";
+        }
+    }
 }
