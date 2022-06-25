@@ -21,12 +21,15 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.storage.WorldInfo;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -66,9 +69,75 @@ public class InfoCommand
                                                         getString(c, "regexp"))))))).
                 then(literal("world").
                         then(literal("ticking_order").
-                                executes((c) -> showWorldTickOrder(c.getSource()))));
+                                executes((c) -> showWorldTickOrder(c.getSource()))).
+                        then(literal("weather").
+                                executes((c) -> showWeather(c.getSource()))));
 
         dispatcher.register(command);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    private static int showWeather(CommandSource source)
+    {
+        WorldServer world = source.getWorld();
+        WorldInfo worldInfo = world.getWorldInfo();
+        Function<Integer, String> pack = ticks -> String.format("%.1f", (double)ticks / 20 / 60);
+
+        boolean raining = worldInfo.isRaining();
+        boolean thundering = worldInfo.isThundering();
+        int rainTime = worldInfo.getRainTime();
+        int thunderTime = worldInfo.getThunderTime();
+
+        Messenger.m(source, Messenger.s(""));
+        Messenger.m(source, "g ======= ", "w Weather Telemetry Data", "g  =======");
+        Messenger.m(source, Messenger.s("clearWeatherTime = " + worldInfo.getClearWeatherTime()));
+        Messenger.m(source, Messenger.s("rainTime = " + rainTime));
+        Messenger.m(source, Messenger.s("raining = " + raining));
+        Messenger.m(source, Messenger.s("thunderTime = " + thunderTime));
+        Messenger.m(source, Messenger.s("thundering = " + thundering));
+
+        Messenger.m(source, Messenger.s(""));
+        Messenger.m(source, "g ======= ", "w Weather Forecast", "g  =======");
+        if (raining && thundering)
+        {
+            Messenger.m(source, "w Current weather: Thundering");
+            Messenger.m(source, String.format("w Rain duration: %s minutes", pack.apply(rainTime)));
+            Messenger.m(source, String.format("w Thundering duration: %s minutes", pack.apply(Math.min(rainTime, thunderTime))));
+        }
+        else if (raining && !thundering)
+        {
+            Messenger.m(source, "w Current weather: Raining");
+            Messenger.m(source, String.format("w Rain duration: %s minutes", pack.apply(rainTime)));
+            if (thunderTime < rainTime)
+            {
+                Messenger.m(source, String.format("w Thunder in: %s minutes", pack.apply(thunderTime)));
+            }
+            else
+            {
+                Messenger.m(source, "w No thunder during this rain");
+            }
+        }
+        else
+        {
+            Messenger.m(source, "w Current weather: Clear sky");
+            Messenger.m(source, String.format("w Rain in: %s minutes", pack.apply(rainTime)));
+            if (thundering)
+            {
+                if (rainTime < thunderTime)
+                {
+                    Messenger.m(source, String.format("w It will be a thunderstorm which will last up to %s minutes", pack.apply(thunderTime - rainTime)));
+                }
+                else
+                {
+                    Messenger.m(source, String.format("w Thunder forecast unavailable, you can retry in %s minutes", pack.apply(thunderTime)));
+                }
+            }
+            else
+            {
+                Messenger.m(source, String.format("w No thunder for at least %s minutes", pack.apply(thunderTime)));
+            }
+        }
+        return 1;
     }
 
     private static int showWorldTickOrder(CommandSource source)
