@@ -15,6 +15,7 @@ import carpet.settings.SettingsManager;
 import carpet.utils.HUDController;
 import carpet.utils.deobfuscator.McpMapping;
 import com.mojang.brigadier.CommandDispatcher;
+import gca.GcaExtension;
 import net.minecraft.command.CommandSource;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
@@ -57,6 +58,7 @@ public class CarpetServer // static for now - easier to handle all around the co
 
     // Separate from onServerLoaded, because a server can be loaded multiple times in singleplayer
     public static void onGameStarted() {
+        GcaExtension.onGameStarted();
         LoggerRegistry.initLoggers();
     }
 
@@ -64,6 +66,7 @@ public class CarpetServer // static for now - easier to handle all around the co
     {
         MicroTimingLoggerManager.detachServer();
         LifeTimeTracker.detachServer();
+        GcaExtension.onServerClose(server);
         disconnect();
     }
 
@@ -117,6 +120,7 @@ public class CarpetServer // static for now - easier to handle all around the co
     {
         CarpetServerNetworkHandler.onPlayerJoin(player);
         LoggerRegistry.playerConnected(player);
+        GcaExtension.onPlayerLoggedIn(player);
     }
 
     public static void onCarpetClientHello(EntityPlayerMP player)

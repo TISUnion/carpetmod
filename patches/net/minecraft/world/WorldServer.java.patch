@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/WorldServer.java
 +++ b/net/minecraft/world/WorldServer.java
-@@ -1,8 +1,20 @@
+@@ -1,19 +1,34 @@
  package net.minecraft.world;
  
 +import carpet.commands.lifetime.LifeTimeWorldTracker;
@@ -17,11 +17,20 @@
  import com.google.common.collect.Lists;
  import com.google.common.collect.Maps;
  import com.google.common.util.concurrent.ListenableFuture;
++import com.mojang.datafixers.util.Pair;
++import gca.GcaExtension;
++import gca.api.Function;
 +import it.unimi.dsi.fastutil.Hash;
  import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
- import java.util.Iterator;
- import java.util.List;
-@@ -14,6 +26,9 @@
+-import java.util.Iterator;
+-import java.util.List;
+-import java.util.Map;
+-import java.util.Random;
+-import java.util.UUID;
++
++import java.util.*;
+ import java.util.function.BooleanSupplier;
+ import java.util.stream.Collectors;
  import java.util.stream.Stream;
  import javax.annotation.Nonnull;
  import javax.annotation.Nullable;
@@ -207,7 +216,7 @@
          this.chunkProvider.tick(hasTimeLeft);
          int j = this.calculateSkylightSubtracted(1.0F);
  
-@@ -208,26 +298,83 @@
+@@ -208,27 +298,99 @@
              this.setSkylightSubtracted(j);
          }
  
@@ -296,9 +305,25 @@
 +        endTickTask(); // RSMM
 +        endTickTask(); // RSMM
          this.insideTick = false;
++
++        // GCA plan tick function
++        long gameTime = this.getGameTime();
++        List<Pair<Long, Function>> remove = new ArrayList<>();
++        for (Pair<Long, Function> pair : GcaExtension.planFunction) {
++            if (pair.getFirst() == gameTime) {
++                pair.getSecond().accept();
++                remove.add(pair);
++            } else if (pair.getFirst() < gameTime) {
++                remove.add(pair);
++            }
++        }
++        for (Pair<Long, Function> pair : remove) {
++            GcaExtension.planFunction.remove(pair);
++        }
      }
  
-@@ -270,7 +417,7 @@
+     public boolean isInsideTick()
+@@ -270,7 +432,7 @@
                  }
              }
  
@@ -307,7 +332,7 @@
          }
      }
  
-@@ -281,6 +428,7 @@
+@@ -281,6 +443,7 @@
  
      protected void wakeAllPlayers()
      {
@@ -315,7 +340,7 @@
          this.allPlayersSleeping = false;
  
          for (EntityPlayer entityplayer : this.playerEntities.stream().filter(EntityPlayer::isPlayerSleeping).collect(Collectors.toList()))
-@@ -292,6 +440,7 @@
+@@ -292,6 +455,7 @@
          {
              this.resetRainAndThunder();
          }
@@ -323,7 +348,7 @@
      }
  
      private void resetRainAndThunder()
-@@ -306,6 +455,13 @@
+@@ -306,6 +470,13 @@
      {
          if (this.allPlayersSleeping && !this.isRemote)
          {
@@ -337,7 +362,7 @@
              for (EntityPlayer entityplayer : this.playerEntities)
              {
                  if (!entityplayer.isSpectator() && !entityplayer.isPlayerFullyAsleep())
-@@ -397,9 +553,12 @@
+@@ -397,9 +568,12 @@
              boolean flag1 = this.isThundering();
              this.profiler.startSection("pollingChunks");
  
@@ -350,7 +375,7 @@
                  Chunk chunk = iterator.next();
                  int j = chunk.x * 16;
                  int k = chunk.z * 16;
-@@ -407,7 +566,21 @@
+@@ -407,7 +581,21 @@
                  chunk.enqueueRelightChecks();
                  this.profiler.endStartSection("tickChunk");
                  chunk.tick(false);
@@ -372,7 +397,7 @@
  
                  if (flag && flag1 && this.rand.nextInt(100000) == 0)
                  {
-@@ -434,6 +607,8 @@
+@@ -434,6 +622,8 @@
                  }
  
                  this.profiler.endStartSection("iceandsnow");
@@ -381,7 +406,7 @@
  
                  if (this.rand.nextInt(16) == 0)
                  {
-@@ -460,6 +635,8 @@
+@@ -460,6 +650,8 @@
                  }
  
                  this.profiler.endStartSection("tickBlocks");
@@ -390,7 +415,7 @@
  
                  if (i > 0)
                  {
-@@ -493,13 +670,25 @@
+@@ -493,13 +685,25 @@
                          }
                      }
                  }
@@ -417,7 +442,7 @@
      {
          BlockPos blockpos = this.getHeight(Heightmap.Type.MOTION_BLOCKING, pos);
          AxisAlignedBB axisalignedbb = (new AxisAlignedBB(blockpos, new BlockPos(blockpos.getX(), this.getHeight(), blockpos.getZ()))).grow(3.0D);
-@@ -543,6 +732,7 @@
+@@ -543,6 +747,7 @@
  
      protected void tickPlayers()
      {
@@ -425,7 +450,7 @@
          super.tickPlayers();
          this.profiler.endStartSection("players");
  
-@@ -597,6 +787,7 @@
+@@ -597,6 +802,7 @@
  
              this.profiler.endSection();
          }
@@ -433,7 +458,7 @@
      }
  
      public void resetUpdateEntityTick()
-@@ -608,8 +799,11 @@
+@@ -608,8 +814,11 @@
      {
          if (this.worldInfo.getGenerator() != WorldType.DEBUG_ALL_BLOCK_STATES)
          {
@@ -445,7 +470,7 @@
          }
      }
  
-@@ -619,18 +813,32 @@
+@@ -619,18 +828,32 @@
  
          if (ifluidstate.getFluid() == fluidTickEntry.getTarget())
          {
@@ -478,7 +503,7 @@
      }
  
      public void tickEntity(Entity entityIn, boolean forceUpdate)
-@@ -1021,26 +1229,60 @@
+@@ -1021,26 +1244,60 @@
  
      public void addBlockEvent(BlockPos pos, Block blockIn, int eventID, int eventParam)
      {
@@ -542,7 +567,7 @@
      }
  
      public void close()
-@@ -1194,4 +1436,54 @@
+@@ -1194,4 +1451,54 @@
      {
          return this.server.getNetworkTagManager();
      }
