@@ -6,7 +6,7 @@
  import java.util.List;
 +
 +import carpet.patches.EntityPlayerMPFake;
-+import gca.GcaSetting;
++import carpet.settings.CarpetSettings;
 +import gca.tools.FakePlayerAutoFish;
  import net.minecraft.advancements.CriteriaTriggers;
  import net.minecraft.block.Block;
@@ -16,7 +16,7 @@
                  worldserver.spawnParticle(Particles.FISHING, this.posX, d3, this.posZ, (int)(1.0F + this.width * 20.0F), (double)this.width, 0.0D, (double)this.width, (double)0.2F);
                  this.ticksCatchable = MathHelper.nextInt(this.rand, 20, 40);
 +                Entity entity = this.getAngler();
-+                if (GcaSetting.fakePlayerAutoFish && entity instanceof EntityPlayerMPFake) {
++                if (CarpetSettings.fakePlayerAutoFish && entity instanceof EntityPlayerMPFake) {
 +                    FakePlayerAutoFish.autoFish((EntityPlayer) entity);
 +                }
              }

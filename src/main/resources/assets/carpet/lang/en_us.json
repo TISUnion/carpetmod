@@ -1,0 +1,31 @@
+{
+  "category.GCA": "GCA",
+
+  "rule.openFakePlayerInventory.name": "Fake Player Inventory",
+  "rule.openFakePlayerInventory.desc": "Allow player to open the fake player's inventory",
+
+  "rule.openFakePlayerEnderChest.name": "Fake Player Ender Chest",
+  "rule.openFakePlayerEnderChest.desc": "Allow player to open the fake player's ender chest",
+
+  "rule.fakePlayerResident.name": "Fake Player Resident",
+  "rule.fakePlayerResident.desc": "Keep the fake player when exiting the level",
+
+  "rule.fakePlayerAutoReplenishment.name": "Fake Player Auto Replenishment",
+  "rule.fakePlayerAutoReplenishment.desc": "Make fake player to auto replenishment",
+
+  "rule.fakePlayerAutoFish.name": "Fake Player Auto Fish",
+  "rule.fakePlayerAutoFish.desc": "Make fake player to auto fish",
+
+  "rule.fakePlayerAutoReplaceTool.name": "Fake Player Auto Replace Tool",
+  "rule.fakePlayerAutoReplaceTool.desc": "Make fake player to auto replace almost damaged tool",
+
+  "action.attack.interval.14": "Attack every 14 gt: %s",
+  "action.attack.continuous": "Attack continuous: %s",
+  "action.use.continuous": "Use continuous: %s",
+  "action.stop_all": "Stop all action",
+
+  "gac.hotbar": "Hotbar: %s",
+
+  "on": "on",
+  "off": "off"
+}

@@ -72,15 +72,17 @@
      }
  
      public abstract boolean init() throws IOException;
-@@ -350,6 +375,7 @@
+@@ -350,6 +375,9 @@
          this.func_212369_a(isavehandler, worldsaveddatastorage, worldinfo, worldsettings);
          this.setDifficultyForAllWorlds(this.getDifficulty());
          this.initialWorldChunkLoad(worldsaveddatastorage);
-+        GcaExtension.onServerStart(this);
++        if(!this.isSinglePlayer()){
++            GcaExtension.onServerStart(this);
++        }
      }
  
      public void func_212369_a(ISaveHandler p_212369_1_, WorldSavedDataStorage p_212369_2_, WorldInfo p_212369_3_, WorldSettings p_212369_4_)
-@@ -570,8 +596,15 @@
+@@ -570,8 +598,15 @@
  
      public void stopServer()
      {
@@ -96,7 +98,7 @@
          if (this.getNetworkSystem() != null)
          {
              this.getNetworkSystem().terminateEndpoints();
-@@ -639,34 +672,64 @@
+@@ -639,34 +674,64 @@
      {
          try
          {
@@ -178,7 +180,7 @@
                  }
              }
              else
-@@ -782,7 +845,18 @@
+@@ -782,7 +847,18 @@
      {
          long i = Util.nanoTime();
          ++this.tickCounter;
@@ -197,7 +199,7 @@
          if (this.startProfiling)
          {
              this.startProfiling = false;
-@@ -790,6 +864,9 @@
+@@ -790,6 +866,9 @@
          }
  
          this.profiler.startSection("root");
@@ -207,7 +209,7 @@
          this.updateTimeLightAndEntities(hasTimeLeft);
  
          if (i - this.nanoTimeSinceStatusRefresh >= 5000000000L)
-@@ -810,10 +887,28 @@
+@@ -810,10 +889,28 @@
  
          if (this.tickCounter % 900 == 0)
          {
@@ -236,7 +238,7 @@
          }
  
          this.profiler.startSection("snooper");
-@@ -829,16 +924,34 @@
+@@ -829,16 +926,34 @@
          }
  
          this.profiler.endSection();
@@ -271,7 +273,7 @@
          FutureTask<?> futuretask;
  
          while ((futuretask = this.futureTaskQueue.poll()) != null)
-@@ -847,8 +960,11 @@
+@@ -847,8 +962,11 @@
          }
  
          this.profiler.endStartSection("commandFunctions");
@@ -283,7 +285,7 @@
  
          for (WorldServer worldserver : this.getWorlds())
          {
-@@ -870,6 +986,7 @@
+@@ -870,6 +988,7 @@
  
                  this.profiler.startSection("tick");
  
@@ -291,7 +293,7 @@
                  try
                  {
                      worldserver.tick(hasTimeLeft);
-@@ -878,18 +995,31 @@
+@@ -878,18 +997,31 @@
                  {
                      CrashReport crashreport = CrashReport.makeCrashReport(throwable1, "Exception ticking world");
                      worldserver.fillCrashReport(crashreport);
@@ -325,7 +327,7 @@
                  }
  
                  this.profiler.endSection();
-@@ -905,10 +1035,16 @@
+@@ -905,10 +1037,16 @@
              }))[this.tickCounter % 100] = Util.nanoTime() - i;
          }
  
@@ -342,7 +344,7 @@
          this.profiler.endStartSection("tickables");
  
          for (int j = 0; j < this.tickables.size(); ++j)
-@@ -917,6 +1053,8 @@
+@@ -917,6 +1055,8 @@
          }
  
          this.profiler.endSection();
@@ -351,7 +353,7 @@
      }
  
      public boolean getAllowNether()
-@@ -929,6 +1067,12 @@
+@@ -929,6 +1069,12 @@
          this.tickables.add(tickable);
      }
  
@@ -364,7 +366,7 @@
      public static void main(String[] p_main_0_)
      {
          Bootstrap.register();
-@@ -1004,6 +1148,11 @@
+@@ -1004,6 +1150,11 @@
                  }
              }
  
@@ -376,7 +378,7 @@
              YggdrasilAuthenticationService yggdrasilauthenticationservice = new YggdrasilAuthenticationService(Proxy.NO_PROXY, UUID.randomUUID().toString());
              MinecraftSessionService minecraftsessionservice = yggdrasilauthenticationservice.createMinecraftSessionService();
              GameProfileRepository gameprofilerepository = yggdrasilauthenticationservice.createProfileRepository();
-@@ -1142,7 +1291,8 @@
+@@ -1142,7 +1293,8 @@
  
      public String getServerModName()
      {
@@ -386,7 +388,7 @@
      }
  
      public CrashReport addServerInfoToCrashReport(CrashReport report)
-@@ -1605,6 +1755,12 @@
+@@ -1605,6 +1757,12 @@
      {
          return this.serverTime;
      }
@@ -399,7 +401,7 @@
  
      public Thread getServerThread()
      {
-@@ -1639,6 +1795,7 @@
+@@ -1639,6 +1797,7 @@
          }
          else
          {
@@ -407,7 +409,7 @@
              this.getPlayerList().saveAllPlayerData();
              this.resourcePacks.reloadPacksFromFinders();
              this.loadDataPacks(this.getWorld(DimensionType.OVERWORLD).getWorldInfo());
-@@ -1825,4 +1982,28 @@
+@@ -1825,4 +1984,28 @@
              return 0;
          }
      }

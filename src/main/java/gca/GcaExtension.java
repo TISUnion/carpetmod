@@ -1,8 +1,7 @@
 package gca;
 
-import carpet.CarpetServer;
 import carpet.patches.EntityPlayerMPFake;
-import carpet.settings.SettingsManager;
+import carpet.settings.CarpetSettings;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -52,10 +51,6 @@ public class GcaExtension {
         GcaExtension.fakePlayerInventoryContainerMap.remove(player);
     }
 
-    public static void onGameStarted() {
-        SettingsManager.parseSettingsClass(GcaSetting.class);
-    }
-
     public static void onServerClose(MinecraftServer server) {
         JsonObject fakePlayerList = new JsonObject();
         fakePlayerInventoryContainerMap.forEach((player, fakePlayerInventoryContainer) -> {
@@ -79,7 +74,7 @@ public class GcaExtension {
     }
 
     public static void onServerStart(MinecraftServer server) {
-        if (GcaSetting.fakePlayerResident) {
+        if (CarpetSettings.fakePlayerResident) {
             JsonObject fakePlayerList = new JsonObject();
             File file = getFile(server);
             if (!file.isFile()) {

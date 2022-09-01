@@ -1276,4 +1276,54 @@ public class CarpetSettings
             return "You must set `TISCMConfig.MOD_WORLDEDIT` to true during mod compiling and have worldedit classes included in .jar to enable world edit";
         }
     }
+//                 /$$$$$$   /$$$$$$   /$$$$$$
+//                /$$__  $$ /$$__  $$ /$$__  $$
+//               | $$  \__/| $$  \__/| $$  \ $$
+//               | $$ /$$$$| $$      | $$$$$$$$
+//               | $$|_  $$| $$      | $$__  $$
+//               | $$  \ $$| $$    $$| $$  | $$
+//               |  $$$$$$/|  $$$$$$/| $$  | $$
+//                \______/  \______/ |__/  |__/
+
+    // 允许玩家打开假人背包
+    @Rule(
+            desc = "Allow player to open the fake player's inventory",
+            category = GCA
+    )
+    public static boolean openFakePlayerInventory = false;
+
+    // 允许玩家打开假人末影箱
+    @Rule(
+            desc = "Allow player to open the fake player's ender chest",
+            category = GCA
+    )
+    public static boolean openFakePlayerEnderChest = false;
+
+    // 退出存档时保留假人
+    @Rule(
+            desc = "Keep the fake player when exiting the level",
+            category = GCA
+    )
+    public static boolean fakePlayerResident = false;
+
+    // 让假人自动补货
+    @Rule(
+            desc = "Make fake player to auto replenishment",
+            category = GCA
+    )
+    public static boolean fakePlayerAutoReplenishment = false;
+
+    // 让假人自动钓鱼
+    @Rule(
+            desc = "Make fake player to auto fish",
+            category = GCA
+    )
+    public static boolean fakePlayerAutoFish = false;
+
+    // 让假人自动切换快损坏的工具
+    @Rule(
+            desc = "Make fake player to auto replace almost damaged tool",
+            category = GCA
+    )
+    public static boolean fakePlayerAutoReplaceTool = false;
 }
