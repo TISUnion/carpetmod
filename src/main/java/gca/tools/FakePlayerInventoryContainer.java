@@ -197,7 +197,7 @@ public class FakePlayerInventoryContainer extends CustomMenu {
         List<Button> hotBarList = new ArrayList<>();
         for (int i = 0; i < 9; i++) {
             ITextComponent hotBarComponent = ComponentTranslate.trans(
-                    "Hotbar: %s",
+                    "gca.hotbar",
                     TextFormatting.WHITE,
                     new Style().setBold(true).setItalic(false),
                     i + 1
@@ -214,10 +214,10 @@ public class FakePlayerInventoryContainer extends CustomMenu {
         }
         this.addButtonList(new RadioList(hotBarList, true));
 
-        Button stopAll = new AutoResetButton("Stop all action");
-        Button attackInterval14 = new Button(false, "Attack every 14 gt: %s");
-        Button attackContinuous = new Button(false, "Attack continuous: %s");
-        Button useContinuous = new Button(false, "Use continuous: %s");
+        Button stopAll = new AutoResetButton("action.stop_all");
+        Button attackInterval14 = new Button(false, "action.attack.interval.14");
+        Button attackContinuous = new Button(false, "action.attack.continuous");
+        Button useContinuous = new Button(false, "action.use.continuous");
 
         stopAll.addTurnOnFunction(() -> {
             attackInterval14.turnOffWithoutFunction();

@@ -24,7 +24,7 @@
   "action.use.continuous": "Use continuous: %s",
   "action.stop_all": "Stop all action",
 
-  "gac.hotbar": "Hotbar: %s",
+  "gca.hotbar": "Hotbar: %s",
 
   "on": "on",
   "off": "off"

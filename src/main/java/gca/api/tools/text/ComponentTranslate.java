@@ -49,7 +49,7 @@ public class ComponentTranslate {
                     Objects.requireNonNull(
                             Translations.class
                                     .getClassLoader()
-                                    .getResourceAsStream(String.format("assets/gca/lang/%s.json", lang))
+                                    .getResourceAsStream(String.format("assets/carpet/lang/%s.json", lang))
                     ),
                     StandardCharsets.UTF_8
             );
@@ -59,7 +59,7 @@ public class ComponentTranslate {
                         Objects.requireNonNull(
                                 Translations.class
                                         .getClassLoader()
-                                        .getResourceAsStream("assets/gca/lang/en_us.json")
+                                        .getResourceAsStream("assets/carpet/lang/en_us.json")
                         ),
                         StandardCharsets.UTF_8
                 );

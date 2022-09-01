@@ -608,7 +608,7 @@
   "action.use.continuous": "一直右键：%s",
   "action.stop_all": "停止所有动作",
 
-  "gac.hotbar": "快捷栏：%s",
+  "gca.hotbar": "快捷栏：%s",
 
   "on": "开启",
   "off": "关闭"
