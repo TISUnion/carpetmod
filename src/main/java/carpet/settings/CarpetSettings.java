@@ -698,6 +698,12 @@ public class CarpetSettings
     )
     public static double voidRelatedAltitude = -64.0D;
 
+    @Rule(
+            desc = "Deobfuscate stack traces in crash report",
+            category = {FEATURE}
+    )
+    public static boolean deobfuscateCrashReportStackTrace = false;
+
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$
     //   | $$     | $$  | $$  \__/| $$  \__/| $$$$  /$$$$

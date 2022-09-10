@@ -1,0 +1,43 @@
+--- a/net/minecraft/crash/CrashReport.java
++++ b/net/minecraft/crash/CrashReport.java
+@@ -1,5 +1,7 @@
+ package net.minecraft.crash;
+ 
++import carpet.settings.CarpetSettings;
++import carpet.utils.deobfuscator.StackTraceDeobfuscator;
+ import com.google.common.collect.Lists;
+ import java.io.File;
+ import java.io.FileOutputStream;
+@@ -97,8 +99,15 @@
+             builder.append("Thread: ").append(Thread.currentThread().getName()).append("\n");
+             builder.append("Stacktrace:\n");
+ 
+-            for (StackTraceElement stacktraceelement : this.stacktrace)
++            // TISCM deobfuscateCrashReportStackTrace
++            StackTraceElement[] stackTraceElements = this.stacktrace;
++            if (CarpetSettings.deobfuscateCrashReportStackTrace)
+             {
++                stackTraceElements = StackTraceDeobfuscator.deobfuscateStackTrace(stackTraceElements);
++            }
++            for (StackTraceElement stacktraceelement : stackTraceElements)
++//            for (StackTraceElement stacktraceelement : this.stacktrace)
++            {
+                 builder.append("\t").append("at ").append((Object)stacktraceelement);
+                 builder.append("\n");
+             }
+@@ -141,6 +150,15 @@
+ 
+         String s;
+ 
++        // TISCM deobfuscateCrashReportStackTrace
++        if (CarpetSettings.deobfuscateCrashReportStackTrace)
++        {
++            for (Throwable t = throwable; t != null; t = t.getCause())
++            {
++                t.setStackTrace(StackTraceDeobfuscator.deobfuscateStackTrace(t.getStackTrace()));
++            }
++        }
++
+         try
+         {
+             stringwriter = new StringWriter();

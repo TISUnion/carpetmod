@@ -47,6 +47,9 @@
   "rule.creativeOpenContainerForcibly.name": "创造玩家强制打开容器",
   "rule.creativeOpenContainerForcibly.desc": "允许创造模式的玩家打开被阻挡的容器，如潜影盒",
 
+  "rule.deobfuscateCrashReportStackTrace.name": "反混淆崩溃报告堆栈追踪",
+  "rule.deobfuscateCrashReportStackTrace.desc": "反混淆崩溃报告中输出的堆栈追踪",
+
   "rule.dispenserNoItemCost.name": "发射器不消耗物品",
   "rule.dispenserNoItemCost.desc": "开启后，发射器发射不再消耗物品",
   "rule.dispenserNoItemCost.extra.0": "无论投掷物品还是使用物品都如此，但是投掷器传输物品仍会消耗物品",

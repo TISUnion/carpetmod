@@ -1,0 +1,27 @@
+--- a/net/minecraft/crash/CrashReportCategory.java
++++ b/net/minecraft/crash/CrashReportCategory.java
+@@ -1,5 +1,7 @@
+ package net.minecraft.crash;
+ 
++import carpet.settings.CarpetSettings;
++import carpet.utils.deobfuscator.StackTraceDeobfuscator;
+ import com.google.common.collect.Lists;
+ import java.util.List;
+ import java.util.Locale;
+@@ -185,8 +187,15 @@
+         {
+             builder.append("\nStacktrace:");
+ 
+-            for (StackTraceElement stacktraceelement : this.stackTrace)
++            // TISCM deobfuscateCrashReportStackTrace
++            StackTraceElement[] stackTraceElements = this.stackTrace;
++            if (CarpetSettings.deobfuscateCrashReportStackTrace)
+             {
++                stackTraceElements = StackTraceDeobfuscator.deobfuscateStackTrace(stackTraceElements);
++            }
++            for (StackTraceElement stacktraceelement : stackTraceElements)
++//            for (StackTraceElement stacktraceelement : this.stackTrace)
++            {
+                 builder.append("\n\tat ");
+                 builder.append((Object)stacktraceelement);
+             }
