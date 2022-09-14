@@ -331,7 +331,7 @@ public class EntityInfo
                 }
                 if (e instanceof EntitySlime)
                 {
-                    lst.add(Messenger.c(String.format("w  - Base attack: %.1f",((EntitySlime)e).getPublicAttackStrength())));
+                    lst.add(Messenger.c(String.format("w  - Base attack: %d",((EntitySlime)e).getPublicAttackStrength())));
                 }
             }
         }
