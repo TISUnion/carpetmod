@@ -192,7 +192,7 @@ public class Logger
             BufferedReader reader = new BufferedReader(new FileReader("./carpetLogger/" + logName + ".conf"));
             String line;
             while ((line = reader.readLine()) != null){
-                String[] subData = line.split(" ");
+                String[] subData = line.split(" ", 2);
                 subscribedOnlinePlayers.put(subData[0], subData[1]);
             }
         }catch (FileNotFoundException e) { /*System.out.println("[TISCM]: couldn't find persistant config file for logger " + logName);*/ }
