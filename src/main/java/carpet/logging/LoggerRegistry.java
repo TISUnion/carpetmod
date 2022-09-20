@@ -58,7 +58,7 @@ public class LoggerRegistry
         registerLogger("mobcaps", new HUDLogger("mobcaps", "dynamic",new String[]{"dynamic", "overworld", "nether","end"}));
 
         // TISCM loggers
-        registerLogger("chunkdebug", new Logger("chunkdebug",null, new String[]{"X:1 Z:2", "\".*Nether\""}));
+        registerLogger("chunkdebug", new Logger("chunkdebug",null, new String[]{"\"X:1 Z:2\"", "\".*Nether\""}));
         registerLogger("villagecount", new HUDLogger("villagecount", null, null));
         registerLogger("memory", new HUDLogger("memory", null, null));
         registerLogger("microTiming", MicroTimingStandardCarpetLogger.getInstance());
