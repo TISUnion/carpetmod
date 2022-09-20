@@ -5,6 +5,7 @@ import carpet.logging.microtiming.MicroTimingLoggerManager;
 import carpet.logging.microtiming.enums.TickStage;
 import carpet.utils.TextUtil;
 import carpet.utils.Messenger;
+import carpet.utils.deobfuscator.StackTracePrinter;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
@@ -35,7 +36,9 @@ public class ChunkLogHelper
                     "g at ",
                     phase[0],
                     "g  in ",
-                    TextUtil.getDimensionNameText(worldIn.getDimension().getType()).applyTextStyle(TextFormatting.DARK_GREEN)
+                    TextUtil.getDimensionNameText(worldIn.getDimension().getType()).applyTextStyle(TextFormatting.DARK_GREEN),
+                    "w  ",
+                    StackTracePrinter.create().ignore(ChunkLogHelper.class).deobfuscate().toSymbolText()
             );
             if (option != null)
             {
