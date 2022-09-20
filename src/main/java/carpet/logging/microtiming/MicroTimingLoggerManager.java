@@ -270,6 +270,16 @@ public class MicroTimingLoggerManager
         return getWorldLogger(world).map(MicroTimingLogger::getTickStage);
     }
 
+    public static Optional<String> getTickStageDetail(World world)
+    {
+        return getWorldLogger(world).map(MicroTimingLogger::getTickStageDetail);
+    }
+
+    public static Optional<TickStageExtraBase> getTickStageExtra(World world)
+    {
+        return getWorldLogger(world).map(MicroTimingLogger::getTickStageExtra);
+    }
+
     /*
      * ----------------
      *   Marker Logic
