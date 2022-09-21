@@ -12,13 +12,19 @@
  import java.util.BitSet;
  import java.util.HashSet;
  import java.util.Iterator;
-@@ -15,7 +9,29 @@
+@@ -15,7 +9,35 @@
  import java.util.concurrent.ConcurrentLinkedQueue;
  import java.util.concurrent.atomic.AtomicInteger;
  import java.util.function.Predicate;
 +
  import javax.annotation.Nullable;
 +
++import carpet.helpers.PushableEntityPredicateWrapper;
++import net.minecraft.entity.EntityLivingBase;
++import net.minecraft.entity.item.EntityArmorStand;
++import net.minecraft.entity.item.EntityBoat;
++import net.minecraft.entity.item.EntityMinecart;
++import net.minecraft.entity.passive.EntityBat;
 +import org.apache.logging.log4j.LogManager;
 +import org.apache.logging.log4j.Logger;
 +
@@ -42,7 +48,7 @@
  import net.minecraft.block.Block;
  import net.minecraft.block.ITileEntityProvider;
  import net.minecraft.block.state.IBlockState;
-@@ -23,6 +39,7 @@
+@@ -23,6 +45,7 @@
  import net.minecraft.crash.CrashReportCategory;
  import net.minecraft.crash.ReportedException;
  import net.minecraft.entity.Entity;
@@ -50,7 +56,7 @@
  import net.minecraft.entity.player.EntityPlayer;
  import net.minecraft.fluid.Fluid;
  import net.minecraft.fluid.IFluidState;
-@@ -30,6 +47,7 @@
+@@ -30,6 +53,7 @@
  import net.minecraft.init.Fluids;
  import net.minecraft.nbt.NBTTagCompound;
  import net.minecraft.network.PacketBuffer;
@@ -58,7 +64,7 @@
  import net.minecraft.tileentity.TileEntity;
  import net.minecraft.util.ClassInheritanceMultiMap;
  import net.minecraft.util.EnumFacing;
-@@ -43,6 +61,7 @@
+@@ -43,6 +67,7 @@
  import net.minecraft.world.EnumLightType;
  import net.minecraft.world.ITickList;
  import net.minecraft.world.World;
@@ -66,7 +72,7 @@
  import net.minecraft.world.WorldType;
  import net.minecraft.world.biome.Biome;
  import net.minecraft.world.chunk.storage.AnvilChunkLoader;
-@@ -52,10 +71,8 @@
+@@ -52,10 +77,8 @@
  import net.minecraft.world.gen.feature.structure.StructureStart;
  import net.minecraftforge.api.distmarker.Dist;
  import net.minecraftforge.api.distmarker.OnlyIn;
@@ -78,7 +84,7 @@
  {
      private static final Logger LOGGER = LogManager.getLogger();
      public static final ChunkSection EMPTY_SECTION = null;
-@@ -89,7 +106,25 @@
+@@ -89,7 +112,30 @@
      private int neighborCount;
      private final AtomicInteger field_205757_F = new AtomicInteger();
      private final ChunkPos field_212816_F;
@@ -101,10 +107,15 @@
 +    private final ClassInheritanceMultiMap<Entity>[] hardHitBoxEntityLists;
 +    private final boolean optimizedHardHitBoxEntityCollisionEnabled;
 +
++    // TISCM optimizedPushableEntityCollision
++    // an array like field entityLists but only stores entities with possibly canBePushed() != false
++    private final ClassInheritanceMultiMap<Entity>[] pushableEntityLists;
++    private final boolean optimizedPushableEntityCollisionEnabled;
++
      @OnlyIn(Dist.CLIENT)
      public Chunk(World worldIn, int cx, int cz, Biome[] biomesIn)
      {
-@@ -99,6 +134,12 @@
+@@ -99,6 +145,17 @@
      public Chunk(World worldIn, int cx, int cz, Biome[] biomesIn, UpgradeData upgradeDataIn, ITickList<Block> blocksToBeTickedIn, ITickList<Fluid> fluidsToBeTickedIn, long inhabitedTimeIn)
      {
          this.entityLists = new ClassInheritanceMultiMap[16];
@@ -114,20 +125,28 @@
 +        this.optimizedHardHitBoxEntityCollisionEnabled = CarpetSettings.optimizedHardHitBoxEntityCollision;
 +        // TISCM optimizedHardHitBoxEntityCollision ends
 +
++        // TISCM optimizedPushableEntityCollision
++        this.pushableEntityLists = new ClassInheritanceMultiMap[this.entityLists.length];
++        this.optimizedPushableEntityCollisionEnabled = CarpetSettings.optimizedPushableEntityCollision;
++        // TISCM optimizedPushableEntityCollision ends
++
          this.world = worldIn;
          this.x = cx;
          this.z = cz;
-@@ -116,6 +157,9 @@
+@@ -116,6 +173,12 @@
          for (int i = 0; i < this.entityLists.length; ++i)
          {
              this.entityLists[i] = new ClassInheritanceMultiMap<>(Entity.class);
 +
 +            // TISCM optimizedHardHitBoxEntityCollision
 +            this.hardHitBoxEntityLists[i] = new ClassInheritanceMultiMap<>(Entity.class);
++
++            // TISCM optimizedPushableEntityCollision
++            this.pushableEntityLists[i] = new ClassInheritanceMultiMap<>(Entity.class);
          }
  
          this.blockBiomeArray = biomesIn;
-@@ -212,37 +256,45 @@
+@@ -212,37 +275,45 @@
              {
                  if (this.world.dimension.hasSkyLight())
                  {
@@ -199,7 +218,7 @@
                      }
                  }
              }
-@@ -339,40 +391,52 @@
+@@ -339,40 +410,52 @@
              int j = heightmap.getHeight(x & 15, z & 15);
              int k = this.x * 16 + x;
              int l = this.z * 16 + z;
@@ -278,7 +297,7 @@
                  }
              }
  
-@@ -380,19 +444,23 @@
+@@ -380,19 +463,23 @@
              {
                  this.heightMapMinimum = j;
              }
@@ -312,7 +331,7 @@
              }
  
              this.dirty = true;
-@@ -489,9 +557,17 @@
+@@ -489,9 +576,17 @@
          }
      }
  
@@ -330,7 +349,7 @@
          int i = pos.getX() & 15;
          int j = pos.getY();
          int k = pos.getZ() & 15;
-@@ -517,10 +593,16 @@
+@@ -517,10 +612,16 @@
                  }
  
                  chunksection = new ChunkSection(j >> 4 << 4, this.world.dimension.hasSkyLight());
@@ -348,7 +367,7 @@
              chunksection.set(i, j & 15, k, state);
              this.heightMap.get(Heightmap.Type.MOTION_BLOCKING).update(i, j, k, state);
              this.heightMap.get(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES).update(i, j, k, state);
-@@ -529,6 +611,11 @@
+@@ -529,6 +630,11 @@
  
              if (!this.world.isRemote)
              {
@@ -360,7 +379,7 @@
                  iblockstate.onReplaced(this.world, pos, state, isMoving);
              }
              else if (block1 != block && block1 instanceof ITileEntityProvider)
-@@ -551,10 +638,14 @@
+@@ -551,10 +657,14 @@
                      int i1 = state.getOpacity(this.world, pos);
                      int j1 = iblockstate.getOpacity(this.world, pos);
                      this.relightBlock(i, j, k, state);
@@ -378,7 +397,7 @@
                      }
                  }
  
-@@ -570,12 +661,48 @@
+@@ -570,12 +680,48 @@
  
                  if (!this.world.isRemote)
                  {
@@ -429,7 +448,7 @@
  
                      if (tileentity1 == null)
                      {
-@@ -596,6 +723,9 @@
+@@ -596,6 +742,9 @@
  
      public int getLightFor(EnumLightType type, BlockPos pos)
      {
@@ -439,7 +458,7 @@
          return this.getLight(type, pos, this.world.getDimension().hasSkyLight());
      }
  
-@@ -651,10 +781,18 @@
+@@ -651,10 +800,18 @@
                  {
                      return;
                  }
@@ -460,7 +479,7 @@
              }
  
              if (light == EnumLightType.SKY)
-@@ -680,6 +818,9 @@
+@@ -680,6 +837,9 @@
  
      public int getLightSubtracted(BlockPos pos, int amount, boolean hasSkylight)
      {
@@ -470,7 +489,7 @@
          int i = pos.getX() & 15;
          int j = pos.getY();
          int k = pos.getZ() & 15;
-@@ -742,6 +883,18 @@
+@@ -742,6 +902,32 @@
          entityIn.chunkCoordY = k;
          entityIn.chunkCoordZ = this.z;
          this.entityLists[k].add(entityIn);
@@ -486,10 +505,24 @@
 +                this.hardHitBoxEntityLists[k].add(entityIn);
 +            }
 +        }
++
++        // TISCM optimizedPushableEntityCollision
++        if (this.optimizedPushableEntityCollisionEnabled)
++        {
++            // in vanilla only these types of entity may have canBePushed return true
++            if (entityIn instanceof EntityLivingBase || entityIn instanceof EntityMinecart || entityIn instanceof EntityBoat)
++            {
++                // bat and armor stand are special cases that cannot be pushed as EntityLivingBase
++                if (!(entityIn instanceof EntityBat) && !(entityIn instanceof EntityArmorStand))
++                {
++                    this.pushableEntityLists[k].add(entityIn);
++                }
++            }
++        }
      }
  
      public void setHeightmap(Heightmap.Type type, long[] data)
-@@ -767,6 +920,12 @@
+@@ -767,6 +953,18 @@
          }
  
          this.entityLists[index].remove(entityIn);
@@ -499,10 +532,16 @@
 +        {
 +            this.hardHitBoxEntityLists[index].remove(entityIn);
 +        }
++
++        // TISCM optimizedPushableEntityCollision
++        if (this.optimizedHardHitBoxEntityCollisionEnabled)
++        {
++            this.pushableEntityLists[index].remove(entityIn);
++        }
      }
  
      public boolean canSeeSky(BlockPos pos)
-@@ -869,7 +1028,7 @@
+@@ -869,7 +1067,7 @@
          this.deferredTileEntities.put(new BlockPos(nbt.getInt("x"), nbt.getInt("y"), nbt.getInt("z")), nbt);
      }
  
@@ -511,7 +550,7 @@
      {
          if (this.loaded)
          {
-@@ -894,10 +1053,24 @@
+@@ -894,10 +1092,24 @@
                  return !(p_212383_0_ instanceof EntityPlayer);
              }));
          }
@@ -536,7 +575,7 @@
          this.loaded = false;
  
          for (TileEntity tileentity : this.tileEntities.values())
-@@ -907,8 +1080,38 @@
+@@ -907,8 +1119,38 @@
  
          for (ClassInheritanceMultiMap<Entity> classinheritancemultimap : this.entityLists)
          {
@@ -576,7 +615,7 @@
      }
  
      public void markDirty()
-@@ -916,7 +1119,8 @@
+@@ -916,7 +1158,8 @@
          this.dirty = true;
      }
  
@@ -586,7 +625,7 @@
      {
          int i = MathHelper.floor((aabb.minY - 2.0D) / 16.0D);
          int j = MathHelper.floor((aabb.maxY + 2.0D) / 16.0D);
-@@ -925,9 +1129,9 @@
+@@ -925,9 +1168,9 @@
  
          for (int k = i; k <= j; ++k)
          {
@@ -598,14 +637,19 @@
                  {
                      if (entity.getBoundingBox().intersects(aabb) && entity != entityIn)
                      {
-@@ -954,6 +1158,21 @@
+@@ -954,6 +1197,26 @@
          }
      }
  
 +    // TISCM optimizedHardHitBoxEntityCollision preserves vanilla interface
 +    public void getEntitiesWithinAABBForEntity(@Nullable Entity entityIn, AxisAlignedBB aabb, List<Entity> listToFill, Predicate <? super Entity > filter)
 +    {
-+        getEntitiesWithinAABBForEntityInner(entityIn, aabb, listToFill, filter, this.entityLists);
++        ClassInheritanceMultiMap<Entity>[] entityList = this.entityLists;
++        if (this.optimizedPushableEntityCollisionEnabled && CarpetSettings.optimizedPushableEntityCollision && filter instanceof PushableEntityPredicateWrapper)
++        {
++            entityList = this.pushableEntityLists;
++        }
++        getEntitiesWithinAABBForEntityInner(entityIn, aabb, listToFill, filter, entityList);
 +    }
 +
 +    // TISCM optimizedHardHitBoxEntityCollision
@@ -620,7 +664,7 @@
      public <T extends Entity> void getEntitiesOfTypeWithinAABB(Class <? extends T > entityClass, AxisAlignedBB aabb, List<T> listToFill, @Nullable Predicate <? super T > filter)
      {
          int i = MathHelper.floor((aabb.minY - 2.0D) / 16.0D);
-@@ -997,6 +1216,9 @@
+@@ -997,6 +1260,9 @@
  
      public void tick(boolean skipRecheckGaps)
      {
@@ -630,7 +674,7 @@
          if (this.isGapLightingUpdated && this.world.dimension.hasSkyLight() && !skipRecheckGaps)
          {
              this.recheckGaps(this.world.isRemote);
-@@ -1138,9 +1360,28 @@
+@@ -1138,9 +1404,28 @@
                  this.sections[l].recalculateRefCounts();
              }
          }
@@ -661,7 +705,7 @@
          for (TileEntity tileentity : this.tileEntities.values())
          {
              tileentity.updateContainingBlockInfo();
-@@ -1165,6 +1406,12 @@
+@@ -1165,6 +1450,12 @@
          this.queuedLightChecks = 0;
      }
  
@@ -674,7 +718,7 @@
      public void enqueueRelightChecks()
      {
          if (this.queuedLightChecks < 4096)
-@@ -1190,7 +1437,7 @@
+@@ -1190,7 +1481,7 @@
  
                      if (this.sections[j] == EMPTY_SECTION && flag || this.sections[j] != EMPTY_SECTION && this.sections[j].get(k, i1, l).isAir())
                      {
@@ -683,7 +727,7 @@
                          {
                              BlockPos blockpos2 = blockpos1.offset(enumfacing);
  
-@@ -1497,4 +1744,67 @@
+@@ -1497,4 +1788,67 @@
          QUEUED,
          CHECK;
      }

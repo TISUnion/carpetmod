@@ -1,14 +1,15 @@
 --- a/net/minecraft/util/EntitySelectors.java
 +++ b/net/minecraft/util/EntitySelectors.java
-@@ -1,5 +1,7 @@
+@@ -1,5 +1,8 @@
  package net.minecraft.util;
  
 +import carpet.helpers.CreativeNoClipHelper;
++import carpet.helpers.PushableEntityPredicateWrapper;
 +import carpet.settings.CarpetSettings;
  import com.google.common.base.Predicates;
  import java.util.function.Predicate;
  import javax.annotation.Nullable;
-@@ -31,7 +33,14 @@
+@@ -31,7 +34,14 @@
      };
      public static final Predicate<Entity> NOT_SPECTATING = (p_200818_0_) ->
      {
@@ -24,3 +25,32 @@
      };
  
      public static Predicate<Entity> withinRange(double x, double y, double z, double range)
+@@ -47,14 +57,14 @@
+     {
+         Team team = entityIn.getTeam();
+         Team.CollisionRule team$collisionrule = team == null ? Team.CollisionRule.ALWAYS : team.getCollisionRule();
+-        return (Predicate<Entity>)(team$collisionrule == Team.CollisionRule.NEVER ? Predicates.alwaysFalse() : NOT_SPECTATING.and((p_210290_3_) ->
++        Predicate<Entity> predicate = (Predicate<Entity>) (team$collisionrule == Team.CollisionRule.NEVER ? Predicates.alwaysFalse() : NOT_SPECTATING.and((p_210290_3_) ->
+         {
+ 
+             if (!p_210290_3_.canBePushed())
+             {
+                 return false;
+             }
+-            else if (!entityIn.world.isRemote || p_210290_3_ instanceof EntityPlayer && ((EntityPlayer)p_210290_3_).isUser())
++            else if (!entityIn.world.isRemote || p_210290_3_ instanceof EntityPlayer && ((EntityPlayer) p_210290_3_).isUser())
+             {
+                 Team team1 = p_210290_3_.getTeam();
+                 Team.CollisionRule team$collisionrule1 = team1 == null ? Team.CollisionRule.ALWAYS : team1.getCollisionRule();
+@@ -82,6 +92,11 @@
+                 return false;
+             }
+         }));
++        if (CarpetSettings.optimizedPushableEntityCollision)
++        {
++            predicate = new PushableEntityPredicateWrapper(predicate);
++        }
++        return predicate;
+     }
+ 
+     public static Predicate<Entity> notRiding(Entity entityIn)

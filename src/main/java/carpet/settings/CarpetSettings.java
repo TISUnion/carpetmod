@@ -476,7 +476,8 @@ public class CarpetSettings
                     "It uses an extra separate list to store entities, that have a hard hit box including boat and shulker, in a chunk",
                     "It reduces quite a lot of unnecessary iterating when an entity is moving and trying to search entities with hard hit box on the way," +
                             "since the world is always not filled with boats and shulkers",
-                    "Enable it before loading the chunk to make it work"
+                    "Enable it before loading the chunk to make it work",
+                    "See also: optimizedPushableEntityCollision"
             },
             category = {OPTIMIZATION, EXPERIMENTAL}
     )
@@ -491,6 +492,18 @@ public class CarpetSettings
             category = {OPTIMIZATION, EXPERIMENTAL}
     )
     public static boolean optimizedFastEntityMovement = false;
+
+    @Rule(
+            desc = "Optimize entity fetching when entities try to collide with nearby pushable entities",
+            extra = {
+                    "It uses an extra separate list to store entities, that have the possibility of being pushed, in a chunk",
+                    "It reduces unnecessary iterating on the entity list if there are tons of non-pushable entities nearby e.g. items",
+                    "Enable it before loading the chunk to make it work",
+                    "See also: optimizedHardHitBoxEntityCollision"
+            },
+            category = {OPTIMIZATION, EXPERIMENTAL}
+    )
+    public static boolean optimizedPushableEntityCollision = false;
 
     @Rule(
             desc = "Fixed memory leak caused by drowned path finding AI",
