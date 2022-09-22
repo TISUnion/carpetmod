@@ -8,6 +8,7 @@ import carpet.settings.CarpetSettings;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumDyeColor;
 
+import java.io.*;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -19,7 +20,7 @@ public class LoggerRegistry
     // Map from logger names to loggers.
     private static Map<String, Logger> loggerRegistry = new HashMap<>();
     // Map from player names to the set of names of the logs that player is subscribed to.
-    public static Map<String, Map<String, String>> playerSubscriptions = new HashMap<>();
+    private static Map<String, Map<String, String>> playerSubscriptions = new HashMap<>();
     //statics to quickly asses if its worth even to call each one
     public static boolean __tnt;
     public static boolean __projectiles;
@@ -89,7 +90,7 @@ public class LoggerRegistry
         if (option == null) option = log.getDefault();
         playerSubscriptions.get(playerName).put(logName,option);
         log.addPlayer(playerName, option);
-        log.dumpPersistantSubs();
+        dumpPersistentSubs(log);
     }
 
     /**
@@ -103,7 +104,7 @@ public class LoggerRegistry
             subscriptions.remove(logName);
             loggerRegistry.get(logName).removePlayer(playerName);
             if (subscriptions.size() == 0) playerSubscriptions.remove(playerName);
-            loggerRegistry.get(logName).dumpPersistantSubs();
+            dumpPersistentSubs(loggerRegistry.get(logName));
         }
     }
 
@@ -160,6 +161,7 @@ public class LoggerRegistry
     private static void registerLogger(String name, Logger logger)
     {
         loggerRegistry.put(name, logger);
+        loadPersistentSubs(logger);
         setAccess(logger);
     }
 
@@ -179,6 +181,48 @@ public class LoggerRegistry
         }
     }
 
+    private static void loadPersistentSubs(Logger logger)
+    {
+        try
+        {
+            BufferedReader reader = new BufferedReader(new FileReader("./carpetLogger/" + logger.getLogName() + ".conf"));
+            String line;
+            while ((line = reader.readLine()) != null)
+            {
+                String[] subData = line.split(" ", 2);
+                subscribePlayer(subData[0], logger.getLogName(), subData[1]);
+            }
+        }
+        catch (FileNotFoundException e)
+        {
+            /*System.out.println("[TISCM]: couldn't find persistant config file for logger " + logName);*/
+        }
+        catch (IOException e)
+        {
+            System.out.println("[TISCM]: couldn't read persistant config file for logger " + logger.getLogName());
+        }
+    }
 
+    private static void dumpPersistentSubs(Logger logger)
+    {
+        //get the directory created
+        File saveDir = new File("./carpetLogger");
+        if (!saveDir.exists())
+        {
+            if (!saveDir.mkdirs()) System.out.println("[TISCM]: couldn't create presistant logger directory");
+        }
 
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("./carpetLogger/" + logger.getLogName() + ".conf", false)))
+        {
+            for (Map.Entry<String, String> entry : logger.getAllSubscribes())
+            {
+                writer.write( entry.getKey() + " " + entry.getValue());
+                writer.newLine();
+            }
+        }
+        catch (IOException e)
+        {
+            System.out.println("[TISCM]: couldn't write persistant config file for logger " + logger.getLogName());
+        }
+    }
 }

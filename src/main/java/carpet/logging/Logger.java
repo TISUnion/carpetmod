@@ -1,10 +1,10 @@
 package carpet.logging;
 
 import carpet.CarpetServer;
+import com.google.common.collect.Iterables;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.text.ITextComponent;
 
-import java.io.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +32,6 @@ public class Logger
         this.logName = logName;
         this.default_option = def;
         this.options = options;
-        this.loadPersistantSubs();
     }
 
     public String getDefault()
@@ -84,6 +83,11 @@ public class Logger
     public boolean hasOnlineSubscribers()
     {
         return subscribedOnlinePlayers.size() > 0;
+    }
+
+    public Iterable<Map.Entry<String, String>> getAllSubscribes()
+    {
+        return Iterables.concat(subscribedOnlinePlayers.entrySet(), subscribedOfflinePlayers.entrySet());
     }
 
     /**
@@ -185,40 +189,6 @@ public class Logger
             subscribedOnlinePlayers.remove(playerName);
         }
         LoggerRegistry.setAccess(this);
-    }
-
-    public void loadPersistantSubs() {
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader("./carpetLogger/" + logName + ".conf"));
-            String line;
-            while ((line = reader.readLine()) != null){
-                String[] subData = line.split(" ", 2);
-                subscribedOnlinePlayers.put(subData[0], subData[1]);
-            }
-        }catch (FileNotFoundException e) { /*System.out.println("[TISCM]: couldn't find persistant config file for logger " + logName);*/ }
-        catch (IOException e) { System.out.println("[TISCM]: couldn't read persistant config file for logger " + logName); }
-    }
-
-    public void dumpPersistantSubs(){
-
-        //get the directory created
-        File saveDir = new File("./carpetLogger");
-        if (!saveDir.exists()){
-            if (!saveDir.mkdirs()) System.out.println("[TISCM]: couldn't create presistant logger directory");
-        }
-
-        try{
-            BufferedWriter writer = new BufferedWriter(new FileWriter("./carpetLogger/" + logName + ".conf", false));
-            for ( String player : subscribedOnlinePlayers.keySet()){
-                writer.write( player + " " + subscribedOnlinePlayers.get(player));
-                writer.newLine();
-            }
-            for ( String player : subscribedOfflinePlayers.keySet()){
-                writer.write( player + " " + subscribedOfflinePlayers.get(player));
-                writer.newLine();
-            }
-            writer.close();
-        }catch (IOException e) { System.out.println("[TISCM]: couldn't write persistant config file for logger " + logName); }
     }
 
     public String getAcceptedOption(String arg)
