@@ -110,7 +110,10 @@ public class CarpetServer // static for now - easier to handle all around the co
     {
         // this for whatever reason gets called multiple times even when joining;
         TickSpeed.reset();
-        settingsManager.detachServer();
+        if (settingsManager != null)
+        {
+            settingsManager.detachServer();
+        }
     }
 
     public static void onPlayerLoggedIn(EntityPlayerMP player)
