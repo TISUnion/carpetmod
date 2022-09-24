@@ -3,6 +3,7 @@ package me.jellysquid.mods.lithium.common.world.scheduler;
 import carpet.logging.microtiming.MicroTimingLoggerManager;
 import carpet.logging.microtiming.tickstages.TileTickTickStageExtra;
 import carpet.settings.CarpetSettings;
+import com.google.common.collect.Iterators;
 import it.unimi.dsi.fastutil.longs.Long2ObjectAVLTreeMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectSortedMap;
@@ -389,5 +390,15 @@ public class LithiumServerTickScheduler<T> extends ServerTickList<T> {
     // 60 time bits, 4 priority bits
     private static long getBucketKey(long time, TickPriority priority) {
         return (time << 4L) | (priority.ordinal() & 15);
+    }
+
+    // TISCM add getters
+    public int getEntryCount()
+    {
+        return this.scheduledTicks.size() + this.executingTicks.size();
+    }
+    public Iterator<NextTickListEntry<T>> getEntryIterator()
+    {
+        return Iterators.concat(this.scheduledTicks.keySet().iterator(), this.executingTicks.iterator());
     }
 }

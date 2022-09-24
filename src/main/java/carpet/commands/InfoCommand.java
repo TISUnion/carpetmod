@@ -8,30 +8,41 @@ import carpet.utils.BlockInfo;
 import carpet.utils.EntityInfo;
 import carpet.utils.Messenger;
 import carpet.utils.TntInfo;
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Multiset;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.minecraft.block.BlockEventData;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.arguments.BlockPosArgument;
 import net.minecraft.command.arguments.EntityArgument;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.item.EntityTNTPrimed;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.ITickable;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.IRegistry;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.event.HoverEvent;
+import net.minecraft.world.NextTickListEntry;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.storage.WorldInfo;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.mojang.brigadier.arguments.StringArgumentType.getString;
 import static com.mojang.brigadier.arguments.StringArgumentType.greedyString;
@@ -69,7 +80,9 @@ public class InfoCommand
                                                         getString(c, "regexp"))))))).
                 then(literal("world").
                         then(literal("container").
-                                executes((c) -> showWorldContainer(c.getSource()))).
+                                executes((c) -> showWorldContainer(c.getSource(), false)).
+                                then(literal("detailed").
+                                        executes(c -> showWorldContainer(c.getSource(), true)))).
                         then(literal("ticking_order").
                                 executes((c) -> showWorldTickOrder(c.getSource()))).
                         then(literal("weather").
@@ -78,20 +91,92 @@ public class InfoCommand
         dispatcher.register(command);
     }
 
-    private static int showWorldContainer(CommandSource source)
+
+    private static <T, K> void showCountsInCollection(CommandSource source, Collection<T> collection, Function<T, K> keyExtractor, Function<K, ITextComponent> nameGetter)
+    {
+        Multiset<K> counter = HashMultiset.create();
+        collection.stream().map(keyExtractor).forEach(counter::add);
+        List<Multiset.Entry<K>> topN = counter.entrySet().stream().
+                sorted(Collections.reverseOrder(Comparator.comparingInt(Multiset.Entry::getCount))).
+                collect(Collectors.toList());
+
+        for (int i = 0; i < topN.size(); i++)
+        {
+            Multiset.Entry<K> entry = topN.get(i);
+            Messenger.m(source,
+                    String.format("g %d. ", i + 1),
+                    nameGetter.apply(entry.getElement()),
+                    String.format("w  %d", entry.getCount()),
+                    "g x"
+            );
+        }
+    }
+
+    private static int showWorldContainer(CommandSource source, boolean detailed)
     {
         WorldServer world = source.getWorld();
 
-        Messenger.m(source, "g Current World: ", TextUtil.getDimensionNameText(world.getDimension().getType()));
-        Messenger.m(source, Messenger.s(String.format("w Loaded chunks: %d", world.getChunkProvider().getLoadedChunkCount())));
-        Messenger.m(source, Messenger.s(String.format("w Regular entities: %d", world.loadedEntityList.size())));
-        Messenger.m(source, Messenger.s(String.format("w Player entities: %d", world.playerEntities.size())));
-        Messenger.m(source, Messenger.s(String.format("w Weather entities: %d", world.weatherEffects.size())));
-        Messenger.m(source, Messenger.s(String.format("w Loaded tile entities: %d", world.loadedTileEntityList.size())));
-        Messenger.m(source, Messenger.s(String.format("w Ticking tile entities: %d", world.tickableTileEntities.size())));
-        Messenger.m(source, Messenger.s(String.format("w Block tile tick: %d", world.getPendingBlockTicks().getEntryCount())));
-        Messenger.m(source, Messenger.s(String.format("w Fluid tile tick: %d", world.getPendingFluidTicks().getEntryCount())));
-        Messenger.m(source, Messenger.s(String.format("w Block event: %d", world.blockEventQueue.size())));
+        Messenger.m(source, Messenger.s(""));
+        Messenger.m(source, "w Current World: ", TextUtil.getDimensionNameText(world.getDimension().getType()));
+        Messenger.m(source, Messenger.s(String.format("Loaded chunks: %d", world.getChunkProvider().getLoadedChunkCount())));
+
+        Messenger.m(source, Messenger.s(String.format("Regular entities: %d", world.loadedEntityList.size())));
+        if (detailed)
+        {
+            showCountsInCollection(source, world.loadedEntityList, Entity::getType, EntityType::getName);
+        }
+
+        Messenger.m(source, Messenger.s(String.format("Player entities: %d", world.playerEntities.size())));
+        if (detailed)
+        {
+            world.playerEntities.forEach(player -> Messenger.m(source, "g - ", player.getName()));
+        }
+
+        Messenger.m(source, Messenger.s(String.format("Weather entities: %d", world.weatherEffects.size())));
+        Messenger.m(source, Messenger.s(String.format("Ticking tile entities: %d", world.tickableTileEntities.size())));
+        Messenger.m(source, Messenger.s(String.format("Loaded tile entities: %d", world.loadedTileEntityList.size())));
+        if (detailed)
+        {
+            Set<TileEntityType<?>> tickableSet = world.loadedTileEntityList.stream().
+                    filter(te -> te instanceof ITickable).
+                    map(TileEntity::getType).
+                    collect(Collectors.toSet());
+            showCountsInCollection(source, world.loadedTileEntityList, TileEntity::getType, tileEntityType -> {
+                ITextComponent text = Optional.ofNullable(TileEntityType.getId(tileEntityType)).
+                        map(id ->
+                                Optional.ofNullable(IRegistry.BLOCK.get(id)).
+                                        map(TextUtil::getBlockName).
+                                        orElse(Messenger.s(id.toString()))
+                        ).
+                        orElse(Messenger.s("unknown"));
+                boolean tickable = tickableSet.contains(tileEntityType);
+                text.getStyle().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Messenger.s("Tickable: " + tickable)));
+                if (!tickable)
+                {
+                    text.getStyle().setColor(TextFormatting.GRAY);
+                }
+                return text;
+            });
+        }
+
+        Messenger.m(source, Messenger.s(String.format("Block tile tick: %d", world.getPendingBlockTicks().getEntryCount())));
+        if (detailed)
+        {
+            showCountsInCollection(source, Lists.newArrayList(world.getPendingBlockTicks().getEntryIterator()), NextTickListEntry::getTarget, TextUtil::getBlockName);
+        }
+
+        Messenger.m(source, Messenger.s(String.format("Fluid tile tick: %d", world.getPendingFluidTicks().getEntryCount())));
+        if (detailed)
+        {
+            showCountsInCollection(source, Lists.newArrayList(world.getPendingFluidTicks().getEntryIterator()), NextTickListEntry::getTarget, TextUtil::getFluidName);
+        }
+
+        Messenger.m(source, Messenger.s(String.format("Block event: %d", world.blockEventQueue.size())));
+        if (detailed)
+        {
+            showCountsInCollection(source, world.blockEventQueue, BlockEventData::getBlock, TextUtil::getBlockName);
+        }
+
         return 1;
     }
 

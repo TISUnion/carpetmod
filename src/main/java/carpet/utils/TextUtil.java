@@ -7,6 +7,7 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.text.ITextComponent;
@@ -179,6 +180,11 @@ public class TextUtil
 	public static ITextComponent getBlockName(Block block)
 	{
 		return TextUtil.attachFormatting(new TextComponentTranslation(block.getTranslationKey()), TextFormatting.WHITE);
+	}
+
+	public static ITextComponent getFluidName(Fluid fluid)
+	{
+		return getBlockName(fluid.getDefaultState().getBlockState().getBlock());
 	}
 
 	// some language doesn't use space char to divide word
