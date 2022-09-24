@@ -215,21 +215,32 @@
                              ++i;
                          }
                      }
-@@ -360,6 +481,82 @@
+@@ -360,6 +481,93 @@
  
      public boolean chunkExists(int x, int z)
      {
 +        // [CM] Chunk cache
 +        if (CarpetSettings.chunkCache)
 +        {
-+            Chunk chunk = this.chunkCache.get(getChunkIndex(x, z));
++            int index = getChunkIndex(x, z);
++            Chunk chunk = this.chunkCache.get(index);
 +            if (chunk != null && chunk.getPos().x == x && chunk.getPos().z == z)
++            {
 +                return true;
++            }
++            chunk = this.loadedChunks.get(ChunkPos.asLong(x, z));
++            if (chunk != null)
++            {
++                this.chunkCache.lazySet(index, chunk);
++                return true;
++            }
++            return false;
 +        }
 +        // [CM] End
          return this.loadedChunks.containsKey(ChunkPos.asLong(x, z));
      }
-+    
++
++    // [CM] Chunk cache
 +    private static int getChunkIndex(int x, int z)
 +    {
 +        return ((x & 15) << 4) | (z & 15);
