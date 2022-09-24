@@ -100,7 +100,7 @@
 -    ObjectLinkedOpenHashSet<BlockEventData> blockEventQueue = new ObjectLinkedOpenHashSet<>();
 +
 +    // TISCM hashset load factor
-+    ObjectLinkedOpenHashSet<BlockEventData> blockEventQueue =
++    public ObjectLinkedOpenHashSet<BlockEventData> blockEventQueue =
 +            TISCMConfig.HASH_SET_LOAD_FACTOR ?
 +            new ObjectLinkedOpenHashSet<>(Hash.DEFAULT_INITIAL_SIZE, Hash.VERY_FAST_LOAD_FACTOR) :
 +            new ObjectLinkedOpenHashSet<>();

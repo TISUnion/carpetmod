@@ -197,7 +197,7 @@
                          list = Lists.newArrayList();
                      }
  
-@@ -171,83 +161,82 @@
+@@ -171,85 +161,90 @@
          return list == null ? Collections.emptyList() : list;
      }
  
@@ -317,3 +317,11 @@
              this.pendingTickListEntriesHashSet.add(nextticklistentry);
              this.pendingTickListEntriesTreeSet.add(nextticklistentry);
          }
+     }
++
++    // TISCM
++    public int getEntryCount()
++    {
++        return this.pendingTickListEntriesHashSet.size() + this.pendingTickListEntriesThisTick.size();
++    }
+ }

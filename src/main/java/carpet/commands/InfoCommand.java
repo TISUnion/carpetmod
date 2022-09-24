@@ -68,12 +68,31 @@ public class InfoCommand
                                                         EntityArgument.getEntities(c,"entity selector"),
                                                         getString(c, "regexp"))))))).
                 then(literal("world").
+                        then(literal("container").
+                                executes((c) -> showWorldContainer(c.getSource()))).
                         then(literal("ticking_order").
                                 executes((c) -> showWorldTickOrder(c.getSource()))).
                         then(literal("weather").
                                 executes((c) -> showWeather(c.getSource()))));
 
         dispatcher.register(command);
+    }
+
+    private static int showWorldContainer(CommandSource source)
+    {
+        WorldServer world = source.getWorld();
+
+        Messenger.m(source, "g Current World: ", TextUtil.getDimensionNameText(world.getDimension().getType()));
+        Messenger.m(source, Messenger.s(String.format("w Loaded chunks: %d", world.getChunkProvider().getLoadedChunkCount())));
+        Messenger.m(source, Messenger.s(String.format("w Regular entities: %d", world.loadedEntityList.size())));
+        Messenger.m(source, Messenger.s(String.format("w Player entities: %d", world.playerEntities.size())));
+        Messenger.m(source, Messenger.s(String.format("w Weather entities: %d", world.weatherEffects.size())));
+        Messenger.m(source, Messenger.s(String.format("w Loaded tile entities: %d", world.loadedTileEntityList.size())));
+        Messenger.m(source, Messenger.s(String.format("w Ticking tile entities: %d", world.tickableTileEntities.size())));
+        Messenger.m(source, Messenger.s(String.format("w Block tile tick: %d", world.getPendingBlockTicks().getEntryCount())));
+        Messenger.m(source, Messenger.s(String.format("w Fluid tile tick: %d", world.getPendingFluidTicks().getEntryCount())));
+        Messenger.m(source, Messenger.s(String.format("w Block event: %d", world.blockEventQueue.size())));
+        return 1;
     }
 
     @SuppressWarnings("ConstantConditions")
