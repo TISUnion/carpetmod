@@ -1,0 +1,20 @@
+--- a/net/minecraft/item/ItemBucket.java
++++ b/net/minecraft/item/ItemBucket.java
+@@ -1,6 +1,8 @@
+ package net.minecraft.item;
+ 
+ import javax.annotation.Nullable;
++
++import carpet.settings.CarpetSettings;
+ import net.minecraft.advancements.CriteriaTriggers;
+ import net.minecraft.block.IBucketPickupHandler;
+ import net.minecraft.block.ILiquidContainer;
+@@ -165,7 +167,7 @@
+ 
+             if (worldIn.isAirBlock(posIn) || flag || flag1 || iblockstate.getBlock() instanceof ILiquidContainer && ((ILiquidContainer)iblockstate.getBlock()).canContainFluid(worldIn, posIn, iblockstate, this.containedBlock))
+             {
+-                if (worldIn.dimension.doesWaterVaporize() && this.containedBlock.isIn(FluidTags.WATER))
++                if (worldIn.dimension.doesWaterVaporize() && this.containedBlock.isIn(FluidTags.WATER) && !CarpetSettings.creativeNetherWaterPlacement)
+                 {
+                     int i = posIn.getX();
+                     int j = posIn.getY();

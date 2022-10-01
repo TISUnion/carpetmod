@@ -44,6 +44,10 @@
   "rule.commandRefresh.name": "刷新命令开关",
   "rule.commandRefresh.desc": "启用/refresh命令让你的客户端与服务端保持同步",
 
+  "rule.creativeNetherWaterPlacement.name": "创造玩家地狱放水",
+  "rule.creativeNetherWaterPlacement.desc": "允许创造模式的玩家在地狱通过水桶放出水",
+  "rule.creativeNetherWaterPlacement.extra.0": "技术上来讲，本条规则对所有ultrawarm的维度都生效",
+
   "rule.creativeOpenContainerForcibly.name": "创造玩家强制打开容器",
   "rule.creativeOpenContainerForcibly.desc": "允许创造模式的玩家打开被阻挡的容器，如潜影盒",
 

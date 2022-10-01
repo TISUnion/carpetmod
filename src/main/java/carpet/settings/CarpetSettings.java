@@ -726,6 +726,15 @@ public class CarpetSettings
     )
     public static boolean syncServerMsptMetricsData = false;
 
+    @Rule(
+            desc = "Allow creative players place water via water bucket in nether",
+            extra = {
+                    "Technically this rule applies to all ultrawarm dimensions"
+            },
+            category = {CREATIVE}
+    )
+    public static boolean creativeNetherWaterPlacement = false;
+
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$
     //   | $$     | $$  | $$  \__/| $$  \__/| $$$$  /$$$$
