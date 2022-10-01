@@ -1,13 +1,14 @@
 package carpet.utils;
 
-import carpet.utils.Messenger;
-import carpet.utils.Translations;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.command.arguments.BlockStateParser;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.fluid.Fluid;
+import net.minecraft.state.IProperty;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.text.ITextComponent;
@@ -16,9 +17,9 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
-import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.dimension.DimensionType;
 
+import java.util.List;
 import java.util.Map;
 
 public class TextUtil
@@ -94,6 +95,20 @@ public class TextUtil
 		return String.format("/tp %s", uuid);
 	}
 
+	public static ITextComponent join(ITextComponent joiner, ITextComponent... items)
+	{
+		ITextComponent text = Messenger.s("");
+		for (int i = 0; i < items.length; i++)
+		{
+			if (i > 0)
+			{
+				text.appendSibling(joiner);
+			}
+			text.appendSibling(items[i]);
+		}
+		return text;
+	}
+
 	public static Style parseCarpetStyle(String style)
 	{
 		return Messenger.parseStyle(style);
@@ -148,7 +163,7 @@ public class TextUtil
 
 	public static ITextComponent getEntityText(String style, Entity entity)
 	{
-		ITextComponent entityName = (ITextComponent)entity.getType().getName().deepCopy();
+		ITextComponent entityName = entity.getType().getName().deepCopy();
 		ITextComponent hoverText = Messenger.c(String.format("w %s ", getTeleportHint()), entityName);
 		return getFancyText(style, entityName, hoverText, new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, getTeleportCommand(entity)));
 	}
@@ -160,7 +175,7 @@ public class TextUtil
 
 	public static ITextComponent getDimensionNameText(DimensionType dim)
 	{
-		return (ITextComponent)DIMENSION_NAME.getOrDefault(dim, Messenger.s(dim.toString())).deepCopy();
+		return DIMENSION_NAME.getOrDefault(dim, Messenger.s(dim.toString())).deepCopy();
 	}
 
 	public static TextComponentTranslation getTranslatedName(String key, TextFormatting color, Object... args)
@@ -177,9 +192,62 @@ public class TextUtil
 		return getTranslatedName(key, null, args);
 	}
 
+	public static ITextComponent colored(ITextComponent text, Object value)
+	{
+		TextFormatting color = null;
+		if (Boolean.TRUE.equals(value))
+		{
+			color = TextFormatting.GREEN;
+		}
+		else if (Boolean.FALSE.equals(value))
+		{
+			color = TextFormatting.RED;
+		}
+		if (value instanceof Number)
+		{
+			color = TextFormatting.GOLD;
+		}
+		if (color != null)
+		{
+			text.getStyle().setColor(color);
+		}
+		return text;
+	}
+
+	public static ITextComponent colored(Object value)
+	{
+		return colored(Messenger.s(value.toString()), value);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T extends Comparable<T>> ITextComponent property(IProperty<T> property, Object value)
+	{
+		return colored(Messenger.s(property.getName((T)value)), value);
+	}
+
 	public static ITextComponent getBlockName(Block block)
 	{
 		return TextUtil.attachFormatting(new TextComponentTranslation(block.getTranslationKey()), TextFormatting.WHITE);
+	}
+
+	public static ITextComponent getBlockName(IBlockState blockState)
+	{
+		List<ITextComponent> hovers = Lists.newArrayList();
+		hovers.add(getBlockName(blockState.getBlock()));
+		for (IProperty<?> property: blockState.getProperties())
+		{
+			hovers.add(Messenger.c(
+					Messenger.s(property.getName()),
+					"g : ",
+					property(property, blockState.get(property))
+			));
+		}
+		return getFancyText(
+				null,
+				getBlockName(blockState.getBlock()),
+				join(Messenger.s("\n"), hovers.toArray(new ITextComponent[0])),
+				new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, BlockStateParser.toString(blockState, null))
+		);
 	}
 
 	public static ITextComponent getFluidName(Fluid fluid)

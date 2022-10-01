@@ -2,107 +2,78 @@ package carpet.logging.microtiming.events;
 
 import carpet.logging.microtiming.enums.EventType;
 import carpet.logging.microtiming.utils.MicroTimingUtil;
-import carpet.utils.TextUtil;
 import carpet.utils.Messenger;
+import carpet.utils.TextUtil;
 import com.google.common.collect.Lists;
-import net.minecraft.block.Block;
+import com.google.common.collect.Maps;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.state.IProperty;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.function.Function;
 
-public class BlockStateChangeEvent extends BaseEvent
+public class BlockStateChangeEvent extends AbstractSetblockStateEvent
 {
-	private final Block block;
-	private Boolean returnValue;
-	private final List<PropertyChanges> changes = Lists.newArrayList();
-	private final int flags;
+	private final Map<IProperty<?>, PropertyChange> changes = Maps.newLinkedHashMap();
 
-	private static final List<FlagData> SET_BLOCK_STATE_FLAGS = Lists.newArrayList();
-
-	static
+	public BlockStateChangeEvent(EventType eventType, IBlockState oldBlockState, IBlockState newBlockState, Boolean returnValue, int flags)
 	{
-		SET_BLOCK_STATE_FLAGS.add(new FlagData(1, "emits block updates", false));
-		SET_BLOCK_STATE_FLAGS.add(new FlagData(2, "updates listeners", false));
-		SET_BLOCK_STATE_FLAGS.add(new FlagData(4, "updates client listeners", true));
-		SET_BLOCK_STATE_FLAGS.add(new FlagData(8, null, false));
-		SET_BLOCK_STATE_FLAGS.add(new FlagData(16, "emits state updates", true));
-		SET_BLOCK_STATE_FLAGS.add(new FlagData(32, null, false));
-		SET_BLOCK_STATE_FLAGS.add(new FlagData(64, "caused by piston", false));
-		SET_BLOCK_STATE_FLAGS.add(new FlagData(128, null, false));
+		super(eventType, "block_state_change", oldBlockState, newBlockState, returnValue, flags);
 	}
 
-	public BlockStateChangeEvent(EventType eventType, Boolean returnValue, Block block, int flags)
+	public void setChanges(Collection<PropertyChange> changes)
 	{
-		super(eventType, "block_state_change");
-		this.block = block;
-		this.returnValue = returnValue;
-		this.flags = flags;
+		this.changes.clear();
+		changes.forEach(change -> this.changes.put(change.property, change));
 	}
 
-	private ITextComponent getChangesText(char header, boolean justShowMeDetail)
+	private ITextComponent getChangesText(boolean isHover)
 	{
-		List<Object> changes = Lists.newArrayList();
-		boolean isFirst = true;
-		for (PropertyChanges change : this.changes)
+		Function<IProperty<?>, ITextComponent> hoverMaker = currentProperty -> {
+			List<ITextComponent> lines = Lists.newArrayList();
+			lines.add(TextUtil.attachFormatting(Messenger.s(tr("State change details")), TextFormatting.BOLD));
+			this.oldBlockState.getProperties().stream().
+					map(property -> {
+						ITextComponent text = Optional.ofNullable(this.changes.get(property)).
+								map(PropertyTexts::change).
+								orElseGet(() -> {
+									Object value = this.oldBlockState.get(property);
+									return PropertyTexts.value(": ", property, value);
+								});
+						if (property.equals(currentProperty))
+						{
+							text.appendSibling(Messenger.s("    <---", "g"));
+						}
+						return text;
+					}).
+					forEach(lines::add);
+			return TextUtil.join(Messenger.s("\n"), lines.toArray(new ITextComponent[0]));
+		};
+		if (isHover)
 		{
-			if (!isFirst)
-			{
-				changes.add("w " + header);
-			}
-			isFirst = false;
-			ITextComponent simpleText = Messenger.c(
-					String.format("w %s", change.name),
-					"g =",
-					MicroTimingUtil.getColoredValue(change.newValue)
-			);
-			ITextComponent detailText = Messenger.c(
-					String.format("w %s: ", change.name),
-					MicroTimingUtil.getColoredValue(change.oldValue),
-					"g ->",
-					MicroTimingUtil.getColoredValue(change.newValue)
-			);
-			if (justShowMeDetail)
-			{
-				changes.add(detailText);
-			}
-			else
-			{
-				changes.add(TextUtil.getFancyText(null, simpleText, detailText, null));
-			}
+			return hoverMaker.apply(null);
 		}
-		return Messenger.c(changes.toArray(new Object[0]));
-	}
-
-	private ITextComponent getFlagsText()
-	{
-		String bits = Integer.toBinaryString(this.flags);
-		bits = String.join("", Collections.nCopies(Math.max(SET_BLOCK_STATE_FLAGS.size() - bits.length(), 0), "0")) + bits;
-		List<Object> list = Lists.newArrayList();
-		list.add(Messenger.s(String.format("setBlockState flags = %d (%s)", this.flags, bits)));
-		for (FlagData flagData: SET_BLOCK_STATE_FLAGS)
+		else
 		{
-			if (flagData.isValid())
-			{
-				int currentBit = (this.flags & flagData.mask) > 0 ? 1 : 0;
-				list.add(Messenger.c(
-						String.format("w \nbit %d = %d: ", flagData.bitPos, currentBit),
-						String.format("^w 2^%d = %d", flagData.bitPos, flagData.mask),
-						MicroTimingUtil.getSuccessText((currentBit ^ flagData.revert) != 0, false),
-						"w  ",
-						Messenger.s(this.tr("flag_data." + flagData.bitPos, flagData.detail))
-				));
-			}
+			return TextUtil.join(
+					Messenger.s(" "),
+					this.changes.values().stream().
+							map(change -> TextUtil.attachHoverText(
+									PropertyTexts.value("=", change.property, change.newValue),
+									hoverMaker.apply(change.property)
+							)).
+							toArray(ITextComponent[]::new)
+			);
 		}
-		return Messenger.c(list.toArray(new Object[0]));
 	}
 
 	@Override
 	public ITextComponent toText()
 	{
 		List<Object> list = Lists.newArrayList();
-		list.add(this.getEnclosedTranslatedBlockNameHeaderText(this.block));
+		list.add(this.getEnclosedTranslatedBlockNameHeaderText(this.oldBlockState.getBlock()));
 		ITextComponent titleText = TextUtil.getFancyText(
 				null,
 				Messenger.c(COLOR_ACTION + this.tr("State Change")),
@@ -111,25 +82,18 @@ public class BlockStateChangeEvent extends BaseEvent
 		);
 		if (this.getEventType() != EventType.ACTION_END)
 		{
-			list.add(titleText);
-			list.add("g : ");
-			list.add(this.getChangesText(' ', false));
+			list.add(Messenger.c(
+					titleText,
+					"g : ",
+					this.getChangesText(false)
+			));
 		}
 		else
 		{
 			list.add(TextUtil.getFancyText(
-					"w",
-					Messenger.c(
-							titleText,
-							TextUtil.getSpaceText(),
-							COLOR_RESULT + this.tr("finished")
-					),
-					Messenger.c(
-							String.format("w %s", this.tr("Changed BlockStates")),
-							"w :\n",
-							this.getChangesText('\n', true),
-							"w  "
-					),
+					null,
+					Messenger.c(titleText, TextUtil.getSpaceText(), COLOR_RESULT + this.tr("finished")),
+					this.getChangesText(true),
 					null
 			));
 		}
@@ -141,88 +105,80 @@ public class BlockStateChangeEvent extends BaseEvent
 		return Messenger.c(list.toArray(new Object[0]));
 	}
 
-	public void addChanges(String name, Object oldValue, Object newValue)
-	{
-		if (!oldValue.equals(newValue))
-		{
-			this.changes.add(new PropertyChanges(name, oldValue, newValue));
-		}
-	}
-
-	public boolean hasChanges()
-	{
-		return !this.changes.isEmpty();
-	}
-
 	@Override
 	public boolean equals(Object o)
 	{
 		if (this == o) return true;
-		if (!(o instanceof BlockStateChangeEvent)) return false;
+		if (o == null || getClass() != o.getClass()) return false;
 		if (!super.equals(o)) return false;
 		BlockStateChangeEvent that = (BlockStateChangeEvent) o;
-		return Objects.equals(block, that.block) &&
-				Objects.equals(returnValue, that.returnValue) &&
-				Objects.equals(changes, that.changes);
+		return Objects.equals(changes, that.changes);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return Objects.hash(super.hashCode(), block, returnValue, changes);
+		return Objects.hash(super.hashCode(), changes);
 	}
 
-	@Override
-	public void mergeQuitEvent(BaseEvent quitEvent)
+	public static class PropertyTexts
 	{
-		super.mergeQuitEvent(quitEvent);
-		if (quitEvent instanceof BlockStateChangeEvent)
+		// xxx${divider}aaa
+		public static ITextComponent value(String divider, IProperty<?> property, Object value)
 		{
-			this.returnValue = ((BlockStateChangeEvent)quitEvent).returnValue;
+			return Messenger.c(
+					Messenger.s(property.getName()),
+					"g " + divider,
+					TextUtil.property(property, value)
+			);
+		}
+
+		// xxx: aaa->bbb
+		public static ITextComponent change(IProperty<?> property, Object oldValue, Object newValue)
+		{
+			return Messenger.c(
+					Messenger.s(property.getName()),
+					"g : ",
+					TextUtil.property(property, oldValue),
+					"g ->",
+					TextUtil.property(property, newValue)
+			);
+		}
+
+		public static ITextComponent change(PropertyChange propertyChange)
+		{
+			return change(propertyChange.property, propertyChange.oldValue, propertyChange.newValue);
 		}
 	}
 
-	public static class PropertyChanges
+	public static class PropertyChange
 	{
-		public final String name;
+		public final IProperty<?> property;
 		public final Object oldValue;
 		public final Object newValue;
 
-		public PropertyChanges(String name, Object oldValue, Object newValue)
+		public PropertyChange(IProperty<?> property, Object oldValue, Object newValue)
 		{
-			this.name = name;
+			this.property = property;
 			this.oldValue = oldValue;
 			this.newValue = newValue;
 		}
-	}
 
-	private static class FlagData
-	{
-		private final int mask;
-		private final String detail;
-		private final int revert;
-		private final int bitPos;
-
-		private FlagData(int mask, String detail, boolean revert)
+		@Override
+		public boolean equals(Object o)
 		{
-			if (mask <= 0)
-			{
-				throw new IllegalArgumentException(String.format("mask = %d < 0", mask));
-			}
-			this.mask = mask;
-			this.detail = detail;
-			this.revert = revert ? 1 : 0;
-			int pos = 0;
-			for (int n = this.mask; n > 0; n >>= 1)
-			{
-				pos++;
-			}
-			this.bitPos = pos - 1;
+			if (this == o) return true;
+			if (!(o instanceof PropertyChange)) return false;
+			PropertyChange changes = (PropertyChange) o;
+			return Objects.equals(property, changes.property) &&
+					Objects.equals(oldValue, changes.oldValue) &&
+					Objects.equals(newValue, changes.newValue);
 		}
 
-		private boolean isValid()
+		@Override
+		public int hashCode()
 		{
-			return this.detail != null;
+			return Objects.hash(property, oldValue, newValue);
 		}
 	}
 }

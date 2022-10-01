@@ -4,30 +4,23 @@ import carpet.logging.AbstractLogger;
 import carpet.logging.LoggerRegistry;
 import carpet.logging.microtiming.enums.EventType;
 import carpet.logging.microtiming.enums.TickStage;
-import carpet.logging.microtiming.events.BaseEvent;
-import carpet.logging.microtiming.events.BlockStateChangeEvent;
+import carpet.logging.microtiming.marker.MicroTimingMarkerManager;
 import carpet.logging.microtiming.message.IndentedMessage;
 import carpet.logging.microtiming.message.MessageList;
 import carpet.logging.microtiming.message.MessageType;
 import carpet.logging.microtiming.message.MicroTimingMessage;
 import carpet.logging.microtiming.tickstages.TickStageExtraBase;
+import carpet.logging.microtiming.utils.MicroTimingContext;
 import carpet.logging.microtiming.utils.MicroTimingUtil;
 import carpet.utils.TextUtil;
 import carpet.utils.Messenger;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import it.unimi.dsi.fastutil.objects.ReferenceArraySet;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.EnumDyeColor;
-import net.minecraft.state.IProperty;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 
 import java.util.*;
-import java.util.function.BiFunction;
 
 public class MicroTimingLogger extends AbstractLogger
 {
@@ -83,46 +76,27 @@ public class MicroTimingLogger extends AbstractLogger
 		return this.world;
 	}
 
-	private final static Set<IProperty<?>> INTEREST_PROPERTIES = new ReferenceArraySet<>();
-	static
-	{
-		INTEREST_PROPERTIES.add(BlockStateProperties.POWERED);  // redstone repeater, observer, etc.
-		INTEREST_PROPERTIES.add(BlockStateProperties.LIT);  // redstone torch, redstone lamp
-		INTEREST_PROPERTIES.add(BlockStateProperties.POWER_0_15);  // redstone dust, weighted pressure plates, etc.
-		INTEREST_PROPERTIES.add(BlockStateProperties.LOCKED);  // redstone repeater
-	}
 
-	public void onSetBlockState(World world, BlockPos pos, IBlockState oldState, IBlockState newState, Boolean returnValue, int flags, EventType eventType)
+	public void addMessage(MicroTimingContext context)
 	{
-		// lazy loading
-		EnumDyeColor color = null;
-		BlockStateChangeEvent event = new BlockStateChangeEvent(eventType, returnValue, newState.getBlock(), flags);
-
-		for (IProperty<?> IProperty: newState.getProperties())
+		if (context.getColor() == null)
 		{
-			if (INTEREST_PROPERTIES.contains(IProperty))
+			if (context.getWoolGetter() == null)
 			{
-				if (color == null)
-				{
-					Optional<EnumDyeColor> optionalDyeColor = MicroTimingUtil.defaultColorGetter(world, pos);
-					if (!optionalDyeColor.isPresent())
-					{
-						break;
-					}
-					color = optionalDyeColor.get();
-				}
-				event.addChanges(IProperty.getName(), oldState.get(IProperty), newState.get(IProperty));
+				context.withWoolGetter(MicroTimingUtil::defaultColorGetter);
+			}
+			Optional<EnumDyeColor> optionalDyeColor = context.getWoolGetter().apply(this.world, context.getBlockPos());
+			if (optionalDyeColor.isPresent())
+			{
+				context.withColor(optionalDyeColor.get());
+			}
+			else
+			{
+				return;
 			}
 		}
-		if (event.hasChanges())
-		{
-			this.addMessage(color, world, pos, event);
-		}
-	}
-
-	public void addMessage(EnumDyeColor color, World world, BlockPos pos, BaseEvent event)
-	{
-		MicroTimingMessage message = new MicroTimingMessage(this, world.getDimension().getType(), pos, color, event);
+		MicroTimingMarkerManager.getInstance().getMarkerName(context.getWorld(), context.getBlockPos()).ifPresent(context::withBlockName);
+		MicroTimingMessage message = new MicroTimingMessage(this, context);
 		if (message.getEvent().getEventType() != EventType.ACTION_END)
 		{
 			this.messageList.addMessageAndIndent(message);
@@ -131,17 +105,6 @@ public class MicroTimingLogger extends AbstractLogger
 		{
 			this.messageList.addMessageAndUnIndent(message);
 		}
-	}
-
-	public void addMessage(World world, BlockPos pos, BaseEvent event, BiFunction<World, BlockPos, Optional<EnumDyeColor>> woolGetter)
-	{
-		Optional<EnumDyeColor> color = woolGetter.apply(world, pos);
-		color.ifPresent(EnumDyeColor -> this.addMessage(EnumDyeColor, world, pos, event));
-	}
-
-	public void addMessage(World world, BlockPos pos, BaseEvent event)
-	{
-		this.addMessage(world, pos, event, MicroTimingUtil::defaultColorGetter);
 	}
 
 	private ITextComponent getMergedResult(int count, IndentedMessage previousMessage)

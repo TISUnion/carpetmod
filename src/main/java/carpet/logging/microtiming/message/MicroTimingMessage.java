@@ -6,6 +6,7 @@ import carpet.logging.microtiming.enums.EventType;
 import carpet.logging.microtiming.enums.TickStage;
 import carpet.logging.microtiming.events.BaseEvent;
 import carpet.logging.microtiming.tickstages.TickStageExtraBase;
+import carpet.logging.microtiming.utils.MicroTimingContext;
 import carpet.logging.microtiming.utils.MicroTimingUtil;
 import carpet.utils.TextUtil;
 import carpet.utils.Messenger;
@@ -47,24 +48,19 @@ public class MicroTimingMessage
 	private final TickStageExtraBase stageExtra;
 	private final ITextComponent stackTraceText;
 	private final BaseEvent event;
+	private final String blockName;
 
-	public MicroTimingMessage(DimensionType dimensionType, BlockPos pos, EnumDyeColor color, BaseEvent event, TickStage stage, String stageDetail, TickStageExtraBase stageExtra, ITextComponent stackTraceText)
+	public MicroTimingMessage(MicroTimingLogger logger, MicroTimingContext context)
 	{
-		this.dimensionType = dimensionType;
-		this.pos = pos.toImmutable();
-		this.color = color;
-		this.event = event;
-		this.stage = stage;
-		this.stageDetail = stageDetail;
-		this.stageExtra = stageExtra;
-		this.stackTraceText = stackTraceText;
-	}
-	public MicroTimingMessage(MicroTimingLogger logger, DimensionType dimensionType, BlockPos pos, EnumDyeColor color, BaseEvent event)
-	{
-		this(
-				dimensionType, pos, color, event, logger.getTickStage(), logger.getTickStageDetail(), logger.getTickStageExtra(),
-				StackTracePrinter.create().ignore(MicroTimingLoggerManager.class).deobfuscate().toSymbolText()
-		);
+		this.dimensionType = context.getWorld().getDimension().getType();
+		this.pos = context.getBlockPos();
+		this.color = context.getColor();
+		this.event = context.getEventSupplier().get();
+		this.blockName = context.getBlockName();
+		this.stage = logger.getTickStage();
+		this.stageDetail = logger.getTickStageDetail();
+		this.stageExtra = logger.getTickStageExtra();
+		this.stackTraceText = StackTracePrinter.create().ignore(MicroTimingLoggerManager.class).deobfuscate().toSymbolText();
 	}
 
 	public MessageType getMessageType()

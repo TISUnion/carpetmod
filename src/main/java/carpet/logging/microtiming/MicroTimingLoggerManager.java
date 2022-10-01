@@ -8,9 +8,11 @@ import carpet.logging.microtiming.enums.TickStage;
 import carpet.logging.microtiming.events.*;
 import carpet.logging.microtiming.marker.MicroTimingMarkerManager;
 import carpet.logging.microtiming.tickstages.TickStageExtraBase;
+import carpet.logging.microtiming.utils.MicroTimingContext;
 import carpet.logging.microtiming.utils.MicroTimingUtil;
 import carpet.settings.CarpetSettings;
 import carpet.utils.Translator;
+import com.google.common.collect.Lists;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEventData;
@@ -23,6 +25,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.state.IProperty;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
@@ -33,10 +36,9 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.function.Supplier;
 
 public class MicroTimingLoggerManager
 {
@@ -112,20 +114,9 @@ public class MicroTimingLoggerManager
      * -------------------------
      */
 
-    public static void onEvent(World world, BlockPos pos, Supplier<BaseEvent> supplier, BiFunction<World, BlockPos, Optional<EnumDyeColor>> woolGetter)
+    public static void onEvent(MicroTimingContext context)
     {
-        if (isLoggerActivated())
-        {
-            getWorldLogger(world).ifPresent(logger -> logger.addMessage(world, pos, supplier.get(), woolGetter));
-        }
-    }
-
-    public static void onEvent(World world, BlockPos pos, Supplier<BaseEvent> supplier)
-    {
-        if (isLoggerActivated())
-        {
-            getWorldLogger(world).ifPresent(logger -> logger.addMessage(world, pos, supplier.get()));
-        }
+        getWorldLogger(context.getWorld()).ifPresent(logger -> logger.addMessage(context));
     }
 
     /*
@@ -134,9 +125,17 @@ public class MicroTimingLoggerManager
      * ----------------------------------
      */
 
-    public static void onBlockUpdate(World world, BlockPos pos, Block fromBlock, BlockUpdateType updateType, EnumFacing exceptSide, EventType eventType)
+    public static void onBlockUpdate(World world, BlockPos pos, Block sourceBlock, BlockUpdateType updateType, EnumFacing exceptSide, EventType eventType)
     {
-        onEvent(world, pos, () -> new DetectBlockUpdateEvent(eventType, fromBlock, updateType, () -> updateType.getUpdateOrderList(exceptSide)), MicroTimingUtil::blockUpdateColorGetter);
+        if (!isLoggerActivated())
+        {
+            return;
+        }
+        onEvent(MicroTimingContext.create().
+                withWorld(world).withBlockPos(pos).
+                withEventSupplier(() -> new DetectBlockUpdateEvent(eventType, sourceBlock, updateType,  () -> updateType.getUpdateOrderList(exceptSide))).
+                withWoolGetter(MicroTimingUtil::blockUpdateColorGetter)
+        );
     }
 
     public static void onSetBlockState(World world, BlockPos pos, IBlockState oldState, IBlockState newState, Boolean returnValue, int flags, EventType eventType)
@@ -145,7 +144,45 @@ public class MicroTimingLoggerManager
         {
             if (oldState.getBlock() == newState.getBlock())
             {
-                getWorldLogger(world).ifPresent(logger -> logger.onSetBlockState(world, pos, oldState, newState, returnValue, flags, eventType));
+                // lazy loading
+                EnumDyeColor color = null;
+                List<BlockStateChangeEvent.PropertyChange> changes = Lists.newArrayList();
+
+                for (IProperty<?> property : newState.getProperties())
+                {
+                    if (color == null)
+                    {
+                        Optional<EnumDyeColor> optionalDyeColor = MicroTimingUtil.defaultColorGetter(world, pos);
+                        if (!optionalDyeColor.isPresent())
+                        {
+                            break;
+                        }
+                        color = optionalDyeColor.get();
+                    }
+                    if (oldState.get(property) != newState.get(property))
+                    {
+                        changes.add(new BlockStateChangeEvent.PropertyChange(property, oldState.get(property), newState.get(property)));
+                    }
+                }
+                if (!changes.isEmpty())
+                {
+                    onEvent(MicroTimingContext.create().
+                            withWorld(world).withBlockPos(pos).withColor(color).
+                            withEventSupplier(() -> {
+                                BlockStateChangeEvent event = new BlockStateChangeEvent(eventType, oldState, newState, returnValue, flags);
+                                event.setChanges(changes);
+                                return event;
+                            })
+                    );
+                }
+            }
+            else
+            {
+                onEvent(MicroTimingContext.create().
+                        withWorld(world).withBlockPos(pos).
+                        withEventSupplier(() -> new BlockReplaceEvent(eventType, oldState, newState, returnValue, flags)).
+                        withWoolGetter(MicroTimingUtil::defaultColorGetter)
+                );
             }
         }
     }
@@ -158,12 +195,26 @@ public class MicroTimingLoggerManager
 
     public static void onExecuteTileTickEvent(World world, NextTickListEntry<Block> event, EventType eventType)
     {
-        onEvent(world, event.position, () -> new ExecuteTileTickEvent(eventType, event));
+        if (!isLoggerActivated())
+        {
+            return;
+        }
+        onEvent(MicroTimingContext.create().
+                withWorld(world).withBlockPos(event.position).
+                withEventSupplier(() -> new ExecuteTileTickEvent(eventType, event))
+        );
     }
 
     public static void onScheduleTileTickEvent(World world, Block block, BlockPos pos, int delay, TickPriority priority, Boolean success)
     {
-        onEvent(world, pos, () -> new ScheduleTileTickEvent(block, pos, delay, priority, success));
+        if (!isLoggerActivated())
+        {
+            return;
+        }
+        onEvent(MicroTimingContext.create().
+                withWorld(world).withBlockPos(pos).
+                withEventSupplier(() -> new ScheduleTileTickEvent(block, pos, delay, priority, success))
+        );
     }
 
     /*
@@ -174,12 +225,26 @@ public class MicroTimingLoggerManager
 
     public static void onExecuteBlockEvent(World world, BlockEventData blockAction, Boolean returnValue, ExecuteBlockEventEvent.FailInfo failInfo, EventType eventType)
     {
-        onEvent(world, blockAction.getPosition(), () -> new ExecuteBlockEventEvent(eventType, blockAction, returnValue, failInfo));
+        if (!isLoggerActivated())
+        {
+            return;
+        }
+        onEvent(MicroTimingContext.create().
+                withWorld(world).withBlockPos(blockAction.getPosition()).
+                withEvent(new ExecuteBlockEventEvent(eventType, blockAction, returnValue, failInfo))
+        );
     }
 
     public static void onScheduleBlockEvent(World world, BlockEventData blockAction, boolean success)
     {
-        onEvent(world, blockAction.getPosition(), () -> new ScheduleBlockEventEvent(blockAction, success));
+        if (!isLoggerActivated())
+        {
+            return;
+        }
+        onEvent(MicroTimingContext.create().
+                withWorld(world).withBlockPos(blockAction.getPosition()).
+                withEvent(new ScheduleBlockEventEvent(blockAction, success))
+        );
     }
 
     /*
@@ -190,12 +255,26 @@ public class MicroTimingLoggerManager
 
     public static void onEmitBlockUpdate(World world, Block block, BlockPos pos, EventType eventType, String methodName)
     {
-        onEvent(world, pos, () -> new EmitBlockUpdateEvent(eventType, block, methodName));
+        if (!isLoggerActivated())
+        {
+            return;
+        }
+        onEvent(MicroTimingContext.create().
+                withWorld(world).withBlockPos(pos).
+                withEvent(new EmitBlockUpdateEvent(eventType, block, methodName))
+        );
     }
 
     public static void onEmitBlockUpdateRedstoneDust(World world, Block block, BlockPos pos, EventType eventType, String methodName, Collection<BlockPos> updateOrder)
     {
-        onEvent(world, pos, () -> new EmitBlockUpdateRedstoneDustEvent(eventType, block, methodName, pos, updateOrder));
+        if (!isLoggerActivated())
+        {
+            return;
+        }
+        onEvent(MicroTimingContext.create().
+                withWorld(world).withBlockPos(pos).
+                withEvent(new EmitBlockUpdateRedstoneDustEvent(eventType, block, methodName, pos, updateOrder))
+        );
     }
 
     /*

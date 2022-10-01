@@ -64,25 +64,7 @@ public class MicroTimingUtil
 
 	public static ITextComponent getColoredValue(Object value)
 	{
-		ITextComponent text = Messenger.s(value.toString());
-		TextFormatting color = null;
-		if (Boolean.TRUE.equals(value))
-		{
-			color = TextFormatting.GREEN;
-		}
-		else if (Boolean.FALSE.equals(value))
-		{
-			color = TextFormatting.RED;
-		}
-		if (value instanceof Number)
-		{
-			color = TextFormatting.GOLD;
-		}
-		if (color != null)
-		{
-			text.getStyle().setColor(color);
-		}
-		return text;
+		return TextUtil.colored(value);
 	}
 
 	public static ITextComponent getSuccessText(boolean bool, boolean showReturnValue, ITextComponent hoverExtra)
