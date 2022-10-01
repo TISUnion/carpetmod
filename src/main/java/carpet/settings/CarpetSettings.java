@@ -717,6 +717,15 @@ public class CarpetSettings
     )
     public static boolean deobfuscateCrashReportStackTrace = false;
 
+    @Rule(
+            desc = "Sync server's mspt metrics data to the client, so players can see that in the debug screen with F3 + ALT",
+            extra = {
+                    "Carpet TIS Addition is required to be installed on the client"
+            },
+            category = {CLIENT}
+    )
+    public static boolean syncServerMsptMetricsData = false;
+
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$
     //   | $$     | $$  | $$  \__/| $$  \__/| $$$$  /$$$$
