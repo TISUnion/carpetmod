@@ -8,6 +8,7 @@ import carpet.logging.LoggerRegistry;
 import carpet.logging.microtiming.MicroTimingLoggerManager;
 import carpet.logging.microtiming.marker.MicroTimingMarkerManager;
 import carpet.logging.microtiming.utils.MicroTimingStandardCarpetLogger;
+import carpet.logging.phantom.PhantomLogger;
 import carpet.network.CarpetServerNetworkHandler;
 import carpet.script.CarpetScriptServer;
 import carpet.settings.CarpetSettings;
@@ -76,6 +77,7 @@ public class CarpetServer // static for now - easier to handle all around the co
         CarpetSettings.impendingFillSkipUpdates = false;
 
         MicroTimingMarkerManager.getInstance().tick();
+        PhantomLogger.getInstance().tick();
     }
 
     public static void registerCarpetCommands(CommandDispatcher<CommandSource> dispatcher)

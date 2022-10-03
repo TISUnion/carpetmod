@@ -3,6 +3,7 @@ package carpet.logging;
 import carpet.logging.commandblock.CommandBlockLogger;
 import carpet.logging.lifetime.LifeTimeHUDLogger;
 import carpet.logging.microtiming.utils.MicroTimingStandardCarpetLogger;
+import carpet.logging.phantom.PhantomLogger;
 import carpet.logging.tickwarp.TickWarpHUDLogger;
 import carpet.settings.CarpetSettings;
 import net.minecraft.entity.player.EntityPlayer;
@@ -42,6 +43,7 @@ public class LoggerRegistry
     public static boolean __tickWarp;
     public static boolean __lifeTime;
     public static boolean __savestate;
+    public static boolean __phantom;
 
     public static void initLoggers()
     {
@@ -68,6 +70,7 @@ public class LoggerRegistry
         registerLogger(TickWarpHUDLogger.NAME, new HUDLogger(TickWarpHUDLogger.NAME, "bar", new String[]{"bar", "value"}));
         registerLogger(LifeTimeHUDLogger.NAME, LifeTimeHUDLogger.getInstance().getHUDLogger());
         registerLogger("savestate", new Logger("savestate",null, null));
+        registerLogger("phantom", PhantomLogger.getInstance().createCarpetLogger());
     }
 
     /**

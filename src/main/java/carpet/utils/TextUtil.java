@@ -11,10 +11,7 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.state.IProperty;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.*;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
 import net.minecraft.world.dimension.DimensionType;
@@ -163,9 +160,10 @@ public class TextUtil
 
 	public static ITextComponent getEntityText(String style, Entity entity)
 	{
-		ITextComponent entityName = entity.getType().getName().deepCopy();
-		ITextComponent hoverText = Messenger.c(String.format("w %s ", getTeleportHint()), entityName);
-		return getFancyText(style, entityName, hoverText, new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, getTeleportCommand(entity)));
+		ITextComponent entityBaseName = entity.getType().getName().deepCopy();
+		ITextComponent entityDisplayName = entity.getName().deepCopy();
+		ITextComponent hoverText = Messenger.c(entityBaseName, Messenger.s("\n"), String.format("w %s ", getTeleportHint()), entityDisplayName);
+		return getFancyText(style, entityDisplayName, hoverText, new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, getTeleportCommand(entity)));
 	}
 
 //	public static ITextComponent getAttributeText(AttributeModifier attribute)
@@ -265,5 +263,20 @@ public class TextUtil
 	public static ITextComponent getSpaceText()
 	{
 		return Messenger.s(getSpace());
+	}
+
+	public static ITextComponent format(String formatter, Object... args)
+	{
+		TextComponentTranslation dummy = new TextComponentTranslation(formatter, args);
+		try
+		{
+			dummy.getChildren().clear();
+			dummy.invokeInitializeFromFormat(formatter);
+			return Messenger.c(dummy.getChildren().toArray(new Object[0]));
+		}
+		catch (TextComponentTranslationFormatException e)
+		{
+			return Messenger.s(formatter);
+		}
 	}
 }

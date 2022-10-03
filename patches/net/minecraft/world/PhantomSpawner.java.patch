@@ -1,0 +1,21 @@
+--- a/net/minecraft/world/PhantomSpawner.java
++++ b/net/minecraft/world/PhantomSpawner.java
+@@ -1,6 +1,8 @@
+ package net.minecraft.world;
+ 
+ import java.util.Random;
++
++import carpet.logging.phantom.PhantomLogger;
+ import net.minecraft.block.state.IBlockState;
+ import net.minecraft.entity.IEntityLivingData;
+ import net.minecraft.entity.monster.EntityPhantom;
+@@ -71,6 +73,9 @@
+                                             IEntityLivingData ientitylivingdata = null;
+                                             int l = 1 + random.nextInt(difficultyinstance.getDifficulty().getId() + 1);
+ 
++                                            // TISCM phantom logger
++                                            PhantomLogger.getInstance().onPhantomSpawn(entityplayer, l);
++
+                                             for (int i1 = 0; i1 < l; ++i1)
+                                             {
+                                                 EntityPhantom entityphantom = new EntityPhantom(worldIn);

@@ -106,16 +106,6 @@ public class Translator implements Translatable
 			}
 		}
 		String msgKeyString = this.tr(key, defaultKeyText);
-		TextComponentTranslation fixedTranslatableText = new TextComponentTranslation(msgKeyString, args);
-		try
-		{
-			fixedTranslatableText.getChildren().clear();
-			fixedTranslatableText.invokeInitializeFromFormat(msgKeyString);
-			return Messenger.c(fixedTranslatableText.getChildren().toArray(new Object[0]));
-		}
-		catch (TextComponentTranslationFormatException e)
-		{
-			return Messenger.s(msgKeyString);
-		}
+		return TextUtil.format(msgKeyString, args);
 	}
 }
