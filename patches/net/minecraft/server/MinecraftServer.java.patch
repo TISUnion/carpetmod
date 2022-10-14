@@ -239,7 +239,7 @@
 +        // TISCM syncServerMsptMetricsData
 +        if (CarpetSettings.syncServerMsptMetricsData)
 +        {
-+            ServerMsptMetricsDataSyncer.getInstance().broadcastSample(l);
++            ServerMsptMetricsDataSyncer.getInstance().broadcastSample(this.tickCounter, l);
 +        }
 +
 +        // CM worldedit

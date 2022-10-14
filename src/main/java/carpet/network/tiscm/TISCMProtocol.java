@@ -3,6 +3,7 @@ package carpet.network.tiscm;
 import carpet.settings.CarpetSettings;
 import com.google.common.collect.Maps;
 import io.netty.buffer.Unpooled;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.client.CPacketCustomPayload;
 import net.minecraft.network.play.server.SPacketCustomPayload;
@@ -24,8 +25,6 @@ public class TISCMProtocol
 	{
 		HI(true),
 		SUPPORTED_S2C_PACKETS(true),
-
-		MSPT_METRICS_SUBSCRIBE,  // syncServerMsptMetricsData
 		;
 
 		public static final Map<String, C2S> ID_MAP = createIdMap(values());
@@ -43,9 +42,9 @@ public class TISCMProtocol
 			return Optional.ofNullable(ID_MAP.get(id));
 		}
 
-		public CPacketCustomPayload packet(Consumer<PacketBuffer> byteBufBuilder)
+		public CPacketCustomPayload packet(Consumer<NBTTagCompound> payloadBuilder)
 		{
-			return makePacket(CPacketCustomPayload::new, this, byteBufBuilder);
+			return makePacket(CPacketCustomPayload::new, this, payloadBuilder);
 		}
 
 		public boolean isSupported()
@@ -77,9 +76,9 @@ public class TISCMProtocol
 			return Optional.ofNullable(ID_MAP.get(id));
 		}
 
-		public SPacketCustomPayload packet(Consumer<PacketBuffer> byteBufBuilder)
+		public SPacketCustomPayload packet(Consumer<NBTTagCompound> payloadBuilder)
 		{
-			return makePacket(SPacketCustomPayload::new, this, byteBufBuilder);
+			return makePacket(SPacketCustomPayload::new, this, payloadBuilder);
 		}
 	}
 
@@ -89,11 +88,13 @@ public class TISCMProtocol
 		default String getId() { return this.name().toLowerCase(); }
 	}
 
-	private static <T> T makePacket(BiFunction<ResourceLocation, PacketBuffer, T> packetConstructor, PacketId packetId, Consumer<PacketBuffer> byteBufBuilder)
+	private static <T> T makePacket(BiFunction<ResourceLocation, PacketBuffer, T> packetConstructor, PacketId packetId, Consumer<NBTTagCompound> payloadBuilder)
 	{
+		NBTTagCompound nbt = new NBTTagCompound();
+		payloadBuilder.accept(nbt);
 		PacketBuffer packetByteBuf = new PacketBuffer(Unpooled.buffer());
 		packetByteBuf.writeString(packetId.getId());
-		byteBufBuilder.accept(packetByteBuf);
+		packetByteBuf.writeCompoundTag(nbt);
 		return packetConstructor.apply(TISCMProtocol.CHANNEL, packetByteBuf);
 	}
 

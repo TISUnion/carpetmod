@@ -4,8 +4,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetHandlerPlayServer;
-import net.minecraft.network.PacketBuffer;
 import net.minecraft.server.MinecraftServer;
 
 import java.util.function.Consumer;
@@ -15,13 +15,13 @@ public class HandlerContext
 	public static class S2C
 	{
 		public final NetHandlerPlayClient networkHandler;
-		public final PacketBuffer buf;
+		public final NBTTagCompound payload;
 		public final Minecraft client;
 		public final EntityPlayerSP player;
 
-		public S2C(NetHandlerPlayClient networkHandler, PacketBuffer buf)
+		public S2C(NetHandlerPlayClient networkHandler, NBTTagCompound payload)
 		{
-			this.buf = buf;
+			this.payload = payload;
 			this.networkHandler = networkHandler;
 			this.client = networkHandler.getClient();
 			this.player = this.client.player;
@@ -32,24 +32,24 @@ public class HandlerContext
 			this.client.addScheduledTask(runnable);
 		}
 
-		public void send(TISCMProtocol.C2S packetId, Consumer<PacketBuffer> byteBufBuilder)
+		public void send(TISCMProtocol.C2S packetId, Consumer<NBTTagCompound> payloadBuilder)
 		{
-			TISCMClientPacketHandler.getInstance().sendPacket(packetId, byteBufBuilder);
+			TISCMClientPacketHandler.getInstance().sendPacket(packetId, payloadBuilder);
 		}
 	}
 
 	public static class C2S
 	{
 		public final NetHandlerPlayServer networkHandler;
-		public final PacketBuffer buf;
+		public final NBTTagCompound payload;
 		public final MinecraftServer server;
 		public final EntityPlayerMP player;
 		public final String playerName;
 
-		public C2S(NetHandlerPlayServer networkHandler, PacketBuffer buf)
+		public C2S(NetHandlerPlayServer networkHandler, NBTTagCompound payload)
 		{
 			this.networkHandler = networkHandler;
-			this.buf = buf;
+			this.payload = payload;
 			this.server = networkHandler.getServer();
 			this.player = this.networkHandler.player;
 			this.playerName = this.player.getName().getString();
@@ -60,9 +60,9 @@ public class HandlerContext
 			this.server.addScheduledTask(runnable);
 		}
 
-		public void send(TISCMProtocol.S2C packetId, Consumer<PacketBuffer> byteBufBuilder)
+		public void send(TISCMProtocol.S2C packetId, Consumer<NBTTagCompound> payloadBuilder)
 		{
-			TISCMServerPacketHandler.getInstance().sendPacket(this.networkHandler, packetId, byteBufBuilder);
+			TISCMServerPacketHandler.getInstance().sendPacket(this.networkHandler, packetId, payloadBuilder);
 		}
 	}
 }

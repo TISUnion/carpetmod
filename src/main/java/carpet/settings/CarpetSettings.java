@@ -718,6 +718,12 @@ public class CarpetSettings
     public static boolean deobfuscateCrashReportStackTrace = false;
 
     @Rule(
+            desc = "The switch of the TISCM network protocol",
+            category = {TISCM_PROTOCOL}
+    )
+    public static boolean tiscmNetworkProtocol = false;
+
+    @Rule(
             desc = "Sync server's mspt metrics data to the client, so players can see that in the debug screen with F3 + ALT",
             extra = {
                     "Carpet TIS Addition is required to be installed on the client"

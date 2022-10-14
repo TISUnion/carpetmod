@@ -292,7 +292,7 @@
 +        }
 +
 +        // TISCM protocol
-+        if (TISCMProtocol.CHANNEL.equals(channel))
++        if (CarpetSettings.tiscmNetworkProtocol && TISCMProtocol.CHANNEL.equals(channel))
 +        {
 +            TISCMServerPacketHandler.getInstance().dispatch(this, packetIn.getData());
 +            return;

@@ -1,8 +1,4 @@
 {
-  "category.TIS": "TIS",
-  "category.CARPET_MOD": "carpet_mod",
-
-
   "rule.antiSpamDisabled.name": "禁用反刷屏监测",
   "rule.antiSpamDisabled.desc": "禁用玩家身上的刷屏检测，包括：聊天信息发送冷却、创造模式扔物品冷却",
 
@@ -262,6 +258,9 @@
 
   "rule.tileTickLimit.name": "计划刻上限",
   "rule.tileTickLimit.desc": "修改每游戏刻中计划刻事件的执行次数上限",
+
+  "rule.tiscmNetworkProtocol.name": "TISCM网络协议",
+  "rule.tiscmNetworkProtocol.desc": "TISCM网络协议的开关",
 
   "rule.tntDupingFix.desc": "禁用TNT、地毯以及部分铁轨的复制机",
   "rule.tntDupingFix.extra.0": "基于依附性方块的复制机会无法复制，基于红石原件更新的复制机会无法保留被复制的方块",

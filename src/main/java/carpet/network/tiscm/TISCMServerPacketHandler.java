@@ -1,9 +1,9 @@
 package carpet.network.tiscm;
 
 import carpet.CarpetServer;
-import carpet.helpers.ServerMsptMetricsDataSyncer;
 import carpet.utils.NbtUtil;
 import com.google.common.collect.Lists;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.PacketBuffer;
 import org.apache.logging.log4j.Logger;
@@ -24,7 +24,6 @@ public class TISCMServerPacketHandler
 	{
 		this.handlers.put(TISCMProtocol.C2S.HI, this::handleHi);
 		this.handlers.put(TISCMProtocol.C2S.SUPPORTED_S2C_PACKETS, this::handleSupportPackets);
-		this.handlers.put(TISCMProtocol.C2S.MSPT_METRICS_SUBSCRIBE, this::handleMsptMetricsSubscribe);
 		if (this.handlers.size() < TISCMProtocol.C2S.ID_MAP.size())
 		{
 			throw new RuntimeException("TISCMServerPacketDispatcher doesn't handle all C2S packets");
@@ -36,11 +35,17 @@ public class TISCMServerPacketHandler
 		return INSTANCE;
 	}
 
+	/**
+	 * Invoked on network thread
+	 */
 	public void dispatch(NetHandlerPlayServer networkHandler, PacketBuffer packetByteBuf)
 	{
-		TISCMProtocol.C2S.fromId(packetByteBuf.readString(Short.MAX_VALUE)).
+		String packetId = packetByteBuf.readString(Short.MAX_VALUE);
+		NBTTagCompound payload = packetByteBuf.readCompoundTag();
+		HandlerContext.C2S ctx = new HandlerContext.C2S(networkHandler, payload);
+		ctx.runSynced(() -> TISCMProtocol.C2S.fromId(packetId).
 				map(this.handlers::get).
-				ifPresent( handler -> handler.accept(new HandlerContext.C2S(networkHandler, packetByteBuf)));
+				ifPresent( handler -> handler.accept(ctx)));
 	}
 
 	public boolean doesClientSupport(NetHandlerPlayServer networkHandler, TISCMProtocol.S2C packetId)
@@ -53,18 +58,18 @@ public class TISCMServerPacketHandler
 		return packetIds != null && packetIds.contains(packetId);
 	}
 
-	public void sendPacket(NetHandlerPlayServer networkHandler, TISCMProtocol.S2C packetId, Consumer<PacketBuffer> byteBufBuilder)
+	public void sendPacket(NetHandlerPlayServer networkHandler, TISCMProtocol.S2C packetId, Consumer<NBTTagCompound> payloadBuilder)
 	{
 		if (this.doesClientSupport(networkHandler, packetId))
 		{
-			networkHandler.sendPacket(packetId.packet(byteBufBuilder));
+			networkHandler.sendPacket(packetId.packet(payloadBuilder));
 		}
 	}
 
-	private void broadcast(TISCMProtocol.S2C packetId, Consumer<PacketBuffer> byteBufBuilder)
+	public void broadcast(TISCMProtocol.S2C packetId, Consumer<NBTTagCompound> payloadBuilder)
 	{
 		this.clientSupportedPacketsMap.forEach((serverPlayNetworkHandler, supportedPackets) -> {
-			this.sendPacket(serverPlayNetworkHandler, packetId, byteBufBuilder);
+			this.sendPacket(serverPlayNetworkHandler, packetId, payloadBuilder);
 		});
 	}
 
@@ -82,40 +87,30 @@ public class TISCMServerPacketHandler
 
 	public void handleHi(HandlerContext.C2S ctx)
 	{
-		String platformName = ctx.buf.readString(Short.MAX_VALUE);
-		String platformVersion = ctx.buf.readString(Short.MAX_VALUE);
+		String platformName = ctx.payload.getString("platform_name");
+		String platformVersion = ctx.payload.getString("platform_version");
 		LOGGER.info("Player {} connected with TISCM protocol support ({} @ {})", ctx.playerName, platformName, platformVersion);
 
-		ctx.send(TISCMProtocol.S2C.HELLO, buf -> buf.
-				writeString(TISCMProtocol.PLATFORM_NAME).
-				writeString(TISCMProtocol.PLATFORM_VERSION)
-		);
+		ctx.send(TISCMProtocol.S2C.HELLO, nbt -> {
+			nbt.putString("platform_name", TISCMProtocol.PLATFORM_NAME);
+			nbt.putString("platform_version", TISCMProtocol.PLATFORM_VERSION);
+		});
 
 		List<String> ids = Lists.newArrayList(TISCMProtocol.C2S.ID_MAP.keySet());
-		ctx.send(TISCMProtocol.S2C.SUPPORTED_C2S_PACKETS, buf -> buf.
-				writeCompoundTag(NbtUtil.stringList2Nbt(ids))
-		);
+		ctx.send(TISCMProtocol.S2C.SUPPORTED_C2S_PACKETS, nbt -> {
+			nbt.put("supported_c2s_packets", NbtUtil.stringList2Nbt(ids));
+		});
 	}
 
 	public void handleSupportPackets(HandlerContext.C2S ctx)
 	{
-		List<String> ids = NbtUtil.nbt2StringList(Objects.requireNonNull(ctx.buf.readCompoundTag()));
+		List<String> ids = NbtUtil.nbt2StringList(ctx.payload.getCompound("supported_s2c_packets"));
 		LOGGER.debug("Player {} clientside supported TISCM S2C packet ids: {}", ctx.playerName, ids);
 		Set<TISCMProtocol.S2C> packetIds = ids.stream().
 				map(TISCMProtocol.S2C::fromId).
 				filter(Optional::isPresent).
 				map(Optional::get).
 				collect(Collectors.toSet());
-		ctx.runSynced(() -> this.clientSupportedPacketsMap.put(ctx.networkHandler, packetIds));
-	}
-
-	public void handleMsptMetricsSubscribe(HandlerContext.C2S ctx)
-	{
-		boolean	subscribe = ctx.buf.readBoolean();
-		LOGGER.debug("{} MSPT_METRICS_SUBSCRIBE {}", ctx.playerName, subscribe);
-		Consumer<NetHandlerPlayServer> consumer = subscribe ?
-				ServerMsptMetricsDataSyncer.getInstance()::addClient :
-				ServerMsptMetricsDataSyncer.getInstance()::removeClient;
-		ctx.runSynced(() -> consumer.accept(ctx.networkHandler));
+		this.clientSupportedPacketsMap.put(ctx.networkHandler, packetIds);
 	}
 }
