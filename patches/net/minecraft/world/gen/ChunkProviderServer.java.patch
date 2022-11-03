@@ -146,7 +146,7 @@
 +                    }
 +                    catch (Exception e)
 +                    {
-+                        throw new RuntimeException("Failed to save chunk " + pair.getFirst());
++                        throw new RuntimeException("Failed to save chunk " + pair.getFirst(), e);
 +                    }
 +                }
 +
