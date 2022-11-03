@@ -106,6 +106,7 @@ public class CarpetServer // static for now - easier to handle all around the co
         RefreshCommand.getInstance().registerCommand(dispatcher);
         ChunkRegenCommand.register(dispatcher);
         RaycountCommand.register(dispatcher);
+        RemoveEntityCommand.getInstance().registerCommand(dispatcher);
     }
 
     public static void disconnect()

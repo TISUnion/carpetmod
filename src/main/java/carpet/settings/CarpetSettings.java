@@ -741,6 +741,12 @@ public class CarpetSettings
     )
     public static boolean creativeNetherWaterPlacement = false;
 
+    @Rule(
+            desc = "Enables /removeentity command for directly erase target entities from the world",
+            category = {COMMAND, CREATIVE}
+    )
+    public static String commandRemoveEntity = "ops";
+
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$
     //   | $$     | $$  | $$  \__/| $$  \__/| $$$$  /$$$$
