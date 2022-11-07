@@ -89,7 +89,7 @@
          int i = 0;
          this.chunkScheduler.save(() ->
          {
-@@ -249,22 +286,92 @@
+@@ -249,22 +286,93 @@
  
          synchronized (this.chunkLoader)
          {
@@ -146,6 +146,7 @@
 +                    }
 +                    catch (Exception e)
 +                    {
++                        LOGGER.error("[TISCM MULTI_THREAD_CHUNK_SAVING] Failed to saved chunk {}: {}", pair.getFirst(), e);
 +                        throw new RuntimeException("Failed to save chunk " + pair.getFirst(), e);
 +                    }
 +                }
@@ -189,7 +190,7 @@
          }
      }
  
-@@ -306,10 +413,24 @@
+@@ -306,10 +414,24 @@
  
                          if (chunk != null)
                          {
@@ -215,7 +216,7 @@
                              ++i;
                          }
                      }
-@@ -360,6 +481,93 @@
+@@ -360,6 +482,93 @@
  
      public boolean chunkExists(int x, int z)
      {
