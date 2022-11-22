@@ -18,7 +18,7 @@
 +                    MicroTimingLoggerManager.setTickStageExtra(new PlayerActionTickStageExtra(handler.player));
 +                }
                  packetIn.processPacket(processor);
-+                MicroTimingLoggerManager.setTickStageExtra(new PlayerActionTickStageExtra(null));
++                MicroTimingLoggerManager.setTickStageExtra(null);
              });
              throw ThreadQuickExitException.INSTANCE;
          }
