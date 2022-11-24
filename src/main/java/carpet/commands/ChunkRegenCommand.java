@@ -10,6 +10,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.util.math.ChunkPos;
@@ -26,6 +28,8 @@ import static net.minecraft.command.Commands.literal;
 public class ChunkRegenCommand
 {
     private static final Map<DimensionType, Set<ChunkPos>> toBeRegen = Maps.newLinkedHashMap();
+    private static final SuggestionProvider<CommandSource> xSuggest = (c, b) -> ISuggestionProvider.suggest(new String[]{String.valueOf(c.getSource().asPlayer().chunkCoordX)}, b);
+    private static final SuggestionProvider<CommandSource> zSuggest = (c, b) -> ISuggestionProvider.suggest(new String[]{String.valueOf(c.getSource().asPlayer().chunkCoordZ)}, b);
 
     public static void register(CommandDispatcher<CommandSource> dispatcher)
     {
@@ -33,6 +37,22 @@ public class ChunkRegenCommand
                 literal("chunkRegen").
                 requires(s -> SettingsManager.canUseCommand(s, CarpetSettings.commandChunkRegen)).
                 then(chunkOperation("add", ChunkRegenCommand::addChunk)).
+                then(literal("add_area").then(
+                        argument("startChunkX", integer()).
+                        suggests(xSuggest).
+                        then(argument("startChunkZ", integer()).
+                                suggests(zSuggest).
+                                then(
+                                     argument("endChunkX", integer()).
+                                     suggests(xSuggest).
+                                     then(
+                                             argument("endChunkZ", integer()).
+                                             suggests(xSuggest).
+                                             executes(ChunkRegenCommand::AddArea)
+                                     )
+                                )
+                        )
+                )).
                 then(chunkOperation("remove", ChunkRegenCommand::removeChunk)).
                 then(literal("clear").executes(c -> clearChunks(c.getSource()))).
                 then(literal("list").executes(c -> listChunks(c.getSource())))
@@ -43,10 +63,10 @@ public class ChunkRegenCommand
     {
         return literal(name).then(
                 argument("chunkX", integer()).
-                suggests((c, b) -> ISuggestionProvider.suggest(new String[]{String.valueOf(c.getSource().asPlayer().chunkCoordX)}, b)).
+                suggests(xSuggest).
                 then(
                         argument("chunkZ", integer()).
-                        suggests((c, b) -> ISuggestionProvider.suggest(new String[]{String.valueOf(c.getSource().asPlayer().chunkCoordZ)}, b)).
+                        suggests(zSuggest).
                         executes(c -> consumer.apply(c.getSource(), getInteger(c, "chunkX"), getInteger(c, "chunkZ")))
                 )
         );
@@ -67,6 +87,24 @@ public class ChunkRegenCommand
             }
             return ret ? 1 : 0;
         }
+    }
+
+    private static int AddArea(CommandContext<CommandSource> c)
+    {
+        int startChunkX = getInteger(c, "startChunkX");
+        int startChunkZ = getInteger(c, "startChunkZ");
+        int endChunkX = getInteger(c, "endChunkX");
+        int endChunkZ = getInteger(c, "endChunkZ");
+
+        int cnt = 0;
+        for (int x = Math.min(startChunkX, endChunkX); x <= Math.max(startChunkX, endChunkX); x++)
+        {
+            for (int z = Math.min(startChunkZ, endChunkZ); z <= Math.max(startChunkZ, endChunkZ); z++)
+            {
+                cnt += addChunk(c.getSource(), x, z);
+            }
+        }
+        return cnt;
     }
 
     private static int removeChunk(CommandSource source, int chunkX, int chunkZ)
