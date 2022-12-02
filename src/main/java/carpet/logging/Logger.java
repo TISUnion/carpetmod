@@ -1,6 +1,7 @@
 package carpet.logging;
 
 import carpet.CarpetServer;
+import carpet.settings.CarpetSettings;
 import com.google.common.collect.Iterables;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.text.ITextComponent;
@@ -162,6 +163,8 @@ public class Logger
      */
     protected EntityPlayer playerFromName(String name)
     {
+        if (CarpetServer.minecraft_server == null) return null;
+        if (CarpetServer.minecraft_server.getPlayerList() == null) return null;
         return CarpetServer.minecraft_server.getPlayerList().getPlayerByUsername(name);
     }
 

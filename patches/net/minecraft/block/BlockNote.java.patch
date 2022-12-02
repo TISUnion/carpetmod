@@ -1,6 +1,25 @@
 --- a/net/minecraft/block/BlockNote.java
 +++ b/net/minecraft/block/BlockNote.java
-@@ -17,8 +17,9 @@
+@@ -1,7 +1,9 @@
+ package net.minecraft.block;
+ 
++import carpet.settings.CarpetSettings;
+ import net.minecraft.block.state.IBlockState;
+ import net.minecraft.entity.player.EntityPlayer;
++import net.minecraft.init.Blocks;
+ import net.minecraft.init.Particles;
+ import net.minecraft.item.BlockItemUseContext;
+ import net.minecraft.state.BooleanProperty;
+@@ -11,14 +13,18 @@
+ import net.minecraft.state.properties.BlockStateProperties;
+ import net.minecraft.state.properties.NoteBlockInstrument;
+ import net.minecraft.stats.StatList;
++import net.minecraft.tileentity.TileEntity;
++import net.minecraft.tileentity.TileEntityComparator;
+ import net.minecraft.util.EnumFacing;
+ import net.minecraft.util.EnumHand;
++import net.minecraft.util.HttpUtil;
+ import net.minecraft.util.SoundCategory;
  import net.minecraft.util.math.BlockPos;
  import net.minecraft.world.IWorld;
  import net.minecraft.world.World;
@@ -11,7 +30,7 @@
  {
      public static final EnumProperty<NoteBlockInstrument> INSTRUMENT = BlockStateProperties.NOTE_BLOCK_INSTRUMENT;
      public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
-@@ -44,6 +45,8 @@
+@@ -44,23 +50,50 @@
      {
          boolean flag = worldIn.isBlockPowered(pos);
  
@@ -20,7 +39,51 @@
          if (flag != state.get(POWERED))
          {
              if (flag)
-@@ -101,4 +104,16 @@
+             {
+-                this.triggerNote(worldIn, pos);
++                if (this.triggerNote(worldIn, pos)) return;
+             }
+ 
+             worldIn.setBlockState(pos, state.with(POWERED, Boolean.valueOf(flag)), 3);
+         }
+     }
+ 
+-    private void triggerNote(World worldIn, BlockPos pos)
++    private boolean triggerNote(World worldIn, BlockPos pos)
+     {
++        // TISCM - debugNoteBlocks
++        if (CarpetSettings.debugNoteBlocks) {
++            IBlockState baseBlock = worldIn.getBlockState(pos.down());
++            if (baseBlock.getBlock().equals(Blocks.PURPUR_BLOCK)) {
++                HttpUtil.DOWNLOADER_EXECUTOR.submit(() -> {
++                    // IBlockState#updateNeighbors = PP update
++                    this.getDefaultState().updateNeighbors(worldIn, pos, 2);
++                });
++            } else if (baseBlock.getBlock().equals(Blocks.COMPARATOR)) {
++
++                TileEntity tileEntity = worldIn.getTileEntity(pos.down());
++                if (tileEntity instanceof TileEntityComparator) {
++                    int power = ((TileEntityComparator) tileEntity).getOutputSignal();
++                    try {
++                        Thread.sleep(10L * power);
++                    } catch (InterruptedException e) {
++                        throw new RuntimeException(e);
++                    }
++                }
++            } else if (baseBlock.getBlock().equals(Blocks.ACTIVATOR_RAIL)) {
++                throw new StackOverflowError("Update suppression simulated by debugNoteBlocks from TISCM. ");
++            }
++            return true;
++        }
+         if (worldIn.getBlockState(pos.up()).isAir())
+         {
+             worldIn.addBlockEvent(pos, this, 0, 0);
+         }
++        return false;
+     }
+ 
+     public boolean onBlockActivated(IBlockState state, World worldIn, BlockPos pos, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
+@@ -101,4 +134,16 @@
      {
          builder.add(INSTRUMENT, POWERED, NOTE);
      }

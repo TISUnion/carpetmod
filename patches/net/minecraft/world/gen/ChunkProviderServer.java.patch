@@ -1,11 +1,13 @@
 --- a/net/minecraft/world/gen/ChunkProviderServer.java
 +++ b/net/minecraft/world/gen/ChunkProviderServer.java
-@@ -1,5 +1,14 @@
+@@ -1,5 +1,16 @@
  package net.minecraft.world.gen;
  
 +import carpet.commands.ChunkRegenCommand;
 +import carpet.helpers.BedrockBreakingStatHelper;
++import carpet.logging.LoggerRegistry;
 +import carpet.logging.logHelpers.AutoSaveLogHelper;
++import carpet.logging.threadstone.ThreadstoneLogger;
 +import carpet.settings.CarpetSettings;
 +import carpet.utils.Messenger;
 +import carpet.utils.TISCMConfig;
@@ -15,7 +17,7 @@
  import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
  import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
  import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
-@@ -8,7 +17,8 @@
+@@ -8,7 +19,8 @@
  import java.util.Collection;
  import java.util.Iterator;
  import java.util.List;
@@ -25,7 +27,7 @@
  import java.util.function.BooleanSupplier;
  import java.util.function.Consumer;
  import javax.annotation.Nullable;
-@@ -42,11 +52,19 @@
+@@ -42,11 +54,19 @@
      private final IChunkLoader chunkLoader;
      private final Long2ObjectMap<Chunk> loadedChunks = Long2ObjectMaps.synchronize(new ChunkCacheNeighborNotification(8192));
      private Chunk lastAccessed;
@@ -45,7 +47,7 @@
      public ChunkProviderServer(WorldServer worldIn, IChunkLoader chunkLoaderIn, IChunkGenerator<?> chunkGeneratorIn, IThreadListener threadListener)
      {
          this.world = worldIn;
-@@ -86,6 +104,11 @@
+@@ -86,6 +106,11 @@
      @Nullable
      public Chunk getChunk(int x, int z, boolean load, boolean generate)
      {
@@ -57,7 +59,18 @@
          Chunk chunk;
  
          synchronized (this.chunkLoader)
-@@ -215,9 +238,20 @@
+@@ -106,6 +131,10 @@
+ 
+             if (load)
+             {
++                boolean logBeacons = LoggerRegistry.__threadstone;
++                if (logBeacons && ThreadstoneLogger.isCurrentThreadAsync(world)) {
++                    ThreadstoneLogger.getInstance().onAsyncLoadChunk(x, z);
++                }
+                 try
+                 {
+                     chunk = this.chunkLoader.loadChunk(this.world, x, z, (p_212471_3_) ->
+@@ -215,9 +244,20 @@
              }
  
              this.loadedChunks.put(k, chunk);
@@ -79,7 +92,7 @@
          this.mainThread.addScheduledTask(chunk::onLoad);
          return chunk;
      }
-@@ -241,6 +275,9 @@
+@@ -241,6 +281,9 @@
  
      public boolean saveChunks(boolean all)
      {
@@ -89,7 +102,7 @@
          int i = 0;
          this.chunkScheduler.save(() ->
          {
-@@ -249,22 +286,93 @@
+@@ -249,22 +292,93 @@
  
          synchronized (this.chunkLoader)
          {
@@ -190,7 +203,7 @@
          }
      }
  
-@@ -306,10 +414,24 @@
+@@ -306,10 +420,24 @@
  
                          if (chunk != null)
                          {
@@ -216,7 +229,7 @@
                              ++i;
                          }
                      }
-@@ -360,6 +482,93 @@
+@@ -360,6 +488,93 @@
  
      public boolean chunkExists(int x, int z)
      {

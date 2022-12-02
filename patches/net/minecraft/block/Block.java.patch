@@ -18,7 +18,7 @@
  import net.minecraft.block.material.EnumPushReaction;
  import net.minecraft.block.material.Material;
  import net.minecraft.block.material.MaterialColor;
-@@ -72,14 +78,17 @@
+@@ -72,14 +78,19 @@
  import net.minecraft.world.World;
  import net.minecraftforge.api.distmarker.Dist;
  import net.minecraftforge.api.distmarker.OnlyIn;
@@ -34,11 +34,13 @@
      public static final ObjectIntIdentityMap<IBlockState> BLOCK_STATE_IDS = new ObjectIntIdentityMap<>();
 -    private static final EnumFacing[] UPDATE_ORDER = new EnumFacing[] {EnumFacing.WEST, EnumFacing.EAST, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.DOWN, EnumFacing.UP};
 +    // TISCM Micro Timing logger makes public
-+    public static final EnumFacing[] UPDATE_ORDER = new EnumFacing[] {EnumFacing.WEST, EnumFacing.EAST, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.DOWN, EnumFacing.UP};
++    public static final EnumFacing[] UPDATE_ORDER =
++            new EnumFacing[] {EnumFacing.WEST, EnumFacing.EAST, EnumFacing.NORTH, EnumFacing.SOUTH,
++                    EnumFacing.DOWN, EnumFacing.UP};
      protected final int lightValue;
      protected final float blockHardness;
      protected final float blockResistance;
-@@ -175,21 +184,42 @@
+@@ -175,21 +186,42 @@
      @Deprecated
      public MaterialColor getMaterialColor(IBlockState state, IBlockReader worldIn, BlockPos pos)
      {
@@ -82,7 +84,7 @@
          }
      }
  
-@@ -621,6 +651,10 @@
+@@ -621,6 +653,10 @@
              double d2 = (double)(worldIn.rand.nextFloat() * 0.5F) + 0.25D;
              EntityItem entityitem = new EntityItem(worldIn, (double)pos.getX() + d0, (double)pos.getY() + d1, (double)pos.getZ() + d2, stack);
              entityitem.setDefaultPickupDelay();
@@ -93,7 +95,7 @@
              worldIn.spawnEntity(entityitem);
          }
      }
-@@ -1764,11 +1798,17 @@
+@@ -1764,11 +1800,17 @@
              private final IBlockState adjacentState;
              private final EnumFacing side;
  
@@ -111,7 +113,7 @@
              }
  
              public boolean equals(Object p_equals_1_)
-@@ -1790,7 +1830,8 @@
+@@ -1790,7 +1832,8 @@
  
              public int hashCode()
              {

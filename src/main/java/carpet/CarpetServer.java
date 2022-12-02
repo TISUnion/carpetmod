@@ -9,6 +9,7 @@ import carpet.logging.microtiming.MicroTimingLoggerManager;
 import carpet.logging.microtiming.marker.MicroTimingMarkerManager;
 import carpet.logging.microtiming.utils.MicroTimingStandardCarpetLogger;
 import carpet.logging.phantom.PhantomLogger;
+import carpet.logging.threadstone.ThreadstoneLogger;
 import carpet.network.CarpetServerNetworkHandler;
 import carpet.script.CarpetScriptServer;
 import carpet.settings.CarpetSettings;
@@ -107,6 +108,7 @@ public class CarpetServer // static for now - easier to handle all around the co
         ChunkRegenCommand.register(dispatcher);
         RaycountCommand.register(dispatcher);
         RemoveEntityCommand.getInstance().registerCommand(dispatcher);
+        ClusterCommand.register(dispatcher);
     }
 
     public static void disconnect()

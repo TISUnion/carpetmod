@@ -7,6 +7,7 @@ import carpet.logging.LoggerRegistry;
 import carpet.logging.lifetime.LifeTimeHUDLogger;
 import carpet.logging.logHelpers.AutoSaveLogHelper;
 import carpet.logging.logHelpers.PacketCounter;
+import carpet.logging.threadstone.ThreadstoneLogger;
 import carpet.logging.tickwarp.TickWarpHUDLogger;
 import carpet.settings.CarpetSettings;
 import net.minecraft.entity.EnumCreatureType;
@@ -96,8 +97,10 @@ public class HUDController
         if (LoggerRegistry.__autosave)
             LoggerRegistry.getLogger("autosave").log(AutoSaveLogHelper::send_hud_info);
 
+
         doHudLogging(LoggerRegistry.__lifeTime, LifeTimeHUDLogger.NAME, LifeTimeHUDLogger.getInstance());
         doHudLogging(LoggerRegistry.__tickWarp, TickWarpHUDLogger.NAME, TickWarpHUDLogger.getInstance());
+        doHudLogging(LoggerRegistry.__threadstone, ThreadstoneLogger.NAME, ThreadstoneLogger.getInstance());
 
         for (EntityPlayer player: player_huds.keySet())
         {

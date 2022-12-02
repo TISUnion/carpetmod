@@ -747,6 +747,42 @@ public class CarpetSettings
     )
     public static String commandRemoveEntity = "ops";
 
+    /*
+    @Rule(
+            desc = "Really?",
+            extra = "Use with caution, this rule affects all observer blocks",
+            category = {CREATIVE}
+    )
+    public static boolean instantObservers = false;
+    */
+
+    @Rule(
+            desc = "Observers updated on an async thread will behave like an ITT observer in 1.12. ",
+            category = {CREATIVE}
+    )
+    public static boolean asyncUpdatesAmplifier = false;
+
+    @Rule(
+            desc = "A note block does a specific thing on activation, based on the block underneath. \n " +
+                    "Purpur block - Sends out a PP update on an async thread. \n" +
+                    "Comparator - Lag the current thread for 10x milliseconds, where x is the power level " +
+                    "of the comparator. \n" +
+                    "Activator rails - Throws a StackOverflowError to imitate update suppression. \n",
+            category = {CREATIVE}
+    )
+    public static boolean debugNoteBlocks = false;
+
+    /*
+    @Rule(
+            desc = "If a beacon receives an NC update when a purpur block is adjacent, " +
+                    "it will start a new thread and send an NC update there. ",
+            category = {CREATIVE}
+    )
+    public static boolean asyncBeaconUpdates = false;
+    */
+
+
+
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$
     //   | $$     | $$  | $$  \__/| $$  \__/| $$$$  /$$$$
