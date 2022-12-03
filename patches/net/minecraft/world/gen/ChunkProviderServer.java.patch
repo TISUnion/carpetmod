@@ -229,7 +229,7 @@
                              ++i;
                          }
                      }
-@@ -360,6 +488,93 @@
+@@ -360,6 +488,99 @@
  
      public boolean chunkExists(int x, int z)
      {
@@ -321,5 +321,11 @@
 +        {
 +            return null;
 +        }
++    }
++
++    // TISCM /info container command added getter
++    public Long2ObjectMap<Chunk> getLoadedChunks$TISCM()
++    {
++        return this.loadedChunks;
 +    }
  }

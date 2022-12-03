@@ -1,0 +1,13 @@
+--- a/net/minecraft/world/gen/ChunkCacheNeighborNotification.java
++++ b/net/minecraft/world/gen/ChunkCacheNeighborNotification.java
+@@ -85,4 +85,10 @@
+     {
+         throw new RuntimeException("Not yet implemented");
+     }
++
++    // TISCM /info container command added getter
++    public int getMask()
++    {
++        return this.mask;
++    }
+ }
