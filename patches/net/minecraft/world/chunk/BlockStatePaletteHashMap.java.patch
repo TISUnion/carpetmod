@@ -1,0 +1,26 @@
+--- a/net/minecraft/world/chunk/BlockStatePaletteHashMap.java
++++ b/net/minecraft/world/chunk/BlockStatePaletteHashMap.java
+@@ -1,5 +1,7 @@
+ package net.minecraft.world.chunk;
+ 
++import java.util.ArrayList;
++import java.util.List;
+ import java.util.function.Function;
+ import javax.annotation.Nullable;
+ import net.minecraft.nbt.NBTTagCompound;
+@@ -109,4 +111,15 @@
+             paletteList.add(this.serializer.apply(this.statePaletteMap.get(i)));
+         }
+     }
++
++    // TISCM palette command added getter
++    public List<T> getStates()
++    {
++        List<T> states = new ArrayList<>();
++        for (int i = 0; i < this.getPaletteSize(); ++i)
++        {
++            states.add(this.get(i));
++        }
++        return states;
++    }
+ }

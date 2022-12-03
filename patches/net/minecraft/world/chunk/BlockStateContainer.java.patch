@@ -83,7 +83,7 @@
          this.lock();
          BlockStatePaletteHashMap<T> blockstatepalettehashmap = new BlockStatePaletteHashMap<>(this.registry, this.bits, this.field_205522_c, this.deserializer, this.serializer);
          blockstatepalettehashmap.idFor(this.defaultState);
-@@ -243,4 +289,63 @@
+@@ -243,4 +289,81 @@
      {
          return 1 + this.palette.getSerializedSize() + PacketBuffer.getVarIntSize(this.storage.size()) + this.storage.getBackingLongArray().length * 8;
      }
@@ -146,4 +146,22 @@
 +    }
 +
 +    // Lithium chunk.serialization ends
++
++    // TISCM palette command added getter
++    public IBlockStatePalette<T> getPalette()
++    {
++        return this.palette;
++    }
++
++    // TISCM palette command added getter
++    public BitArray getStorage()
++    {
++        return this.storage;
++    }
++
++    // TISCM palette command added getter
++    public int getBits()
++    {
++        return this.bits;
++    }
  }

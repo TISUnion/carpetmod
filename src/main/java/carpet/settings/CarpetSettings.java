@@ -781,6 +781,12 @@ public class CarpetSettings
     public static boolean asyncBeaconUpdates = false;
     */
 
+    @Rule(
+            desc = "Enables /palette command for block state palette debug",
+            category = COMMAND
+    )
+    public static String commandPalette = "false";
+
 
 
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$

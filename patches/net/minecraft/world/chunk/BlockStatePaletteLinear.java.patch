@@ -1,0 +1,27 @@
+--- a/net/minecraft/world/chunk/BlockStatePaletteLinear.java
++++ b/net/minecraft/world/chunk/BlockStatePaletteLinear.java
+@@ -1,5 +1,8 @@
+ package net.minecraft.world.chunk;
+ 
++import java.util.ArrayList;
++import java.util.Arrays;
++import java.util.List;
+ import java.util.function.Function;
+ import javax.annotation.Nullable;
+ import net.minecraft.nbt.NBTTagCompound;
+@@ -104,4 +107,15 @@
+ 
+         this.arraySize = nbt.size();
+     }
++
++    // TISCM palette command added getter
++    public List<T> getStates()
++    {
++        List<T> states = new ArrayList<>();
++        for (int i = 0; i < this.func_202137_b(); ++i)
++        {
++            states.add(this.get(i));
++        }
++        return states;
++    }
+ }

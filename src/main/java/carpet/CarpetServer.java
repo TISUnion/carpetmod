@@ -109,6 +109,7 @@ public class CarpetServer // static for now - easier to handle all around the co
         RaycountCommand.register(dispatcher);
         RemoveEntityCommand.getInstance().registerCommand(dispatcher);
         ClusterCommand.register(dispatcher);
+        PaletteCommand.getInstance().registerCommand(dispatcher);
     }
 
     public static void disconnect()
