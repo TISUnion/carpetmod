@@ -787,6 +787,9 @@ public class CarpetSettings
     )
     public static String commandPalette = "false";
 
+    @Rule(desc = "Fixes the async packet bugs related to asynch observer updates.", category = BUGFIX)
+    public static boolean asyncPacketUpdatesFix = false;
+
 
 
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$

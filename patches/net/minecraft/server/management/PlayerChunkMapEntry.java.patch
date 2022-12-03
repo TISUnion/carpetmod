@@ -205,7 +205,7 @@
          }
      }
  
-@@ -309,4 +398,15 @@
+@@ -309,4 +398,22 @@
  
          return d0;
      }
@@ -219,5 +219,12 @@
 +    public Map<EntityPlayerMP, int[]> getNeighborLightTrackings()
 +    {
 +        return neighborLightTrackings;
++    }
++    // [TISCM] Newlight - getters ends
++
++    // CM asyncPacketUpdatesFix setter
++    public void setChanges(int changes)
++    {
++        this.changes = changes;
 +    }
  }
