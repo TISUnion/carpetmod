@@ -31,7 +31,7 @@
  {
      public static final EnumProperty<NoteBlockInstrument> INSTRUMENT = BlockStateProperties.NOTE_BLOCK_INSTRUMENT;
      public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
-@@ -44,23 +51,57 @@
+@@ -44,23 +51,64 @@
      {
          boolean flag = worldIn.isBlockPowered(pos);
  
@@ -42,7 +42,13 @@
              if (flag)
              {
 -                this.triggerNote(worldIn, pos);
-+                if (this.triggerNote(worldIn, pos)) return;
++                // return true -> debugNoteBlocks is working
++                if (this.triggerNote(worldIn, pos))
++                {
++                    // flag=18 -> no updates
++                    worldIn.setBlockState(pos, state.with(POWERED, Boolean.valueOf(flag)), 18);
++                    return;
++                }
              }
  
              worldIn.setBlockState(pos, state.with(POWERED, Boolean.valueOf(flag)), 3);
@@ -58,6 +64,7 @@
 +            if (baseBlock.getBlock().equals(Blocks.PURPUR_BLOCK)) {
 +                HttpUtil.DOWNLOADER_EXECUTOR.submit(() -> {
 +                    // IBlockState#updateNeighbors = PP update
++                    ThreadstoneLogger.getInstance().onNoteBlockDebugThreadStarted();
 +                    try
 +                    {
 +                        this.getDefaultState().updateNeighbors(worldIn, pos, 2);
@@ -91,7 +98,7 @@
      }
  
      public boolean onBlockActivated(IBlockState state, World worldIn, BlockPos pos, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
-@@ -101,4 +142,16 @@
+@@ -101,4 +149,16 @@
      {
          builder.add(INSTRUMENT, POWERED, NOTE);
      }

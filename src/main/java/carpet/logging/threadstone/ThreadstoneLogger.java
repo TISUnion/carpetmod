@@ -39,16 +39,26 @@ public class ThreadstoneLogger extends AbstractHUDLogger {
 
     @Override
     public ITextComponent[] onHudUpdate(String option, EntityPlayer playerEntity) {
-        return new ITextComponent[] {Messenger.s(this.getThreadLifetimes())};
+        long downloaderCount = Thread.getAllStackTraces().keySet().stream().
+                filter(thread -> thread.getState() == Thread.State.RUNNABLE && thread.getName().startsWith("Downloader ")).
+                count();
+        return new ITextComponent[] {
+                Messenger.s(this.getThreadLifetimes()),
+                Messenger.s(String.format("Runnable Downloader: %dx", downloaderCount))
+        };
     }
 
     private static ThreadstoneLogger INSTANCE;
 
-    private void logString(String msg) {
+    private void logText(ITextComponent msg) {
         this.log(((playerOption, player) -> {
-            Messenger.m(player, Messenger.s(msg));
+            Messenger.m(player, msg);
             return null;
         }));
+    }
+
+    private void logString(String msg) {
+        this.logText(Messenger.s(msg));
     }
 
     public String getThreadLifetimes() {
@@ -81,7 +91,7 @@ public class ThreadstoneLogger extends AbstractHUDLogger {
     }
 
     public void onExceptionallyEndedAsyncThread(Throwable throwable) {
-        logString((String.format(ASYNC_EXCEPTION_FORMAT, (Object) throwable.getStackTrace())));
+        logString((String.format(ASYNC_EXCEPTION_FORMAT, throwable)));
     }
 
     public void onConcurrentWriteCrash(Throwable throwable) {
@@ -102,4 +112,7 @@ public class ThreadstoneLogger extends AbstractHUDLogger {
 //                pos.getZ(), Thread.currentThread().getName(), newState.toString(), flags));
     }
 
+    public void onNoteBlockDebugThreadStarted() {
+        logString(String.format("debugNoteBlocks thread %s started", Thread.currentThread().getName()));
+    }
 }
