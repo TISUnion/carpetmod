@@ -45,7 +45,10 @@ public class ThreadstoneLogger extends AbstractHUDLogger {
     private static ThreadstoneLogger INSTANCE;
 
     private void logString(String msg) {
-        this.log(((playerOption, player) -> new ITextComponent[] { Messenger.s(msg) }));
+        this.log(((playerOption, player) -> {
+            Messenger.m(player, Messenger.s(msg));
+            return null;
+        }));
     }
 
     public String getThreadLifetimes() {
