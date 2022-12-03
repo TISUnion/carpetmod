@@ -88,7 +88,7 @@ public class ClusterCommand {
         List<ChunkPos> clusters = helper.getClusters(clusterNum);
         lastResult = clusters;
         String msg = clusters.stream().map(ChunkPos::toString).collect(Collectors.joining("\n"));
-        Messenger.m(commandContext.getSource(), "Calculated cluster chunks: \n" + msg);
+        Messenger.m(commandContext.getSource(), "w Calculated cluster chunks: \n" + msg);
         return 1;
     }
 
@@ -99,7 +99,7 @@ public class ClusterCommand {
 
     private static int cmdLoad(CommandContext<CommandSource> commandContext) {
         commandContext.getSource().getWorld().getChunkProvider().loadChunks(lastResult, (chunk) -> {
-            Messenger.m(commandContext.getSource(), "Loaded cluster chunk: " + chunk.getPos() + "\n");
+            Messenger.m(commandContext.getSource(), "w Loaded cluster chunk: " + chunk.getPos());
         });
         return 1;
     }
@@ -156,7 +156,7 @@ public class ClusterCommand {
                 result.addAll(currentOffset);
                 if (result.size() >= clusterNum) break;
             }
-            return result.size() >= clusterNum ? result : result.subList(0, clusterNum);
+            return result.size() <= clusterNum ? result : result.subList(0, clusterNum);
         }
 
         public ChunkPos getGlassChunkPos() {
