@@ -1,8 +1,9 @@
 --- a/net/minecraft/block/BlockNote.java
 +++ b/net/minecraft/block/BlockNote.java
-@@ -1,7 +1,9 @@
+@@ -1,7 +1,10 @@
  package net.minecraft.block;
  
++import carpet.logging.threadstone.ThreadstoneLogger;
 +import carpet.settings.CarpetSettings;
  import net.minecraft.block.state.IBlockState;
  import net.minecraft.entity.player.EntityPlayer;
@@ -10,7 +11,7 @@
  import net.minecraft.init.Particles;
  import net.minecraft.item.BlockItemUseContext;
  import net.minecraft.state.BooleanProperty;
-@@ -11,14 +13,18 @@
+@@ -11,14 +14,18 @@
  import net.minecraft.state.properties.BlockStateProperties;
  import net.minecraft.state.properties.NoteBlockInstrument;
  import net.minecraft.stats.StatList;
@@ -30,7 +31,7 @@
  {
      public static final EnumProperty<NoteBlockInstrument> INSTRUMENT = BlockStateProperties.NOTE_BLOCK_INSTRUMENT;
      public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
-@@ -44,23 +50,50 @@
+@@ -44,23 +51,57 @@
      {
          boolean flag = worldIn.isBlockPowered(pos);
  
@@ -57,7 +58,14 @@
 +            if (baseBlock.getBlock().equals(Blocks.PURPUR_BLOCK)) {
 +                HttpUtil.DOWNLOADER_EXECUTOR.submit(() -> {
 +                    // IBlockState#updateNeighbors = PP update
-+                    this.getDefaultState().updateNeighbors(worldIn, pos, 2);
++                    try
++                    {
++                        this.getDefaultState().updateNeighbors(worldIn, pos, 2);
++                    }
++                    catch (Throwable throwable)
++                    {
++                        ThreadstoneLogger.getInstance().onExceptionallyEndedAsyncThread(throwable);
++                    }
 +                });
 +            } else if (baseBlock.getBlock().equals(Blocks.COMPARATOR)) {
 +
@@ -83,7 +91,7 @@
      }
  
      public boolean onBlockActivated(IBlockState state, World worldIn, BlockPos pos, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
-@@ -101,4 +134,16 @@
+@@ -101,4 +142,16 @@
      {
          builder.add(INSTRUMENT, POWERED, NOTE);
      }
