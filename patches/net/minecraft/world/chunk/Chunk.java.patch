@@ -534,7 +534,7 @@
 +        }
 +
 +        // TISCM optimizedPushableEntityCollision
-+        if (this.optimizedHardHitBoxEntityCollisionEnabled)
++        if (this.optimizedPushableEntityCollisionEnabled)
 +        {
 +            this.pushableEntityLists[index].remove(entityIn);
 +        }
