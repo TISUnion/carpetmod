@@ -35,8 +35,8 @@
 +            if (CarpetSettings.asyncUpdatesAmplifier && (worldIn instanceof WorldServer) &&
 +                    ThreadstoneLogger.isCurrentThreadAsync((WorldServer) worldIn))
 +            {
-+                this.tick(worldIn.getBlockState(pos), worldIn.getWorld(), pos, worldIn.getRandom());
 +                this.updateNeighborsInFront(worldIn, pos, state);
++                this.tick(worldIn.getBlockState(pos), worldIn.getWorld(), pos, worldIn.getRandom());
 +                return;
 +            }
 +            else
