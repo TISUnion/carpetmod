@@ -1,13 +1,18 @@
 package carpet.logging.threadstone;
 
+import carpet.CarpetServer;
 import carpet.logging.AbstractHUDLogger;
 import carpet.utils.Messenger;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.crash.ReportedException;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.WorldServer;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -94,8 +99,15 @@ public class ThreadstoneLogger extends AbstractHUDLogger {
         logString((String.format(ASYNC_EXCEPTION_FORMAT, throwable)));
     }
 
-    public void onConcurrentWriteCrash(Throwable throwable) {
+    public void onConcurrentWriteCrash(ReportedException throwable) {
         logString(String.format(CONCURRENT_WRITE_CRASH_FORMAT, Thread.currentThread().getName()));
+
+        // save the crash report for further inspecting
+        File file1 = new File(
+                new File(CarpetServer.minecraft_server.getDataDirectory(), "crash-async"),
+                "ConcurrentWrite-" + (new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss")).format(new Date()) + "-" + Thread.currentThread().getName() + ".txt"
+        );
+        throwable.getCrashReport().saveToFile(file1);
     }
 
     public static boolean isCurrentThreadAsync(WorldServer worldIn) {
