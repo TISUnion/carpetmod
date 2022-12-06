@@ -1,9 +1,8 @@
 package carpet.logging.microtiming.events;
 
 import carpet.logging.microtiming.enums.EventType;
-import carpet.utils.TextUtil;
 import carpet.utils.ToTextAble;
-import carpet.utils.TranslatableBase;
+import carpet.utils.TranslationContext;
 import carpet.utils.Messenger;
 import net.minecraft.block.Block;
 import net.minecraft.util.registry.IRegistry;
@@ -11,7 +10,7 @@ import net.minecraft.util.text.ITextComponent;
 
 import java.util.Objects;
 
-public abstract class BaseEvent extends TranslatableBase implements ToTextAble
+public abstract class BaseEvent extends TranslationContext implements ToTextAble
 {
 	protected static final String COLOR_ACTION = "c ";
 	protected static final String COLOR_TARGET = "c ";
@@ -72,7 +71,7 @@ public abstract class BaseEvent extends TranslatableBase implements ToTextAble
 	{
 		return Messenger.c(
 				"g [",
-				TextUtil.getBlockName(block),
+				Messenger.block(block),
 				"^w " + IRegistry.BLOCK.getKey(block),
 				"g ] "
 		);

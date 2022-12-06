@@ -42,7 +42,7 @@ public class MicroTimingStandardCarpetLogger extends Logger
 		if (player instanceof EntityPlayerMP && !MicroTimingLoggerManager.isLoggerActivated())
 		{
 			String command = "/carpet microTiming true";
-			Messenger.m(player, Messenger.c(
+			Messenger.tell(player, Messenger.c(
 					"w " + String.format(translator.tr("rule_hint", "Use command %s to start logging"), command),
 					"?" + command,
 					"^w " + translator.tr("Click to execute")

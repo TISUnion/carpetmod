@@ -30,7 +30,7 @@ public class TileEntityTickStageExtra extends TickStageExtraBase
 	{
 		return Messenger.c(
 				String.format("w %s: ", MicroTimingLoggerManager.tr("Block")),
-				TextUtil.getBlockName(this.block),
+				Messenger.block(this.block),
 				String.format("w \n%s: %d", MicroTimingLoggerManager.tr("Order"), this.order),
 				String.format("w \n%s: [%d, %d, %d]", MicroTimingLoggerManager.tr("Position"), this.pos.getX(), this.pos.getY(), this.pos.getZ())
 		);
@@ -39,6 +39,6 @@ public class TileEntityTickStageExtra extends TickStageExtraBase
 	@Override
 	public ClickEvent getClickEvent()
 	{
-		return new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, TextUtil.getTeleportCommand(this.pos, this.world.getDimension().getType()));
+		return new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, TextUtil.tp(this.pos, this.world.getDimension().getType()));
 	}
 }

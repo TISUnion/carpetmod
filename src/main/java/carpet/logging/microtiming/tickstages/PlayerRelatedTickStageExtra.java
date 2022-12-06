@@ -27,6 +27,6 @@ public abstract class PlayerRelatedTickStageExtra extends TickStageExtraBase
 	@Override
 	public ClickEvent getClickEvent()
 	{
-		return new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, TextUtil.getTeleportCommand(this.player));
+		return new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, TextUtil.tp(this.player));
 	}
 }

@@ -37,7 +37,7 @@ public class TileTickTickStageExtra extends TickStageExtraBase
 		if (target instanceof Block)
 		{
 			list.add(String.format("w %s: ", MicroTimingLoggerManager.tr("Block")));
-			list.add(TextUtil.getBlockName((Block)target));
+			list.add(Messenger.block((Block)target));
 			list.add("w \n");
 		}
 		list.add(String.format("w %s: %d\n", MicroTimingLoggerManager.tr("Order"), this.order));
@@ -49,6 +49,6 @@ public class TileTickTickStageExtra extends TickStageExtraBase
 	@Override
 	public ClickEvent getClickEvent()
 	{
-		return new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, TextUtil.getTeleportCommand(this.nextTickListEntry.position, this.world.getDimension().getType()));
+		return new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, TextUtil.tp(this.nextTickListEntry.position, this.world.getDimension().getType()));
 	}
 }

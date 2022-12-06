@@ -60,7 +60,7 @@ public class MicroTimingMarker
 //			textParams.put("dim", new StringValue(serverWorld.getDimension().getType().toString()));
 //			textParams.put("duration", new NumericValue(Integer.MAX_VALUE));
 //			textParams.put("pos", ListValue.of(new NumericValue(blockPos.getX() + 0.5D), new NumericValue(blockPos.getY() + 0.5D), new NumericValue(blockPos.getZ() + 0.5D)));
-//			textParams.put("text", new FormattedTextValue(Messenger.c(Messenger.s(TextUtil.parseCarpetStyle(MicroTimingUtil.getColorStyle(this.color)).getColor() + "# " + Formatting.RESET), TextUtil.copyText(this.markerName))));
+//			textParams.put("text", new FormattedTextValue(Messenger.c(Messenger.s(Messenger.parseCarpetStyle(MicroTimingUtil.getColorStyle(this.color)).getColor() + "# " + Formatting.RESET), Messenger.copy(this.markerName))));
 //			textParams.put("align", new StringValue(ScarpetDisplayedTextHack.MICRO_TIMING_TEXT_MAGIC_STRING));
 //			this.text = new ShapeData<>(new ShapeDispatcher.Text(), textParams);
 //		}
@@ -167,20 +167,20 @@ public class MicroTimingMarker
 	// 1.15 client cannot response to text component color, so just use Formatting symbol here
 	private ITextComponent withFormattingSymbol(String text)
 	{
-		return Messenger.s(TextUtil.parseCarpetStyle(MicroTimingUtil.getColorStyle(color)).getColor() + text + TextFormatting.RESET);
+		return Messenger.s(Messenger.parseCarpetStyle(MicroTimingUtil.getColorStyle(color)).getColor() + text + TextFormatting.RESET);
 	}
 
 	// [1, 2, 3]
 	public ITextComponent toShortText()
 	{
-		return this.withFormattingSymbol(TextUtil.getCoordinateString(this.blockPos));
+		return this.withFormattingSymbol(TextUtil.coord(this.blockPos));
 	}
 
 	// [1, 2, 3] red
 	public ITextComponent toFullText()
 	{
 		return Messenger.c(
-				Messenger.s(TextUtil.getCoordinateString(this.blockPos)),
+				Messenger.s(Messenger.coord(this.blockPos)),
 				this.withFormattingSymbol(" " + this.color.toString())
 		);
 	}

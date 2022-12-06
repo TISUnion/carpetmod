@@ -4,7 +4,7 @@ import carpet.logging.microtiming.MicroTimingLoggerManager;
 import carpet.logging.microtiming.utils.MicroTimingUtil;
 import carpet.settings.CarpetSettings;
 import carpet.utils.Messenger;
-import carpet.utils.TranslatableBase;
+import carpet.utils.TranslationContext;
 import com.google.common.collect.Maps;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-public class MicroTimingMarkerManager extends TranslatableBase
+public class MicroTimingMarkerManager extends TranslationContext
 {
 	private static final MicroTimingMarkerManager INSTANCE = new MicroTimingMarkerManager();
 

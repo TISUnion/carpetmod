@@ -27,11 +27,11 @@ public class ExecuteTileTickEvent extends BaseEvent
 		List<Object> list = Lists.newArrayList();
 		list.add(this.getEnclosedTranslatedBlockNameHeaderText(this.tileTickEntry.getTarget()));
 		list.add(COLOR_ACTION + this.tr("Execute"));
-		list.add(TextUtil.getSpaceText());
+		list.add(Messenger.getSpaceText());
 		list.add(COLOR_TARGET + this.tr("TileTick Event"));
 		if (this.getEventType() == EventType.ACTION_END)
 		{
-			list.add(TextUtil.getSpaceText());
+			list.add(Messenger.getSpaceText());
 			list.add(COLOR_RESULT + MicroTimingLoggerManager.tr("ended"));
 		}
 		list.add(String.format("^w %s: %d (%s)", MicroTimingLoggerManager.tr("Priority"), this.tileTickEntry.priority.getPriority(), this.tileTickEntry.priority));

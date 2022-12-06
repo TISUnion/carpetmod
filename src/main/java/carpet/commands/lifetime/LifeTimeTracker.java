@@ -4,13 +4,11 @@ import carpet.commands.AbstractTracker;
 import carpet.commands.lifetime.utils.LifeTimeTrackerUtil;
 import carpet.commands.lifetime.utils.SpecificDetailMode;
 import carpet.utils.Messenger;
-import carpet.utils.TextUtil;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
 import net.minecraft.command.CommandSource;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.registry.IRegistry;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -107,7 +105,7 @@ public class LifeTimeTracker extends AbstractTracker
 					sum();
 			if (count == 0)
 			{
-				Messenger.m(source, Messenger.s(this.tr("no_result", "No result yet")));
+				Messenger.tell(source, Messenger.s(this.tr("no_result", "No result yet")));
 			}
 		}
 		catch (Exception e)
@@ -118,7 +116,7 @@ public class LifeTimeTracker extends AbstractTracker
 
 	public void sendUnknownEntity(CommandSource source, String entityTypeString)
 	{
-		Messenger.m(source, Messenger.s(String.format(this.tr("unknown_entity_type", "Unknown entity type \"%s\""), entityTypeString), "r"));
+		Messenger.tell(source, Messenger.s(String.format(this.tr("unknown_entity_type", "Unknown entity type \"%s\""), entityTypeString), "r"));
 	}
 
 	private void printTrackingResultSpecificInner(CommandSource source, String entityTypeString, String detailModeString, boolean realtime)
@@ -135,7 +133,7 @@ public class LifeTimeTracker extends AbstractTracker
 				}
 				catch (IllegalArgumentException e)
 				{
-					Messenger.m(source, Messenger.s(String.format(this.tr("invalid_detail", "Invalid statistic detail \"%s\""), detailModeString), "r"));
+					Messenger.tell(source, Messenger.s(String.format(this.tr("invalid_detail", "Invalid statistic detail \"%s\""), detailModeString), "r"));
 					return;
 				}
 			}
@@ -152,7 +150,7 @@ public class LifeTimeTracker extends AbstractTracker
 					sum();
 			if (count == 0)
 			{
-				Messenger.m(source, Messenger.s(this.tr("no_result", "No result yet")));
+				Messenger.tell(source, Messenger.s(this.tr("no_result", "No result yet")));
 			}
 		}
 		else
@@ -173,8 +171,8 @@ public class LifeTimeTracker extends AbstractTracker
 				String.format("wb %s\n", this.getTranslatedNameFull()),
 				String.format("w %s\n", this.tr("help.doc_summary", "A tracker to track lifetime and spawn / removal reasons from all newly spawned and removed entities")),
 				String.format("w %s", this.tr("help.complete_doc_hint", "Complete doc")),
-				TextUtil.getSpaceText(),
-				TextUtil.getFancyText(
+				Messenger.getSpaceText(),
+				Messenger.fancy(
 						null,
 						Messenger.s(this.tr("help.here", "here"), "ut"),
 						Messenger.s(docLink, "t"),

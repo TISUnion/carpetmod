@@ -1,0 +1,41 @@
+--- a/net/minecraft/util/text/Style.java
++++ b/net/minecraft/util/text/Style.java
+@@ -554,4 +554,38 @@
+                 }
+             }
+         }
++
++    // TISCM field getters
++
++    public Boolean getBoldField()
++    {
++        return this.bold;
++    }
++
++    public Boolean getItalicField()
++    {
++        return this.italic;
++    }
++
++    public Boolean getUnderlineField()
++    {
++        return this.underlined;
++    }
++
++    public Boolean getStrikethroughField()
++    {
++        return this.strikethrough;
++    }
++
++    public Boolean getObfuscatedField()
++    {
++        return this.obfuscated;
++    }
++
++    public TextFormatting getColorField()
++    {
++        return this.color;
++    }
++
++    // TISCM field getters end
+ }

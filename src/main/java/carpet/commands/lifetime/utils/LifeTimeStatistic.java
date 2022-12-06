@@ -3,14 +3,14 @@ package carpet.commands.lifetime.utils;
 import carpet.commands.lifetime.LifeTimeTracker;
 import carpet.utils.Messenger;
 import carpet.utils.TextUtil;
-import carpet.utils.TranslatableBase;
+import carpet.utils.TranslationContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.world.dimension.DimensionType;
 
-public class LifeTimeStatistic extends TranslatableBase
+public class LifeTimeStatistic extends TranslationContext
 {
 	public static final String COLOR_MIN_TIME = "q ";
 	public static final String COLOR_MAX_TIME = "c ";
@@ -138,26 +138,26 @@ public class LifeTimeStatistic extends TranslatableBase
 			{
 				text.appendSibling(Messenger.c(
 						"w  ",
-						TextUtil.getFancyText(
+						Messenger.fancy(
 								null,
 								Messenger.s("[S]", "e"),
 								Messenger.c(
 										"w " + tr("Spawning Position"),
 										"g : ",
-										"w " + TextUtil.getCoordinateString(this.spawningPos)
+										"w " + Messenger.coord(this.spawningPos)
 								),
-								new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, TextUtil.getTeleportCommand(this.spawningPos, this.dimensionType))
+								new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, TextUtil.tp(this.spawningPos, this.dimensionType))
 						),
 						"w  ",
-						TextUtil.getFancyText(
+						Messenger.fancy(
 								null,
 								Messenger.s("[R]", "r"),
 								Messenger.c(
 										"w " + tr("Removal Position"),
 										"g : ",
-										"w " + TextUtil.getCoordinateString(this.removalPos)
+										"w " + Messenger.coord(this.removalPos)
 								),
-								new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, TextUtil.getTeleportCommand(this.removalPos, this.dimensionType))
+								new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, TextUtil.tp(this.removalPos, this.dimensionType))
 						)
 				));
 			}

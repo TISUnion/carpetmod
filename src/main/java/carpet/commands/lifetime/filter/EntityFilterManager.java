@@ -3,8 +3,7 @@ package carpet.commands.lifetime.filter;
 import carpet.commands.lifetime.LifeTimeTracker;
 import carpet.commands.lifetime.utils.LifeTimeTrackerUtil;
 import carpet.utils.Messenger;
-import carpet.utils.TextUtil;
-import carpet.utils.TranslatableBase;
+import carpet.utils.TranslationContext;
 import com.google.common.collect.Maps;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.arguments.EntitySelector;
@@ -17,7 +16,7 @@ import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.function.Predicate;
 
-public class EntityFilterManager extends TranslatableBase
+public class EntityFilterManager extends TranslationContext
 {
 	private static final EntityFilterManager INSTANCE = new EntityFilterManager();
 	private static final Predicate<Entity> DEFAULT_FILTER = entity -> true;
@@ -57,14 +56,14 @@ public class EntityFilterManager extends TranslatableBase
 		{
 			if (!entitySelector.isIncludeNonPlayers() || entitySelector.getUsername() != null)
 			{
-				Messenger.m(source, Messenger.s(this.tr("unsupported.0", "Unsupported entity filter")));
-				Messenger.m(source, Messenger.s(this.tr("unsupported.1", "Please enter a @e style entity selector")));
+				Messenger.tell(source, Messenger.s(this.tr("unsupported.0", "Unsupported entity filter")));
+				Messenger.tell(source, Messenger.s(this.tr("unsupported.1", "Please enter a @e style entity selector")));
 			}
 			else
 			{
 				EntityFilter entityFilter = new EntityFilter(source, entitySelector);
 				this.entityFilter.put(entityType, entityFilter);
-				Messenger.m(source, this.advTr(
+				Messenger.tell(source, this.advTr(
 						"filter_set", "Entity filter of %1$s is set to %2$s",
 						typeName,
 						entityFilter.toText()
@@ -74,7 +73,7 @@ public class EntityFilterManager extends TranslatableBase
 		else
 		{
 			this.entityFilter.remove(entityType);
-			Messenger.m(source, this.advTr(
+			Messenger.tell(source, this.advTr(
 					"filter_removed", "Entity filter of %1$s removed",
 					typeName
 			));
@@ -94,7 +93,7 @@ public class EntityFilterManager extends TranslatableBase
 
 	public void displayFilter(CommandSource source, @Nullable EntityType<?> entityType)
 	{
-		Messenger.m(source, this.advTr(
+		Messenger.tell(source, this.advTr(
 				"display", "Entity filter of %1$s is %2$s",
 				this.getEntityTypeText(entityType),
 				this.getEntityFilterText(entityType)
@@ -103,8 +102,8 @@ public class EntityFilterManager extends TranslatableBase
 
 	public int displayAllFilters(CommandSource source)
 	{
-		Messenger.m(source, Messenger.s(String.format(this.tr("display_total", "There are %s activated filters"), this.entityFilter.size())));
-		this.entityFilter.keySet().forEach(entityType -> Messenger.m(
+		Messenger.tell(source, Messenger.s(String.format(this.tr("display_total", "There are %s activated filters"), this.entityFilter.size())));
+		this.entityFilter.keySet().forEach(entityType -> Messenger.tell(
 				source,
 				Messenger.c(
 						"f - ",
@@ -112,7 +111,7 @@ public class EntityFilterManager extends TranslatableBase
 						"g : ",
 						this.getEntityFilterText(entityType),
 						"w  ",
-						TextUtil.getFancyText(
+						Messenger.fancy(
 								null,
 								Messenger.s("[×]", "r"),
 								Messenger.s(this.tr("click_to_clear", "Click to clear filter")),

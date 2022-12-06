@@ -44,10 +44,10 @@ public class DetectBlockUpdateEvent extends BaseEvent
 		List<Object> list = Lists.newArrayList();
 		list.add(this.getEnclosedTranslatedBlockNameHeaderText(this.fromBlock));
 		list.add(COLOR_ACTION + MicroTimingLoggerManager.tr("Emit"));
-		list.add(TextUtil.getSpaceText());
+		list.add(Messenger.getSpaceText());
 		list.add(COLOR_TARGET + this.updateType);
 		list.add("^w " + this.getUpdateTypeExtraMessage());
-		list.add(TextUtil.getSpaceText());
+		list.add(Messenger.getSpaceText());
 		switch (this.getEventType())
 		{
 			case ACTION_START:

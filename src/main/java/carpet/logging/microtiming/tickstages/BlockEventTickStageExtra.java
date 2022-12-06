@@ -30,7 +30,7 @@ public class BlockEventTickStageExtra extends TickStageExtraBase
 		BlockPos pos = this.blockEventData.getPosition();
 		return Messenger.c(
 				String.format("w %s: ", MicroTimingLoggerManager.tr("Block")),
-				TextUtil.getBlockName(this.blockEventData.getBlock()),
+				Messenger.block(this.blockEventData.getBlock()),
 				String.format("w \n%s: %d", MicroTimingLoggerManager.tr("Order"), this.order),
 				String.format("w \n%s: %d", MicroTimingLoggerManager.tr("Depth"), this.depth),
 				String.format("w \n%s: [%d, %d, %d]", MicroTimingLoggerManager.tr("Position"), pos.getX(), pos.getY(), pos.getZ())
@@ -40,6 +40,6 @@ public class BlockEventTickStageExtra extends TickStageExtraBase
 	@Override
 	public ClickEvent getClickEvent()
 	{
-		return new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, TextUtil.getTeleportCommand(this.blockEventData.getPosition(), this.world.getDimension().getType()));
+		return new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, TextUtil.tp(this.blockEventData.getPosition(), this.world.getDimension().getType()));
 	}
 }

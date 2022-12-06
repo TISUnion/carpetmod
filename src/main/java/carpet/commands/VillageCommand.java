@@ -51,7 +51,7 @@ public class VillageCommand
 				}
 				messages.add(Messenger.c(
 						"w ====== ",
-						TextUtil.getDimensionNameText(world.getDimension().getType()),
+						Messenger.dimension(world),
 						String.format("w  %dx Villages ======", villageList.size())
 				));
 				for (int i = 0; i < villageList.size(); i++)
@@ -83,19 +83,19 @@ public class VillageCommand
 
 	private static void generateVillageInfo(List<ITextComponent> messages, Village village, int index, boolean showDoorDetail)
 	{
-		messages.add(TextUtil.getFancyText(
+		messages.add(Messenger.fancy(
 				null,
 				Messenger.s(String.format("Village #%d", index)),
 				Messenger.s(String.format("Click to see full information of village #%d\nYou need to be in the same dimension of this village", index)),
 				new ClickEvent(ClickEvent.Action.RUN_COMMAND, String.format("/village info %d", index))
 		));
-		messages.add(Messenger.c("w   Dimension: ", TextUtil.getDimensionNameText(village.getWorld().getDimension().getType())));
+		messages.add(Messenger.c("w   Dimension: ", Messenger.dimension(village.getWorld())));
 		BlockPos center = village.getCenter();
-		messages.add(TextUtil.getFancyText(
+		messages.add(Messenger.fancy(
 				null,
-				Messenger.s(String.format("  Center: %s", TextUtil.getCoordinateString(center))),
-				Messenger.s(String.format("Click to teleport to %s", TextUtil.getCoordinateString(center))),
-				new ClickEvent(ClickEvent.Action.RUN_COMMAND, TextUtil.getTeleportCommand(center, village.getWorld().getDimension().getType()))
+				Messenger.s(String.format("  Center: %s", Messenger.coord(center))),
+				Messenger.s(String.format("Click to teleport to %s", Messenger.coord(center))),
+				new ClickEvent(ClickEvent.Action.RUN_COMMAND, TextUtil.tp(center, village.getWorld().getDimension().getType()))
 		));
 		messages.add(Messenger.s(String.format("  Radius: %d", village.getVillageRadius())));
 		messages.add(Messenger.s(String.format("  VillagerCount: %d", village.getNumVillagers())));
@@ -106,7 +106,7 @@ public class VillageCommand
 		{
 			VillageDoorInfo doorInfo = villageDoorInfoList.get(i);
 			BlockPos pos = doorInfo.getDoorBlockPos();
-			line.add(TextUtil.getFancyText(
+			line.add(Messenger.fancy(
 					"g",
 					Messenger.s(" x"),
 					Messenger.c(
@@ -116,7 +116,7 @@ public class VillageCommand
 							String.format("w Y: %d\n", pos.getY()),
 							String.format("w Z: %d", pos.getZ())
 					),
-					new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, TextUtil.getTeleportCommand(pos, village.getWorld().getDimension().getType()))
+					new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, TextUtil.tp(pos, village.getWorld().getDimension().getType()))
 			));
 			if (line.size() == 20 || i == villageDoorInfoList.size() - 1)
 			{

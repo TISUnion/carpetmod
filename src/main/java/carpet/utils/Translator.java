@@ -1,8 +1,6 @@
 package carpet.utils;
 
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.util.text.TextComponentTranslationFormatException;
 
 public class Translator implements Translatable
 {
@@ -96,7 +94,7 @@ public class Translator implements Translatable
 		return Translations.tr(getPath(key, true), key);
 	}
 
-	public ITextComponent advTr(String key, String defaultKeyText, Object ...args)
+	public ITextComponent advTr(String key, String defaultContent, Object ...args)
 	{
 		for (int i = 0; i < args.length; i++)
 		{
@@ -105,7 +103,7 @@ public class Translator implements Translatable
 				args[i] = Messenger.s(args[i].toString());
 			}
 		}
-		String msgKeyString = this.tr(key, defaultKeyText);
-		return TextUtil.format(msgKeyString, args);
+		String msgKeyString = this.tr(key, defaultContent);
+		return Messenger.format(msgKeyString, args);
 	}
 }

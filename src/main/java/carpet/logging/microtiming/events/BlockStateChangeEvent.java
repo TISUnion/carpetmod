@@ -33,7 +33,7 @@ public class BlockStateChangeEvent extends AbstractSetblockStateEvent
 	{
 		Function<IProperty<?>, ITextComponent> hoverMaker = currentProperty -> {
 			List<ITextComponent> lines = Lists.newArrayList();
-			lines.add(TextUtil.attachFormatting(Messenger.s(tr("State change details")), TextFormatting.BOLD));
+			lines.add(Messenger.formatting(Messenger.s(tr("State change details")), TextFormatting.BOLD));
 			this.oldBlockState.getProperties().stream().
 					map(property -> {
 						ITextComponent text = Optional.ofNullable(this.changes.get(property)).
@@ -49,7 +49,7 @@ public class BlockStateChangeEvent extends AbstractSetblockStateEvent
 						return text;
 					}).
 					forEach(lines::add);
-			return TextUtil.join(Messenger.s("\n"), lines.toArray(new ITextComponent[0]));
+			return Messenger.join(Messenger.s("\n"), lines.toArray(new ITextComponent[0]));
 		};
 		if (isHover)
 		{
@@ -57,10 +57,10 @@ public class BlockStateChangeEvent extends AbstractSetblockStateEvent
 		}
 		else
 		{
-			return TextUtil.join(
+			return Messenger.join(
 					Messenger.s(" "),
 					this.changes.values().stream().
-							map(change -> TextUtil.attachHoverText(
+							map(change -> Messenger.hover(
 									PropertyTexts.value("=", change.property, change.newValue),
 									hoverMaker.apply(change.property)
 							)).
@@ -74,7 +74,7 @@ public class BlockStateChangeEvent extends AbstractSetblockStateEvent
 	{
 		List<Object> list = Lists.newArrayList();
 		list.add(this.getEnclosedTranslatedBlockNameHeaderText(this.oldBlockState.getBlock()));
-		ITextComponent titleText = TextUtil.getFancyText(
+		ITextComponent titleText = Messenger.fancy(
 				null,
 				Messenger.c(COLOR_ACTION + this.tr("State Change")),
 				this.getFlagsText(),
@@ -90,9 +90,9 @@ public class BlockStateChangeEvent extends AbstractSetblockStateEvent
 		}
 		else
 		{
-			list.add(TextUtil.getFancyText(
+			list.add(Messenger.fancy(
 					null,
-					Messenger.c(titleText, TextUtil.getSpaceText(), COLOR_RESULT + this.tr("finished")),
+					Messenger.c(titleText, Messenger.getSpaceText(), COLOR_RESULT + this.tr("finished")),
 					this.getChangesText(true),
 					null
 			));
@@ -129,7 +129,7 @@ public class BlockStateChangeEvent extends AbstractSetblockStateEvent
 			return Messenger.c(
 					Messenger.s(property.getName()),
 					"g " + divider,
-					TextUtil.property(property, value)
+					Messenger.property(property, value)
 			);
 		}
 
@@ -139,9 +139,9 @@ public class BlockStateChangeEvent extends AbstractSetblockStateEvent
 			return Messenger.c(
 					Messenger.s(property.getName()),
 					"g : ",
-					TextUtil.property(property, oldValue),
+					Messenger.property(property, oldValue),
 					"g ->",
-					TextUtil.property(property, newValue)
+					Messenger.property(property, newValue)
 			);
 		}
 

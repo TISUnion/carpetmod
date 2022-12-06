@@ -93,7 +93,7 @@ public class RefreshCommand extends AbstractCommand
 	private void refreshPlayerInventory(CommandSource source, EntityPlayerMP player)
 	{
 		source.getServer().getPlayerList().sendInventory(player);
-		Messenger.m(player, Messenger.s(this.tr("inventory.done", "Inventory refreshed")));
+		Messenger.tell(player, Messenger.s(this.tr("inventory.done", "Inventory refreshed")));
 	}
 
 	private int refreshSelfInventory(CommandSource source) throws CommandSyntaxException

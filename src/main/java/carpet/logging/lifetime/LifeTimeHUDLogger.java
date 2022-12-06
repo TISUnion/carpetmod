@@ -46,7 +46,7 @@ public class LifeTimeHUDLogger extends AbstractHUDLogger
 				EntityType<?> entityType = entityTypeOptional.get();
 				BasicTrackedData data = tracker.getDataMap().getOrDefault(entityType, new BasicTrackedData());
 				return new ITextComponent[]{Messenger.c(
-						TextUtil.attachFormatting(TextUtil.copyText(entityType.getName()), TextFormatting.GRAY),
+						Messenger.formatting(Messenger.copy(entityType.getName()), TextFormatting.GRAY),
 						"g : ",
 						"e " + data.getSpawningCount(),
 						"g /",

@@ -335,11 +335,11 @@ public class SpawnReporter
                     report.add(Messenger.c(
                             String.format("w  > %s (%.1f min), %.1f m/t, {", code, 60*hours, (1.0D*spawn_cap_count.get(code))/ spawn_attempts.get(code)),
                             Messenger.c(
-                                    TextUtil.getFancyText(null, Messenger.s(String.format("%.1f%%F", full)), Messenger.s(String.format("%.6f%% Full", full)), null),
+                                    Messenger.fancy(null, Messenger.s(String.format("%.1f%%F", full)), Messenger.s(String.format("%.6f%% Full", full)), null),
                                     "w  / ",
-                                    TextUtil.getFancyText(null, Messenger.s(String.format("%.1f%%-", fail)), Messenger.s(String.format("%.6f%% Fail", fail)), null),
+                                    Messenger.fancy(null, Messenger.s(String.format("%.1f%%-", fail)), Messenger.s(String.format("%.6f%% Fail", fail)), null),
                                     "w  / ",
-                                    TextUtil.getFancyText(null, Messenger.s(String.format("%.1f%%+", succ)), Messenger.s(String.format("%.6f%% Success", succ)), null)
+                                    Messenger.fancy(null, Messenger.s(String.format("%.1f%%+", succ)), Messenger.s(String.format("%.6f%% Success", succ)), null)
                             ),
                             String.format("w }; %.2f s/att", (1.0D*spawn_ticks_spawns.get(code))/(spawn_ticks_fail.get(code)+spawn_ticks_succ.get(code)))
                     ));

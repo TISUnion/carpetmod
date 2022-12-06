@@ -79,6 +79,6 @@ public class StackTracePrinter
 	public ITextComponent toSymbolText()
 	{
 		ITextComponent baseText = this.toBaseText();
-		return TextUtil.getFancyText("f", Messenger.s("$"), baseText, null);
+		return Messenger.fancy("f", Messenger.s("$"), baseText, null);
 	}
 }

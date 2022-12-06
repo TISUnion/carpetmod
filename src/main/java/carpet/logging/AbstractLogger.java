@@ -1,7 +1,7 @@
 package carpet.logging;
 
 import carpet.CarpetServer;
-import carpet.utils.TranslatableBase;
+import carpet.utils.TranslationContext;
 import com.google.common.base.Joiner;
 import com.mojang.brigadier.StringReader;
 import net.minecraft.util.text.ITextComponent;
@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public abstract class AbstractLogger extends TranslatableBase
+public abstract class AbstractLogger extends TranslationContext
 {
 	public final static String MULTI_OPTION_SEP_REG = "[,. ]";
 	public final static String OPTION_SEP = ",";
