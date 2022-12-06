@@ -81,7 +81,7 @@ public class CarpetWorldEdit
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     public static final String MOD_ID = "worldedit";
-    public static final String VERSION = "7.2.6";
+    public static final String VERSION = "7.2.7";
 
     public static final String CUI_PLUGIN_CHANNEL = "cui";
     public static final ResourceLocation CUI_IDENTIFIER = new ResourceLocation(CarpetWorldEdit.MOD_ID, CarpetWorldEdit.CUI_PLUGIN_CHANNEL);
