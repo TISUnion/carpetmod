@@ -31,7 +31,7 @@
  {
      public static final EnumProperty<NoteBlockInstrument> INSTRUMENT = BlockStateProperties.NOTE_BLOCK_INSTRUMENT;
      public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
-@@ -44,11 +51,22 @@
+@@ -44,10 +51,18 @@
      {
          boolean flag = worldIn.isBlockPowered(pos);
  
@@ -41,58 +41,70 @@
          {
              if (flag)
              {
-+                if (CarpetSettings.debugNoteBlocks)
++                if (CarpetSettings.debugNoteBlocks && this.debugNoteBlocksImpl(worldIn, pos))
 +                {
 +                    // flag=18 -> no updates
 +                    worldIn.setBlockState(pos, state.with(POWERED, Boolean.valueOf(flag)), 18);
-+                }
-                 this.triggerNote(worldIn, pos);
-+                if (CarpetSettings.debugNoteBlocks)
-+                {
 +                    return;
 +                }
+                 this.triggerNote(worldIn, pos);
              }
  
-             worldIn.setBlockState(pos, state.with(POWERED, Boolean.valueOf(flag)), 3);
-@@ -57,6 +75,37 @@
+@@ -55,6 +70,53 @@
+         }
+     }
  
-     private void triggerNote(World worldIn, BlockPos pos)
-     {
-+        // TISCM - debugNoteBlocks
-+        if (CarpetSettings.debugNoteBlocks) {
-+            IBlockState baseBlock = worldIn.getBlockState(pos.down());
-+            if (baseBlock.getBlock().equals(Blocks.PURPUR_BLOCK)) {
-+                HttpUtil.DOWNLOADER_EXECUTOR.submit(() -> {
-+                    // IBlockState#updateNeighbors = PP update
-+                    ThreadstoneLogger.getInstance().onNoteBlockDebugThreadStarted();
-+                    try
-+                    {
-+                        this.getDefaultState().updateNeighbors(worldIn, pos, 2);
-+                    }
-+                    catch (Throwable throwable)
-+                    {
-+                        ThreadstoneLogger.getInstance().onExceptionallyEndedAsyncThread(throwable);
-+                    }
-+                });
-+            } else if (baseBlock.getBlock().equals(Blocks.COMPARATOR)) {
-+
-+                TileEntity tileEntity = worldIn.getTileEntity(pos.down());
-+                if (tileEntity instanceof TileEntityComparator) {
-+                    int power = ((TileEntityComparator) tileEntity).getOutputSignal();
-+                    try {
-+                        Thread.sleep(10L * power);
-+                    } catch (InterruptedException e) {
-+                        throw new RuntimeException(e);
-+                    }
++    // TISCM - debugNoteBlocks
++    private boolean debugNoteBlocksImpl(World worldIn, BlockPos pos)
++    {
++        IBlockState baseBlock = worldIn.getBlockState(pos.down());
++        if (baseBlock.getBlock().equals(Blocks.PURPUR_BLOCK))
++        {
++            HttpUtil.DOWNLOADER_EXECUTOR.submit(() -> {
++                // IBlockState#updateNeighbors = PP update
++                ThreadstoneLogger.getInstance().onNoteBlockDebugThreadStarted();
++                try
++                {
++                    this.getDefaultState().updateNeighbors(worldIn, pos, 2);
 +                }
-+            } else if (baseBlock.getBlock().equals(Blocks.ACTIVATOR_RAIL)) {
-+                throw new StackOverflowError("Update suppression simulated by debugNoteBlocks from TISCM. ");
++                catch (Throwable throwable)
++                {
++                    ThreadstoneLogger.getInstance().onExceptionallyEndedAsyncThread(throwable);
++                }
++            });
++        }
++        else if (baseBlock.getBlock().equals(Blocks.COMPARATOR))
++        {
++            TileEntity tileEntity = worldIn.getTileEntity(pos.down());
++            if (tileEntity instanceof TileEntityComparator)
++            {
++                int power = ((TileEntityComparator) tileEntity).getOutputSignal();
++                try
++                {
++                    Thread.sleep(10L * power);
++                }
++                catch (InterruptedException e)
++                {
++                    throw new RuntimeException(e);
++                }
 +            }
 +        }
++        else if (baseBlock.getBlock().equals(Blocks.ACTIVATOR_RAIL))
++        {
++            throw new StackOverflowError("Update suppression simulated by debugNoteBlocks from TISCM.");
++        }
++        else
++        {
++            // no special block
++            return false;
++        }
++        return true;
++    }
++
+     private void triggerNote(World worldIn, BlockPos pos)
+     {
          if (worldIn.getBlockState(pos.up()).isAir())
-         {
-             worldIn.addBlockEvent(pos, this, 0, 0);
-@@ -101,4 +150,16 @@
+@@ -101,4 +163,16 @@
      {
          builder.add(INSTRUMENT, POWERED, NOTE);
      }
