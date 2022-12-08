@@ -3,7 +3,6 @@ package carpet.commands;
 import carpet.settings.CarpetSettings;
 import carpet.settings.SettingsManager;
 import carpet.utils.Messenger;
-import carpet.utils.TextUtil;
 import carpet.utils.deobfuscator.McpMapping;
 import com.google.common.collect.Lists;
 import com.mojang.brigadier.CommandDispatcher;
@@ -118,7 +117,7 @@ public class PaletteCommand extends AbstractCommand
 				{
 					Messenger.m(source,
 							String.format("w %" + maxIdxLen + "d. %s ", i, long2Bits(i, bits)),
-							TextUtil.getBlockName(state)
+							Messenger.block(state)
 					);
 				}
 			}
@@ -191,7 +190,7 @@ public class PaletteCommand extends AbstractCommand
 		{
 			for (BlockPos bp : getJKNearbyPos(j, k, bits, pos))
 			{
-				Messenger.m(source, TextUtil.getCoordinateText(null, bp, source.getWorld().getDimension().getType()));
+				Messenger.m(source, Messenger.coord(null, bp, source.getWorld().getDimension().getType()));
 			}
 		}
 
@@ -209,8 +208,7 @@ public class PaletteCommand extends AbstractCommand
 		}
 		Messenger.m(
 				source,
-				TextUtil.getFancyText(
-						null,
+				Messenger.fancy(
 						Messenger.s(String.format("L%s:", append), "f"),
 						Messenger.s("Long array index: " + index),
 						null

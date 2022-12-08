@@ -1,9 +1,9 @@
 package carpet.commands;
 
 import carpet.CarpetServer;
-import carpet.utils.*;
 import carpet.settings.CarpetSettings;
 import carpet.settings.SettingsManager;
+import carpet.utils.*;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
