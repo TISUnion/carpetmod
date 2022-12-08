@@ -187,17 +187,20 @@
          if (!itemstack.isEmpty())
          {
              this.player.interactionManager.processRightClick(this.player, worldserver, itemstack, enumhand);
-@@ -1121,6 +1164,9 @@
+@@ -1121,6 +1164,12 @@
  
      public void onDisconnect(ITextComponent reason)
      {
++        // CM
++        CarpetServer.onPlayerLoggedOut(this.player);
++
 +        // CM worldedit
 +        CarpetWorldEditAccess.onPlayerDisconnect(this.player);
 +
          LOGGER.info("{} lost connection: {}", this.player.getName().getString(), reason.getString());
          this.server.refreshStatusNextTick();
          this.server.getPlayerList().sendMessage((new TextComponentTranslation("multiplayer.player.left", this.player.getDisplayName())).applyTextStyle(TextFormatting.YELLOW));
-@@ -1223,6 +1269,11 @@
+@@ -1223,6 +1272,11 @@
  
              this.chatSpamThresholdCount += 20;
  
@@ -209,7 +212,7 @@
              if (this.chatSpamThresholdCount > 200 && !this.server.getPlayerList().canSendCommands(this.player.getGameProfile()))
              {
                  this.disconnect(new TextComponentTranslation("disconnect.spam"));
-@@ -1250,19 +1301,25 @@
+@@ -1250,19 +1304,25 @@
          switch (packetIn.getAction())
          {
              case START_SNEAKING:
@@ -235,7 +238,7 @@
                  if (this.player.isPlayerSleeping())
                  {
                      this.player.wakeUpPlayer(false, true, true);
-@@ -1303,7 +1360,10 @@
+@@ -1303,7 +1363,10 @@
                  break;
              case START_FALL_FLYING:
  
@@ -247,7 +250,7 @@
                  {
                      ItemStack itemstack = this.player.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
  
-@@ -1345,6 +1405,9 @@
+@@ -1345,6 +1408,9 @@
                  if (packetIn.getAction() == CPacketUseEntity.Action.INTERACT)
                  {
                      EnumHand enumhand = packetIn.getHand();
@@ -257,7 +260,7 @@
                      this.player.interactOn(entity, enumhand);
                  }
                  else if (packetIn.getAction() == CPacketUseEntity.Action.INTERACT_AT)
-@@ -1360,6 +1423,8 @@
+@@ -1360,6 +1426,8 @@
                          this.server.logWarning("Player " + this.player.getName().getString() + " tried to attack an invalid entity");
                          return;
                      }
@@ -266,7 +269,7 @@
  
                      this.player.attackTargetEntityWithCurrentItem(entity);
                  }
-@@ -1536,6 +1601,12 @@
+@@ -1536,6 +1604,12 @@
              else if (flag && flag2 && this.itemDropThreshold < 200)
              {
                  this.itemDropThreshold += 20;
@@ -279,7 +282,7 @@
                  EntityItem entityitem = this.player.dropItem(itemstack, true);
  
                  if (entityitem != null)
-@@ -1622,5 +1693,45 @@
+@@ -1622,5 +1696,45 @@
  
      public void processCustomPayload(CPacketCustomPayload packetIn)
      {
