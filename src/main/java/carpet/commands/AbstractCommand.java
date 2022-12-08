@@ -1,10 +1,10 @@
 package carpet.commands;
 
-import carpet.utils.TranslatableBase;
+import carpet.utils.TranslationContext;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.command.CommandSource;
 
-public abstract class AbstractCommand extends TranslatableBase
+public abstract class AbstractCommand extends TranslationContext
 {
 	public AbstractCommand(String name)
 	{

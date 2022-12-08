@@ -14,7 +14,7 @@
  import net.minecraft.entity.player.EntityPlayer;
  import net.minecraft.particles.IParticleData;
  import net.minecraft.util.SoundCategory;
-@@ -91,6 +93,14 @@
+@@ -91,6 +93,12 @@
          if (entityIn instanceof EntityLiving)
          {
              this.navigations.remove(((EntityLiving)entityIn).getNavigator());
@@ -22,9 +22,7 @@
 +            // TISCM drownedNavigatorMemoryLeakFix
 +            if (CarpetSettings.drownedNavigatorMemoryLeakFix && entityIn instanceof EntityDrowned)
 +            {
-+                EntityDrowned drowned = (EntityDrowned)entityIn;
-+                this.navigations.remove(drowned.getWaterNavigator());
-+                this.navigations.remove(drowned.getGroundNavigator());
++                this.navigations.remove(((EntityDrowned)entityIn).getInitialEntityNavigation());
 +            }
          }
      }

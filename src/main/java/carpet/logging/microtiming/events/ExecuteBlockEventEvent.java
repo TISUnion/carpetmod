@@ -61,18 +61,18 @@ public class ExecuteBlockEventEvent extends BaseEvent
 		list.add(COLOR_ACTION + this.tr("Execute"));
 		if (this.blockAction.getBlock() instanceof BlockPistonBase)
 		{
-			list.add(TextUtil.getSpaceText());
+			list.add(Messenger.getSpaceText());
 			list.add(COLOR_TARGET + PistonBlockEventType.byId(blockAction.getEventID()));
 		}
 		else
 		{
-			list.add(TextUtil.getSpaceText());
+			list.add(Messenger.getSpaceText());
 			list.add(COLOR_TARGET + this.tr("BlockEvent"));
 		}
 		list.add(getMessageExtraMessengerHoverText(this.blockAction));
 		if (this.getEventType() == EventType.ACTION_END)
 		{
-			list.add(TextUtil.getSpaceText());
+			list.add(Messenger.getSpaceText());
 			list.add(COLOR_RESULT + MicroTimingLoggerManager.tr("ended"));
 		}
 		if (this.returnValue != null)
@@ -136,9 +136,9 @@ public class ExecuteBlockEventEvent extends BaseEvent
 					return Messenger.c(
 							"w " + this.event.tr("fail_info.block_changed", "Block has changed"),
 							"w : ",
-							TextUtil.getBlockName(this.event.blockAction.getBlock()),
+							Messenger.block(this.event.blockAction.getBlock()),
 							"g  -> ",
-							TextUtil.getBlockName(this.actualBlock)
+							Messenger.block(this.actualBlock)
 					);
 				case EVENT_FAIL:
 				default:

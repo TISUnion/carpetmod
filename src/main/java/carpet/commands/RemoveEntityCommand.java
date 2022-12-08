@@ -53,7 +53,7 @@ public class RemoveEntityCommand extends AbstractCommand
 				filter(entity -> !(entity instanceof EntityPlayer)).
 				collect(Collectors.toList());
 		nonPlayerEntities.forEach(Entity::remove);
-		Messenger.m(source, advTr("success", "Removed %1$s entities", nonPlayerEntities.size()), true);
+		Messenger.tell(source, advTr("success", "Removed %1$s entities", nonPlayerEntities.size()), true);
 		return nonPlayerEntities.size();
 	}
 }

@@ -40,7 +40,7 @@ public class EmitBlockUpdateRedstoneDustEvent extends EmitBlockUpdateEvent
 				Vec3i vec = target.subtract(this.pos);
 				EnumFacing direction = EnumFacing.getFacingFromVector(vec.getX(), vec.getY(), vec.getZ());
 				list.add(String.format("w %d. ", i + 1));
-				list.add(Messenger.tp("w", target));
+				list.add(Messenger.coord("w", target));
 				String extra = null;
 				if (target.distanceSq(this.pos) == 1)
 				{

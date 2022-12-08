@@ -7,8 +7,7 @@ import carpet.commands.lifetime.spawning.SpawningReason;
 import carpet.commands.lifetime.utils.AbstractReason;
 import carpet.commands.lifetime.utils.LifeTimeStatistic;
 import carpet.utils.CounterUtil;
-import carpet.utils.TextUtil;
-import carpet.utils.TranslatableBase;
+import carpet.utils.TranslationContext;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.minecraft.entity.Entity;
@@ -22,7 +21,7 @@ import java.util.Map;
 /**
  * A lifetime tracking tracked data per mob type
  */
-public class BasicTrackedData extends TranslatableBase
+public class BasicTrackedData extends TranslationContext
 {
 	public final Map<SpawningReason, Long> spawningReasons = Maps.newHashMap();
 	public final Map<RemovalReason, LifeTimeStatistic> removalReasons = Maps.newHashMap();
@@ -96,7 +95,7 @@ public class BasicTrackedData extends TranslatableBase
 				"g : ",
 				CounterUtil.ratePerHourText(count, ticks, "wgg"),
 				"w  ",
-				TextUtil.attachHoverText(Messenger.s(String.format("%.1f%%", percentage)), Messenger.s(String.format("%.6f%%", percentage)))
+				Messenger.hover(Messenger.s(String.format("%.1f%%", percentage)), Messenger.s(String.format("%.6f%%", percentage)))
 		);
 	}
 

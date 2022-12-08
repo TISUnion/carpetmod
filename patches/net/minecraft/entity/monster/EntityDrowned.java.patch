@@ -22,21 +22,30 @@
  import net.minecraft.util.DamageSource;
  import net.minecraft.util.ResourceLocation;
  import net.minecraft.util.SoundEvent;
-@@ -65,6 +61,18 @@
+@@ -55,6 +51,9 @@
+     protected final PathNavigateSwimmer waterNavigator;
+     protected final PathNavigateGround groundNavigator;
+ 
++    // TISCM drownedNavigatorMemoryLeakFix
++    private final PathNavigate initialEntityNavigation;
++
+     public EntityDrowned(World p_i48903_1_)
+     {
+         super(EntityType.DROWNED, p_i48903_1_);
+@@ -63,8 +62,17 @@
+         this.setPathPriority(PathNodeType.WATER, 0.0F);
+         this.waterNavigator = new PathNavigateSwimmer(this, p_i48903_1_);
          this.groundNavigator = new PathNavigateGround(this, p_i48903_1_);
++
++        // TISCM drownedNavigatorMemoryLeakFix
++        this.initialEntityNavigation = this.navigator;
      }
  
 +    // TISCM drownedNavigatorMemoryLeakFix
-+    public PathNavigateSwimmer getWaterNavigator()
++    public PathNavigate getInitialEntityNavigation()
 +    {
-+        return this.waterNavigator;
++        return this.initialEntityNavigation;
 +    }
-+
-+    public PathNavigateGround getGroundNavigator()
-+    {
-+        return this.groundNavigator;
-+    }
-+    // TISCM drownedNavigatorMemoryLeakFix ends
 +
      protected void applyEntityAI()
      {

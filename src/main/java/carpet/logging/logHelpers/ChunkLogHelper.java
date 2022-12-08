@@ -26,7 +26,7 @@ public class ChunkLogHelper
                 phase[0].appendText("." + MicroTimingLoggerManager.tr("stage_detail." + detail, detail));
             });
             MicroTimingLoggerManager.getTickStageExtra(worldIn).ifPresent(extra -> {
-                phase[0] = TextUtil.getFancyText(null, phase[0], extra.toText(), extra.getClickEvent());
+                phase[0] = Messenger.fancy(null, phase[0], extra.toText(), extra.getClickEvent());
             });
             ITextComponent text = Messenger.c(
                     "g [" + worldIn.getGameTime() + "] ",
@@ -36,7 +36,7 @@ public class ChunkLogHelper
                     "g at ",
                     phase[0],
                     "g  in ",
-                    TextUtil.getDimensionNameText(worldIn.getDimension().getType()).applyTextStyle(TextFormatting.DARK_GREEN),
+                    Messenger.dimension(worldIn).applyTextStyle(TextFormatting.DARK_GREEN),
                     "w  ",
                     StackTracePrinter.create().ignore(ChunkLogHelper.class).deobfuscate().toSymbolText()
             );

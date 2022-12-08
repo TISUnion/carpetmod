@@ -1,11 +1,9 @@
 package carpet.commands;
 
-import carpet.CarpetServer;
 import carpet.script.Fluff;
 import carpet.settings.CarpetSettings;
 import carpet.settings.SettingsManager;
 import carpet.utils.Messenger;
-import carpet.utils.TextUtil;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mojang.brigadier.CommandDispatcher;
@@ -152,7 +150,7 @@ public class ChunkRegenCommand
                     chunks.forEach(chunkPos ->
                             source.sendFeedback(Messenger.c(
                                     "g - ",
-                                    TextUtil.getDimensionNameText(dim),
+                                    Messenger.dimension(dim),
                                     String.format("w  [%d, %d]", chunkPos.x, chunkPos.z)
                             ), false)
                     )
@@ -190,7 +188,7 @@ public class ChunkRegenCommand
             if (chunks != null && chunks.contains(chunkPos))
             {
                 chunks.remove(chunkPos);
-                Messenger.print_server_message(CarpetServer.minecraft_server, Messenger.s(String.format("!! Regenerating chunk [%d, %d] since it has been marked by /chunkregen", chunkX, chunkZ)));
+                Messenger.broadcast(Messenger.s(String.format("!! Regenerating chunk [%d, %d] since it has been marked by /chunkregen", chunkX, chunkZ)));
             }
         }
     }

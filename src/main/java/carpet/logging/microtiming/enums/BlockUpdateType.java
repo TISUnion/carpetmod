@@ -39,7 +39,7 @@ public enum BlockUpdateType
 		int counter = 0;
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append(tr("aka"));
-		stringBuilder.append(TextUtil.getSpace());
+		stringBuilder.append(" ");
 		stringBuilder.append(Joiner.on(", ").join(this.aka));
 		stringBuilder.append('\n');
 		for (EnumFacing direction : this.updateOrder)

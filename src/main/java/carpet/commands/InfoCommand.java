@@ -22,7 +22,6 @@ import net.minecraft.entity.item.EntityTNTPrimed;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ITickable;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.IRegistry;
 import net.minecraft.util.text.ITextComponent;
@@ -116,7 +115,7 @@ public class InfoCommand
         WorldServer world = source.getWorld();
 
         Messenger.m(source, Messenger.s(""));
-        Messenger.m(source, "w Current World: ", TextUtil.getDimensionNameText(world.getDimension().getType()));
+        Messenger.m(source, "w Current World: ", Messenger.dimension(world));
         Messenger.m(source, Messenger.s(String.format("Loaded chunks: %d", world.getChunkProvider().getLoadedChunkCount())));
         Long2ObjectMap<Chunk> chunks = world.getChunkProvider().getLoadedChunks$TISCM();
         // it.unimi.dsi.fastutil.longs.Long2ObjectMaps.SynchronizedMap#SynchronizedMap
@@ -152,7 +151,7 @@ public class InfoCommand
                 ITextComponent text = Optional.ofNullable(TileEntityType.getId(tileEntityType)).
                         map(id ->
                                 Optional.ofNullable(IRegistry.BLOCK.get(id)).
-                                        map(TextUtil::getBlockName).
+                                        map(Messenger::block).
                                         orElse(Messenger.s(id.toString()))
                         ).
                         orElse(Messenger.s("unknown"));
@@ -169,19 +168,19 @@ public class InfoCommand
         Messenger.m(source, Messenger.s(String.format("Block tile tick: %d", world.getPendingBlockTicks().getEntryCount())));
         if (detailed)
         {
-            showCountsInCollection(source, Lists.newArrayList(world.getPendingBlockTicks().getEntryIterator()), NextTickListEntry::getTarget, TextUtil::getBlockName);
+            showCountsInCollection(source, Lists.newArrayList(world.getPendingBlockTicks().getEntryIterator()), NextTickListEntry::getTarget, Messenger::block);
         }
 
         Messenger.m(source, Messenger.s(String.format("Fluid tile tick: %d", world.getPendingFluidTicks().getEntryCount())));
         if (detailed)
         {
-            showCountsInCollection(source, Lists.newArrayList(world.getPendingFluidTicks().getEntryIterator()), NextTickListEntry::getTarget, TextUtil::getFluidName);
+            showCountsInCollection(source, Lists.newArrayList(world.getPendingFluidTicks().getEntryIterator()), NextTickListEntry::getTarget, Messenger::fluid);
         }
 
         Messenger.m(source, Messenger.s(String.format("Block event: %d", world.blockEventQueue.size())));
         if (detailed)
         {
-            showCountsInCollection(source, world.blockEventQueue, BlockEventData::getBlock, TextUtil::getBlockName);
+            showCountsInCollection(source, world.blockEventQueue, BlockEventData::getBlock, Messenger::block);
         }
 
         return 1;
@@ -259,7 +258,7 @@ public class InfoCommand
             order++;
             Messenger.m(source, Messenger.c(
                     "g " + order + ". ",
-                    TextUtil.getDimensionNameText(world.getDimension().getType())
+                    Messenger.dimension(world)
             ));
         }
         return 1;

@@ -55,7 +55,7 @@ public class PhantomLogger extends AbstractLogger
 	{
 		String command = String.format("/log %s", this.getName());
 		return Messenger.c(
-				TextUtil.getFancyText(
+				Messenger.fancy(
 						null,
 						Messenger.c("g [", advTr("header", "Phantom Reminder"), "g ] "),
 						Messenger.s(command),
@@ -75,7 +75,7 @@ public class PhantomLogger extends AbstractLogger
 			if (LoggingOption.SPAWNING.isContainedIn(option))
 			{
 				return new ITextComponent[]{
-						pack(advTr("summon", "%1$s summoned %2$sx %3$s", TextUtil.getEntityText("b", spawnerPlayer), phantomAmount, PHANTOM_NAME))
+						pack(advTr("summon", "%1$s summoned %2$sx %3$s", Messenger.entity("b", spawnerPlayer), phantomAmount, PHANTOM_NAME))
 				};
 			}
 			return null;

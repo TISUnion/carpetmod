@@ -2,16 +2,16 @@ package carpet.utils;
 
 import net.minecraft.util.text.ITextComponent;
 
-public class TranslatableBase implements Translatable
+public class TranslationContext implements Translatable
 {
 	private final Translator translator;
 
-	public TranslatableBase(Translator translator)
+	public TranslationContext(Translator translator)
 	{
 		this.translator = translator;
 	}
 
-	public TranslatableBase(String type, String name)
+	public TranslationContext(String type, String name)
 	{
 		this(new Translator(type, name));
 	}

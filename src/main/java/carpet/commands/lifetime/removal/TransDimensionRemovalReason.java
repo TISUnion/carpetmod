@@ -1,7 +1,6 @@
 package carpet.commands.lifetime.removal;
 
 import carpet.utils.Messenger;
-import carpet.utils.TextUtil;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.dimension.DimensionType;
@@ -38,8 +37,8 @@ public class TransDimensionRemovalReason extends RemovalReason
 		return Messenger.c(
 				"w " + this.tr("trans_dimension", "Trans-dimension"),
 				"g  (" + this.tr("trans_dimension.to", "to"),
-				TextUtil.getSpaceText(),
-				TextUtil.attachFormatting(TextUtil.getDimensionNameText(this.newDimension), TextFormatting.GRAY),
+				Messenger.getSpaceText(),
+				Messenger.formatting(Messenger.dimension(this.newDimension), TextFormatting.GRAY),
 				"g )"
 		);
 	}

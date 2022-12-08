@@ -38,7 +38,7 @@ public class ScheduleTileTickEvent extends BaseEvent
 		List<Object> list = Lists.newArrayList();
 		list.add(this.getEnclosedTranslatedBlockNameHeaderText(block));
 		list.add(COLOR_ACTION + this.tr("Scheduled"));
-		list.add(TextUtil.getSpaceText());
+		list.add(Messenger.getSpaceText());
 		list.add(COLOR_TARGET + this.tr("TileTick Event"));
 		list.add(String.format("^w %s: %dgt\n%s: %d (%s)", MicroTimingLoggerManager.tr("Delay"), delay, MicroTimingLoggerManager.tr("Priority"), priority.getPriority(), priority));
 		if (this.success != null)

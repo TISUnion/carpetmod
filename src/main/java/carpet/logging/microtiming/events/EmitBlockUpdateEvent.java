@@ -42,7 +42,7 @@ public class EmitBlockUpdateEvent extends BaseEvent
 		list.add(this.getEnclosedTranslatedBlockNameHeaderText(this.block));
 		ITextComponent updatesText = Messenger.c(
 				COLOR_ACTION + this.tr("Emit"),
-				TextUtil.getSpaceText(),
+				Messenger.getSpaceText(),
 				COLOR_TARGET + this.tr("Updates")
 		);
 		if (this.methodName != null)
@@ -53,11 +53,11 @@ public class EmitBlockUpdateEvent extends BaseEvent
 		switch (this.getEventType())
 		{
 			case ACTION_START:
-				list.add(TextUtil.getSpaceText());
+				list.add(Messenger.getSpaceText());
 				list.add(COLOR_RESULT + MicroTimingLoggerManager.tr("started"));
 				break;
 			case ACTION_END:
-				list.add(TextUtil.getSpaceText());
+				list.add(Messenger.getSpaceText());
 				list.add(COLOR_RESULT + MicroTimingLoggerManager.tr("ended"));
 				break;
 			default:

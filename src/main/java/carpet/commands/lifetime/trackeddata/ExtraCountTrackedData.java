@@ -4,7 +4,6 @@ import carpet.commands.lifetime.removal.RemovalReason;
 import carpet.commands.lifetime.spawning.SpawningReason;
 import carpet.utils.CounterUtil;
 import carpet.utils.Messenger;
-import carpet.utils.TextUtil;
 import com.google.common.collect.Maps;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.text.ITextComponent;
@@ -36,7 +35,7 @@ public abstract class ExtraCountTrackedData extends BasicTrackedData
 
 	private ITextComponent attachExtraCountHoverText(ITextComponent text, long extraCount, long ticks)
 	{
-		return TextUtil.attachHoverText(text, Messenger.c(
+		return Messenger.hover(text, Messenger.c(
 				"w " + this.getCountDisplayString(),
 				"g : ",
 				CounterUtil.ratePerHourText(extraCount, ticks, "wgg")

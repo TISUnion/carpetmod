@@ -22,16 +22,16 @@ public class BlockReplaceEvent extends AbstractSetblockStateEvent
 	{
 		List<Object> list = Lists.newArrayList();
 		list.add(this.getEnclosedTranslatedBlockNameHeaderText(this.oldBlockState.getBlock()));
-		ITextComponent titleText = TextUtil.getFancyText(
+		ITextComponent titleText = Messenger.fancy(
 				null,
 				Messenger.c(COLOR_ACTION + tr("Block Replace")),
 				this.getFlagsText(),
 				null
 		);
 		ITextComponent infoText = Messenger.c(
-				TextUtil.getBlockName(this.oldBlockState),
+				Messenger.block(this.oldBlockState),
 				"g ->",
-				TextUtil.getBlockName(this.newBlockState)
+				Messenger.block(this.newBlockState)
 		);
 		if (this.getEventType() != EventType.ACTION_END)
 		{
@@ -39,9 +39,9 @@ public class BlockReplaceEvent extends AbstractSetblockStateEvent
 		}
 		else
 		{
-			list.add(TextUtil.getFancyText(
+			list.add(Messenger.fancy(
 					"w",
-					Messenger.c(titleText, TextUtil.getSpaceText(), COLOR_RESULT + tr("finished")),
+					Messenger.c(titleText, Messenger.getSpaceText(), COLOR_RESULT + tr("finished")),
 					infoText,
 					null
 			));

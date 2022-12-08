@@ -2,14 +2,14 @@ package carpet.commands;
 
 import carpet.utils.GameUtil;
 import carpet.utils.Messenger;
-import carpet.utils.TranslatableBase;
+import carpet.utils.TranslationContext;
 import carpet.utils.Translator;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
 
 import static net.minecraft.command.Commands.literal;
 
-public abstract class AbstractTracker extends TranslatableBase
+public abstract class AbstractTracker extends TranslationContext
 {
 	private static final Translator baseTranslator = new Translator("tracker");
 	private final String name;
@@ -84,7 +84,7 @@ public abstract class AbstractTracker extends TranslatableBase
 		{
 			if (showFeedback)
 			{
-				Messenger.m(source, Messenger.c(
+				Messenger.tell(source, Messenger.c(
 						"r " + String.format(baseTranslator.tr("tracking_already_started", "%s is already running"), this.getTranslatedNameFull())
 				));
 			}
@@ -95,9 +95,7 @@ public abstract class AbstractTracker extends TranslatableBase
 		this.startMillis = System.currentTimeMillis();
 		if (showFeedback)
 		{
-			Messenger.m(source, Messenger.c(
-					"w " + String.format(baseTranslator.tr("tracking_started", "%s started"), this.getTranslatedNameFull())
-			));
+			Messenger.tell(source, Messenger.s(String.format(baseTranslator.tr("tracking_started", "%s started"), this.getTranslatedNameFull())), true);
 		}
 		this.initTracker();
 		return 1;
@@ -112,15 +110,13 @@ public abstract class AbstractTracker extends TranslatableBase
 				this.reportTracking(source, false);
 				if (showFeedback)
 				{
-					Messenger.m(source, Messenger.c(
-							"w  \n",
-							"w " + String.format(baseTranslator.tr("tracking_stopped", "%s stopped"), this.getTranslatedNameFull())
-					));
+					Messenger.tell(source, Messenger.s(" "));
+					Messenger.tell(source, Messenger.s(String.format(baseTranslator.tr("tracking_stopped", "%s stopped"), this.getTranslatedNameFull())), true);
 				}
 			}
 			else if (showFeedback)
 			{
-				Messenger.m(source, Messenger.c(
+				Messenger.tell(source, Messenger.c(
 						"r " + String.format(baseTranslator.tr("tracking_not_started", "%s has not started"), this.getTranslatedNameFull())
 				));
 			}
@@ -138,7 +134,7 @@ public abstract class AbstractTracker extends TranslatableBase
 		{
 			source.sendFeedback(Messenger.s(" "), false);
 		}
-		Messenger.m(source, Messenger.s(String.format(baseTranslator.tr("tracking_restarted", "%s restarted"), this.getTranslatedNameFull())));
+		Messenger.tell(source, Messenger.s(String.format(baseTranslator.tr("tracking_restarted", "%s restarted"), this.getTranslatedNameFull())), true);
 		return 1;
 	}
 
@@ -150,7 +146,7 @@ public abstract class AbstractTracker extends TranslatableBase
 		}
 		else
 		{
-			Messenger.m(source, Messenger.c(
+			Messenger.tell(source, Messenger.c(
 					"r " + String.format(baseTranslator.tr("tracking_not_started", "%s has not started"), this.getTranslatedNameFull())
 			));
 		}

@@ -1,8 +1,7 @@
 package carpet.commands.lifetime.filter;
 
 import carpet.utils.Messenger;
-import carpet.utils.TextUtil;
-import carpet.utils.TranslatableBase;
+import carpet.utils.TranslationContext;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.arguments.EntitySelector;
 import net.minecraft.entity.Entity;
@@ -14,7 +13,7 @@ import net.minecraft.world.WorldServer;
 
 import java.util.function.Predicate;
 
-public class EntityFilter extends TranslatableBase implements Predicate<Entity>
+public class EntityFilter extends TranslationContext implements Predicate<Entity>
 {
 	private final EntitySelector entitySelector;
 	private final CommandSource serverCommandSource;
@@ -79,12 +78,12 @@ public class EntityFilter extends TranslatableBase implements Predicate<Entity>
 	public ITextComponent toText()
 	{
 		String inputText = this.entitySelector.getInputText();
-		return TextUtil.getFancyText(
+		return Messenger.fancy(
 				"y",
 				Messenger.s(inputText),
 				Messenger.c(
 						String.format("w %s: ", this.tr("Dimension")),
-						TextUtil.getDimensionNameText(this.serverCommandSource.getWorld().getDimension().getType()),
+						Messenger.dimension(this.serverCommandSource.getWorld().getDimension().getType()),
 						String.format("w \n%s: %s", this.tr("Anchor Pos"), this.getAnchorPos())
 				),
 				new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, inputText)

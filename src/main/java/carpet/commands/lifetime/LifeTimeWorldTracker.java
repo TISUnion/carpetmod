@@ -9,8 +9,7 @@ import carpet.commands.lifetime.trackeddata.ItemTrackedData;
 import carpet.commands.lifetime.utils.LifeTimeTrackerUtil;
 import carpet.commands.lifetime.utils.SpecificDetailMode;
 import carpet.utils.Messenger;
-import carpet.utils.TextUtil;
-import carpet.utils.TranslatableBase;
+import carpet.utils.TranslationContext;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.minecraft.command.CommandSource;
@@ -25,7 +24,7 @@ import net.minecraft.world.WorldServer;
 
 import java.util.*;
 
-public class LifeTimeWorldTracker extends TranslatableBase
+public class LifeTimeWorldTracker extends TranslationContext
 {
 	private final WorldServer world;
 	private final Map<EntityType<?>, BasicTrackedData> dataMap = Maps.newHashMap();
@@ -111,7 +110,7 @@ public class LifeTimeWorldTracker extends TranslatableBase
 		List<ITextComponent> result = Lists.newArrayList();
 		result.add(Messenger.s(" "));
 		result.add(Messenger.c(
-				TextUtil.attachFormatting(TextUtil.getDimensionNameText(this.world.getDimension().getType()), TextFormatting.BOLD, TextFormatting.GOLD),
+				Messenger.formatting(Messenger.dimension(this.world), TextFormatting.BOLD, TextFormatting.GOLD),
 				String.format("g  (%s)", this.world.getDimension().getType().toString())
 		));
 
@@ -142,7 +141,7 @@ public class LifeTimeWorldTracker extends TranslatableBase
 					// [Creeper] S/R: 21/8, L: 145/145/145.00 (gt)
 					result.add(Messenger.c(
 							"g - [",
-							TextUtil.getFancyText(
+							Messenger.fancy(
 									null,
 									entityType.getName(),
 									Messenger.c(
@@ -155,7 +154,7 @@ public class LifeTimeWorldTracker extends TranslatableBase
 									new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, currentCommandBase)
 							),
 							"g ] ",
-							TextUtil.getFancyText(
+							Messenger.fancy(
 									null,
 									Messenger.c("e S", "g /", "r R"),
 									Messenger.c(
@@ -166,7 +165,7 @@ public class LifeTimeWorldTracker extends TranslatableBase
 									null
 							),
 							"g : ",
-							TextUtil.getFancyText(
+							Messenger.fancy(
 									null,
 									Messenger.c("e " + data.getSpawningCount()),
 									Messenger.c(
@@ -177,7 +176,7 @@ public class LifeTimeWorldTracker extends TranslatableBase
 									new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, String.format("%s %s", currentCommandBase, SpecificDetailMode.SPAWNING))
 							),
 							"g /",
-							TextUtil.getFancyText(
+							Messenger.fancy(
 									null,
 									Messenger.c("r " + data.getRemovalCount()),
 									Messenger.c(
@@ -188,7 +187,7 @@ public class LifeTimeWorldTracker extends TranslatableBase
 									new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, String.format("%s %s", currentCommandBase, SpecificDetailMode.REMOVAL))
 							),
 							"g , ",
-							TextUtil.getFancyText(
+							Messenger.fancy(
 									null,
 									Messenger.c(
 											"q L", "g : ",
@@ -210,7 +209,7 @@ public class LifeTimeWorldTracker extends TranslatableBase
 				String.format("c %s: ", this.tr("filter_info_header", "Filter")),
 				EntityFilterManager.getInstance().getEntityFilterText(specificType),
 				"g  / ",
-				TextUtil.getFancyText("g", Messenger.s("[G]"), Messenger.s(EntityFilterManager.getInstance().tr("Global")), null),
+				Messenger.fancy("g", Messenger.s("[G]"), Messenger.s(EntityFilterManager.getInstance().tr("Global")), null),
 				"g  ",
 				EntityFilterManager.getInstance().getEntityFilterText(null)
 		));
@@ -227,7 +226,7 @@ public class LifeTimeWorldTracker extends TranslatableBase
 		}
 		if (showLifeTime)
 		{
-			result.add(TextUtil.getFancyText(
+			result.add(Messenger.fancy(
 					"q",
 					Messenger.s(this.tr("Life Time Overview")),
 					Messenger.s(this.tr("life_time_explain", "The amount of spawning stage passing between entity spawning and entity removal")),

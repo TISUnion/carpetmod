@@ -56,11 +56,11 @@ public class CommandBlockLogger extends AbstractLogger
 				executor.setLastLoggedTime(time);
 			}
 			return new ITextComponent[]{Messenger.c(
-					TextUtil.attachFormatting(TextUtil.copyText(nameText), TextFormatting.GOLD),
-					TextUtil.getSpaceText(),
+					Messenger.formatting(Messenger.copy(nameText), TextFormatting.GOLD),
+					Messenger.getSpaceText(),
 					"w " + this.tr("executed"),
-					TextUtil.getSpaceText(),
-					TextUtil.getFancyText(
+					Messenger.getSpaceText(),
+					Messenger.fancy(
 							"c",
 							Messenger.s(finalCommandPreview),
 							Messenger.s(executor.getCommand()),
@@ -76,8 +76,8 @@ public class CommandBlockLogger extends AbstractLogger
 	{
 		this.logCommandBlockExecution(
 				world,
-				TextUtil.getBlockName(state.getBlock()),
-				TextUtil.getCoordinateText("w", pos, world.getDimension().getType()),
+				Messenger.block(state.getBlock()),
+				Messenger.coord("w", pos, world.getDimension().getType()),
 				executor
 		);
 	}
@@ -90,8 +90,8 @@ public class CommandBlockLogger extends AbstractLogger
 		}
 		this.logCommandBlockExecution(
 				entity.getEntityWorld(),
-				TextUtil.getEntityText(null, entity),
-				TextUtil.getCoordinateText("w", entity.getPositionVector(), entity.getEntityWorld().getDimension().getType()),
+				Messenger.entity(null, entity),
+				Messenger.coord("w", entity.getPositionVector(), entity.getEntityWorld().getDimension().getType()),
 				entity.getCommandBlockLogic()
 		);
 	}

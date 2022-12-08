@@ -102,7 +102,7 @@ public class MicroTimingMessage
 		{
 			ret = Messenger.c(
 					text,
-					"?" + TextUtil.getTeleportCommand(pos, this.dimensionType),
+					"?" + TextUtil.tp(pos, this.dimensionType),
 					String.format("^w [ %d, %d, %d ]", this.pos.getX(), this.pos.getY(), this.pos.getZ())
 			);
 		}
@@ -124,10 +124,10 @@ public class MicroTimingMessage
 		List<Object> hoverTextList = Lists.newArrayList();
 		hoverTextList.add(this.stageExtra != null ? Messenger.c(this.stageExtra.toText(), "w \n"): Messenger.s(""));
 		hoverTextList.add(String.format("w %s: ", MicroTimingLoggerManager.tr("Dimension")));
-		hoverTextList.add(this.stage.isInsideWorld() ? TextUtil.getDimensionNameText(this.dimensionType) : "w N/A");
+		hoverTextList.add(this.stage.isInsideWorld() ? Messenger.dimension(this.dimensionType) : "w N/A");
 		return Messenger.c(
 				"g  @",
-				TextUtil.getFancyText(
+				Messenger.fancy(
 						null,
 						Messenger.c(stageText.toArray(new Object[0])),
 						Messenger.c(hoverTextList.toArray(new Object[0])),

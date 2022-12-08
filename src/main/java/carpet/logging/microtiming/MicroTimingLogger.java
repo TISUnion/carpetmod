@@ -111,7 +111,7 @@ public class MicroTimingLogger extends AbstractLogger
 	{
 		return Messenger.c(
 				MicroTimingMessage.getIndentationText(previousMessage.getIndentation()),
-				TextUtil.getFancyText(
+				Messenger.fancy(
 						"g",
 						Messenger.s(String.format("  +%dx", count)),
 						Messenger.c(
@@ -134,9 +134,9 @@ public class MicroTimingLogger extends AbstractLogger
 				"^w world.getGameTime()",
 				"g  " + this.world.getGameTime(),
 				"f  @ ",
-				TextUtil.getFancyText(
+				Messenger.fancy(
 						"g",
-						TextUtil.getDimensionNameText(this.world.getDimension().getType()),
+						Messenger.dimension(this.world),
 						Messenger.s(this.world.getDimension().getType().toString()),
 						null
 				),

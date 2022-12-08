@@ -128,6 +128,12 @@ public class CarpetServer // static for now - easier to handle all around the co
         LoggerRegistry.playerConnected(player);
     }
 
+    public static void onPlayerLoggedOut(EntityPlayerMP player)
+    {
+        CarpetServerNetworkHandler.onPlayerLoggedOut(player);
+        LoggerRegistry.playerDisconnected(player);
+    }
+
     public static void onCarpetClientHello(EntityPlayerMP player)
     {
         MicroTimingStandardCarpetLogger.getInstance().onCarpetClientHello(player);

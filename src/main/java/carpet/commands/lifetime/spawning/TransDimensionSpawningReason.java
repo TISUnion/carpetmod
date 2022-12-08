@@ -1,7 +1,6 @@
 package carpet.commands.lifetime.spawning;
 
 import carpet.utils.Messenger;
-import carpet.utils.TextUtil;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.dimension.DimensionType;
@@ -38,8 +37,8 @@ public class TransDimensionSpawningReason extends SpawningReason
 		return Messenger.c(
 				"w " + this.tr("trans_dimension", "Trans-dimension"),
 				"g  (" + this.tr("trans_dimension.from", "from"),
-				TextUtil.getSpaceText(),
-				TextUtil.attachFormatting(TextUtil.getDimensionNameText(this.oldDimension), TextFormatting.GRAY),
+				Messenger.getSpaceText(),
+				Messenger.formatting(Messenger.dimension(this.oldDimension), TextFormatting.GRAY),
 				"g )"
 		);
 	}

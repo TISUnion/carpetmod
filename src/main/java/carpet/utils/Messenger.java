@@ -1,23 +1,42 @@
 package carpet.utils;
 
+import carpet.CarpetServer;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.command.CommandSource;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.entity.ai.attributes.BaseAttribute;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.fluid.FluidState;
+import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.Item;
+import net.minecraft.state.IProperty;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.registry.IRegistry;
+import net.minecraft.util.text.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
+import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public class Messenger
 {
@@ -78,10 +97,6 @@ public class Messenger
         if (style.indexOf('v')>=0) comp.getStyle().setColor(TextFormatting.DARK_BLUE);
         if (style.indexOf('k')>=0) comp.getStyle().setColor(TextFormatting.BLACK);
         return comp;
-    }
-    public static Style parseStyle(String style)
-    {
-        return _applyStyleToTextComponent(s(""), style).getStyle();
     }
     public static String heatmap_color(double actual, double reference)
     {
@@ -266,9 +281,6 @@ public class Messenger
         return message;
     }
 
-
-
-
     public static void send(EntityPlayer player, Collection<ITextComponent> lines)
     {
         lines.forEach(player::sendMessage);
@@ -277,7 +289,6 @@ public class Messenger
     {
         lines.stream().forEachOrdered((s) -> source.sendFeedback(s, false));
     }
-
 
     public static void print_server_message(MinecraftServer server, String message)
     {
@@ -290,15 +301,447 @@ public class Messenger
             entityplayer.sendMessage(txt);
         }
     }
-    public static void print_server_message(MinecraftServer server, ITextComponent message)
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////// ^ Legacy Carpet Mod Stuffs ^  //////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////  v       TISCM stuffs      v  //////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
+    private static final Translator translator = new Translator("util");
+
+    /*
+     * ----------------------------
+     *    Text Factories - Basic
+     * ----------------------------
+     */
+
+    // Simple Text
+    public static ITextComponent s(Object text)
     {
-        if (server == null)
-            LOG.error("Message not delivered: "+message.getString());
-        server.sendMessage(message);
-        for (EntityPlayer entityplayer : server.getPlayerList().getPlayers())
+        return new TextComponentString(text.toString());
+    }
+
+    // Simple Text with carpet style
+    public static ITextComponent s(Object text, String carpetStyle)
+    {
+        return formatting(s(text), carpetStyle);
+    }
+
+    // Simple Text with formatting
+    public static ITextComponent s(Object text, TextFormatting ...textFormattings)
+    {
+        return formatting(s(text), textFormattings);
+    }
+
+    public static ITextComponent newLine()
+    {
+        return s("\n");
+    }
+
+    public static ITextComponent colored(ITextComponent text, Object value)
+    {
+        TextFormatting color = null;
+        if (Boolean.TRUE.equals(value))
         {
-            entityplayer.sendMessage(message);
+            color = TextFormatting.GREEN;
         }
+        else if (Boolean.FALSE.equals(value))
+        {
+            color = TextFormatting.RED;
+        }
+        if (value instanceof Number)
+        {
+            color = TextFormatting.GOLD;
+        }
+        if (color != null)
+        {
+            formatting(text, color);
+        }
+        return text;
+    }
+
+    public static ITextComponent colored(Object value)
+    {
+        return colored(s(value), value);
+    }
+
+    public static ITextComponent property(IProperty<?> property, Object value)
+    {
+        return colored(s(TextUtil.property(property, value)), value);
+    }
+
+    // Translation Text
+    public static ITextComponent tr(String key, Object ... args)
+    {
+        return new TextComponentTranslation(key, args);
+    }
+
+    // Fancy text
+    // A copy will be made to make sure the original displayText will not be modified
+    public static ITextComponent fancy(String carpetStyle, ITextComponent displayText, ITextComponent hoverText, ClickEvent clickEvent)
+    {
+        ITextComponent text = copy(displayText);
+        if (carpetStyle != null)
+        {
+            text.setStyle(parseCarpetStyle(carpetStyle));
+        }
+        if (hoverText != null)
+        {
+            hover(text, hoverText);
+        }
+        if (clickEvent != null)
+        {
+            click(text, clickEvent);
+        }
+        return text;
+    }
+
+    public static ITextComponent fancy(ITextComponent displayText, ITextComponent hoverText, ClickEvent clickEvent)
+    {
+        return fancy(null, displayText, hoverText, clickEvent);
+    }
+
+    public static ITextComponent join(ITextComponent joiner, ITextComponent... items)
+    {
+        ITextComponent text = s("");
+        for (int i = 0; i < items.length; i++)
+        {
+            if (i > 0)
+            {
+                text.appendSibling(joiner);
+            }
+            text.appendSibling(items[i]);
+        }
+        return text;
+    }
+
+    public static ITextComponent format(String formatter, Object... args)
+    {
+        TextComponentTranslation dummy = new TextComponentTranslation(formatter, args);
+        try
+        {
+            dummy.getChildren().clear();
+            dummy.invokeInitializeFromFormat(formatter);
+            return Messenger.c(dummy.getChildren().toArray(new Object[0]));
+        }
+        catch (TextComponentTranslationFormatException e)
+        {
+            return Messenger.s(formatter);
+        }
+    }
+
+    /*
+     * -------------------------------
+     *    Text Factories - Advanced
+     * -------------------------------
+     */
+
+    public static ITextComponent bool(boolean value)
+    {
+        return s(String.valueOf(value), value ? TextFormatting.GREEN : TextFormatting.RED);
+    }
+
+    private static ITextComponent getTeleportHint(ITextComponent dest)
+    {
+        return translator.advTr("teleport_hint", "Click to teleport to %1$s", dest);
+    }
+
+    private static ITextComponent __coord(String style, @Nullable DimensionType dim, String posStr, String command)
+    {
+        ITextComponent hoverText = Messenger.s("");
+        hoverText.appendSibling(getTeleportHint(Messenger.s(posStr)));
+        if (dim != null)
+        {
+            hoverText.appendText("\n");
+            hoverText.appendSibling(translator.advTr("teleport_hint.dimension", "Dimension"));
+            hoverText.appendText(": ");
+            hoverText.appendSibling(dimension(dim));
+        }
+        return fancy(style, Messenger.s(posStr), hoverText, new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, command));
+    }
+
+    public static ITextComponent coord(String style, Vec3d pos, DimensionType dim) {return __coord(style, dim, TextUtil.coord(pos), TextUtil.tp(pos, dim));}
+    public static ITextComponent coord(String style, Vec3i pos, DimensionType dim) {return __coord(style, dim, TextUtil.coord(pos), TextUtil.tp(pos, dim));}
+    public static ITextComponent coord(String style, ChunkPos pos, DimensionType dim) {return __coord(style, dim, TextUtil.coord(pos), TextUtil.tp(pos, dim));}
+    public static ITextComponent coord(String style, Vec3d pos) {return __coord(style, null, TextUtil.coord(pos), TextUtil.tp(pos));}
+    public static ITextComponent coord(String style, Vec3i pos) {return __coord(style, null, TextUtil.coord(pos), TextUtil.tp(pos));}
+    public static ITextComponent coord(String style, ChunkPos pos) {return __coord(style, null, TextUtil.coord(pos), TextUtil.tp(pos));}
+    public static ITextComponent coord(Vec3d pos, DimensionType dim) {return coord(null, pos, dim);}
+    public static ITextComponent coord(Vec3i pos, DimensionType dim) {return coord(null, pos, dim);}
+    public static ITextComponent coord(ChunkPos pos, DimensionType dim) {return coord(null, pos, dim);}
+    public static ITextComponent coord(Vec3d pos) {return coord(null, pos);}
+    public static ITextComponent coord(Vec3i pos) {return coord(null, pos);}
+    public static ITextComponent coord(ChunkPos pos) {return coord(null, pos);}
+
+    private static ITextComponent __vector(String style, String displayText, String detailedText)
+    {
+        return fancy(style, Messenger.s(displayText), Messenger.s(detailedText), new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, detailedText));
+    }
+    public static ITextComponent vector(String style, Vec3d vec) {return __vector(style, TextUtil.vector(vec), TextUtil.vector(vec, 6));}
+    public static ITextComponent vector(Vec3d vec) {return vector(null, vec);}
+
+    public static ITextComponent entityType(EntityType<?> entityType)
+    {
+        return entityType.getName();
+    }
+    public static ITextComponent entityType(Entity entity)
+    {
+        return entityType(entity.getType());
+    }
+
+    public static ITextComponent entity(String style, Entity entity)
+    {
+        ITextComponent entityBaseName = entityType(entity);
+        ITextComponent entityDisplayName = entity.getName();
+        String entityTypeStr = Optional.ofNullable(EntityType.getId(entity.getType())).map(ResourceLocation::toString).orElse("?");
+        ITextComponent hoverText = Messenger.c(
+                translator.advTr("entity_type", "Entity type: %1$s (%2$s)", entityBaseName, s(entityTypeStr), newLine()),
+                getTeleportHint(entityDisplayName)
+        );
+        return fancy(style, entityDisplayName, hoverText, new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, TextUtil.tp(entity)));
+    }
+
+    public static ITextComponent entity(Entity entity)
+    {
+        return entity(null, entity);
+    }
+
+    public static ITextComponent attribute(BaseAttribute attribute)
+    {
+        return tr("attribute.name." + attribute.getName());
+    }
+
+    private static final ImmutableMap<DimensionType, ITextComponent> DIMENSION_NAME = ImmutableMap.of(
+            DimensionType.OVERWORLD, tr("createWorld.customize.preset.overworld"),
+            DimensionType.NETHER, tr("advancements.nether.root.title"),
+            DimensionType.THE_END, tr("advancements.end.root.title")
+    );
+
+    public static ITextComponent dimension(DimensionType dim)
+    {
+        ITextComponent dimText = DIMENSION_NAME.get(dim);
+        return dimText != null ? copy(dimText) : Messenger.s(dim.toString());
+    }
+    public static ITextComponent dimension(World world)
+    {
+        return dimension(world.getDimension().getType());
+    }
+
+    public static ITextComponent getColoredDimensionSymbol(DimensionType dimensionType)
+    {
+        if (dimensionType.equals(DimensionType.OVERWORLD))
+        {
+            return s("O", TextFormatting.DARK_GREEN);  // DARK_GREEN
+        }
+        if (dimensionType.equals(DimensionType.NETHER))
+        {
+            return s("N", TextFormatting.DARK_RED);  // DARK_RED
+        }
+        if (dimensionType.equals(DimensionType.THE_END))
+        {
+            return s("E", TextFormatting.DARK_PURPLE);  // DARK_PURPLE
+        }
+        return s(dimensionType.toString().toUpperCase().substring(0, 1));
+    }
+
+    public static ITextComponent block(Block block)
+    {
+        return hover(tr(block.getTranslationKey()), s(TextUtil.block(block)));
+    }
+
+    public static ITextComponent block(IBlockState blockState)
+    {
+        List<ITextComponent> hovers = Lists.newArrayList();
+        hovers.add(s(TextUtil.block(blockState.getBlock())));
+        for (IProperty<?> property: blockState.getProperties())
+        {
+            hovers.add(Messenger.c(
+                    Messenger.s(property.getName()),
+                    "g : ",
+                    property(property, blockState.get(property))
+            ));
+        }
+        return fancy(
+                block(blockState.getBlock()),
+                join(s("\n"), hovers.toArray(new ITextComponent[0])),
+                new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, TextUtil.block(blockState))
+        );
+    }
+
+    public static ITextComponent fluid(Fluid fluid)
+    {
+        String fluidId = Optional.ofNullable(IRegistry.FLUID.getKey(fluid)).map(ResourceLocation::toString).orElse("?");
+        return hover(block(fluid.getDefaultState().getBlockState().getBlock()), s(fluidId));
+    }
+
+    public static ITextComponent fluid(FluidState fluid)
+    {
+        return fluid(fluid.getFluid());
+    }
+
+    public static ITextComponent blockEntity(TileEntity blockEntity)
+    {
+        ResourceLocation id = IRegistry.BLOCK_ENTITY_TYPE.getKey(blockEntity.getType());
+        return s(id != null ?
+                id.toString() : // vanilla block entity
+                blockEntity.getClass().getSimpleName()  // modded block entity, assuming the class name is not obfuscated
+        );
+    }
+
+    public static ITextComponent item(Item item)
+    {
+        return tr(item.getTranslationKey());
+    }
+
+    public static ITextComponent color(EnumDyeColor color)
+    {
+        String colorStr = color.getName().toLowerCase();
+        return translator.advTr("color." + colorStr, colorStr.replace('_', ' '));
+    }
+
+    /*
+     * --------------------
+     *    Text Modifiers
+     * --------------------
+     */
+
+    public static ITextComponent hover(ITextComponent text, HoverEvent hoverEvent)
+    {
+        text.getStyle().setHoverEvent(hoverEvent);
+        return text;
+    }
+
+    public static ITextComponent hover(ITextComponent text, ITextComponent hoverText)
+    {
+        return hover(text, new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverText));
+    }
+
+    public static ITextComponent click(ITextComponent text, ClickEvent clickEvent)
+    {
+        text.getStyle().setClickEvent(clickEvent);
+        return text;
+    }
+
+    public static ITextComponent formatting(ITextComponent text, TextFormatting... formattings)
+    {
+        text.applyTextStyles(formattings);
+        return text;
+    }
+
+    public static ITextComponent formatting(ITextComponent text, String carpetStyle)
+    {
+        Style textStyle = text.getStyle();
+        Style parsedStyle = parseCarpetStyle(carpetStyle);
+
+        textStyle.setColor(parsedStyle.getColorField());
+        textStyle.setBold(parsedStyle.getBoldField());
+        textStyle.setItalic(parsedStyle.getItalicField());
+        textStyle.setUnderlined(parsedStyle.getUnderlineField());
+        textStyle.setStrikethrough(parsedStyle.getStrikethroughField());
+        textStyle.setObfuscated(parsedStyle.getObfuscatedField());
+
+        return style(text, textStyle);
+    }
+
+    public static ITextComponent style(ITextComponent text, Style style)
+    {
+        text.setStyle(style);
+        return text;
+    }
+
+    public static ITextComponent copy(ITextComponent text)
+    {
+        return text.deepCopy();
+    }
+
+    /*
+     * ------------------
+     *    Text Senders
+     * ------------------
+     */
+
+    private static void __tell(CommandSource source, ITextComponent text, boolean broadcastToOps)
+    {
+        // translation logic is handled in carpettisaddition.mixins.translations.ServerPlayerEntityMixin
+        source.sendFeedback(text, broadcastToOps);
+    }
+
+    public static void tell(CommandSource source, ITextComponent text, boolean broadcastToOps)
+    {
+        __tell(source, text, broadcastToOps);
+    }
+    public static void tell(EntityPlayer player, ITextComponent text, boolean broadcastToOps)
+    {
+        tell(player.getCommandSource(), text, broadcastToOps);
+    }
+    public static void tell(CommandSource source, ITextComponent text)
+    {
+        tell(source, text, false);
+    }
+    public static void tell(EntityPlayer player, ITextComponent text)
+    {
+        tell(player, text, false);
+    }
+    public static void tell(CommandSource source, Iterable<ITextComponent> texts, boolean broadcastToOps)
+    {
+        texts.forEach(text -> tell(source, text, broadcastToOps));
+    }
+    public static void tell(EntityPlayer player, Iterable<ITextComponent> texts, boolean broadcastToOps)
+    {
+        texts.forEach(text -> tell(player, text, broadcastToOps));
+    }
+    public static void tell(CommandSource source, Iterable<ITextComponent> texts)
+    {
+        tell(source, texts, false);
+    }
+    public static void tell(EntityPlayer player, Iterable<ITextComponent> texts)
+    {
+        tell(player, texts, false);
+    }
+
+    public static void reminder(EntityPlayer player, ITextComponent text)
+    {
+        player.sendStatusMessage(text, true);
+    }
+
+    public static void sendToConsole(ITextComponent text)
+    {
+        if (CarpetServer.minecraft_server != null)
+        {
+            CarpetServer.minecraft_server.sendMessage(text);
+        }
+    }
+
+    public static void broadcast(ITextComponent text)
+    {
+        sendToConsole(text);
+        if (CarpetServer.minecraft_server != null)
+        {
+            CarpetServer.minecraft_server.getPlayerList().getPlayers().forEach(player -> tell(player, text));
+        }
+    }
+
+
+    /*
+     * ----------
+     *    Misc
+     * ----------
+     */
+
+    public static Style parseCarpetStyle(String style)
+    {
+        return _applyStyleToTextComponent(s(""), style).getStyle();
+    }
+
+    // some language doesn't use space char to divide word
+    // so here comes the compatibility
+    @Deprecated
+    public static ITextComponent getSpaceText()
+    {
+        return translator.advTr("language.space", " ");
     }
 }
 

@@ -64,7 +64,7 @@ public class MicroTimingUtil
 
 	public static ITextComponent getColoredValue(Object value)
 	{
-		return TextUtil.colored(value);
+		return Messenger.colored(value);
 	}
 
 	public static ITextComponent getSuccessText(boolean bool, boolean showReturnValue, ITextComponent hoverExtra)
@@ -84,8 +84,8 @@ public class MicroTimingUtil
 			));
 		}
 		return bool ?
-				TextUtil.getFancyText("e", Messenger.s("√"), hintText, null) :
-				TextUtil.getFancyText("r", Messenger.s("×"), hintText, null);
+				Messenger.fancy("e", Messenger.s("√"), hintText, null) :
+				Messenger.fancy("r", Messenger.s("×"), hintText, null);
 	}
 	public static ITextComponent getSuccessText(boolean bool, boolean showReturnValue)
 	{
