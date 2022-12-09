@@ -20,6 +20,9 @@
 
 package carpet.spark;
 
+import carpet.spark.plugin.CarpetServerSparkPlugin;
+import net.minecraft.server.MinecraftServer;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -28,9 +31,10 @@ public class CarpetSparkMod
     public static CarpetSparkMod mod;
 
     public static final String MOD_ID = "spark";
-    public static final String VERSION = "1.6.2-TISCM";
+    public static final String VERSION = "1.10.13-TISCM";
 
     private Path configDirectory;
+    private CarpetServerSparkPlugin activeServerPlugin = null;
 
     public void onInitialize() {
         CarpetSparkMod.mod = this;
@@ -48,4 +52,22 @@ public class CarpetSparkMod
         }
         return this.configDirectory;
     }
+
+    // Server hooks
+
+    // fabric-api: ServerLifecycleEvents.SERVER_STARTING
+    public void initializeServer(MinecraftServer server) {
+        this.activeServerPlugin = CarpetServerSparkPlugin.register(this, server);
+    }
+
+    // ServerLifecycleEvents.SERVER_STOPPING
+    public void onServerStopping(MinecraftServer stoppingServer) {
+        if (this.activeServerPlugin != null) {
+            this.activeServerPlugin.disable();
+            this.activeServerPlugin = null;
+        }
+    }
+
+    // no onServerCommandRegister
+    // no need to register command again, spark wh
 }

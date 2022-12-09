@@ -23,12 +23,18 @@ package carpet.spark.plugin;
 import carpet.settings.SettingsManager;
 import carpet.spark.*;
 import com.mojang.brigadier.Command;
+import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import me.lucko.spark.common.monitor.ping.PlayerPingProvider;
+import me.lucko.spark.common.platform.MetadataProvider;
 import me.lucko.spark.common.platform.PlatformInfo;
+import me.lucko.spark.common.platform.serverconfig.ServerConfigProvider;
+import me.lucko.spark.common.platform.world.WorldInfoProvider;
+import me.lucko.spark.common.sampler.ThreadDumper;
 import me.lucko.spark.common.tick.TickHook;
 import me.lucko.spark.common.tick.TickReporter;
 import net.minecraft.command.CommandSource;
@@ -36,53 +42,65 @@ import net.minecraft.command.ICommandSource;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 
-import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 public class CarpetServerSparkPlugin extends CarpetSparkPlugin implements Command<CommandSource>, SuggestionProvider<CommandSource> {
 
+    // TISCM store singleton
     private static CarpetServerSparkPlugin plugin;
 
     public static CarpetServerSparkPlugin getInstance() {
         return plugin;
     }
 
-    // fabric-api: ServerLifecycleEvents.SERVER_STARTING
-    public static void register(CarpetSparkMod mod, MinecraftServer server) {
+    public static CarpetServerSparkPlugin register(CarpetSparkMod mod, MinecraftServer server) {
         plugin = new CarpetServerSparkPlugin(mod, server);
         plugin.enable();
-
-        // register commands
-        registerCommands(server.getCommandManager().getDispatcher(), plugin, plugin, "spark");
-    }
-
-    // ServerLifecycleEvents.SERVER_STOPPING
-    public static void onServerStopping(MinecraftServer stoppingServer) {
-        if (stoppingServer == plugin.server) {
-            plugin.disable();
-        }
+        return plugin;
     }
 
     private final MinecraftServer server;
+    private final ThreadDumper gameThreadDumper;
+
+    // TISCM store hooks so their fabric api events can be simulated
     private final CarpetServerTickHook tickHook;
     private final CarpetServerTickReporter tickReporter;
 
     public CarpetServerSparkPlugin(CarpetSparkMod mod, MinecraftServer server) {
         super(mod);
         this.server = server;
+        this.gameThreadDumper = new ThreadDumper.Specific(server.getServerThread());
+
         this.tickHook = new CarpetServerTickHook();
-        this.tickReporter =  new CarpetServerTickReporter();
+        this.tickReporter = new CarpetServerTickReporter();
+    }
+    public CarpetServerTickHook getTickHook() {
+        return this.tickHook;
+    }
+    public CarpetServerTickReporter getTickReporter() {
+        return this.tickReporter;
+    }
+
+    @Override
+    public void enable() {
+        super.enable();
+
+        // register commands
+        registerCommands(this.server.getCommandManager().getDispatcher());
+    }
+
+    public void registerCommands(CommandDispatcher<CommandSource> dispatcher) {
+        registerCommands(dispatcher, this, this, "spark");
     }
 
     @Override
     public int run(CommandContext<CommandSource> context) throws CommandSyntaxException {
-        String[] args = processArgs(context, false);
+        String[] args = processArgs(context, false, "/spark", "spark");
         if (args == null) {
             return 0;
         }
 
-        this.threadDumper.ensureSetup();
         ICommandSource source = context.getSource().getEntity() != null ? context.getSource().getEntity() : context.getSource().getServer();
         this.platform.executeCommand(new CarpetCommandSender(source, this), args);
         return Command.SINGLE_SUCCESS;
@@ -90,21 +108,12 @@ public class CarpetServerSparkPlugin extends CarpetSparkPlugin implements Comman
 
     @Override
     public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
-        String[] args = processArgs(context, true);
+        String[] args = processArgs(context, true, "/spark", "spark");
         if (args == null) {
             return Suggestions.empty();
         }
 
         return generateSuggestions(new CarpetCommandSender(context.getSource().asPlayer(), this), args, builder);
-    }
-
-    private static String[] processArgs(CommandContext<CommandSource> context, boolean tabComplete) {
-        String[] split = context.getInput().split(" ", tabComplete ? -1 : 0);
-        if (split.length == 0 || !split[0].equals("/spark") && !split[0].equals("spark")) {
-            return null;
-        }
-
-        return Arrays.copyOfRange(split, 1, split.length);
     }
 
     @Override
@@ -124,8 +133,14 @@ public class CarpetServerSparkPlugin extends CarpetSparkPlugin implements Comman
         ).map(sender -> new CarpetCommandSender(sender, this));
     }
 
-    public CarpetServerTickHook getTickHook() {
-        return this.tickHook;
+    @Override
+    public void executeSync(Runnable task) {
+        this.server.addScheduledTask(task);
+    }
+
+    @Override
+    public ThreadDumper getDefaultThreadDumper() {
+        return this.gameThreadDumper;
     }
 
     @Override
@@ -133,13 +148,31 @@ public class CarpetServerSparkPlugin extends CarpetSparkPlugin implements Comman
         return this.getTickHook();
     }
 
-    public CarpetServerTickReporter getTickReporter() {
-        return this.tickReporter;
-    }
-
     @Override
     public TickReporter createTickReporter() {
         return this.getTickReporter();
+    }
+
+    @Override
+    public PlayerPingProvider createPlayerPingProvider() {
+        return new CarpetPlayerPingProvider(this.server);
+    }
+
+    @Override
+    public ServerConfigProvider createServerConfigProvider() {
+        // never try to think about exposing it
+        return null;
+    }
+
+    @Override
+    public MetadataProvider createExtraMetadataProvider() {
+        // not that ez to be ported uwu
+        return null;
+    }
+
+    @Override
+    public WorldInfoProvider createWorldInfoProvider() {
+        return new CarpetWorldInfoProvider.Server(this.server);
     }
 
     @Override

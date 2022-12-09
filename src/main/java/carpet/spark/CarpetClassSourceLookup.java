@@ -20,7 +20,7 @@
 
 package carpet.spark;
 
-import me.lucko.spark.common.util.ClassSourceLookup;
+import me.lucko.spark.common.sampler.source.ClassSourceLookup;
 
 public class CarpetClassSourceLookup implements ClassSourceLookup
 {

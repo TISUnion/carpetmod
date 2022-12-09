@@ -42,7 +42,7 @@ public class CarpetSparkAccess
 	{
 		if (TISCMConfig.MOD_SPARK)
 		{
-			CarpetServerSparkPlugin.register(CarpetSparkMod.mod, server);
+			CarpetSparkMod.mod.initializeServer(server);
 		}
 	}
 
@@ -51,7 +51,7 @@ public class CarpetSparkAccess
 	{
 		if (TISCMConfig.MOD_SPARK)
 		{
-			CarpetServerSparkPlugin.onServerStopping(server);
+			CarpetSparkMod.mod.onServerStopping(server);
 		}
 	}
 }

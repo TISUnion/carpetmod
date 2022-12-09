@@ -17,17 +17,22 @@ buildscript {
     }
 }
 
-import com.github.abrarsyed.jastyle.ASFormatter;
+
+import com.github.abrarsyed.jastyle.ASFormatter
 import com.github.abrarsyed.jastyle.OptParser
-import com.google.common.collect.Maps;
+import com.google.common.collect.Maps
 import com.google.gson.GsonBuilder
 import groovy.json.JsonSlurper
-import java.util.zip.*
-import net.minecraftforge.gradle.patcher.task.TaskExtractMCPData
 import org.apache.commons.io.IOUtils
 import org.apache.commons.io.input.NullInputStream
-import org.objectweb.asm.*
-import org.objectweb.asm.tree.*
+import org.objectweb.asm.ClassReader
+import org.objectweb.asm.ClassWriter
+import org.objectweb.asm.tree.AnnotationNode
+import org.objectweb.asm.tree.ClassNode
+
+import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
+import java.util.zip.ZipOutputStream
 
 // ===== MAIN BUILDSCRIPT ===== //
 
@@ -173,9 +178,8 @@ def projectMod = project(':' + settings.modname) {
             exclude group: 'org.yaml'  // worldedit only uses yaml stuffs in bukkit
         }
         // spark
-        compile 'com.github.TISUnion:spark:bf70da979e'
-        compileOnly 'org.checkerframework:checker-qual:3.8.0'
-        sparkLibs 'com.github.TISUnion:spark:bf70da979e'
+        compile 'com.github.TISUnion.spark:spark-common:647e674ced'
+        sparkLibs 'com.github.TISUnion.spark:spark-common:647e674ced'
     }
 
     task runclient(type: JavaExec, dependsOn: [":" + settings.modname + ":downloadAssets", ":" + settings.modname + ":extractNatives"]) {
