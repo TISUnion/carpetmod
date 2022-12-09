@@ -10,6 +10,7 @@ import carpet.logging.microtiming.marker.MicroTimingMarkerManager;
 import carpet.logging.microtiming.utils.MicroTimingStandardCarpetLogger;
 import carpet.logging.phantom.PhantomLogger;
 import carpet.network.CarpetServerNetworkHandler;
+import carpet.network.tiscm.TISCMServerPacketHandler;
 import carpet.script.CarpetScriptServer;
 import carpet.settings.CarpetSettings;
 import carpet.settings.SettingsManager;
@@ -129,6 +130,7 @@ public class CarpetServer // static for now - easier to handle all around the co
     {
         CarpetServerNetworkHandler.onPlayerLoggedOut(player);
         LoggerRegistry.playerDisconnected(player);
+        TISCMServerPacketHandler.getInstance().onPlayerDisconnected(player.connection);
     }
 
     public static void onCarpetClientHello(EntityPlayerMP player)

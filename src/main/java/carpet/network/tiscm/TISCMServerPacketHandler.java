@@ -3,6 +3,7 @@ package carpet.network.tiscm;
 import carpet.CarpetServer;
 import carpet.utils.NbtUtil;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.PacketBuffer;
@@ -18,7 +19,7 @@ public class TISCMServerPacketHandler
 	private static final TISCMServerPacketHandler INSTANCE = new TISCMServerPacketHandler();
 
 	private final Map<TISCMProtocol.C2S, Consumer<HandlerContext.C2S>> handlers = new EnumMap<>(TISCMProtocol.C2S.class);
-	private final Map<NetHandlerPlayServer, Set<TISCMProtocol.S2C>> clientSupportedPacketsMap = new WeakHashMap<>();
+	private final Map<NetHandlerPlayServer, Set<TISCMProtocol.S2C>> clientSupportedPacketsMap = Maps.newLinkedHashMap();
 
 	private TISCMServerPacketHandler()
 	{
@@ -46,6 +47,11 @@ public class TISCMServerPacketHandler
 		ctx.runSynced(() -> TISCMProtocol.C2S.fromId(packetId).
 				map(this.handlers::get).
 				ifPresent( handler -> handler.accept(ctx)));
+	}
+
+	public void onPlayerDisconnected(NetHandlerPlayServer networkHandler)
+	{
+		this.clientSupportedPacketsMap.remove(networkHandler);
 	}
 
 	public boolean doesClientSupport(NetHandlerPlayServer networkHandler, TISCMProtocol.S2C packetId)
