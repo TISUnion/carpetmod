@@ -22,4 +22,4 @@ Thanks to [World Edit mod](https://github.com/EngineHub/WorldEdit) and [Spark mo
 
 See https://github.com/gnembon/carpetmod/blob/master/README.md
 
-Also you need to download TISCM_libs from [here](https://files.catbox.moe/wpe6a5.zip) and unzip it into the project folder, since some of the library providers are down
+Also you need to download TISCM_libs from [here](https://files.catbox.moe/xqp3xy.zip) and unzip it into the project folder, since some of the library providers are down
