@@ -586,6 +586,15 @@ if (settings.pipeline == 'joined') {
     }
 }
 
+static def getGitCommitHash() {
+    try {
+        'git rev-parse --verify HEAD'.execute().text.trim()
+    }
+    catch (Exception ignored) {
+        return 'unknown'
+    }
+}
+
 // Tasks to produce zip files containing only the changed classes, making the final release zip
 for (def dist : ['Client', 'Server']) {
     task('createRelease' + dist, type: Zip) {
@@ -645,6 +654,15 @@ for (def dist : ['Client', 'Server']) {
                     }
                 }
             }
+        }
+
+        from {
+            def f = new File('projects/' + settings.modname + '/build/_commit_hash')
+            if (!f.parentFile.exists()) {
+                f.parentFile.mkdir()
+            }
+            f.text = getGitCommitHash()
+            f
         }
 
         archiveName = "${settings.modname}_${project.version}_${dist}.zip"
