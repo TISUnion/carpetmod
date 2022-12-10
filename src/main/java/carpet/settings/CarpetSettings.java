@@ -747,6 +747,16 @@ public class CarpetSettings
     )
     public static String commandRemoveEntity = "ops";
 
+    @Rule(
+            desc = "Add a double confirmation for /stop command to prevent stopping server accidentally",
+            extra = {
+                    "You need to enter /stop twice within 1 minute to stop the server",
+                    "This mechanics only works for players"
+            },
+            category = {COMMAND}
+    )
+    public static boolean stopCommandDoubleConfirmation = false;
+
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$
     //   | $$     | $$  | $$  \__/| $$  \__/| $$$$  /$$$$
