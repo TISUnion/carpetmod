@@ -17,6 +17,9 @@ buildscript {
     }
 }
 
+plugins {
+    id 'me.fallenbreath.yamlang' version '191e2e33bf' apply false
+}
 
 import com.github.abrarsyed.jastyle.ASFormatter
 import com.github.abrarsyed.jastyle.OptParser
@@ -89,6 +92,7 @@ def projectMod = project(':' + settings.modname) {
     apply plugin: 'java'
     apply plugin: 'eclipse'
     apply plugin: 'net.minecraftforge.gradle.forgedev.patcher'
+    apply plugin: 'me.fallenbreath.yamlang'
     sourceSets {
         main {
             java {
@@ -180,6 +184,10 @@ def projectMod = project(':' + settings.modname) {
         // spark
         compile 'com.github.TISUnion.spark:spark-common:647e674ced'
         sparkLibs 'com.github.TISUnion.spark:spark-common:647e674ced'
+    }
+    yamlang {
+        targetSourceSets = [sourceSets.main]
+        inputDir = 'assets/carpet/lang'
     }
 
     task runclient(type: JavaExec, dependsOn: [":" + settings.modname + ":downloadAssets", ":" + settings.modname + ":extractNatives"]) {
