@@ -11,6 +11,7 @@ import carpet.logging.microtiming.tickstages.TickStageExtraBase;
 import carpet.logging.microtiming.utils.MicroTimingContext;
 import carpet.logging.microtiming.utils.MicroTimingUtil;
 import carpet.settings.CarpetSettings;
+import carpet.utils.GameUtil;
 import carpet.utils.Translator;
 import com.google.common.collect.Lists;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
@@ -72,6 +73,12 @@ public class MicroTimingLoggerManager
         return CarpetSettings.microTiming && LoggerRegistry.__microTiming && instance != null;
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    public static boolean shouldRecordEvent()
+    {
+        return isLoggerActivated() && GameUtil.isOnServerThread();
+    }
+
     public static void attachServer(MinecraftServer minecraftServer)
     {
         instance = new MicroTimingLoggerManager(minecraftServer);
@@ -127,7 +134,7 @@ public class MicroTimingLoggerManager
 
     public static void onBlockUpdate(World world, BlockPos pos, Block sourceBlock, BlockUpdateType updateType, EnumFacing exceptSide, EventType eventType)
     {
-        if (!isLoggerActivated())
+        if (!shouldRecordEvent())
         {
             return;
         }
@@ -140,7 +147,7 @@ public class MicroTimingLoggerManager
 
     public static void onSetBlockState(World world, BlockPos pos, IBlockState oldState, IBlockState newState, Boolean returnValue, int flags, EventType eventType)
     {
-        if (isLoggerActivated())
+        if (!shouldRecordEvent())
         {
             if (oldState.getBlock() == newState.getBlock())
             {
@@ -195,7 +202,7 @@ public class MicroTimingLoggerManager
 
     public static void onExecuteTileTickEvent(World world, NextTickListEntry<Block> event, EventType eventType)
     {
-        if (!isLoggerActivated())
+        if (!shouldRecordEvent())
         {
             return;
         }
@@ -207,7 +214,7 @@ public class MicroTimingLoggerManager
 
     public static void onScheduleTileTickEvent(World world, Block block, BlockPos pos, int delay, TickPriority priority, Boolean success)
     {
-        if (!isLoggerActivated())
+        if (!shouldRecordEvent())
         {
             return;
         }
@@ -225,7 +232,7 @@ public class MicroTimingLoggerManager
 
     public static void onExecuteBlockEvent(World world, BlockEventData blockAction, Boolean returnValue, ExecuteBlockEventEvent.FailInfo failInfo, EventType eventType)
     {
-        if (!isLoggerActivated())
+        if (!shouldRecordEvent())
         {
             return;
         }
@@ -237,7 +244,7 @@ public class MicroTimingLoggerManager
 
     public static void onScheduleBlockEvent(World world, BlockEventData blockAction, boolean success)
     {
-        if (!isLoggerActivated())
+        if (!shouldRecordEvent())
         {
             return;
         }
@@ -255,7 +262,7 @@ public class MicroTimingLoggerManager
 
     public static void onEmitBlockUpdate(World world, Block block, BlockPos pos, EventType eventType, String methodName)
     {
-        if (!isLoggerActivated())
+        if (!shouldRecordEvent())
         {
             return;
         }
@@ -267,7 +274,7 @@ public class MicroTimingLoggerManager
 
     public static void onEmitBlockUpdateRedstoneDust(World world, Block block, BlockPos pos, EventType eventType, String methodName, Collection<BlockPos> updateOrder)
     {
-        if (!isLoggerActivated())
+        if (!shouldRecordEvent())
         {
             return;
         }
