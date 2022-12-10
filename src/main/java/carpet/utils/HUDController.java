@@ -178,11 +178,16 @@ public class HUDController
 
     private static ITextComponent [] send_mem_usage()
     {
+        final long bytesPerMB = 1024 * 1024;
+        long free = Runtime.getRuntime().freeMemory();
+        long total = Runtime.getRuntime().totalMemory();
+        long max = Runtime.getRuntime().maxMemory();
 
-
-        ITextComponent [] ret =  new ITextComponent[]{
-                Messenger.c("g "+ (Runtime.getRuntime().maxMemory() - Runtime.getRuntime().freeMemory())/1048576 + "M / " +(Runtime.getRuntime().maxMemory()/1048576) + " M"),
+        long usedMB = Math.max(total - free, 0) / bytesPerMB;
+        long allocatedMB = total / bytesPerMB;
+        long maxMB = max != Long.MAX_VALUE ? max / bytesPerMB : -1;
+        return new ITextComponent[]{
+                Messenger.c(String.format("g %dM / %dM | %dM", usedMB, allocatedMB, maxMB))
         };
-        return ret;
     }
 }
