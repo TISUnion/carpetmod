@@ -20,34 +20,26 @@
 
 package carpet.spark;
 
-import carpet.settings.CarpetSettings;
-import me.lucko.spark.common.platform.PlatformInfo;
+import com.google.common.collect.ImmutableMap;
+import me.lucko.spark.common.monitor.ping.PlayerPingProvider;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.MinecraftServer;
 
-public class CarpetPlatformInfo implements PlatformInfo
-{
-    private final Type type;
+import java.util.Map;
 
-    public CarpetPlatformInfo(Type type) {
-        this.type = type;
+public class CarpetPlayerPingProvider implements PlayerPingProvider {
+    private final MinecraftServer server;
+
+    public CarpetPlayerPingProvider(MinecraftServer server) {
+        this.server = server;
     }
 
     @Override
-    public Type getType() {
-        return type;
-    }
-
-    @Override
-    public String getName() {
-        return "TIS Carpet";
-    }
-
-    @Override
-    public String getVersion() {
-        return CarpetSettings.carpetVersion;
-    }
-
-    @Override
-    public String getMinecraftVersion() {
-        return "1.13.2";
+    public Map<String, Integer> poll() {
+        ImmutableMap.Builder<String, Integer> builder = ImmutableMap.builder();
+        for (EntityPlayerMP player : this.server.getPlayerList().getPlayers()) {
+            builder.put(player.getGameProfile().getName(), player.ping);
+        }
+        return builder.build();
     }
 }

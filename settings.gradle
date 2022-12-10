@@ -1,3 +1,19 @@
+pluginManagement {
+    repositories {
+        maven { url 'https://jitpack.io' }
+    }
+    resolutionStrategy {
+        eachPlugin {
+            switch (requested.id.id) {
+                case "me.fallenbreath.yamlang":
+                    useModule("com.github.Fallen-Breath:yamlang:${requested.version}")
+                    break
+            }
+        }
+    }
+}
+
+
 import groovy.json.JsonSlurper
 
 def settings = new JsonSlurper().parseText(file('conf/settings.json').text)

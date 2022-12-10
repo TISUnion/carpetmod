@@ -192,7 +192,7 @@ public class CarpetCommand
     {
         listSettings(source, "Current CarpetMod Settings", CarpetServer.settingsManager.getNonDefault());
 
-        Messenger.m(source, "Carpet Mod version: "+CarpetSettings.carpetVersion);
+        Messenger.m(source, "g Carpet Mod version: "+CarpetSettings.carpetVersion);
         try
         {
             EntityPlayer player = source.asPlayer();
