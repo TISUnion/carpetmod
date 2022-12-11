@@ -1,6 +1,6 @@
 package carpet.helpers;
 
-import carpet.utils.Messenger;
+import carpet.utils.TextUtil;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -16,7 +16,7 @@ public class UpdateSuppressionException extends RuntimeException {
     @Override
     public String getMessage()
     {
-        return String.format("Update Suppression at %s in %s", Messenger.coord(this.pos), this.world.getDimension().getType());
+        return String.format("Update Suppression at %s in %s", TextUtil.coord(this.pos), this.world.getDimension().getType());
     }
 
     @Override
