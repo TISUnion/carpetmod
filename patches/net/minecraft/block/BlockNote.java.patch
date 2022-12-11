@@ -31,7 +31,7 @@
  {
      public static final EnumProperty<NoteBlockInstrument> INSTRUMENT = BlockStateProperties.NOTE_BLOCK_INSTRUMENT;
      public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
-@@ -44,10 +51,18 @@
+@@ -44,8 +51,21 @@
      {
          boolean flag = worldIn.isBlockPowered(pos);
  
@@ -39,26 +39,36 @@
 +
          if (flag != state.get(POWERED))
          {
++            if (CarpetSettings.debugNoteBlocks && this.isDebugNoteBlocksTarget(worldIn, pos))
++            {
++                // flag=18 -> no updates
++                worldIn.setBlockState(pos, state.with(POWERED, Boolean.valueOf(flag)), 18);
++                if (flag)  // rising edge
++                {
++                    this.debugNoteBlocksImpl(worldIn, pos);
++                }
++                return;
++            }
++
              if (flag)
              {
-+                if (CarpetSettings.debugNoteBlocks && this.debugNoteBlocksImpl(worldIn, pos))
-+                {
-+                    // flag=18 -> no updates
-+                    worldIn.setBlockState(pos, state.with(POWERED, Boolean.valueOf(flag)), 18);
-+                    return;
-+                }
                  this.triggerNote(worldIn, pos);
-             }
- 
-@@ -55,6 +70,53 @@
+@@ -55,6 +75,54 @@
          }
      }
  
 +    // TISCM - debugNoteBlocks
-+    private boolean debugNoteBlocksImpl(World worldIn, BlockPos pos)
++    private boolean isDebugNoteBlocksTarget(World worldIn, BlockPos pos)
 +    {
-+        IBlockState baseBlock = worldIn.getBlockState(pos.down());
-+        if (baseBlock.getBlock().equals(Blocks.PURPUR_BLOCK))
++        Block baseBlock = worldIn.getBlockState(pos.down()).getBlock();
++        return baseBlock == Blocks.PURPUR_BLOCK || baseBlock == Blocks.COMPARATOR || baseBlock == Blocks.ACTIVATOR_RAIL;
++    }
++
++    // TISCM - debugNoteBlocks
++    private void debugNoteBlocksImpl(World worldIn, BlockPos pos)
++    {
++        Block baseBlock = worldIn.getBlockState(pos.down()).getBlock();
++        if (baseBlock == Blocks.PURPUR_BLOCK)
 +        {
 +            HttpUtil.DOWNLOADER_EXECUTOR.submit(() -> {
 +                // IBlockState#updateNeighbors = PP update
@@ -73,7 +83,7 @@
 +                }
 +            });
 +        }
-+        else if (baseBlock.getBlock().equals(Blocks.COMPARATOR))
++        else if (baseBlock == Blocks.COMPARATOR)
 +        {
 +            TileEntity tileEntity = worldIn.getTileEntity(pos.down());
 +            if (tileEntity instanceof TileEntityComparator)
@@ -89,22 +99,16 @@
 +                }
 +            }
 +        }
-+        else if (baseBlock.getBlock().equals(Blocks.ACTIVATOR_RAIL))
++        else if (baseBlock == Blocks.ACTIVATOR_RAIL)
 +        {
 +            throw new StackOverflowError("Update suppression simulated by debugNoteBlocks from TISCM.");
 +        }
-+        else
-+        {
-+            // no special block
-+            return false;
-+        }
-+        return true;
 +    }
 +
      private void triggerNote(World worldIn, BlockPos pos)
      {
          if (worldIn.getBlockState(pos.up()).isAir())
-@@ -101,4 +163,16 @@
+@@ -101,4 +169,16 @@
      {
          builder.add(INSTRUMENT, POWERED, NOTE);
      }
