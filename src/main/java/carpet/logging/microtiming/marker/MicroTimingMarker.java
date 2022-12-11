@@ -180,7 +180,7 @@ public class MicroTimingMarker
 	public ITextComponent toFullText()
 	{
 		return Messenger.c(
-				Messenger.s(Messenger.coord(this.blockPos)),
+				Messenger.coord(this.blockPos),
 				this.withFormattingSymbol(" " + this.color.toString())
 		);
 	}
