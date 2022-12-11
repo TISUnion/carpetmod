@@ -25,16 +25,18 @@
  {
      public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
  
-@@ -48,7 +56,20 @@
+@@ -48,7 +56,22 @@
          else
          {
              worldIn.setBlockState(pos, state.with(POWERED, Boolean.valueOf(true)), 2);
 -            worldIn.getPendingBlockTicks().scheduleTick(pos, this, 2);
 +
-+
++            // TISCM asyncUpdatesAmplifier
 +            if (CarpetSettings.asyncUpdatesAmplifier && (worldIn instanceof WorldServer) &&
 +                    ThreadstoneLogger.isCurrentThreadAsync((WorldServer) worldIn))
 +            {
++                // send update here so redstone component is able to receive signal
++                // not the same behavior as 1.12 ITT observer chain, but it's more useful imo
 +                this.updateNeighborsInFront(worldIn, pos, state);
 +                this.tick(worldIn.getBlockState(pos), worldIn.getWorld(), pos, worldIn.getRandom());
 +                return;
@@ -47,7 +49,7 @@
          }
  
          this.updateNeighborsInFront(worldIn, pos, state);
-@@ -68,16 +89,27 @@
+@@ -68,16 +91,27 @@
      {
          if (!worldIn.isRemote() && !worldIn.getPendingBlockTicks().isTickScheduled(pos, this))
          {
@@ -76,7 +78,7 @@
      }
  
      public boolean canProvidePower(IBlockState state)
-@@ -123,4 +155,16 @@
+@@ -123,4 +157,16 @@
      {
          return this.getDefaultState().with(FACING, context.getNearestLookingDirection().getOpposite().getOpposite());
      }
