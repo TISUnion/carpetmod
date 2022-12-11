@@ -15,25 +15,7 @@
  import net.minecraft.stats.StatList;
  import net.minecraft.tileentity.TileEntity;
  import net.minecraft.tileentity.TileEntityBeacon;
-@@ -31,6 +35,17 @@
-         return new TileEntityBeacon();
-     }
- 
-+    @Override
-+    public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
-+        Block block;
-+        for (EnumFacing facing : EnumFacing.values()) {
-+            block = worldIn.getBlockState(pos.offset(facing)).getBlock();
-+            if (block == Blocks.REDSTONE_BLOCK) {
-+                ThreadstoneLogger.getInstance().clear();
-+            }
-+        }
-+    }
-+
-     public boolean onBlockActivated(IBlockState state, World worldIn, BlockPos pos, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
-     {
-         if (worldIn.isRemote)
-@@ -83,6 +98,17 @@
+@@ -83,6 +87,17 @@
      {
          HttpUtil.DOWNLOADER_EXECUTOR.submit(() ->
          {
@@ -51,7 +33,7 @@
              Chunk chunk = worldIn.getChunk(glassPos);
  
              for (int i = glassPos.getY() - 1; i >= 0; --i)
-@@ -111,7 +137,16 @@
+@@ -111,7 +126,16 @@
                      });
                  }
              }

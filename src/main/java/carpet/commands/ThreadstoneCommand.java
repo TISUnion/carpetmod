@@ -1,6 +1,7 @@
 package carpet.commands;
 
 import carpet.CarpetServer;
+import carpet.logging.threadstone.ThreadstoneLogger;
 import carpet.settings.CarpetSettings;
 import carpet.settings.SettingsManager;
 import carpet.utils.Messenger;
@@ -52,6 +53,11 @@ public class ThreadstoneCommand extends AbstractCommand
 	{
 		LiteralCommandNode<CommandSource> root = dispatcher.register(literal(NAME).
 				requires(s -> SettingsManager.canUseCommand(s, CarpetSettings.commandThreadstone)).
+				then(literal("logger").
+						then(literal("reset").
+								executes(c -> resetThreadstoneLogger(c.getSource()))
+						)
+				).
 				then(literal("rsf").
 						executes(c -> showRedstoneFlagHelp(c.getSource())).
 						then(literal("get").
@@ -76,6 +82,13 @@ public class ThreadstoneCommand extends AbstractCommand
 						)
 				));
 		dispatcher.register(literal("ts").redirect(root));
+	}
+
+	private int resetThreadstoneLogger(CommandSource source)
+	{
+		ThreadstoneLogger.getInstance().clear();
+		Messenger.tell(source, "Reset threadstone logger glass thread statistic");
+		return 1;
 	}
 
 	//////////////////////////////////////////////////
