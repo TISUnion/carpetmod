@@ -33,77 +33,38 @@
      public boolean onBlockActivated(IBlockState state, World worldIn, BlockPos pos, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
      {
          if (worldIn.isRemote)
-@@ -83,33 +98,54 @@
+@@ -83,6 +98,17 @@
      {
          HttpUtil.DOWNLOADER_EXECUTOR.submit(() ->
          {
--            Chunk chunk = worldIn.getChunk(glassPos);
--
--            for (int i = glassPos.getY() - 1; i >= 0; --i)
--            {
--                BlockPos blockpos = new BlockPos(glassPos.getX(), i, glassPos.getZ());
--
--                if (!chunk.canSeeSky(blockpos))
--                {
--                    break;
++            // TISCM threadstone logger logs beacons
++            boolean logBeacons = LoggerRegistry.__threadstone;
++            long initial = System.nanoTime();
++            if (logBeacons) {
++                ThreadstoneLogger.getInstance().submitGlassThreadCreation(glassPos);
++            }
++
++            // TISCM threadstone logger add try
 +            try {
-+                boolean logBeacons = LoggerRegistry.__threadstone;
-+                long initial = System.nanoTime();
-+                long cur = initial;
-+                if (logBeacons) {
-+                    ThreadstoneLogger.getInstance().submitGlassThreadCreation(glassPos);
++
++            // vanilla logic starts
+             Chunk chunk = worldIn.getChunk(glassPos);
+ 
+             for (int i = glassPos.getY() - 1; i >= 0; --i)
+@@ -111,7 +137,16 @@
+                     });
                  }
-+                Chunk chunk = worldIn.getChunk(glassPos);
+             }
++            // vanilla logic ends
  
--                IBlockState iblockstate = worldIn.getBlockState(blockpos);
--
--                if (iblockstate.getBlock() == Blocks.BEACON)
-+                for (int i = glassPos.getY() - 1; i >= 0; --i)
-                 {
--                    ((WorldServer)worldIn).addScheduledTask(() ->
-+                    BlockPos blockpos = new BlockPos(glassPos.getX(), i, glassPos.getZ());
-+
-+                    if (!chunk.canSeeSky(blockpos))
-                     {
--                        TileEntity tileentity = worldIn.getTileEntity(blockpos);
-+                        break;
-+                    }
- 
--                        if (tileentity instanceof TileEntityBeacon)
-+                    IBlockState iblockstate = worldIn.getBlockState(blockpos);
-+
-+                    if (iblockstate.getBlock() == Blocks.BEACON)
-+                    {
-+                        ((WorldServer)worldIn).addScheduledTask(() ->
-                         {
--                            ((TileEntityBeacon)tileentity).updateBeacon();
--                            worldIn.addBlockEvent(blockpos, Blocks.BEACON, 1, 0);
--                        }
-+                            TileEntity tileentity = worldIn.getTileEntity(blockpos);
- 
--                    });
-+                            if (tileentity instanceof TileEntityBeacon)
-+                            {
-+                                ((TileEntityBeacon)tileentity).updateBeacon();
-+                                worldIn.addBlockEvent(blockpos, Blocks.BEACON, 1, 0);
-+                            }
-+
-+                        });
-+                    }
-+                    if (logBeacons && (i & 4) == 0) {
-+                        cur = System.nanoTime();
-+                        if (cur - initial > 1000) {
-+                            ThreadstoneLogger.getInstance().submitGlassThreadAlive(glassPos, cur - initial);
-+                        }
-+                        initial = cur;
-+                    }
-                 }
++            // TISCM threadstone logger logs beacons add catch-finally
++            } catch (Throwable throwable) {
++                ThreadstoneLogger.getInstance().onExceptionallyEndedAsyncThread(throwable);
++            } finally {
 +                if (logBeacons) {
 +                    ThreadstoneLogger.getInstance().submitGlassThreadTermination(glassPos, System.nanoTime() - initial);
 +                }
-+            } catch (Throwable throwable) {
-+                ThreadstoneLogger.getInstance().onExceptionallyEndedAsyncThread(throwable);
-+                ThreadstoneLogger.getInstance().submitGlassThreadTermination(glassPos, 0);
-             }
- 
++            }
          });
+     }
+ }
