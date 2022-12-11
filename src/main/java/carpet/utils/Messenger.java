@@ -701,6 +701,14 @@ public class Messenger
     {
         tell(player, texts, false);
     }
+    public static void tell(CommandSource source, String text)
+    {
+        tell(source, s(text));
+    }
+    public static void tell(EntityPlayer player, String text)
+    {
+        tell(player, s(text));
+    }
 
     public static void reminder(EntityPlayer player, ITextComponent text)
     {

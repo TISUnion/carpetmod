@@ -90,6 +90,12 @@ public class CarpetSettings
     public static String commandRaycount = "false";
 
     @Rule(
+            desc = "Enables /threadstone or /ts command for some threadstone tools",
+            category = COMMAND
+    )
+    public static String commandThreadstone = "false";
+
+    @Rule(
             desc = "enable visualize projectile logger",
             category = SURVIVAL
     )
