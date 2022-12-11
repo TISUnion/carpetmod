@@ -96,6 +96,12 @@ public class CarpetSettings
     public static String commandThreadstone = "false";
 
     @Rule(
+            desc = "Enables /cluster for cluster chunk calculator & tools",
+            category = COMMAND
+    )
+    public static String commandCluster = "false";
+
+    @Rule(
             desc = "enable visualize projectile logger",
             category = SURVIVAL
     )

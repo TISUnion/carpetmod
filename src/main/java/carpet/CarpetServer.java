@@ -108,7 +108,7 @@ public class CarpetServer // static for now - easier to handle all around the co
         ChunkRegenCommand.register(dispatcher);
         RaycountCommand.register(dispatcher);
         RemoveEntityCommand.getInstance().registerCommand(dispatcher);
-        ClusterCommand.register(dispatcher);
+        ClusterCommand.getInstance().registerCommand(dispatcher);
         PaletteCommand.getInstance().registerCommand(dispatcher);
         ThreadstoneCommand.getInstance().registerCommand(dispatcher);
     }
