@@ -1,0 +1,13 @@
+--- a/net/minecraft/command/CommandSource.java
++++ b/net/minecraft/command/CommandSource.java
+@@ -285,4 +285,10 @@
+     {
+         return Collections.singleton(ISuggestionProvider.Coordinates.DEFAULT_GLOBAL);
+     }
++
++    // TISCM add getter
++    public ICommandSource getSource()
++    {
++        return this.source;
++    }
+ }

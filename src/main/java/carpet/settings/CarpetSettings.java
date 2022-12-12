@@ -759,14 +759,15 @@ public class CarpetSettings
     )
     public static String commandRemoveEntity = "ops";
 
-    /*
     @Rule(
-            desc = "Really?",
-            extra = "Use with caution, this rule affects all observer blocks",
-            category = {CREATIVE}
+            desc = "Add a double confirmation for /stop command to prevent stopping server accidentally",
+            extra = {
+                    "You need to enter /stop twice within 1 minute to stop the server",
+                    "This mechanics only works for players"
+            },
+            category = {COMMAND}
     )
-    public static boolean instantObservers = false;
-    */
+    public static boolean stopCommandDoubleConfirmation = false;
 
     @Rule(
             desc = "Observers updated on an async thread will behave like an ITT observer in 1.12. ",

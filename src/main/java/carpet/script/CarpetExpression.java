@@ -2403,6 +2403,12 @@ public class CarpetExpression
             return (cc, tt) -> time;
         });
 
+        this.expr.addLazyFunction("world_time", 0, (c, t, lv) ->
+        {
+            Value time = new NumericValue(((CarpetContext) c).s.getWorld().getGameTime());
+            return (cc, tt) -> time;
+        });
+
         this.expr.addLazyFunction("game_tick", -1, (c, t, lv) -> {
             CommandSource s = ((CarpetContext)c).s;
             s.getServer().tick( () -> System.nanoTime()- CarpetServer.scriptServer.tickStart<50000000L);

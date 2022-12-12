@@ -1,0 +1,22 @@
+--- a/net/minecraft/command/impl/StopCommand.java
++++ b/net/minecraft/command/impl/StopCommand.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.command.impl;
+ 
++import carpet.helpers.StopCommandDoubleConfirmation;
+ import com.mojang.brigadier.CommandDispatcher;
+ import net.minecraft.command.CommandSource;
+ import net.minecraft.command.Commands;
+@@ -14,6 +15,12 @@
+             return p_198727_0_.hasPermissionLevel(4);
+         }).executes((p_198726_0_) ->
+         {
++            // TISCM stopCommandDoubleConfirmation
++            if (StopCommandDoubleConfirmation.handleDoubleConfirmation(p_198726_0_))
++            {
++                return 0;
++            }
++
+             p_198726_0_.getSource().sendFeedback(new TextComponentTranslation("commands.stop.stopping"), true);
+             p_198726_0_.getSource().getServer().initiateShutdown();
+             return 1;
