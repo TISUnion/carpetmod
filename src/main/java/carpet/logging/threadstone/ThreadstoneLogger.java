@@ -3,6 +3,8 @@ package carpet.logging.threadstone;
 import carpet.CarpetServer;
 import carpet.logging.AbstractHUDLogger;
 import carpet.utils.Messenger;
+import carpet.utils.ReflectionUtil;
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.crash.ReportedException;
 import net.minecraft.entity.player.EntityPlayer;
@@ -34,15 +36,12 @@ public class ThreadstoneLogger extends AbstractHUDLogger {
 
     @Override
     public ITextComponent[] onHudUpdate(String option, EntityPlayer playerEntity) {
-        long downloaderCount = Thread.getAllStackTraces().keySet().stream().
-                filter(thread -> thread.getState() == Thread.State.RUNNABLE && thread.getName().startsWith("Downloader ")).
-                count();
-
         WorldServer world = (WorldServer)playerEntity.getEntityWorld();
+        Pair<Integer, Integer> glassTheadInfo = GlassThreadUtil.getGlassThreadCount();
         return new ITextComponent[] {
                 GlassThreadStatistic.getInstance().report(),
                 world.getChunkProvider().chunkLoadingCacheStatistic.report(),
-                Messenger.s(String.format("Runnable Downloader: %dx", downloaderCount))
+                Messenger.s(String.format("Glass threads: %d/%d", glassTheadInfo.getFirst(), glassTheadInfo.getSecond()))
         };
     }
 
