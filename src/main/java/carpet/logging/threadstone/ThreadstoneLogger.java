@@ -13,14 +13,11 @@ import net.minecraft.world.WorldServer;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class ThreadstoneLogger extends AbstractHUDLogger {
 
     public static final String NAME = "threadstone";
 
-    public static final String HUD_DISPLAY_FORMAT = "C/T: %d/%d, avg lifetime (ns): %d";
     public static final String ASYNC_LOAD_CHUNK_FORMAT = "Detected possible async loading - @Chunk (%d,%d) from thread named %s. ";
     public static final String ASYNC_SETBLOCKSTATE_FORMAT =
             "Detected possible async setBlockState(...) - @BlockPos (%d,%d,%d) from thread named %s into new blockstate %s with flags %d. ";
@@ -31,15 +28,8 @@ public class ThreadstoneLogger extends AbstractHUDLogger {
     public static final String ASYNC_EXCEPTION_FORMAT =
             "An exception occured on an async thread: %s\n";
 
-    private AtomicInteger glassThreadCreations;
-    private AtomicInteger glassThreadTerminations;
-    private AtomicLong totalGlassThreadLifetime;
-
     public ThreadstoneLogger(String name) {
         super(name);
-        glassThreadCreations = new AtomicInteger();
-        glassThreadTerminations = new AtomicInteger();
-        totalGlassThreadLifetime = new AtomicLong();
     }
 
     @Override
@@ -47,8 +37,11 @@ public class ThreadstoneLogger extends AbstractHUDLogger {
         long downloaderCount = Thread.getAllStackTraces().keySet().stream().
                 filter(thread -> thread.getState() == Thread.State.RUNNABLE && thread.getName().startsWith("Downloader ")).
                 count();
+
+        WorldServer world = (WorldServer)playerEntity.getEntityWorld();
         return new ITextComponent[] {
-                Messenger.s(this.getThreadLifetimes()),
+                GlassThreadStatistic.getInstance().report(),
+                world.getChunkProvider().chunkLoadingCacheStatistic.report(),
                 Messenger.s(String.format("Runnable Downloader: %dx", downloaderCount))
         };
     }
@@ -66,33 +59,9 @@ public class ThreadstoneLogger extends AbstractHUDLogger {
         this.logText(Messenger.s(msg));
     }
 
-    public String getThreadLifetimes() {
-        int t = glassThreadTerminations.get();
-        return String.format(HUD_DISPLAY_FORMAT, glassThreadCreations.get(), t, (t != 0) ? totalGlassThreadLifetime.get() / t : 0);
-    }
-
     public synchronized static ThreadstoneLogger getInstance() {
         if (INSTANCE == null) INSTANCE = new ThreadstoneLogger(NAME);
         return INSTANCE;
-    }
-
-    public void clear() {
-        glassThreadCreations.set(0);
-        glassThreadTerminations.set(0);
-        totalGlassThreadLifetime.set(0);
-    }
-
-    public void submitGlassThreadCreation(BlockPos glassPos) {
-        glassThreadCreations.incrementAndGet();
-    }
-
-    public void submitGlassThreadTermination(BlockPos glassPos, long lifetimeNanos) {
-        glassThreadTerminations.incrementAndGet();
-        totalGlassThreadLifetime.addAndGet(lifetimeNanos);
-    }
-
-    public void submitGlassThreadAlive(BlockPos glassPos, long timeElapsedNanos) {
-        totalGlassThreadLifetime.addAndGet(timeElapsedNanos);
     }
 
     public void onExceptionallyEndedAsyncThread(Throwable throwable) {

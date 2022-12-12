@@ -1,21 +1,15 @@
 --- a/net/minecraft/block/BlockBeacon.java
 +++ b/net/minecraft/block/BlockBeacon.java
-@@ -1,10 +1,14 @@
+@@ -1,5 +1,8 @@
  package net.minecraft.block;
  
 +import carpet.logging.LoggerRegistry;
++import carpet.logging.threadstone.GlassThreadStatistic;
 +import carpet.logging.threadstone.ThreadstoneLogger;
-+import carpet.settings.CarpetSettings;
  import net.minecraft.block.state.IBlockState;
  import net.minecraft.entity.EntityLivingBase;
  import net.minecraft.entity.player.EntityPlayer;
- import net.minecraft.init.Blocks;
- import net.minecraft.item.ItemStack;
-+import net.minecraft.state.properties.NoteBlockInstrument;
- import net.minecraft.stats.StatList;
- import net.minecraft.tileentity.TileEntity;
- import net.minecraft.tileentity.TileEntityBeacon;
-@@ -83,6 +87,17 @@
+@@ -83,6 +86,17 @@
      {
          HttpUtil.DOWNLOADER_EXECUTOR.submit(() ->
          {
@@ -23,7 +17,7 @@
 +            boolean logBeacons = LoggerRegistry.__threadstone;
 +            long initial = System.nanoTime();
 +            if (logBeacons) {
-+                ThreadstoneLogger.getInstance().submitGlassThreadCreation(glassPos);
++                GlassThreadStatistic.getInstance().onGlassThreadCreated(glassPos);
 +            }
 +
 +            // TISCM threadstone logger add try
@@ -33,7 +27,7 @@
              Chunk chunk = worldIn.getChunk(glassPos);
  
              for (int i = glassPos.getY() - 1; i >= 0; --i)
-@@ -111,7 +126,16 @@
+@@ -111,7 +125,16 @@
                      });
                  }
              }
@@ -44,7 +38,7 @@
 +                ThreadstoneLogger.getInstance().onExceptionallyEndedAsyncThread(throwable);
 +            } finally {
 +                if (logBeacons) {
-+                    ThreadstoneLogger.getInstance().submitGlassThreadTermination(glassPos, System.nanoTime() - initial);
++                    GlassThreadStatistic.getInstance().onGlassThreadTerminated(glassPos, System.nanoTime() - initial);
 +                }
 +            }
          });

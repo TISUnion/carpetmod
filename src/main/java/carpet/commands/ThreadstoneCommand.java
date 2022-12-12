@@ -1,7 +1,7 @@
 package carpet.commands;
 
 import carpet.CarpetServer;
-import carpet.logging.threadstone.ThreadstoneLogger;
+import carpet.logging.threadstone.GlassThreadStatistic;
 import carpet.settings.CarpetSettings;
 import carpet.settings.SettingsManager;
 import carpet.utils.Messenger;
@@ -13,12 +13,14 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.event.ClickEvent;
+import net.minecraft.world.WorldServer;
 
 import javax.annotation.Nullable;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 import static com.mojang.brigadier.arguments.IntegerArgumentType.getInteger;
 import static com.mojang.brigadier.arguments.IntegerArgumentType.integer;
@@ -55,7 +57,13 @@ public class ThreadstoneCommand extends AbstractCommand
 				requires(s -> SettingsManager.canUseCommand(s, CarpetSettings.commandThreadstone)).
 				then(literal("logger").
 						then(literal("reset").
-								executes(c -> resetThreadstoneLogger(c.getSource()))
+								executes(c -> resetThreadstoneLogger(c.getSource(), ResetTarget.values())).
+								then(literal("glassthread").
+										executes(c -> resetThreadstoneLogger(c.getSource(), new ResetTarget[]{ResetTarget.GLASS_THREAD}))
+								).
+								then(literal("chunkloadcache").
+										executes(c -> resetThreadstoneLogger(c.getSource(), new ResetTarget[]{ResetTarget.CHUNK_LOAD_CACHE}))
+								)
 						)
 				).
 				then(literal("rsf").
@@ -84,11 +92,44 @@ public class ThreadstoneCommand extends AbstractCommand
 		dispatcher.register(literal("ts").redirect(root));
 	}
 
-	private int resetThreadstoneLogger(CommandSource source)
+	//////////////////////////////////////////////////
+	//          Threadstone Logger control          //
+	//////////////////////////////////////////////////
+
+	private int resetThreadstoneLogger(CommandSource source, ResetTarget[] targets)
 	{
-		ThreadstoneLogger.getInstance().clear();
-		Messenger.tell(source, "Reset threadstone logger glass thread statistic");
-		return 1;
+		for (ResetTarget target : targets)
+		{
+			target.trigger(source);
+		}
+		return targets.length;
+	}
+
+	private enum ResetTarget
+	{
+		GLASS_THREAD(source -> {
+			GlassThreadStatistic.getInstance().reset();
+			Messenger.tell(source, "Reset glass thread statistic");
+		}),
+		CHUNK_LOAD_CACHE(source -> {
+			for (WorldServer world : CarpetServer.minecraft_server.getWorlds())
+			{
+				world.getChunkProvider().chunkLoadingCacheStatistic.reset();
+			}
+			Messenger.tell(source, "Reset chunk loading cache statistic");
+		});
+
+		private final Consumer<CommandSource> impl;
+
+		ResetTarget(Consumer<CommandSource> impl)
+		{
+			this.impl = impl;
+		}
+
+		public void trigger(CommandSource source)
+		{
+			this.impl.accept(source);
+		}
 	}
 
 	//////////////////////////////////////////////////

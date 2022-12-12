@@ -15,6 +15,7 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.state.IProperty;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
@@ -24,7 +25,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.registry.IRegistry;
 import net.minecraft.util.text.*;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
 import net.minecraft.world.World;
@@ -416,6 +416,11 @@ public class Messenger
             text.appendSibling(items[i]);
         }
         return text;
+    }
+    public static ITextComponent join(ITextComponent joiner, Iterable<ITextComponent> items)
+    {
+        List<ITextComponent> list = Lists.newArrayList(items);
+        return join(joiner, list.toArray(new ITextComponent[0]));
     }
 
     public static ITextComponent format(String formatter, Object... args)
