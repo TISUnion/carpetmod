@@ -144,7 +144,7 @@ public class LifeTimeStatistic extends TranslationContext
 								Messenger.c(
 										"w " + tr("Spawning Position"),
 										"g : ",
-										"w " + Messenger.coord(this.spawningPos)
+										"w " + TextUtil.coord(this.spawningPos)
 								),
 								new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, TextUtil.tp(this.spawningPos, this.dimensionType))
 						),
@@ -155,7 +155,7 @@ public class LifeTimeStatistic extends TranslationContext
 								Messenger.c(
 										"w " + tr("Removal Position"),
 										"g : ",
-										"w " + Messenger.coord(this.removalPos)
+										"w " + TextUtil.coord(this.removalPos)
 								),
 								new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, TextUtil.tp(this.removalPos, this.dimensionType))
 						)

@@ -3,7 +3,6 @@ package carpet.logging.commandblock;
 import carpet.logging.AbstractLogger;
 import carpet.logging.LoggerRegistry;
 import carpet.utils.Messenger;
-import carpet.utils.TextUtil;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityMinecartCommandBlock;
 import net.minecraft.tileentity.CommandBlockBaseLogic;
@@ -77,7 +76,7 @@ public class CommandBlockLogger extends AbstractLogger
 		this.logCommandBlockExecution(
 				world,
 				Messenger.block(state.getBlock()),
-				Messenger.coord("w", pos, world.getDimension().getType()),
+				Messenger.coord(pos, world.getDimension().getType()),
 				executor
 		);
 	}
@@ -91,7 +90,7 @@ public class CommandBlockLogger extends AbstractLogger
 		this.logCommandBlockExecution(
 				entity.getEntityWorld(),
 				Messenger.entity(null, entity),
-				Messenger.coord("w", entity.getPositionVector(), entity.getEntityWorld().getDimension().getType()),
+				Messenger.coord(entity.getPositionVector(), entity.getEntityWorld().getDimension().getType()),
 				entity.getCommandBlockLogic()
 		);
 	}

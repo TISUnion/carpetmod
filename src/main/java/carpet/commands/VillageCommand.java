@@ -91,12 +91,7 @@ public class VillageCommand
 		));
 		messages.add(Messenger.c("w   Dimension: ", Messenger.dimension(village.getWorld())));
 		BlockPos center = village.getCenter();
-		messages.add(Messenger.fancy(
-				null,
-				Messenger.s(String.format("  Center: %s", Messenger.coord(center))),
-				Messenger.s(String.format("Click to teleport to %s", Messenger.coord(center))),
-				new ClickEvent(ClickEvent.Action.RUN_COMMAND, TextUtil.tp(center, village.getWorld().getDimension().getType()))
-		));
+		messages.add(Messenger.format("  Center: %s", Messenger.coord(center)));
 		messages.add(Messenger.s(String.format("  Radius: %d", village.getVillageRadius())));
 		messages.add(Messenger.s(String.format("  VillagerCount: %d", village.getNumVillagers())));
 		messages.add(Messenger.s(String.format("  DoorCount: %d", village.getVillageDoorInfoList().size())));
