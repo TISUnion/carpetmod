@@ -3,7 +3,6 @@ package carpet.logging.threadstone;
 import carpet.CarpetServer;
 import carpet.logging.AbstractHUDLogger;
 import carpet.utils.Messenger;
-import carpet.utils.ReflectionUtil;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.crash.ReportedException;
@@ -39,8 +38,8 @@ public class ThreadstoneLogger extends AbstractHUDLogger {
         WorldServer world = (WorldServer)playerEntity.getEntityWorld();
         Pair<Integer, Integer> glassTheadInfo = GlassThreadUtil.getGlassThreadCount();
         return new ITextComponent[] {
-                GlassThreadStatistic.getInstance().report(),
                 world.getChunkProvider().chunkLoadingCacheStatistic.report(),
+                GlassThreadStatistic.getInstance().report(),
                 Messenger.s(String.format("Glass threads: %d/%d", glassTheadInfo.getFirst(), glassTheadInfo.getSecond()))
         };
     }

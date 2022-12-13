@@ -2,11 +2,16 @@ package carpet.logging.threadstone;
 
 import carpet.utils.Messenger;
 import com.google.common.collect.Lists;
-import net.minecraft.util.math.BlockPos;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
+import it.unimi.dsi.fastutil.longs.LongList;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Deque;
+import java.util.List;
+import java.util.function.BiFunction;
 
 public class GlassThreadStatistic
 {
@@ -14,11 +19,10 @@ public class GlassThreadStatistic
 	private static final int[] MAX_RATIO = new int[]{50, 10, 1};
 	private static final int MAX_RECORD = 10000;
 	
-	private int creationCount = 0;
 	private final Deque<Long> lifespans = Lists.newLinkedList();
 	private final Object lock = new Object();
 
-	private boolean dirty = true;
+	private volatile boolean dirty = true;
 	private ITextComponent cachedMessage = null;
 
 	public static GlassThreadStatistic getInstance()
@@ -30,22 +34,12 @@ public class GlassThreadStatistic
 	{
 		synchronized (this.lock)
 		{
-			this.creationCount = 0;
 			this.lifespans.clear();
-			this.dirty = true;
 		}
+		this.dirty = true;
 	}
 
-	public void onGlassThreadCreated(BlockPos glassPos)
-	{
-		synchronized (this.lock)
-		{
-			this.creationCount++;
-			this.dirty = true;
-		}
-	}
-
-	public void onGlassThreadTerminated(BlockPos glassPos, long lifespanNs)
+	public void onGlassThreadTerminated(long lifespanNs)
 	{
 		synchronized (this.lock)
 		{
@@ -53,10 +47,9 @@ public class GlassThreadStatistic
 			if (this.lifespans.size() > MAX_RECORD)
 			{
 				this.lifespans.removeFirst();
-				this.creationCount--;
 			}
-			this.dirty = true;
 		}
+		this.dirty = true;
 	}
 
 	public ITextComponent report()
@@ -66,37 +59,37 @@ public class GlassThreadStatistic
 			return this.cachedMessage;
 		}
 
-		int c;
-		int t;
-		List<Long> lifespans = Lists.newArrayList();
-
+		LongList lifespans = new LongArrayList();
 		synchronized (this.lock)
 		{
-			c = this.creationCount;
 			lifespans.addAll(this.lifespans);
-			t = lifespans.size();
 		}
 
-		ITextComponent message = Messenger.format("C/T: %s/%s", c, t);
-		if (t > 0)
+		int n = lifespans.size();
+		BiFunction<String, String, ITextComponent> builder = (a, b) -> Messenger.c(Messenger.s(a), Messenger.s(b, TextFormatting.GRAY));
+		ITextComponent message;
+		if (n > 0)
 		{
 			lifespans.sort(Comparator.reverseOrder());
-			List<ITextComponent> mins = Lists.newArrayList();
+
+			List<ITextComponent> items = Lists.newArrayList();
+			items.add(builder.apply(String.format("GS: %d", n), "x"));
+			items.add(builder.apply(String.format("A: %.0f", Arrays.stream(lifespans.toLongArray()).average().orElse(0) / 1000), "us"));
 			for (int r : MAX_RATIO)
 			{
-				int i = (int)Math.round((t - 1) * (r / 100.0));
-				mins.add(Messenger.s(String.format("%d%%: %dus", r, lifespans.get(i) / 1000)));
+				int i = (int)Math.round((n - 1) * (r / 100.0));
+				items.add(builder.apply(String.format("%d%%: %d", r, lifespans.getLong(i) / 1000), "us"));
 			}
-			message.appendSibling(Messenger.s(" | ", TextFormatting.DARK_GRAY));
-			message.appendSibling(Messenger.join(Messenger.s(", ", TextFormatting.GRAY), mins));
-			message.appendSibling(Messenger.s(" (TOP%)", TextFormatting.GRAY));
+
+			message = Messenger.join(Messenger.s(", ", TextFormatting.GRAY), items);
+		}
+		else
+		{
+			message = builder.apply("Glass stats: ", "N/A");
 		}
 
 		this.cachedMessage = message;
-		synchronized (this.lock)
-		{
-			this.dirty = false;
-		}
+		this.dirty = false;
 		return message;
 	}
 }
