@@ -147,7 +147,7 @@ public class MicroTimingLoggerManager
 
     public static void onSetBlockState(World world, BlockPos pos, IBlockState oldState, IBlockState newState, Boolean returnValue, int flags, EventType eventType)
     {
-        if (!shouldRecordEvent())
+        if (shouldRecordEvent())
         {
             if (oldState.getBlock() == newState.getBlock())
             {
