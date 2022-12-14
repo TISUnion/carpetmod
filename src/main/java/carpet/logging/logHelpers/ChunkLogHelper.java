@@ -3,7 +3,6 @@ package carpet.logging.logHelpers;
 import carpet.logging.LoggerRegistry;
 import carpet.logging.microtiming.MicroTimingLoggerManager;
 import carpet.logging.microtiming.enums.TickStage;
-import carpet.utils.TextUtil;
 import carpet.utils.Messenger;
 import carpet.utils.deobfuscator.StackTracePrinter;
 import net.minecraft.util.text.ITextComponent;

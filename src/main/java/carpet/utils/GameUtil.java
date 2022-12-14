@@ -26,4 +26,9 @@ public class GameUtil
 		}
 		return false;
 	}
+
+	public static void ensureOnServerThread(Runnable runnable)
+	{
+		CarpetServer.minecraft_server.addScheduledTask(runnable);
+	}
 }

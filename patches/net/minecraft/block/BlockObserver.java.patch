@@ -33,7 +33,7 @@
 +
 +            // TISCM asyncUpdatesAmplifier
 +            if (CarpetSettings.asyncUpdatesAmplifier && (worldIn instanceof WorldServer) &&
-+                    ThreadstoneLogger.isCurrentThreadAsync((WorldServer) worldIn))
++                    ThreadstoneLogger.isOnGlassThread())
 +            {
 +                // send update here so redstone component is able to receive signal
 +                // not the same behavior as 1.12 ITT observer chain, but it's more useful imo
@@ -55,7 +55,7 @@
          {
 -            worldIn.getPendingBlockTicks().scheduleTick(pos, this, 2);
 +            if (CarpetSettings.asyncUpdatesAmplifier && (worldIn instanceof WorldServer)
-+                && ThreadstoneLogger.isCurrentThreadAsync((WorldServer) worldIn))
++                && ThreadstoneLogger.isOnGlassThread())
 +            {
 +                this.tick(worldIn.getBlockState(pos), worldIn.getWorld(), pos, worldIn.getRandom());
 +            }
