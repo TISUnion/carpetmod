@@ -78,12 +78,11 @@ public class ThreadstoneLogger extends AbstractHUDLogger {
     }
 
     public static boolean isCurrentThreadAsync(WorldServer worldIn) {
-        Thread cur = Thread.currentThread();
-        return !(cur.equals(worldIn.getServer().getServerThread())) && !(cur.getName().contains("Client"));
+        return GlassThreadUtil.isOnGlassThread();
     }
 
     public void onAsyncLoadChunk(int x, int z) {
-//        logString(String.format(ASYNC_LOAD_CHUNK_FORMAT, x, z, Thread.currentThread().getName()));
+        logString(String.format(ASYNC_LOAD_CHUNK_FORMAT, x, z, Thread.currentThread().getName()));
     }
 
     public void onAsyncSetBlockState(BlockPos pos, IBlockState newState, int flags) {
