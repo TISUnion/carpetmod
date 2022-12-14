@@ -104,7 +104,13 @@ public class ClusterCommand extends AbstractCommand
 						)
 				).
 				then(literal("load").
-						executes(c -> loadClusters(c.getSource()))
+						executes(c -> loadClusters(c.getSource())).
+						then(argument("amount", integer()).
+								executes(c -> {
+									setRequestAmount(c.getSource(), getInteger(c, "amount"));
+									return loadClusters(c.getSource());
+								})
+						)
 				)
 		);
 	}
@@ -219,6 +225,7 @@ public class ClusterCommand extends AbstractCommand
 				int cnt = counter.incrementAndGet();
 				Messenger.tell(source, String.format("Loaded cluster chunk %s %.1f%%", TextUtil.coord(chunk.getPos()), 100.0 * cnt / result.size()));
 			}).join();
+			Messenger.tell(source, String.format("Loaded %d cluster chunks", counter.get()));
 			return result.size();
 		});
 	}
