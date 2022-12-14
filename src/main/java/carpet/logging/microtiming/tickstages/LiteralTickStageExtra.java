@@ -6,7 +6,6 @@ import net.minecraft.util.text.ITextComponent;
 
 public class LiteralTickStageExtra extends TickStageExtraBase
 {
-	public static final LiteralTickStageExtra SYNC_TASKS = new LiteralTickStageExtra("SyncTasks including player actions", "sync_tasks");
 	public static final LiteralTickStageExtra ENTITY_WEATHER_EFFECT = new LiteralTickStageExtra("Ticking weather effects", "entity_weather_effect");
 	public static final LiteralTickStageExtra ENTITY_REMOVING = new LiteralTickStageExtra("Removing entities", "entity_removing");
 	public static final LiteralTickStageExtra ENTITY_PLAYER = new LiteralTickStageExtra("Ticking player entities", "entity_regular");
