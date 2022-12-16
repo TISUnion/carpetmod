@@ -98,12 +98,12 @@ public class Messenger
         if (style.indexOf('k')>=0) comp.getStyle().setColor(TextFormatting.BLACK);
         return comp;
     }
-    public static String heatmap_color(double actual, double reference)
+    public static TextFormatting heatmap_color(double actual, double reference)
     {
-        String color = "e";
-        if (actual > 0.5D*reference) color = "y";
-        if (actual > 0.8D*reference) color = "r";
-        if (actual > reference) color = "m";
+        TextFormatting color = TextFormatting.DARK_GREEN;
+        if (actual > 0.5D*reference) color = TextFormatting.YELLOW;
+        if (actual > 0.8D*reference) color = TextFormatting.RED;
+        if (actual > reference) color = TextFormatting.LIGHT_PURPLE;
         return color;
     }
     public static String creatureTypeColor(EnumCreatureType type)
