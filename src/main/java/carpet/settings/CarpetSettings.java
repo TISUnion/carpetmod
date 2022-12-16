@@ -776,6 +776,15 @@ public class CarpetSettings
     public static boolean stopCommandDoubleConfirmation = false;
 
     @Rule(
+            desc = "Set the range where player will receive an explosion packet when an explosion happens",
+            validate = Validator.NONNEGATIVE_NUMBER.class,
+            options = {"0", "16", "64", "128", "2048"},
+            strict = false,
+            category = {CREATIVE}
+    )
+    public static double explosionPacketRange = 64.0D;  // sqrt(4096.0D)
+
+    @Rule(
             desc = "Observers updated on an async thread will behave like an ITT observer in 1.12. ",
             category = {CREATIVE}
     )

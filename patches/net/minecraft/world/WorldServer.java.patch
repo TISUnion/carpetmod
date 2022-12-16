@@ -478,6 +478,15 @@
      }
  
      public void tickEntity(Entity entityIn, boolean forceUpdate)
+@@ -1010,7 +1218,7 @@
+ 
+         for (EntityPlayer entityplayer : this.playerEntities)
+         {
+-            if (entityplayer.getDistanceSq(x, y, z) < 4096.0D)
++            if (entityplayer.getDistanceSq(x, y, z) < CarpetSettings.explosionPacketRange * CarpetSettings.explosionPacketRange)
+             {
+                 ((EntityPlayerMP)entityplayer).connection.sendPacket(new SPacketExplosion(x, y, z, strength, explosion.getAffectedBlockPositions(), explosion.getPlayerKnockbackMap().get(entityplayer)));
+             }
 @@ -1021,26 +1229,60 @@
  
      public void addBlockEvent(BlockPos pos, Block blockIn, int eventID, int eventParam)
