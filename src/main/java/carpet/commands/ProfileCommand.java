@@ -22,11 +22,11 @@ public class ProfileCommand
                 executes( (c) -> healthReport(c.getSource(), 100)).
                 then(literal("health").
                         executes( (c) -> healthReport(c.getSource(), 100)).
-                        then(argument("ticks", integer(20, 24000)).
+                        then(argument("ticks", integer(1, 24000)).
                                 executes( (c) -> healthReport(c.getSource(), getInteger(c, "ticks"))))).
                 then(literal("entities").
                         executes((c) -> healthEntities(c.getSource(), 100)).
-                        then(argument("ticks", integer(20, 24000)).
+                        then(argument("ticks", integer(1, 24000)).
                                 executes((c) -> healthEntities(c.getSource(), getInteger(c, "ticks")))));
         dispatcher.register(literalargumentbuilder);
     }
