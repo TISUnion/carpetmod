@@ -29,6 +29,7 @@ import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -128,7 +129,7 @@ public class Messenger
         {
             return new TextComponentString("");
         }
-        String parts[] = message.split("\\s", 2);
+        String[] parts = StringUtils.splitPreserveAllTokens(message, " ", 2);
         String desc = parts[0];
         String str = "";
         if (parts.length > 1) str = parts[1];
