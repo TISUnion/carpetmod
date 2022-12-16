@@ -4,6 +4,7 @@ import carpet.CarpetServer;
 import carpet.settings.CarpetSettings;
 import carpet.settings.ParsedRule;
 import carpet.settings.SettingsManager;
+import carpet.utils.CommitHashFetcher;
 import carpet.utils.Messenger;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -193,6 +194,7 @@ public class CarpetCommand
         listSettings(source, "Current CarpetMod Settings", CarpetServer.settingsManager.getNonDefault());
 
         Messenger.m(source, "g Carpet Mod version: "+CarpetSettings.carpetVersion);
+        Messenger.m(source, "g Commit hash: " + CommitHashFetcher.getCommitHash().orElse("unknown"));
         try
         {
             EntityPlayer player = source.asPlayer();

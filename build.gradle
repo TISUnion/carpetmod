@@ -86,6 +86,15 @@ def projectClean = project(':clean') {
 def worldEditEnabled = System.getenv("worldedit") != "false"
 def sparkEnabled = System.getenv("spark") != "false"
 
+static def getGitCommitHash() {
+    try {
+        'git rev-parse --verify HEAD'.execute().text.trim()
+    }
+    catch (Exception ignored) {
+        return 'unknown'
+    }
+}
+
 
 def projectMod = project(':' + settings.modname) {
     evaluationDependsOn(':clean')
@@ -188,6 +197,18 @@ def projectMod = project(':' + settings.modname) {
     yamlang {
         targetSourceSets = [sourceSets.main]
         inputDir = 'assets/carpet/lang'
+    }
+    processResources {
+        into("assets/carpet") {
+            from {
+                def f = new File(rootDir, 'projects/' + settings.modname + '/build/commit_hash')
+                if (!f.parentFile.exists()) {
+                    f.parentFile.mkdirs()
+                }
+                f.text = getGitCommitHash()
+                f
+            }
+        }
     }
 
     task runclient(type: JavaExec, dependsOn: [":" + settings.modname + ":downloadAssets", ":" + settings.modname + ":extractNatives"]) {
@@ -586,15 +607,6 @@ if (settings.pipeline == 'joined') {
     }
 }
 
-static def getGitCommitHash() {
-    try {
-        'git rev-parse --verify HEAD'.execute().text.trim()
-    }
-    catch (Exception ignored) {
-        return 'unknown'
-    }
-}
-
 // Tasks to produce zip files containing only the changed classes, making the final release zip
 for (def dist : ['Client', 'Server']) {
     task('createRelease' + dist, type: Zip) {
@@ -654,15 +666,6 @@ for (def dist : ['Client', 'Server']) {
                     }
                 }
             }
-        }
-
-        from {
-            def f = new File('projects/' + settings.modname + '/build/_commit_hash')
-            if (!f.parentFile.exists()) {
-                f.parentFile.mkdir()
-            }
-            f.text = getGitCommitHash()
-            f
         }
 
         archiveName = "${settings.modname}_${project.version}_${dist}.zip"
