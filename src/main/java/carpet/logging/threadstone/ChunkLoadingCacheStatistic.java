@@ -1,6 +1,5 @@
 package carpet.logging.threadstone;
 
-import carpet.utils.GameUtil;
 import carpet.utils.Messenger;
 import net.minecraft.util.text.ITextComponent;
 
@@ -17,14 +16,9 @@ public class ChunkLoadingCacheStatistic
 		this.hitCount.set(0);
 	}
 
-	private static boolean isAsyncThread()
-	{
-		return !GameUtil.isOnServerThread();
-	}
-
 	public void onLRUMissed()
 	{
-		if (isAsyncThread())
+		if (GlassThreadUtil.isOnGlassThread())
 		{
 			this.missCount.incrementAndGet();
 		}
@@ -32,7 +26,7 @@ public class ChunkLoadingCacheStatistic
 
 	public void onLRUHit()
 	{
-		if (isAsyncThread())
+		if (GlassThreadUtil.isOnGlassThread())
 		{
 			this.hitCount.incrementAndGet();
 		}
