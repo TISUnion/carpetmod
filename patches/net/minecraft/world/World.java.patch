@@ -42,7 +42,15 @@
  import net.minecraft.block.Block;
  import net.minecraft.block.material.Material;
  import net.minecraft.block.state.IBlockState;
-@@ -72,20 +87,33 @@
+@@ -65,6 +80,7 @@
+ import net.minecraft.world.chunk.Chunk;
+ import net.minecraft.world.chunk.IChunkProvider;
+ import net.minecraft.world.dimension.Dimension;
++import net.minecraft.world.dimension.DimensionType;
+ import net.minecraft.world.gen.Heightmap;
+ import net.minecraft.world.storage.ISaveHandler;
+ import net.minecraft.world.storage.SessionLockException;
+@@ -72,20 +88,33 @@
  import net.minecraft.world.storage.WorldSavedDataStorage;
  import net.minecraftforge.api.distmarker.Dist;
  import net.minecraftforge.api.distmarker.OnlyIn;
@@ -81,7 +89,7 @@
      public final List<EntityPlayer> playerEntities = Lists.newArrayList();
      public final List<Entity> weatherEffects = Lists.newArrayList();
      protected final IntHashMap<Entity> entitiesById = new IntHashMap<>();
-@@ -116,6 +144,16 @@
+@@ -116,6 +145,16 @@
      private final WorldBorder worldBorder;
      int[] lightUpdateBlockList = new int['\u8000'];
  
@@ -98,7 +106,7 @@
      protected World(ISaveHandler p_i49813_1_, @Nullable WorldSavedDataStorage p_i49813_2_, WorldInfo p_i49813_3_, Dimension p_i49813_4_, Profiler p_i49813_5_, boolean p_i49813_6_)
      {
          this.saveHandler = p_i49813_1_;
-@@ -125,6 +163,8 @@
+@@ -125,6 +164,8 @@
          this.dimension = p_i49813_4_;
          this.isRemote = p_i49813_6_;
          this.worldBorder = p_i49813_4_.createWorldBorder();
@@ -107,7 +115,7 @@
      }
  
      public Biome getBiome(BlockPos pos)
-@@ -224,8 +264,25 @@
+@@ -224,8 +265,25 @@
          }
      }
  
@@ -133,7 +141,7 @@
          if (isOutsideBuildHeight(pos))
          {
              return false;
-@@ -238,7 +295,7 @@
+@@ -238,7 +296,7 @@
          {
              Chunk chunk = this.getChunk(pos);
              Block block = newState.getBlock();
@@ -142,7 +150,7 @@
  
              if (iblockstate == null)
              {
-@@ -261,7 +318,7 @@
+@@ -261,7 +319,7 @@
                      {
                          this.markBlockRangeForRenderUpdate(pos, pos);
                      }
@@ -151,7 +159,7 @@
                      if ((flags & 2) != 0 && (!this.isRemote || (flags & 4) == 0) && chunk.isPopulated())
                      {
                          this.notifyBlockUpdate(pos, iblockstate, newState, flags);
-@@ -277,7 +334,9 @@
+@@ -277,7 +335,9 @@
                          }
                      }
  
@@ -162,7 +170,7 @@
                      {
                          int i = flags & -2;
                          iblockstate.updateDiagonalNeighbors(this, pos, i);
-@@ -372,19 +431,22 @@
+@@ -372,19 +432,22 @@
              this.eventListeners.get(i).markBlockRangeForRenderUpdate(x1, y1, z1, x2, y2, z2);
          }
      }
@@ -186,7 +194,7 @@
          if (skipSide != EnumFacing.WEST)
          {
              this.neighborChanged(pos.west(), blockType, pos);
-@@ -414,18 +476,34 @@
+@@ -414,18 +477,34 @@
          {
              this.neighborChanged(pos.south(), blockType, pos);
          }
@@ -222,13 +230,12 @@
              catch (Throwable throwable)
              {
                  CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Exception while updating neighbours");
-@@ -1199,13 +1277,24 @@
+@@ -1199,13 +1278,23 @@
      {
          this.profiler.startSection("entities");
          this.profiler.startSection("global");
 +        /// CM profiler
-+        int did = this.dimension.getType().getId();
-+        String world_name = (did==0)?"Overworld":((did<0?"The Nether":"The End"));
++        DimensionType world_name = this.dimension.getType();
 +        CarpetProfiler.ProfilerToken tok_entities = CarpetProfiler.start_section_concurrent(world_name, "Entities", this.isRemote);
 +        // end
  

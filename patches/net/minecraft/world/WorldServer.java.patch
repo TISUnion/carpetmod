@@ -169,14 +169,13 @@
          this.insideTick = true;
          super.tick(hasTimeLeft);
  
-@@ -191,15 +264,32 @@
+@@ -191,15 +264,31 @@
              this.wakeAllPlayers();
          }
  
 -        this.profiler.startSection("spawner");
 +        //CM profiler
-+        int did = this.dimension.getType().getId();
-+        String world_name = (did==0)?"Overworld":((did<0?"The Nether":"The End"));
++        DimensionType world_name = this.dimension.getType();
 +        // CM end
  
 -        if (this.getGameRules().getBoolean("doMobSpawning") && this.worldInfo.getGenerator() != WorldType.DEBUG_ALL_BLOCK_STATES)
@@ -207,7 +206,7 @@
          this.chunkProvider.tick(hasTimeLeft);
          int j = this.calculateSkylightSubtracted(1.0F);
  
-@@ -208,26 +298,83 @@
+@@ -208,26 +297,83 @@
              this.setSkylightSubtracted(j);
          }
  
@@ -298,7 +297,7 @@
          this.insideTick = false;
      }
  
-@@ -270,7 +417,7 @@
+@@ -270,7 +416,7 @@
                  }
              }
  
@@ -307,7 +306,7 @@
          }
      }
  
-@@ -281,6 +428,7 @@
+@@ -281,6 +427,7 @@
  
      protected void wakeAllPlayers()
      {
@@ -315,7 +314,7 @@
          this.allPlayersSleeping = false;
  
          for (EntityPlayer entityplayer : this.playerEntities.stream().filter(EntityPlayer::isPlayerSleeping).collect(Collectors.toList()))
-@@ -292,6 +440,7 @@
+@@ -292,6 +439,7 @@
          {
              this.resetRainAndThunder();
          }
@@ -323,7 +322,7 @@
      }
  
      private void resetRainAndThunder()
-@@ -306,6 +455,13 @@
+@@ -306,6 +454,13 @@
      {
          if (this.allPlayersSleeping && !this.isRemote)
          {
@@ -337,7 +336,7 @@
              for (EntityPlayer entityplayer : this.playerEntities)
              {
                  if (!entityplayer.isSpectator() && !entityplayer.isPlayerFullyAsleep())
-@@ -397,9 +553,12 @@
+@@ -397,9 +552,12 @@
              boolean flag1 = this.isThundering();
              this.profiler.startSection("pollingChunks");
  
@@ -350,7 +349,7 @@
                  Chunk chunk = iterator.next();
                  int j = chunk.x * 16;
                  int k = chunk.z * 16;
-@@ -407,7 +566,21 @@
+@@ -407,7 +565,21 @@
                  chunk.enqueueRelightChecks();
                  this.profiler.endStartSection("tickChunk");
                  chunk.tick(false);
@@ -372,7 +371,7 @@
  
                  if (flag && flag1 && this.rand.nextInt(100000) == 0)
                  {
-@@ -434,6 +607,8 @@
+@@ -434,6 +606,8 @@
                  }
  
                  this.profiler.endStartSection("iceandsnow");
@@ -381,7 +380,7 @@
  
                  if (this.rand.nextInt(16) == 0)
                  {
-@@ -460,6 +635,8 @@
+@@ -460,6 +634,8 @@
                  }
  
                  this.profiler.endStartSection("tickBlocks");
@@ -390,7 +389,7 @@
  
                  if (i > 0)
                  {
-@@ -493,13 +670,25 @@
+@@ -493,13 +669,25 @@
                          }
                      }
                  }
@@ -417,7 +416,7 @@
      {
          BlockPos blockpos = this.getHeight(Heightmap.Type.MOTION_BLOCKING, pos);
          AxisAlignedBB axisalignedbb = (new AxisAlignedBB(blockpos, new BlockPos(blockpos.getX(), this.getHeight(), blockpos.getZ()))).grow(3.0D);
-@@ -543,6 +732,7 @@
+@@ -543,6 +731,7 @@
  
      protected void tickPlayers()
      {
@@ -425,7 +424,7 @@
          super.tickPlayers();
          this.profiler.endStartSection("players");
  
-@@ -597,6 +787,7 @@
+@@ -597,6 +786,7 @@
  
              this.profiler.endSection();
          }
@@ -433,7 +432,7 @@
      }
  
      public void resetUpdateEntityTick()
-@@ -608,8 +799,11 @@
+@@ -608,8 +798,11 @@
      {
          if (this.worldInfo.getGenerator() != WorldType.DEBUG_ALL_BLOCK_STATES)
          {
@@ -445,7 +444,7 @@
          }
      }
  
-@@ -619,18 +813,32 @@
+@@ -619,18 +812,32 @@
  
          if (ifluidstate.getFluid() == fluidTickEntry.getTarget())
          {
@@ -478,7 +477,7 @@
      }
  
      public void tickEntity(Entity entityIn, boolean forceUpdate)
-@@ -1010,7 +1218,7 @@
+@@ -1010,7 +1217,7 @@
  
          for (EntityPlayer entityplayer : this.playerEntities)
          {
@@ -487,7 +486,7 @@
              {
                  ((EntityPlayerMP)entityplayer).connection.sendPacket(new SPacketExplosion(x, y, z, strength, explosion.getAffectedBlockPositions(), explosion.getPlayerKnockbackMap().get(entityplayer)));
              }
-@@ -1021,26 +1229,60 @@
+@@ -1021,26 +1228,60 @@
  
      public void addBlockEvent(BlockPos pos, Block blockIn, int eventID, int eventParam)
      {
@@ -551,7 +550,7 @@
      }
  
      public void close()
-@@ -1194,4 +1436,54 @@
+@@ -1194,4 +1435,54 @@
      {
          return this.server.getNetworkTagManager();
      }

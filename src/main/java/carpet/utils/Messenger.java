@@ -13,11 +13,12 @@ import net.minecraft.entity.ai.attributes.BaseAttribute;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.state.IProperty;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.*;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -271,10 +272,6 @@ public class Messenger
 
     //simple text
 
-    public static ITextComponent s(String text)
-    {
-        return s(text,"");
-    }
     public static ITextComponent s(String text, String style)
     {
         ITextComponent message = new TextComponentString(text);
@@ -588,13 +585,46 @@ public class Messenger
         return fluid(fluid.getFluid());
     }
 
+    private static ITextComponent blockEntityBlock(Block block)
+    {
+        return tr(block.getTranslationKey());
+    }
+    private static final ImmutableMap<TileEntityType<?>, ITextComponent> BLOCK_ENTITIES_NAMES = new ImmutableMap.Builder<TileEntityType<?>, ITextComponent>().
+            put(TileEntityType.FURNACE, blockEntityBlock(Blocks.FURNACE)).
+            put(TileEntityType.CHEST, blockEntityBlock(Blocks.CHEST)).
+            put(TileEntityType.TRAPPED_CHEST, blockEntityBlock(Blocks.TRAPPED_CHEST)).
+            put(TileEntityType.ENDER_CHEST, blockEntityBlock(Blocks.ENDER_CHEST)).
+            put(TileEntityType.JUKEBOX, blockEntityBlock(Blocks.JUKEBOX)).
+            put(TileEntityType.DISPENSER, blockEntityBlock(Blocks.DISPENSER)).
+            put(TileEntityType.DROPPER, blockEntityBlock(Blocks.DROPPER)).
+            put(TileEntityType.SIGN, blockEntityBlock(Blocks.SIGN)).
+            put(TileEntityType.MOB_SPAWNER, blockEntityBlock(Blocks.SPAWNER)).
+            put(TileEntityType.PISTON, blockEntityBlock(Blocks.MOVING_PISTON)).
+            put(TileEntityType.BREWING_STAND, blockEntityBlock(Blocks.BREWING_STAND)).
+            put(TileEntityType.ENCHANTING_TABLE, blockEntityBlock(Blocks.ENCHANTING_TABLE)).
+            put(TileEntityType.END_PORTAL, blockEntityBlock(Blocks.END_PORTAL)).
+            put(TileEntityType.BEACON, blockEntityBlock(Blocks.BEACON)).
+            put(TileEntityType.SKULL, s(translator.tr("block.skull", "Skull"))).
+            put(TileEntityType.DAYLIGHT_DETECTOR, blockEntityBlock(Blocks.DAYLIGHT_DETECTOR)).
+            put(TileEntityType.HOPPER, blockEntityBlock(Blocks.HOPPER)).
+            put(TileEntityType.COMPARATOR, blockEntityBlock(Blocks.COMPARATOR)).
+            put(TileEntityType.BANNER, s(translator.tr("block.banner", "Banner"))).
+            put(TileEntityType.STRUCTURE_BLOCK, blockEntityBlock(Blocks.STRUCTURE_BLOCK)).
+            put(TileEntityType.END_GATEWAY, blockEntityBlock(Blocks.END_GATEWAY)).
+            put(TileEntityType.COMMAND_BLOCK, blockEntityBlock(Blocks.COMMAND_BLOCK)).
+            put(TileEntityType.SHULKER_BOX, blockEntityBlock(Blocks.SHULKER_BOX)).
+            put(TileEntityType.BED, s(translator.tr("block.bed", "Bed"))).
+            put(TileEntityType.CONDUIT, blockEntityBlock(Blocks.CONDUIT)).
+            build();
+
+    public static ITextComponent blockEntity(TileEntityType<?> blockEntityType)
+    {
+        ITextComponent name = BLOCK_ENTITIES_NAMES.get(blockEntityType);
+        return name != null ? copy(name) : s(String.valueOf(IRegistry.BLOCK_ENTITY_TYPE.getKey(blockEntityType)));
+    }
     public static ITextComponent blockEntity(TileEntity blockEntity)
     {
-        ResourceLocation id = IRegistry.BLOCK_ENTITY_TYPE.getKey(blockEntity.getType());
-        return s(id != null ?
-                id.toString() : // vanilla block entity
-                blockEntity.getClass().getSimpleName()  // modded block entity, assuming the class name is not obfuscated
-        );
+        return blockEntity(blockEntity.getType());
     }
 
     public static ITextComponent item(Item item)
