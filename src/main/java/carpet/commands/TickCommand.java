@@ -55,7 +55,9 @@ public class TickCommand
                 then(literal("entities").
                         executes((c) -> healthEntities(c.getSource(), 100)).
                         then(argument("ticks", integer(1,24000)).
-                                executes((c) -> healthEntities(c.getSource(), getInteger(c, "ticks")))));
+                                executes((c) -> healthEntities(c.getSource(), getInteger(c, "ticks"))).
+                                then(argument("topN", integer(-1)).
+                                        executes((c) -> healthEntities(c.getSource(), getInteger(c, "ticks"), getInteger(c, "topN"))))));
 
 
         dispatcher.register(literalargumentbuilder);
@@ -133,10 +135,15 @@ public class TickCommand
         return 1;
     }
 
+    protected static int healthEntities(CommandSource source, int ticks, int topN)
+    {
+        CarpetProfiler.prepare_entity_report(ticks, topN);
+        return 1;
+    }
+
     protected static int healthEntities(CommandSource source, int ticks)
     {
-        CarpetProfiler.prepare_entity_report(ticks);
-        return 1;
+        return healthEntities(source, ticks, 10);
     }
 
 }

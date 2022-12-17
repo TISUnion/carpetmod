@@ -29,7 +29,8 @@ public class CarpetProfiler
     private static final SectionKey GAMETICK_KEY = new SectionKey(null, "tick", false);
     public static int tick_health_requested = 0;
     private static int tick_health_elapsed = 0;
-    private static TestType test_type = TestType.NONE; //1 for ticks, 2 for entities;
+    private static TestType test_type = TestType.NONE;
+    private static int test_entity_top_n = 10;
     private static ProfilerToken current_section = null;
     private static long current_tick_start = 0;
 
@@ -55,12 +56,13 @@ public class CarpetProfiler
         current_section = null;
     }
 
-    public static void prepare_entity_report(int ticks)
+    public static void prepare_entity_report(int ticks, int topN)
     {
         //maybe add so it only spams the sending player, but honestly - all may want to see it
         ENTITY_COUNT.clear();
         ENTITY_TIMES.clear();
         test_type = TestType.ENTITIES;
+        test_entity_top_n = topN;
 
         tick_health_elapsed = ticks;
         tick_health_requested = ticks;
@@ -171,6 +173,7 @@ public class CarpetProfiler
     private static void cleanup_tick_report()
     {
         test_type = TestType.NONE;
+        test_entity_top_n = 10;
         tick_health_elapsed = 0;
         tick_health_requested = 0;
         current_tick_start = 0L;
@@ -232,7 +235,7 @@ public class CarpetProfiler
         broadcast("Average tick time: %sms",nf.format(divider*total_tick_time));
         SECTION_STATS.removeLong(GAMETICK_KEY);
 
-        int topN = 10;
+        int topN = test_entity_top_n > 0 ? test_entity_top_n : Integer.MAX_VALUE;
         Messenger.print_server_message(server, "Top " + topN + " counts:");
         ENTITY_COUNT.object2LongEntrySet().stream().
                 sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())).
