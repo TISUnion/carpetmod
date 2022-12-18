@@ -180,17 +180,19 @@
          if (this.startProfiling)
          {
              this.startProfiling = false;
-@@ -790,6 +862,9 @@
+@@ -790,6 +862,11 @@
          }
  
          this.profiler.startSection("root");
 +
++        CarpetProfiler.start_section(null, "Carpet");
 +        CarpetServer.tick(this);
++        CarpetProfiler.end_current_section();
 +
          this.updateTimeLightAndEntities(hasTimeLeft);
  
          if (i - this.nanoTimeSinceStatusRefresh >= 5000000000L)
-@@ -810,10 +885,28 @@
+@@ -810,10 +887,28 @@
  
          if (this.tickCounter % 900 == 0)
          {
@@ -219,7 +221,7 @@
          }
  
          this.profiler.startSection("snooper");
-@@ -829,16 +922,40 @@
+@@ -829,16 +924,40 @@
          }
  
          this.profiler.endSection();
@@ -260,7 +262,7 @@
          FutureTask<?> futuretask;
  
          while ((futuretask = this.futureTaskQueue.poll()) != null)
-@@ -847,8 +964,12 @@
+@@ -847,8 +966,12 @@
          }
  
          this.profiler.endStartSection("commandFunctions");
@@ -273,7 +275,7 @@
  
          for (WorldServer worldserver : this.getWorlds())
          {
-@@ -870,6 +991,7 @@
+@@ -870,6 +993,7 @@
  
                  this.profiler.startSection("tick");
  
@@ -281,7 +283,7 @@
                  try
                  {
                      worldserver.tick(hasTimeLeft);
-@@ -878,18 +1000,31 @@
+@@ -878,18 +1002,31 @@
                  {
                      CrashReport crashreport = CrashReport.makeCrashReport(throwable1, "Exception ticking world");
                      worldserver.fillCrashReport(crashreport);
@@ -315,7 +317,7 @@
                  }
  
                  this.profiler.endSection();
-@@ -905,10 +1040,16 @@
+@@ -905,10 +1042,16 @@
              }))[this.tickCounter % 100] = Util.nanoTime() - i;
          }
  
@@ -332,7 +334,7 @@
          this.profiler.endStartSection("tickables");
  
          for (int j = 0; j < this.tickables.size(); ++j)
-@@ -917,6 +1058,8 @@
+@@ -917,6 +1060,8 @@
          }
  
          this.profiler.endSection();
@@ -341,7 +343,7 @@
      }
  
      public boolean getAllowNether()
-@@ -929,6 +1072,12 @@
+@@ -929,6 +1074,12 @@
          this.tickables.add(tickable);
      }
  
@@ -354,7 +356,7 @@
      public static void main(String[] p_main_0_)
      {
          Bootstrap.register();
-@@ -1004,6 +1153,11 @@
+@@ -1004,6 +1155,11 @@
                  }
              }
  
@@ -366,7 +368,7 @@
              YggdrasilAuthenticationService yggdrasilauthenticationservice = new YggdrasilAuthenticationService(Proxy.NO_PROXY, UUID.randomUUID().toString());
              MinecraftSessionService minecraftsessionservice = yggdrasilauthenticationservice.createMinecraftSessionService();
              GameProfileRepository gameprofilerepository = yggdrasilauthenticationservice.createProfileRepository();
-@@ -1142,7 +1296,8 @@
+@@ -1142,7 +1298,8 @@
  
      public String getServerModName()
      {
@@ -376,7 +378,7 @@
      }
  
      public CrashReport addServerInfoToCrashReport(CrashReport report)
-@@ -1605,6 +1760,12 @@
+@@ -1605,6 +1762,12 @@
      {
          return this.serverTime;
      }
@@ -389,7 +391,7 @@
  
      public Thread getServerThread()
      {
-@@ -1639,6 +1800,7 @@
+@@ -1639,6 +1802,7 @@
          }
          else
          {
@@ -397,7 +399,7 @@
              this.getPlayerList().saveAllPlayerData();
              this.resourcePacks.reloadPacksFromFinders();
              this.loadDataPacks(this.getWorld(DimensionType.OVERWORLD).getWorldInfo());
-@@ -1825,4 +1987,28 @@
+@@ -1825,4 +1989,28 @@
              return 0;
          }
      }
