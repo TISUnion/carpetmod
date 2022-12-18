@@ -3,6 +3,7 @@ package carpet.commands;
 import carpet.settings.CarpetSettings;
 import carpet.settings.SettingsManager;
 import carpet.utils.Messenger;
+import carpet.utils.TextUtil;
 import carpet.utils.deobfuscator.McpMapping;
 import com.google.common.collect.Lists;
 import com.mojang.brigadier.CommandDispatcher;
@@ -13,6 +14,7 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.util.BitArray;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.chunk.*;
 
@@ -50,14 +52,32 @@ public class PaletteCommand extends AbstractCommand
 		dispatcher.register(literalargumentbuilder);
 	}
 
-	private BlockStateContainer<IBlockState> getBlockStateContainer(CommandSource source)
+	private interface BlockStateContainerAction
+	{
+		int execute(BlockStateContainer<IBlockState> container, IBlockStatePalette<IBlockState> palette);
+	}
+
+	private int doWithBlockStateContainer(CommandSource source, BlockStateContainerAction action)
 	{
 		BlockPos blockPos = new BlockPos(source.getPos());
 		Chunk chunk = source.getWorld().getChunk(blockPos);
 		ChunkSection[] sections = chunk.getSections();
 
 		int sectionIndex = MathHelper.clamp(blockPos.getY() >> 4, 0, sections.length - 1);
-		return sections[sectionIndex].getData();
+		ChunkSection section = sections[sectionIndex];
+		String coordStr = TextUtil.coord(new Vec3i(chunk.x, sectionIndex, chunk.z));
+		if (section == null)
+		{
+			Messenger.tell(source, Messenger.format("Chunk section %s is null", coordStr));
+			return 0;
+		}
+		else
+		{
+			BlockStateContainer<IBlockState> container = section.getData();
+			IBlockStatePalette<IBlockState> palette = container.getPalette();
+			Messenger.tell(source, Messenger.format("Chunk section %s", coordStr));
+			return action.execute(container, palette);
+		}
 	}
 
 	private static String remapClass(Class<?> clazz)
@@ -67,66 +87,65 @@ public class PaletteCommand extends AbstractCommand
 
 	private int showInfo(CommandSource source)
 	{
-		BlockStateContainer<IBlockState> container = getBlockStateContainer(source);
-		IBlockStatePalette<IBlockState> palette = container.getPalette();
+		return this.doWithBlockStateContainer(source, (container, palette) -> {
+			int bits = container.getBits();
+			Messenger.m(source, String.format("w Bits: %d (max=%d)", bits, 1 << bits));
+			Messenger.m(source, "w Palette type: " + remapClass(palette.getClass()));
 
-		int bits = container.getBits();
-		Messenger.m(source, String.format("w Bits: %d (max=%d)", bits, 1 << bits));
-		Messenger.m(source, "w Palette type: " + remapClass(palette.getClass()));
-
-		int size = -1;
-		if (palette instanceof BlockStatePaletteLinear)
-		{
-			size = ((BlockStatePaletteLinear<IBlockState>)palette).func_202137_b();
-		}
-		else if (palette instanceof BlockStatePaletteHashMap)
-		{
-			size = ((BlockStatePaletteHashMap<IBlockState>)palette).getPaletteSize();
-		}
-		else if (palette instanceof BlockStatePaletteRegistry)
-		{
-			size = Block.BLOCK_STATE_IDS.size();
-		}
-		Messenger.m(source, "w Palette size: " + size);
-		return 0;
+			int size = -1;
+			if (palette instanceof BlockStatePaletteLinear)
+			{
+				size = ((BlockStatePaletteLinear<IBlockState>)palette).func_202137_b();
+			}
+			else if (palette instanceof BlockStatePaletteHashMap)
+			{
+				size = ((BlockStatePaletteHashMap<IBlockState>)palette).getPaletteSize();
+			}
+			else if (palette instanceof BlockStatePaletteRegistry)
+			{
+				size = Block.BLOCK_STATE_IDS.size();
+			}
+			Messenger.m(source, "w Palette size: " + size);
+			return size;
+		});
 	}
 
 	private int showIdInfo(CommandSource source)
 	{
-		BlockStateContainer<IBlockState> container = getBlockStateContainer(source);
-		IBlockStatePalette<IBlockState> palette = container.getPalette();
-		List<IBlockState> states = null;
-		if (palette instanceof BlockStatePaletteLinear)
-		{
-			states = ((BlockStatePaletteLinear<IBlockState>)palette).getStates();
-		}
-		else if (palette instanceof BlockStatePaletteHashMap)
-		{
-			states = ((BlockStatePaletteHashMap<IBlockState>)palette).getStates();
-		}
-
-		int bits = container.getBits();
-		if (states != null)
-		{
-			Messenger.m(source, "w Palette ids:");
-			int maxIdxLen = String.valueOf(states.size() - 1).length();
-			for (int i = 0; i < states.size(); i++)
+		return this.doWithBlockStateContainer(source, (container, palette) -> {
+			List<IBlockState> states = null;
+			if (palette instanceof BlockStatePaletteLinear)
 			{
-				IBlockState state = states.get(i);
-				if (state != null)
+				states = ((BlockStatePaletteLinear<IBlockState>)palette).getStates();
+			}
+			else if (palette instanceof BlockStatePaletteHashMap)
+			{
+				states = ((BlockStatePaletteHashMap<IBlockState>)palette).getStates();
+			}
+
+			int bits = container.getBits();
+			if (states != null)
+			{
+				Messenger.m(source, "w Palette ids:");
+				int maxIdxLen = String.valueOf(states.size() - 1).length();
+				for (int i = 0; i < states.size(); i++)
 				{
-					Messenger.m(source,
-							String.format("w %" + maxIdxLen + "d. %s ", i, long2Bits(i, bits)),
-							Messenger.block(state)
-					);
+					IBlockState state = states.get(i);
+					if (state != null)
+					{
+						Messenger.m(source,
+								String.format("w %" + maxIdxLen + "d. %s ", i, long2Bits(i, bits)),
+								Messenger.block(state)
+						);
+					}
 				}
 			}
-		}
-		else
-		{
-			Messenger.m(source, "w It's a Registry Palette");
-		}
-		return 0;
+			else
+			{
+				Messenger.m(source, "w It's a Registry Palette");
+			}
+			return bits;
+		});
 	}
 
 	// [low, high]
@@ -166,35 +185,36 @@ public class PaletteCommand extends AbstractCommand
 
 	private int showPosInfo(CommandSource source, boolean showNearby)
 	{
-		BlockPos pos = new BlockPos(source.getPos());
-		BlockStateContainer<IBlockState> container = getBlockStateContainer(source);
-		BitArray storage = container.getStorage();
-		long[] longArray = storage.getBackingLongArray();
-		int bits = storage.bitsPerEntry();
-		int index = getIndex(pos);
-		int i = index * bits;
-		int j = i / 64;
-		int k = ((index + 1) * bits - 1) / 64;
-		int l = i % 64;
+		return this.doWithBlockStateContainer(source, (container, palette) -> {
+			BlockPos pos = new BlockPos(source.getPos());
+			BitArray storage = container.getStorage();
+			long[] longArray = storage.getBackingLongArray();
+			int bits = storage.bitsPerEntry();
+			int index = getIndex(pos);
+			int i = index * bits;
+			int j = i / 64;
+			int k = ((index + 1) * bits - 1) / 64;
+			int l = i % 64;
 
-		if (j == k)
-		{
-			displayJKBits(source, j, longArray[j], l, l + bits - 1, "");
-		}
-		else
-		{
-			displayJKBits(source, j, longArray[j], l, 64, "1");
-			displayJKBits(source, k, longArray[k], 0, (l + bits - 1) % 64, "2");
-		}
-		if (showNearby)
-		{
-			for (BlockPos bp : getJKNearbyPos(j, k, bits, pos))
+			if (j == k)
 			{
-				Messenger.m(source, Messenger.coord(null, bp, source.getWorld().getDimension().getType()));
+				displayJKBits(source, j, longArray[j], l, l + bits - 1, "");
 			}
-		}
+			else
+			{
+				displayJKBits(source, j, longArray[j], l, 64, "1");
+				displayJKBits(source, k, longArray[k], 0, (l + bits - 1) % 64, "2");
+			}
+			if (showNearby)
+			{
+				for (BlockPos bp : getJKNearbyPos(j, k, bits, pos))
+				{
+					Messenger.m(source, Messenger.coord(null, bp, source.getWorld().getDimension().getType()));
+				}
+			}
 
-		return 0;
+			return j == k ? 1 : 2;
+		});
 	}
 
 	private void displayJKBits(CommandSource source, int index, long longString, long start, long end, String append)
