@@ -46,7 +46,7 @@ public class MicroTimingLoggerManager
     private static MicroTimingLoggerManager instance;
     public static final Translator TRANSLATOR = (new MicroTimingLogger(null)).getTranslator();
 
-    private final Map<WorldServer, MicroTimingLogger> loggers = new Reference2ObjectArrayMap<>();
+    private final List<MicroTimingLogger> loggers = Lists.newArrayList();
     private long lastFlushTime;
 
     public MicroTimingLoggerManager(MinecraftServer minecraftServer)
@@ -54,18 +54,13 @@ public class MicroTimingLoggerManager
         this.lastFlushTime = -1;
         for (WorldServer world : minecraftServer.getWorlds())
         {
-            this.loggers.put(world, world.getMicroTickLogger());
+            this.loggers.add(world.getMicroTickLogger());
         }
     }
 
     public static MicroTimingLoggerManager getInstance()
     {
         return instance;
-    }
-
-    public Map<WorldServer, MicroTimingLogger> getLoggers()
-    {
-        return loggers;
     }
 
     public static boolean isLoggerActivated()
@@ -298,7 +293,7 @@ public class MicroTimingLoggerManager
     {
         if (instance != null)
         {
-            for (MicroTimingLogger logger : instance.loggers.values())
+            for (MicroTimingLogger logger : instance.loggers)
             {
                 logger.setTickStage(stage);
             }
@@ -318,7 +313,7 @@ public class MicroTimingLoggerManager
     {
         if (instance != null)
         {
-            for (MicroTimingLogger logger : instance.loggers.values())
+            for (MicroTimingLogger logger : instance.loggers)
             {
                 logger.setTickStageExtra(stage);
             }
@@ -336,7 +331,7 @@ public class MicroTimingLoggerManager
         if (gameTime != this.lastFlushTime)
         {
             this.lastFlushTime = gameTime;
-            for (MicroTimingLogger logger : this.loggers.values())
+            for (MicroTimingLogger logger : this.loggers)
             {
                 logger.flushMessages();
             }
