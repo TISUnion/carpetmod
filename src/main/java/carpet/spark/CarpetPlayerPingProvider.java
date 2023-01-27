@@ -24,8 +24,11 @@ import com.google.common.collect.ImmutableMap;
 import me.lucko.spark.common.monitor.ping.PlayerPingProvider;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.management.PlayerList;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 public class CarpetPlayerPingProvider implements PlayerPingProvider {
     private final MinecraftServer server;
@@ -37,7 +40,10 @@ public class CarpetPlayerPingProvider implements PlayerPingProvider {
     @Override
     public Map<String, Integer> poll() {
         ImmutableMap.Builder<String, Integer> builder = ImmutableMap.builder();
-        for (EntityPlayerMP player : this.server.getPlayerList().getPlayers()) {
+        for (EntityPlayerMP player : Optional.of(this.server.getPlayerList()).
+                map(PlayerList::getPlayers).
+                orElse(Collections.emptyList())
+        ) {
             builder.put(player.getGameProfile().getName(), player.ping);
         }
         return builder.build();
