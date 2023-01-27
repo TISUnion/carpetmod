@@ -8,6 +8,7 @@ import carpet.utils.deobfuscator.McpMapping;
 import com.google.common.collect.Lists;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import me.jellysquid.mods.lithium.common.world.chunk.LithiumHashPalette;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.command.CommandSource;
@@ -105,6 +106,10 @@ public class PaletteCommand extends AbstractCommand
 			{
 				size = Block.BLOCK_STATE_IDS.size();
 			}
+			else if (palette instanceof LithiumHashPalette)
+			{
+				size = ((LithiumHashPalette<IBlockState>)palette).getSize();
+			}
 			Messenger.m(source, "w Palette size: " + size);
 			return size;
 		});
@@ -121,6 +126,10 @@ public class PaletteCommand extends AbstractCommand
 			else if (palette instanceof BlockStatePaletteHashMap)
 			{
 				states = ((BlockStatePaletteHashMap<IBlockState>)palette).getStates();
+			}
+			else if (palette instanceof LithiumHashPalette)
+			{
+				states = ((LithiumHashPalette<IBlockState>)palette).getStates();
 			}
 
 			int bits = container.getBits();
