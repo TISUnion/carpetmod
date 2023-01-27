@@ -3,10 +3,7 @@ package carpet.commands;
 import carpet.CarpetServer;
 import carpet.settings.CarpetSettings;
 import carpet.settings.SettingsManager;
-import carpet.utils.BlockInfo;
-import carpet.utils.EntityInfo;
-import carpet.utils.Messenger;
-import carpet.utils.TntInfo;
+import carpet.utils.*;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
@@ -21,10 +18,12 @@ import net.minecraft.command.arguments.EntityArgument;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.item.EntityTNTPrimed;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.IRegistry;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
@@ -342,6 +341,24 @@ public class InfoCommand
     }
     private static int infoBlock(CommandSource source, BlockPos pos, String grep)
     {
+        // check block pos first. stop notvanilla remote chunk loading trick using this
+        if (source.getEntity() instanceof EntityPlayer)
+        {
+            EntityPlayer player = (EntityPlayer) source.getEntity();
+            // only check for not create&op player
+            if (!(player.isCreative() && player.hasPermissionLevel(2)))
+            {
+                // only allow querying block within 32m at max
+                int range = MathHelper.clamp(source.getWorld().getServer().getPlayerList().getEntityViewDistance(), 2, 32);
+                if (player.getDistanceSq(pos) >= range * range)
+                {
+                    Messenger.tell(source, Messenger.format("Block %s is too far to be queried", TextUtil.coord(pos)));
+                    Messenger.tell(source, Messenger.format("You can only query blocks within %s blocks", range));
+                    return 0;
+                }
+            }
+        }
+
         printBlock(BlockInfo.blockInfo(pos, source.getWorld()),source, grep);
         return 1;
     }
