@@ -15,6 +15,7 @@ import static com.mojang.brigadier.arguments.IntegerArgumentType.integer;
 import static net.minecraft.command.Commands.argument;
 import static net.minecraft.command.Commands.literal;
 
+@Deprecated
 public class ClusterCommand_void
 {
     // syntax:
