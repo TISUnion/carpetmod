@@ -97,6 +97,9 @@ public class CarpetSettings
 
     @Rule(
             desc = "Enables /threadstone or /ts command for some threadstone tools",
+            extra = {
+                    "See also: rule threadstoneLogger"
+            },
             category = COMMAND
     )
     public static String commandThreadstone = "false";
@@ -828,6 +831,17 @@ public class CarpetSettings
             category = BUGFIX
     )
     public static boolean endCityStructureStartFix = false;
+
+    @Rule(
+            desc = "Switch for threadstone logger",
+            extra = {
+                    "It's too powerful for non-creative environment so we need a rule for it",
+                    "You need to set this rule value to true before using the threadstone logger",
+                    "See also: rule commandThreadstone"
+            },
+            category = EXPERIMENTAL
+    )
+    public static boolean threadstoneLogger = false;
 
 
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$

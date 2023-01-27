@@ -64,7 +64,7 @@
          }
      }
  
-@@ -86,15 +116,26 @@
+@@ -86,15 +116,32 @@
      @Nullable
      public Chunk getChunk(int x, int z, boolean load, boolean generate)
      {
@@ -80,23 +80,29 @@
              if (this.lastAccessed != null && this.lastAccessed.getPos().x == x && this.lastAccessed.getPos().z == z)
              {
 +                // TISCM threadstone logger
-+                this.chunkLoadingCacheStatistic.onLRUHit();
++                if (CarpetSettings.threadstoneLogger)
++                {
++                    this.chunkLoadingCacheStatistic.onLRUHit();
++                }
 +
                  return this.lastAccessed;
              }
  
 +            // TISCM threadstone logger
-+            this.chunkLoadingCacheStatistic.onLRUMissed();
++            if (CarpetSettings.threadstoneLogger)
++            {
++                this.chunkLoadingCacheStatistic.onLRUMissed();
++            }
 +
              long i = ChunkPos.asLong(x, z);
              chunk = this.loadedChunks.get(i);
  
-@@ -106,6 +147,12 @@
+@@ -106,6 +153,12 @@
  
              if (load)
              {
 +                // TISCM threadstone logger
-+                if (LoggerRegistry.__threadstone && ThreadstoneLogger.isOnGlassThread())
++                if (CarpetSettings.threadstoneLogger && LoggerRegistry.__threadstone && ThreadstoneLogger.isOnGlassThread())
 +                {
 +                    ThreadstoneLogger.getInstance().onAsyncLoadChunk(x, z);
 +                }
@@ -104,12 +110,12 @@
                  try
                  {
                      chunk = this.chunkLoader.loadChunk(this.world, x, z, (p_212471_3_) ->
-@@ -128,6 +175,12 @@
+@@ -128,6 +181,12 @@
          }
          else if (generate)
          {
 +            // TISCM threadstone logger
-+            if (LoggerRegistry.__threadstone && ThreadstoneLogger.isOnGlassThread())
++            if (CarpetSettings.threadstoneLogger && LoggerRegistry.__threadstone && ThreadstoneLogger.isOnGlassThread())
 +            {
 +                ThreadstoneLogger.getInstance().onAsyncGenerateChunk(x, z);
 +            }
@@ -117,7 +123,7 @@
              try
              {
                  this.taskManager.startBatch();
-@@ -215,9 +268,20 @@
+@@ -215,9 +274,20 @@
              }
  
              this.loadedChunks.put(k, chunk);
@@ -139,7 +145,7 @@
          this.mainThread.addScheduledTask(chunk::onLoad);
          return chunk;
      }
-@@ -241,6 +305,9 @@
+@@ -241,6 +311,9 @@
  
      public boolean saveChunks(boolean all)
      {
@@ -149,7 +155,7 @@
          int i = 0;
          this.chunkScheduler.save(() ->
          {
-@@ -249,22 +316,93 @@
+@@ -249,22 +322,93 @@
  
          synchronized (this.chunkLoader)
          {
@@ -250,7 +256,7 @@
          }
      }
  
-@@ -306,10 +444,24 @@
+@@ -306,10 +450,24 @@
  
                          if (chunk != null)
                          {
@@ -276,7 +282,7 @@
                              ++i;
                          }
                      }
-@@ -360,6 +512,99 @@
+@@ -360,6 +518,99 @@
  
      public boolean chunkExists(int x, int z)
      {

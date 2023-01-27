@@ -3,11 +3,14 @@ package carpet.logging;
 import carpet.CarpetServer;
 import carpet.settings.CarpetSettings;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.text.ITextComponent;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -199,4 +202,27 @@ public class Logger
         if (options != null && Arrays.asList(options).contains(arg)) return arg;
         return null;
     }
+
+    // TISCM logger subscription validator extension
+
+    private final List<SubscriptionValidator> subscriptionValidatorList = Lists.newArrayList();
+
+    public void addSubscriptionValidator(SubscriptionValidator subscriptionValidator)
+    {
+        this.subscriptionValidatorList.add(subscriptionValidator);
+    }
+
+    // NOT public API
+    public boolean canPlayerSubscribe(EntityPlayer player, @Nullable String option)
+    {
+        return this.subscriptionValidatorList.stream().allMatch(v -> v.validate(player, option));
+    }
+
+    @FunctionalInterface
+    public interface SubscriptionValidator
+    {
+        boolean validate(EntityPlayer player, String option);
+    }
+
+    // TISCM logger subscription validator extension ends
 }

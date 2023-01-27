@@ -2,6 +2,8 @@ package carpet.logging.threadstone;
 
 import carpet.CarpetServer;
 import carpet.logging.AbstractHUDLogger;
+import carpet.logging.HUDLogger;
+import carpet.settings.CarpetSettings;
 import carpet.utils.GameUtil;
 import carpet.utils.Messenger;
 import carpet.utils.deobfuscator.StackTracePrinter;
@@ -28,6 +30,14 @@ public class ThreadstoneLogger extends AbstractHUDLogger {
 
     public static ThreadstoneLogger getInstance() {
         return INSTANCE;
+    }
+
+    @Override
+    public HUDLogger createCarpetLogger()
+    {
+        HUDLogger logger = super.createCarpetLogger();
+        logger.addSubscriptionValidator((p, o) -> CarpetSettings.threadstoneLogger);
+        return logger;
     }
 
     @Override

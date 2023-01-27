@@ -1,18 +1,19 @@
 --- a/net/minecraft/world/chunk/BlockStateContainer.java
 +++ b/net/minecraft/world/chunk/BlockStateContainer.java
-@@ -5,6 +5,11 @@
+@@ -5,6 +5,12 @@
  import java.util.concurrent.locks.ReentrantLock;
  import java.util.function.Function;
  import java.util.stream.Collectors;
 +
 +import carpet.logging.LoggerRegistry;
 +import carpet.logging.threadstone.ThreadstoneLogger;
++import carpet.settings.CarpetSettings;
 +import me.jellysquid.mods.lithium.LithiumConfig;
 +import me.jellysquid.mods.lithium.common.world.chunk.LithiumHashPalette;
  import net.minecraft.crash.CrashReport;
  import net.minecraft.crash.CrashReportCategory;
  import net.minecraft.crash.ReportedException;
-@@ -44,7 +49,13 @@
+@@ -44,7 +50,13 @@
              CrashReport crashreport = new CrashReport("Writing into PalettedContainer from multiple threads", new IllegalStateException());
              CrashReportCategory crashreportcategory = crashreport.makeCategory("Thread dumps");
              crashreportcategory.addDetail("Thread dumps", s);
@@ -20,14 +21,14 @@
 +
 +            // threadstone logger
 +            ReportedException exception = new ReportedException(crashreport);
-+            if (LoggerRegistry.__threadstone) {
++            if (CarpetSettings.threadstoneLogger && LoggerRegistry.__threadstone) {
 +                ThreadstoneLogger.getInstance().onConcurrentWriteCrash(exception);
 +            }
 +            throw exception;
          }
          else
          {
-@@ -74,6 +85,13 @@
+@@ -74,6 +86,13 @@
  
      private void setBits(int bitsIn)
      {
@@ -41,7 +42,7 @@
          if (bitsIn != this.bits)
          {
              this.bits = bitsIn;
-@@ -98,6 +116,27 @@
+@@ -98,6 +117,27 @@
          }
      }
  
@@ -69,7 +70,7 @@
      public int onResize(int p_onResize_1_, T p_onResize_2_)
      {
          this.lock();
-@@ -214,6 +253,13 @@
+@@ -214,6 +254,13 @@
  
      public void writeChunkPalette(NBTTagCompound compound, String paletteName, String paletteDataName)
      {
@@ -83,7 +84,7 @@
          this.lock();
          BlockStatePaletteHashMap<T> blockstatepalettehashmap = new BlockStatePaletteHashMap<>(this.registry, this.bits, this.field_205522_c, this.deserializer, this.serializer);
          blockstatepalettehashmap.idFor(this.defaultState);
-@@ -243,4 +289,81 @@
+@@ -243,4 +290,81 @@
      {
          return 1 + this.palette.getSerializedSize() + PacketBuffer.getVarIntSize(this.storage.size()) + this.storage.getBackingLongArray().length * 8;
      }

@@ -172,9 +172,15 @@ public class LogCommand
             Messenger.m(source, "r No player specified");
             return 0;
         }
-        if (LoggerRegistry.getLogger(logName) == null)
+        Logger logger = LoggerRegistry.getLogger(logName);
+        if (logger == null)
         {
             Messenger.m(source, "r Unknown logger: ","rb "+logName);
+            return 0;
+        }
+        if (!logger.canPlayerSubscribe(player, null))
+        {
+            Messenger.m(source, "r Cannot subscribe logger ","rb "+logName);
             return 0;
         }
         boolean subscribed = LoggerRegistry.togglePlayerSubscription(player_name, logName);
@@ -196,9 +202,15 @@ public class LogCommand
             Messenger.m(source, "r No player specified");
             return 0;
         }
-        if (LoggerRegistry.getLogger(logname) == null)
+        Logger logger = LoggerRegistry.getLogger(logname);
+        if (logger == null)
         {
             Messenger.m(source, "r Unknown logger: ","rb "+logname);
+            return 0;
+        }
+        if (!logger.canPlayerSubscribe(player, option))
+        {
+            Messenger.m(source, "r Cannot subscribe logger ","rb "+logname);
             return 0;
         }
         LoggerRegistry.subscribePlayer(player_name, logname, option);
