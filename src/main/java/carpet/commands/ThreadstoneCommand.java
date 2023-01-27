@@ -89,7 +89,11 @@ public class ThreadstoneCommand extends AbstractCommand
 								)
 						)
 				));
-		dispatcher.register(literal("ts").redirect(root));
+		dispatcher.register(
+				literal("ts").
+				requires(s -> SettingsManager.canUseCommand(s, CarpetSettings.commandThreadstone)).
+				redirect(root)
+		);
 	}
 
 	//////////////////////////////////////////////////
