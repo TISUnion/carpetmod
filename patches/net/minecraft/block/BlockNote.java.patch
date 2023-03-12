@@ -1,6 +1,26 @@
 --- a/net/minecraft/block/BlockNote.java
 +++ b/net/minecraft/block/BlockNote.java
-@@ -17,8 +17,9 @@
+@@ -1,7 +1,10 @@
+ package net.minecraft.block;
+ 
++import carpet.logging.threadstone.ThreadstoneLogger;
++import carpet.settings.CarpetSettings;
+ import net.minecraft.block.state.IBlockState;
+ import net.minecraft.entity.player.EntityPlayer;
++import net.minecraft.init.Blocks;
+ import net.minecraft.init.Particles;
+ import net.minecraft.item.BlockItemUseContext;
+ import net.minecraft.state.BooleanProperty;
+@@ -11,14 +14,18 @@
+ import net.minecraft.state.properties.BlockStateProperties;
+ import net.minecraft.state.properties.NoteBlockInstrument;
+ import net.minecraft.stats.StatList;
++import net.minecraft.tileentity.TileEntity;
++import net.minecraft.tileentity.TileEntityComparator;
+ import net.minecraft.util.EnumFacing;
+ import net.minecraft.util.EnumHand;
++import net.minecraft.util.HttpUtil;
+ import net.minecraft.util.SoundCategory;
  import net.minecraft.util.math.BlockPos;
  import net.minecraft.world.IWorld;
  import net.minecraft.world.World;
@@ -11,7 +31,7 @@
  {
      public static final EnumProperty<NoteBlockInstrument> INSTRUMENT = BlockStateProperties.NOTE_BLOCK_INSTRUMENT;
      public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
-@@ -44,6 +45,8 @@
+@@ -44,8 +51,21 @@
      {
          boolean flag = worldIn.isBlockPowered(pos);
  
@@ -19,8 +39,76 @@
 +
          if (flag != state.get(POWERED))
          {
++            if (CarpetSettings.debugNoteBlocks && this.isDebugNoteBlocksTarget(worldIn, pos))
++            {
++                // flag=18 -> no updates
++                worldIn.setBlockState(pos, state.with(POWERED, Boolean.valueOf(flag)), 18);
++                if (flag)  // rising edge
++                {
++                    this.debugNoteBlocksImpl(worldIn, pos);
++                }
++                return;
++            }
++
              if (flag)
-@@ -101,4 +104,16 @@
+             {
+                 this.triggerNote(worldIn, pos);
+@@ -55,6 +75,54 @@
+         }
+     }
+ 
++    // TISCM - debugNoteBlocks
++    private boolean isDebugNoteBlocksTarget(World worldIn, BlockPos pos)
++    {
++        Block baseBlock = worldIn.getBlockState(pos.down()).getBlock();
++        return baseBlock == Blocks.PURPUR_BLOCK || baseBlock == Blocks.COMPARATOR || baseBlock == Blocks.ACTIVATOR_RAIL;
++    }
++
++    // TISCM - debugNoteBlocks
++    private void debugNoteBlocksImpl(World worldIn, BlockPos pos)
++    {
++        Block baseBlock = worldIn.getBlockState(pos.down()).getBlock();
++        if (baseBlock == Blocks.PURPUR_BLOCK)
++        {
++            HttpUtil.DOWNLOADER_EXECUTOR.submit(() -> {
++                // IBlockState#updateNeighbors = PP update
++                ThreadstoneLogger.getInstance().onNoteBlockDebugThreadStarted();
++                try
++                {
++                    this.getDefaultState().updateNeighbors(worldIn, pos, 2);
++                }
++                catch (Throwable throwable)
++                {
++                    ThreadstoneLogger.getInstance().onExceptionallyEndedAsyncThread(throwable);
++                }
++            });
++        }
++        else if (baseBlock == Blocks.COMPARATOR)
++        {
++            TileEntity tileEntity = worldIn.getTileEntity(pos.down());
++            if (tileEntity instanceof TileEntityComparator)
++            {
++                int power = ((TileEntityComparator) tileEntity).getOutputSignal();
++                try
++                {
++                    Thread.sleep(10L * power);
++                }
++                catch (InterruptedException e)
++                {
++                    throw new RuntimeException(e);
++                }
++            }
++        }
++        else if (baseBlock == Blocks.ACTIVATOR_RAIL)
++        {
++            throw new StackOverflowError("Update suppression simulated by debugNoteBlocks from TISCM.");
++        }
++    }
++
+     private void triggerNote(World worldIn, BlockPos pos)
+     {
+         if (worldIn.getBlockState(pos.up()).isAir())
+@@ -101,4 +169,16 @@
      {
          builder.add(INSTRUMENT, POWERED, NOTE);
      }

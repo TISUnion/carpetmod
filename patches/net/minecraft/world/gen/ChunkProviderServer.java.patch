@@ -1,11 +1,15 @@
 --- a/net/minecraft/world/gen/ChunkProviderServer.java
 +++ b/net/minecraft/world/gen/ChunkProviderServer.java
-@@ -1,5 +1,14 @@
+@@ -1,5 +1,18 @@
  package net.minecraft.world.gen;
  
 +import carpet.commands.ChunkRegenCommand;
 +import carpet.helpers.BedrockBreakingStatHelper;
++import carpet.logging.LoggerRegistry;
 +import carpet.logging.logHelpers.AutoSaveLogHelper;
++import carpet.logging.logHelpers.ChunkLogHelper;
++import carpet.logging.threadstone.ChunkLoadingCacheStatistic;
++import carpet.logging.threadstone.ThreadstoneLogger;
 +import carpet.settings.CarpetSettings;
 +import carpet.utils.Messenger;
 +import carpet.utils.TISCMConfig;
@@ -15,7 +19,7 @@
  import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
  import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
  import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
-@@ -8,7 +17,8 @@
+@@ -8,7 +21,8 @@
  import java.util.Collection;
  import java.util.Iterator;
  import java.util.List;
@@ -25,7 +29,7 @@
  import java.util.function.BooleanSupplier;
  import java.util.function.Consumer;
  import javax.annotation.Nullable;
-@@ -42,11 +52,19 @@
+@@ -42,11 +56,22 @@
      private final IChunkLoader chunkLoader;
      private final Long2ObjectMap<Chunk> loadedChunks = Long2ObjectMaps.synchronize(new ChunkCacheNeighborNotification(8192));
      private Chunk lastAccessed;
@@ -42,10 +46,25 @@
 +                    new LinkedBlockingQueue<>(), new ThreadFactoryBuilder().setNameFormat("ChunkSaver %d").build()
 +            ) : null;
 +
++    // TISCM threadstone logger
++    public final ChunkLoadingCacheStatistic chunkLoadingCacheStatistic = new ChunkLoadingCacheStatistic();
++
      public ChunkProviderServer(WorldServer worldIn, IChunkLoader chunkLoaderIn, IChunkGenerator<?> chunkGeneratorIn, IThreadListener threadListener)
      {
          this.world = worldIn;
-@@ -86,6 +104,11 @@
+@@ -67,6 +92,11 @@
+         if (this.world.dimension.canDropChunk(chunkIn.x, chunkIn.z))
+         {
+             this.droppedChunks.add(ChunkPos.asLong(chunkIn.x, chunkIn.z));
++
++            //TISCM: chunk debug
++            if (LoggerRegistry.__chunkdebug){
++                ChunkLogHelper.onChunkNewState(this.world, chunkIn.x, chunkIn.z, "m Queued Unload");
++            }
+         }
+     }
+ 
+@@ -86,15 +116,32 @@
      @Nullable
      public Chunk getChunk(int x, int z, boolean load, boolean generate)
      {
@@ -57,7 +76,54 @@
          Chunk chunk;
  
          synchronized (this.chunkLoader)
-@@ -215,9 +238,20 @@
+         {
+             if (this.lastAccessed != null && this.lastAccessed.getPos().x == x && this.lastAccessed.getPos().z == z)
+             {
++                // TISCM threadstone logger
++                if (CarpetSettings.threadstoneLogger)
++                {
++                    this.chunkLoadingCacheStatistic.onLRUHit();
++                }
++
+                 return this.lastAccessed;
+             }
+ 
++            // TISCM threadstone logger
++            if (CarpetSettings.threadstoneLogger)
++            {
++                this.chunkLoadingCacheStatistic.onLRUMissed();
++            }
++
+             long i = ChunkPos.asLong(x, z);
+             chunk = this.loadedChunks.get(i);
+ 
+@@ -106,6 +153,12 @@
+ 
+             if (load)
+             {
++                // TISCM threadstone logger
++                if (CarpetSettings.threadstoneLogger && LoggerRegistry.__threadstone && ThreadstoneLogger.isOnGlassThread())
++                {
++                    ThreadstoneLogger.getInstance().onAsyncLoadChunk(x, z);
++                }
++
+                 try
+                 {
+                     chunk = this.chunkLoader.loadChunk(this.world, x, z, (p_212471_3_) ->
+@@ -128,6 +181,12 @@
+         }
+         else if (generate)
+         {
++            // TISCM threadstone logger
++            if (CarpetSettings.threadstoneLogger && LoggerRegistry.__threadstone && ThreadstoneLogger.isOnGlassThread())
++            {
++                ThreadstoneLogger.getInstance().onAsyncGenerateChunk(x, z);
++            }
++
+             try
+             {
+                 this.taskManager.startBatch();
+@@ -215,9 +274,20 @@
              }
  
              this.loadedChunks.put(k, chunk);
@@ -79,7 +145,7 @@
          this.mainThread.addScheduledTask(chunk::onLoad);
          return chunk;
      }
-@@ -241,6 +275,9 @@
+@@ -241,6 +311,9 @@
  
      public boolean saveChunks(boolean all)
      {
@@ -89,7 +155,7 @@
          int i = 0;
          this.chunkScheduler.save(() ->
          {
-@@ -249,22 +286,93 @@
+@@ -249,22 +322,93 @@
  
          synchronized (this.chunkLoader)
          {
@@ -190,7 +256,7 @@
          }
      }
  
-@@ -306,10 +414,24 @@
+@@ -306,10 +450,24 @@
  
                          if (chunk != null)
                          {
@@ -216,7 +282,7 @@
                              ++i;
                          }
                      }
-@@ -360,6 +482,93 @@
+@@ -360,6 +518,99 @@
  
      public boolean chunkExists(int x, int z)
      {
@@ -308,5 +374,11 @@
 +        {
 +            return null;
 +        }
++    }
++
++    // TISCM /info container command added getter
++    public Long2ObjectMap<Chunk> getLoadedChunks$TISCM()
++    {
++        return this.loadedChunks;
 +    }
  }

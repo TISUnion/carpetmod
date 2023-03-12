@@ -1,8 +1,9 @@
 --- a/net/minecraft/server/management/PlayerChunkMap.java
 +++ b/net/minecraft/server/management/PlayerChunkMap.java
-@@ -1,9 +1,11 @@
+@@ -1,9 +1,12 @@
  package net.minecraft.server.management;
  
++import carpet.settings.CarpetSettings;
 +import carpet.utils.TISCMConfig;
  import com.google.common.collect.AbstractIterator;
  import com.google.common.collect.ComparisonChain;
@@ -12,7 +13,7 @@
  import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
  import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
  import java.util.Collections;
-@@ -33,7 +35,9 @@
+@@ -33,7 +36,9 @@
      };
      private final WorldServer world;
      private final List<EntityPlayerMP> players = Lists.newArrayList();
@@ -23,7 +24,21 @@
      private final Set<PlayerChunkMapEntry> dirtyEntries = Sets.newHashSet();
      private final List<PlayerChunkMapEntry> pendingSendToPlayers = Lists.newLinkedList();
      private final List<PlayerChunkMapEntry> entriesWithoutChunks = Lists.newLinkedList();
-@@ -446,4 +450,10 @@
+@@ -118,6 +123,13 @@
+             this.dirtyEntries.clear();
+         }
+ 
++        // Fix for chunks not updating after async updates CARPET-PUNCHSTER
++        if(CarpetSettings.asyncPacketUpdatesFix) {
++            for(PlayerChunkMapEntry entry : entries){
++                entry.setChanges(0);
++            }
++        }
++
+         if (this.sortMissingChunks && i % 4L == 0L)
+         {
+             this.sortMissingChunks = false;
+@@ -446,4 +458,10 @@
              this.getWorld().getChunkProvider().queueUnload(chunk);
          }
      }

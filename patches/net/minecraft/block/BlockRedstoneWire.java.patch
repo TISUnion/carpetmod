@@ -226,7 +226,7 @@
              }
              else
              {
-@@ -584,4 +618,31 @@
+@@ -584,4 +618,37 @@
      {
          return BlockFaceShape.UNDEFINED;
      }
@@ -256,5 +256,11 @@
 +    @Override
 +    public int getPowerLevel(World world, BlockPos pos, IBlockState state) {
 +        return state.get(POWER);
++    }
++
++    // TISCM /threadstone command added getter
++    public boolean getCanProvidePower()
++    {
++        return this.canProvidePower;
 +    }
  }

@@ -90,6 +90,27 @@ public class CarpetSettings
     public static String commandRaycount = "false";
 
     @Rule(
+            desc = "Enables /sleep command for creating lag",
+            category = COMMAND
+    )
+    public static String commandSleep = "false";
+
+    @Rule(
+            desc = "Enables /threadstone or /ts command for some threadstone tools",
+            extra = {
+                    "See also: rule threadstoneLogger"
+            },
+            category = COMMAND
+    )
+    public static String commandThreadstone = "false";
+
+    @Rule(
+            desc = "Enables /cluster for cluster chunk calculator & tools",
+            category = COMMAND
+    )
+    public static String commandCluster = "false";
+
+    @Rule(
             desc = "enable visualize projectile logger",
             category = SURVIVAL
     )
@@ -756,6 +777,73 @@ public class CarpetSettings
             category = {COMMAND}
     )
     public static boolean stopCommandDoubleConfirmation = false;
+
+    @Rule(
+            desc = "Set the range where player will receive an explosion packet when an explosion happens",
+            validate = Validator.NONNEGATIVE_NUMBER.class,
+            options = {"0", "16", "64", "128", "2048"},
+            strict = false,
+            category = {CREATIVE}
+    )
+    public static double explosionPacketRange = 64.0D;  // sqrt(4096.0D)
+
+    @Rule(
+            desc = "Observers updated on an async thread will behave like an ITT observer in 1.12. ",
+            category = {CREATIVE}
+    )
+    public static boolean asyncUpdatesAmplifier = false;
+
+    @Rule(
+            desc = "A note block does a specific thing on activation, based on the block underneath. \n " +
+                    "Purpur block - Sends out a PP update on an async thread. \n" +
+                    "Comparator - Lag the current thread for 10x milliseconds, where x is the power level " +
+                    "of the comparator. \n" +
+                    "Activator rails - Throws a StackOverflowError to imitate update suppression. \n",
+            category = {CREATIVE}
+    )
+    public static boolean debugNoteBlocks = false;
+
+    /*
+    @Rule(
+            desc = "If a beacon receives an NC update when a purpur block is adjacent, " +
+                    "it will start a new thread and send an NC update there. ",
+            category = {CREATIVE}
+    )
+    public static boolean asyncBeaconUpdates = false;
+    */
+
+    @Rule(
+            desc = "Enables /palette command for block state palette debug",
+            category = COMMAND
+    )
+    public static String commandPalette = "false";
+
+    @Rule(desc = "Fixes the async packet bugs related to asynch observer updates.", category = BUGFIX)
+    public static boolean asyncPacketUpdatesFix = false;
+
+    @Rule(
+            desc = "Fixed end city structure start will be saved with invalid state after reload from disk",
+            extra = {
+                    "Because mojang forgets to save / restore the isSizeable field of EndCityStructure$Start",
+                    "In vanilla you can use savestate to force the structure start chunk to be regenerated as a workaround",
+                    "Notes that those already invalid structure starts cannot be fixed",
+                    "In CMP you can /chunkregen the start chunk to make it work again"
+            },
+            category = BUGFIX
+    )
+    public static boolean endCityStructureStartFix = false;
+
+    @Rule(
+            desc = "Switch for threadstone logger",
+            extra = {
+                    "It's too powerful for non-creative environment so we need a rule for it",
+                    "You need to set this rule value to true before using the threadstone logger",
+                    "See also: rule commandThreadstone"
+            },
+            category = EXPERIMENTAL
+    )
+    public static boolean threadstoneLogger = false;
+
 
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$

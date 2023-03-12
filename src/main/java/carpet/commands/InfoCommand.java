@@ -10,6 +10,7 @@ import com.google.common.collect.Multiset;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.minecraft.block.BlockEventData;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
@@ -32,7 +33,9 @@ import net.minecraft.util.text.event.HoverEvent;
 import net.minecraft.world.NextTickListEntry;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.gen.ChunkCacheNeighborNotification;
 import net.minecraft.world.storage.WorldInfo;
 
 import java.util.*;
@@ -116,6 +119,14 @@ public class InfoCommand
         Messenger.m(source, Messenger.s(""));
         Messenger.m(source, "w Current World: ", Messenger.dimension(world));
         Messenger.m(source, Messenger.s(String.format("Loaded chunks: %d", world.getChunkProvider().getLoadedChunkCount())));
+        Long2ObjectMap<Chunk> chunks = world.getChunkProvider().getLoadedChunks$TISCM();
+        // it.unimi.dsi.fastutil.longs.Long2ObjectMaps.SynchronizedMap#SynchronizedMap
+        ReflectionUtil.getField(chunks, "map").ifPresent(map -> {
+            if (map instanceof ChunkCacheNeighborNotification)
+            {
+                Messenger.m(source, Messenger.s(String.format("  Map mask: %d", ((ChunkCacheNeighborNotification)map).getMask())));
+            }
+        });
 
         Messenger.m(source, Messenger.s(String.format("Regular entities: %d", world.loadedEntityList.size())));
         if (detailed)

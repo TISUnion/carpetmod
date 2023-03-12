@@ -45,7 +45,7 @@ public class ChunkRegenCommand
                                      suggests(xSuggest).
                                      then(
                                              argument("endChunkZ", integer()).
-                                             suggests(xSuggest).
+                                             suggests(zSuggest).
                                              executes(ChunkRegenCommand::AddArea)
                                      )
                                 )

@@ -12,7 +12,9 @@ import net.minecraft.world.chunk.IBlockStatePaletteResizer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 
 import static it.unimi.dsi.fastutil.Hash.FAST_LOAD_FACTOR;
@@ -179,5 +181,16 @@ public class LithiumHashPalette<T> implements IBlockStatePalette<T> {
         Arrays.fill(this.entries, null);
         this.table.clear();
         this.size = 0;
+    }
+
+    // TISCM palette command added getter
+    public List<T> getStates()
+    {
+        List<T> states = new ArrayList<>();
+        for (int i = 0; i < this.getSize(); ++i)
+        {
+            states.add(this.get(i));
+        }
+        return states;
     }
 }

@@ -11,4 +11,14 @@ public abstract class AbstractHUDLogger extends AbstractLogger
 	}
 
 	public abstract ITextComponent[] onHudUpdate(String option, EntityPlayer playerEntity);
+
+	@Override
+	public HUDLogger createCarpetLogger()
+	{
+		return new HUDLogger(
+				this.getName(),
+				wrapOption(this.getDefaultLoggingOption()),
+				wrapOptions(this.getSuggestedLoggingOption())
+		);
+	}
 }

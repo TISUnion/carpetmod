@@ -7,6 +7,7 @@ import carpet.logging.LoggerRegistry;
 import carpet.logging.lifetime.LifeTimeHUDLogger;
 import carpet.logging.logHelpers.AutoSaveLogHelper;
 import carpet.logging.logHelpers.PacketCounter;
+import carpet.logging.threadstone.ThreadstoneLogger;
 import carpet.logging.tickwarp.TickWarpHUDLogger;
 import carpet.settings.CarpetSettings;
 import net.minecraft.entity.EnumCreatureType;
@@ -15,11 +16,14 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.play.server.SPacketPlayerListHeaderFooter;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Tuple;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.WorldServer;
 
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -96,8 +100,10 @@ public class HUDController
         if (LoggerRegistry.__autosave)
             LoggerRegistry.getLogger("autosave").log(AutoSaveLogHelper::send_hud_info);
 
+
         doHudLogging(LoggerRegistry.__lifeTime, LifeTimeHUDLogger.NAME, LifeTimeHUDLogger.getInstance());
         doHudLogging(LoggerRegistry.__tickWarp, TickWarpHUDLogger.NAME, TickWarpHUDLogger.getInstance());
+        doHudLogging(LoggerRegistry.__threadstone, ThreadstoneLogger.NAME, ThreadstoneLogger.getInstance());
 
         for (EntityPlayer player: player_huds.keySet())
         {
@@ -117,17 +123,23 @@ public class HUDController
         }
     }
 
+    private static final NumberFormat tpsNumberFormat = Util.make(() -> {
+        DecimalFormat nf = new DecimalFormat();
+        nf.setMinimumFractionDigits(1);
+        nf.setMaximumFractionDigits(1);
+        return nf;
+    });
+
     private static ITextComponent [] send_tps_display(MinecraftServer server)
     {
         double MSPT = MathHelper.average(server.tickTimeArray) * 1.0E-6D;
         double TPS = 1000.0D / Math.max((TickSpeed.time_warp_start_time != 0)?0.0:TickSpeed.mspt, MSPT);
-        String color = Messenger.heatmap_color(MSPT,TickSpeed.mspt);
-        NumberFormat nf = NumberFormat.getNumberInstance();
-        nf.setMinimumFractionDigits(1);
-        nf.setMaximumFractionDigits(1);
+        TextFormatting color = Messenger.heatmap_color(MSPT,TickSpeed.mspt);
         return new ITextComponent[]{Messenger.c(
-                "g TPS: ", Messenger.s(nf.format(TPS), color),
-                "g  MSPT: ", Messenger.s(nf.format(MSPT), color)
+                Messenger.s("TPS: ", TextFormatting.GRAY),
+                Messenger.s(tpsNumberFormat.format(TPS), color),
+                Messenger.s(" MSPT: ", TextFormatting.GRAY),
+                Messenger.s(tpsNumberFormat.format(MSPT), color)
         )};
     }
 
@@ -139,9 +151,11 @@ public class HUDController
             Tuple<Integer,Integer> counts = SpawnReporter.mobcaps.get(dim).getOrDefault(type, new Tuple<>(0,0));
             int actual = counts.getA(); int limit = counts.getB();
             components.add(Messenger.c(
-                    (actual+limit == 0)?"g -":Messenger.heatmap_color(actual,limit)+" "+actual,
+                    (actual+limit == 0) ?
+                            Messenger.s("-", TextFormatting.GRAY) :
+                            Messenger.s(actual, Messenger.heatmap_color(actual,limit)),
                     Messenger.creatureTypeColor(type)+" /"+((actual+limit == 0)?"-":limit)
-                    ));
+            ));
             components.add(Messenger.c("w  "));
         }
         components.remove(components.size()-1);

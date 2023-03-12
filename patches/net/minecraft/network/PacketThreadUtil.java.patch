@@ -1,24 +1,30 @@
 --- a/net/minecraft/network/PacketThreadUtil.java
 +++ b/net/minecraft/network/PacketThreadUtil.java
-@@ -1,5 +1,7 @@
+@@ -1,5 +1,8 @@
  package net.minecraft.network;
  
 +import carpet.logging.microtiming.MicroTimingLoggerManager;
++import carpet.logging.microtiming.enums.TickStage;
 +import carpet.logging.microtiming.tickstages.PlayerActionTickStageExtra;
  import net.minecraft.util.IThreadListener;
  
  public class PacketThreadUtil
-@@ -10,7 +12,13 @@
+@@ -10,7 +13,18 @@
          {
              scheduler.addScheduledTask(() ->
              {
-+                if (processor instanceof NetHandlerPlayServer)  // TISCM Micro Timing logger
++                // TISCM Micro Timing logger
++                if (processor instanceof NetHandlerPlayServer)
 +                {
 +                    NetHandlerPlayServer handler = (NetHandlerPlayServer)processor;
++                    MicroTimingLoggerManager.setTickStage(TickStage.PLAYER_ACTION);
 +                    MicroTimingLoggerManager.setTickStageExtra(new PlayerActionTickStageExtra(handler.player));
 +                }
++
                  packetIn.processPacket(processor);
++
 +                MicroTimingLoggerManager.setTickStageExtra(null);
++                MicroTimingLoggerManager.setTickStage(TickStage.ASYNC_TASK);
              });
              throw ThreadQuickExitException.INSTANCE;
          }

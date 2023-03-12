@@ -13,10 +13,12 @@ import net.minecraft.entity.ai.attributes.BaseAttribute;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.state.IProperty;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.*;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -24,11 +26,11 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.registry.IRegistry;
 import net.minecraft.util.text.*;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -98,12 +100,12 @@ public class Messenger
         if (style.indexOf('k')>=0) comp.getStyle().setColor(TextFormatting.BLACK);
         return comp;
     }
-    public static String heatmap_color(double actual, double reference)
+    public static TextFormatting heatmap_color(double actual, double reference)
     {
-        String color = "e";
-        if (actual > 0.5D*reference) color = "y";
-        if (actual > 0.8D*reference) color = "r";
-        if (actual > reference) color = "m";
+        TextFormatting color = TextFormatting.DARK_GREEN;
+        if (actual > 0.5D*reference) color = TextFormatting.YELLOW;
+        if (actual > 0.8D*reference) color = TextFormatting.RED;
+        if (actual > reference) color = TextFormatting.LIGHT_PURPLE;
         return color;
     }
     public static String creatureTypeColor(EnumCreatureType type)
@@ -128,7 +130,7 @@ public class Messenger
         {
             return new TextComponentString("");
         }
-        String parts[] = message.split("\\s", 2);
+        String[] parts = StringUtils.splitPreserveAllTokens(message, " ", 2);
         String desc = parts[0];
         String str = "";
         if (parts.length > 1) str = parts[1];
@@ -270,10 +272,6 @@ public class Messenger
 
     //simple text
 
-    public static ITextComponent s(String text)
-    {
-        return s(text,"");
-    }
     public static ITextComponent s(String text, String style)
     {
         ITextComponent message = new TextComponentString(text);
@@ -416,6 +414,11 @@ public class Messenger
             text.appendSibling(items[i]);
         }
         return text;
+    }
+    public static ITextComponent join(ITextComponent joiner, Iterable<ITextComponent> items)
+    {
+        List<ITextComponent> list = Lists.newArrayList(items);
+        return join(joiner, list.toArray(new ITextComponent[0]));
     }
 
     public static ITextComponent format(String formatter, Object... args)
@@ -582,13 +585,46 @@ public class Messenger
         return fluid(fluid.getFluid());
     }
 
+    private static ITextComponent blockEntityBlock(Block block)
+    {
+        return tr(block.getTranslationKey());
+    }
+    private static final ImmutableMap<TileEntityType<?>, ITextComponent> BLOCK_ENTITIES_NAMES = new ImmutableMap.Builder<TileEntityType<?>, ITextComponent>().
+            put(TileEntityType.FURNACE, blockEntityBlock(Blocks.FURNACE)).
+            put(TileEntityType.CHEST, blockEntityBlock(Blocks.CHEST)).
+            put(TileEntityType.TRAPPED_CHEST, blockEntityBlock(Blocks.TRAPPED_CHEST)).
+            put(TileEntityType.ENDER_CHEST, blockEntityBlock(Blocks.ENDER_CHEST)).
+            put(TileEntityType.JUKEBOX, blockEntityBlock(Blocks.JUKEBOX)).
+            put(TileEntityType.DISPENSER, blockEntityBlock(Blocks.DISPENSER)).
+            put(TileEntityType.DROPPER, blockEntityBlock(Blocks.DROPPER)).
+            put(TileEntityType.SIGN, blockEntityBlock(Blocks.SIGN)).
+            put(TileEntityType.MOB_SPAWNER, blockEntityBlock(Blocks.SPAWNER)).
+            put(TileEntityType.PISTON, blockEntityBlock(Blocks.MOVING_PISTON)).
+            put(TileEntityType.BREWING_STAND, blockEntityBlock(Blocks.BREWING_STAND)).
+            put(TileEntityType.ENCHANTING_TABLE, blockEntityBlock(Blocks.ENCHANTING_TABLE)).
+            put(TileEntityType.END_PORTAL, blockEntityBlock(Blocks.END_PORTAL)).
+            put(TileEntityType.BEACON, blockEntityBlock(Blocks.BEACON)).
+            put(TileEntityType.SKULL, s(translator.tr("block.skull", "Skull"))).
+            put(TileEntityType.DAYLIGHT_DETECTOR, blockEntityBlock(Blocks.DAYLIGHT_DETECTOR)).
+            put(TileEntityType.HOPPER, blockEntityBlock(Blocks.HOPPER)).
+            put(TileEntityType.COMPARATOR, blockEntityBlock(Blocks.COMPARATOR)).
+            put(TileEntityType.BANNER, s(translator.tr("block.banner", "Banner"))).
+            put(TileEntityType.STRUCTURE_BLOCK, blockEntityBlock(Blocks.STRUCTURE_BLOCK)).
+            put(TileEntityType.END_GATEWAY, blockEntityBlock(Blocks.END_GATEWAY)).
+            put(TileEntityType.COMMAND_BLOCK, blockEntityBlock(Blocks.COMMAND_BLOCK)).
+            put(TileEntityType.SHULKER_BOX, blockEntityBlock(Blocks.SHULKER_BOX)).
+            put(TileEntityType.BED, s(translator.tr("block.bed", "Bed"))).
+            put(TileEntityType.CONDUIT, blockEntityBlock(Blocks.CONDUIT)).
+            build();
+
+    public static ITextComponent blockEntity(TileEntityType<?> blockEntityType)
+    {
+        ITextComponent name = BLOCK_ENTITIES_NAMES.get(blockEntityType);
+        return name != null ? copy(name) : s(String.valueOf(IRegistry.BLOCK_ENTITY_TYPE.getKey(blockEntityType)));
+    }
     public static ITextComponent blockEntity(TileEntity blockEntity)
     {
-        ResourceLocation id = IRegistry.BLOCK_ENTITY_TYPE.getKey(blockEntity.getType());
-        return s(id != null ?
-                id.toString() : // vanilla block entity
-                blockEntity.getClass().getSimpleName()  // modded block entity, assuming the class name is not obfuscated
-        );
+        return blockEntity(blockEntity.getType());
     }
 
     public static ITextComponent item(Item item)
@@ -701,6 +737,14 @@ public class Messenger
     {
         tell(player, texts, false);
     }
+    public static void tell(CommandSource source, String text)
+    {
+        tell(source, s(text));
+    }
+    public static void tell(EntityPlayer player, String text)
+    {
+        tell(player, s(text));
+    }
 
     public static void reminder(EntityPlayer player, ITextComponent text)
     {
@@ -722,6 +766,10 @@ public class Messenger
         {
             CarpetServer.minecraft_server.getPlayerList().getPlayers().forEach(player -> tell(player, text));
         }
+    }
+    public static void broadcast(String text)
+    {
+        broadcast(s(text));
     }
 
 

@@ -5,7 +5,7 @@ import carpet.utils.TISCMConfig;
 /**
  * Code level configurable lithium config
  * Great thanks to lithium mod team for providing such OP optimizations
- * Lithium mod repos: https://github.com/jellysquid3/lithium-fabric
+ * Lithium mod repos: https://github.com/CaffeineMC/lithium-fabric
  *
  * See also: {@link TISCMConfig}
  */
@@ -19,7 +19,7 @@ public class LithiumConfig
 	public static final boolean BLOCK_MOVING_BLOCK_SHAPES       = LITHIUM_ENABLE && true;
 	public static final boolean BLOCK_PISTON_SHAPES             = LITHIUM_ENABLE && true;
 	public static final boolean CACHED_HASHCODE                 = LITHIUM_ENABLE && true;
-	public static final boolean CHUNK_PALETTE                   = LITHIUM_ENABLE && true;
+	public static final boolean CHUNK_PALETTE                   = LITHIUM_ENABLE && true;  // u might want to switch this off when doing threadstone
 	public static final boolean CHUNK_SERIALIZATION             = LITHIUM_ENABLE && true;
 	public static final boolean ENTITY_DATA_TRACKER_NO_LOCKS    = LITHIUM_ENABLE && true;
 	public static final boolean ENTITY_DATA_TRACKER_USE_ARRAYS  = LITHIUM_ENABLE && true;

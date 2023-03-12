@@ -1,0 +1,44 @@
+--- a/net/minecraft/block/BlockBeacon.java
++++ b/net/minecraft/block/BlockBeacon.java
+@@ -1,5 +1,9 @@
+ package net.minecraft.block;
+ 
++import carpet.logging.LoggerRegistry;
++import carpet.logging.threadstone.GlassThreadStatistic;
++import carpet.logging.threadstone.ThreadstoneLogger;
++import carpet.settings.CarpetSettings;
+ import net.minecraft.block.state.IBlockState;
+ import net.minecraft.entity.EntityLivingBase;
+ import net.minecraft.entity.player.EntityPlayer;
+@@ -83,6 +87,14 @@
+     {
+         HttpUtil.DOWNLOADER_EXECUTOR.submit(() ->
+         {
++            // TISCM threadstone logger logs beacons
++            boolean logBeacons = CarpetSettings.threadstoneLogger && LoggerRegistry.__threadstone;
++            long startNano = logBeacons ? System.nanoTime() : 0;
++
++            // TISCM threadstone logger add try
++            try {
++
++            // vanilla logic starts
+             Chunk chunk = worldIn.getChunk(glassPos);
+ 
+             for (int i = glassPos.getY() - 1; i >= 0; --i)
+@@ -111,7 +123,16 @@
+                     });
+                 }
+             }
++            // vanilla logic ends
+ 
++            // TISCM threadstone logger logs beacons add catch-finally
++            } catch (Throwable throwable) {
++                ThreadstoneLogger.getInstance().onExceptionallyEndedAsyncThread(throwable);
++            } finally {
++                if (logBeacons) {
++                    GlassThreadStatistic.getInstance().onGlassThreadTerminated(System.nanoTime() - startNano);
++                }
++            }
+         });
+     }
+ }

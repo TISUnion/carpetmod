@@ -430,6 +430,7 @@ logger:
       tileentity: 方块实体
       dragonfight: 龙战逻辑
       autosave: 自动保存
+      asynctask: 异步回调任务
       playeraction: 玩家操作
       commandfunction: 函数及数据包
       network: 网络
@@ -698,6 +699,10 @@ util:
   stack_trace:
     deobfuscated_stack_trace: 反混淆后的堆栈跟踪
     n_more_lines: 等%d行
+  block:
+    skull: 头颅
+    banner: 旗帜
+    bed: 床
 
 misc:
   player_mount_anything_permission_denied: 只有OP玩家才被允许骑乘任意实体

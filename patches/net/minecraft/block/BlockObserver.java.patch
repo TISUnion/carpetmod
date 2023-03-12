@@ -1,19 +1,22 @@
 --- a/net/minecraft/block/BlockObserver.java
 +++ b/net/minecraft/block/BlockObserver.java
-@@ -1,6 +1,9 @@
+@@ -1,6 +1,11 @@
  package net.minecraft.block;
  
  import java.util.Random;
 +
 +import carpet.logging.microtiming.MicroTimingLoggerManager;
 +import carpet.logging.microtiming.enums.EventType;
++import carpet.logging.threadstone.ThreadstoneLogger;
++import carpet.settings.CarpetSettings;
  import net.minecraft.block.state.IBlockState;
  import net.minecraft.item.BlockItemUseContext;
  import net.minecraft.state.BooleanProperty;
-@@ -13,8 +16,10 @@
+@@ -13,8 +18,11 @@
  import net.minecraft.world.IBlockReader;
  import net.minecraft.world.IWorld;
  import net.minecraft.world.World;
++import net.minecraft.world.WorldServer;
 +import redstone.multimeter.block.Meterable;
 +import redstone.multimeter.block.PowerSource;
  
@@ -22,7 +25,47 @@
  {
      public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
  
-@@ -74,10 +79,12 @@
+@@ -48,7 +56,22 @@
+         else
+         {
+             worldIn.setBlockState(pos, state.with(POWERED, Boolean.valueOf(true)), 2);
+-            worldIn.getPendingBlockTicks().scheduleTick(pos, this, 2);
++
++            // TISCM asyncUpdatesAmplifier
++            if (CarpetSettings.asyncUpdatesAmplifier && (worldIn instanceof WorldServer) &&
++                    ThreadstoneLogger.isOnGlassThread())
++            {
++                // send update here so redstone component is able to receive signal
++                // not the same behavior as 1.12 ITT observer chain, but it's more useful imo
++                this.updateNeighborsInFront(worldIn, pos, state);
++                this.tick(worldIn.getBlockState(pos), worldIn.getWorld(), pos, worldIn.getRandom());
++                return;
++            }
++            else
++            {
++                // vanilla
++                worldIn.getPendingBlockTicks().scheduleTick(pos, this, 2);
++            }
+         }
+ 
+         this.updateNeighborsInFront(worldIn, pos, state);
+@@ -68,16 +91,27 @@
+     {
+         if (!worldIn.isRemote() && !worldIn.getPendingBlockTicks().isTickScheduled(pos, this))
+         {
+-            worldIn.getPendingBlockTicks().scheduleTick(pos, this, 2);
++            if (CarpetSettings.asyncUpdatesAmplifier && (worldIn instanceof WorldServer)
++                && ThreadstoneLogger.isOnGlassThread())
++            {
++                this.tick(worldIn.getBlockState(pos), worldIn.getWorld(), pos, worldIn.getRandom());
++            }
++            else
++            {
++                // vanilla
++                worldIn.getPendingBlockTicks().scheduleTick(pos, this, 2);
++            }
+         }
+     }
  
      protected void updateNeighborsInFront(World worldIn, BlockPos pos, IBlockState state)
      {
@@ -35,7 +78,7 @@
      }
  
      public boolean canProvidePower(IBlockState state)
-@@ -123,4 +130,16 @@
+@@ -123,4 +157,16 @@
      {
          return this.getDefaultState().with(FACING, context.getNearestLookingDirection().getOpposite().getOpposite());
      }
