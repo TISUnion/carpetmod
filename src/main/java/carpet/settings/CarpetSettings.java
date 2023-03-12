@@ -822,11 +822,12 @@ public class CarpetSettings
     public static boolean asyncPacketUpdatesFix = false;
 
     @Rule(
-            desc = "Fixed end city structure start becomes invalid after reload from disk",
+            desc = "Fixed end city structure start will be saved with invalid state after reload from disk",
             extra = {
                     "Because mojang forgets to save / restore the isSizeable field of EndCityStructure$Start",
-                    "In vanilla you can use savestate to force the structure start chunk to be regenerated as a workround",
-                    "Notes that those already invalid structure starts cannot be fixed"
+                    "In vanilla you can use savestate to force the structure start chunk to be regenerated as a workaround",
+                    "Notes that those already invalid structure starts cannot be fixed",
+                    "In CMP you can /chunkregen the start chunk to make it work again"
             },
             category = BUGFIX
     )
