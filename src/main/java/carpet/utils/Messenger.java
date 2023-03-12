@@ -767,6 +767,10 @@ public class Messenger
             CarpetServer.minecraft_server.getPlayerList().getPlayers().forEach(player -> tell(player, text));
         }
     }
+    public static void broadcast(String text)
+    {
+        broadcast(s(text));
+    }
 
 
     /*
