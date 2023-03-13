@@ -39,6 +39,16 @@ public class StackTraceDeobfuscator
 		return deobfuscateStackTrace(stackTraceElements, null);
 	}
 
+	public static void deobfuscateThrowableStackTrace(Throwable throwable)
+	{
+		if (throwable == null)
+		{
+			return;
+		}
+		throwable.setStackTrace(deobfuscateStackTrace(throwable.getStackTrace()));
+		deobfuscateThrowableStackTrace(throwable.getCause());
+	}
+
 	private static String getFileName(String className)
 	{
 		if (className.isEmpty())

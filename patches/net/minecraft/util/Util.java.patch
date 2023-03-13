@@ -3,23 +3,31 @@
 @@ -1,5 +1,7 @@
  package net.minecraft.util;
  
-+import carpet.helpers.UpdateSuppressionException;
 +import carpet.settings.CarpetSettings;
++import carpet.utils.deobfuscator.StackTraceDeobfuscator;
  import com.google.common.collect.Iterators;
  import it.unimi.dsi.fastutil.Hash.Strategy;
  import java.io.File;
-@@ -158,7 +160,13 @@
+@@ -17,10 +19,7 @@
+ import java.security.PrivilegedActionException;
+ import java.security.PrivilegedExceptionAction;
+ import java.time.Instant;
+-import java.util.Iterator;
+-import java.util.List;
+-import java.util.Locale;
+-import java.util.Map;
++import java.util.*;
+ import java.util.Map.Entry;
+ import java.util.concurrent.ExecutionException;
+ import java.util.concurrent.FutureTask;
+@@ -158,6 +157,10 @@
          }
          catch (ExecutionException executionexception)
          {
--            logger.fatal("Error executing task", (Throwable)executionexception);
-+            if(CarpetSettings.yeetUpdateSuppressionCrash && executionexception.getCause() instanceof UpdateSuppressionException) {
-+                // neater log message
-+                logger.fatal(String.format("Error executing task: %s", executionexception.getCause()));
++            if (CarpetSettings.deobfuscateCrashReportStackTrace)
++            {
++                StackTraceDeobfuscator.deobfuscateThrowableStackTrace(executionexception);
 +            }
-+            else {
-+                logger.fatal("Error executing task", (Throwable)executionexception);
-+            }
+             logger.fatal("Error executing task", (Throwable)executionexception);
          }
          catch (InterruptedException interruptedexception)
-         {
