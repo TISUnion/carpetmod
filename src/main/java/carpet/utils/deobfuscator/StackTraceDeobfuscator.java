@@ -4,6 +4,7 @@ import carpet.utils.Translator;
 import com.google.common.collect.Lists;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class StackTraceDeobfuscator
@@ -30,7 +31,10 @@ public class StackTraceDeobfuscator
 				list.clear();
 			}
 		}
-		list.add(0, new StackTraceElement(translator.tr("Deobfuscated stack trace"), "", MAPPING_NAME, -1));
+		if (list.size() < 1 || !Objects.equals(list.get(0).getFileName(), MAPPING_NAME))
+		{
+			list.add(0, new StackTraceElement(translator.tr("Deobfuscated stack trace"), "", MAPPING_NAME, -1));
+		}
 		return list.toArray(new StackTraceElement[0]);
 	}
 
