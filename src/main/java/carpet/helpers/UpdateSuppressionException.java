@@ -11,8 +11,9 @@ public class UpdateSuppressionException extends RuntimeException
 	private final World world;
 	private final BlockPos pos;
 
-	public UpdateSuppressionException(World world, BlockPos pos)
+	public UpdateSuppressionException(StackOverflowError cause, World world, BlockPos pos)
 	{
+		super(cause);
 		this.world = world;
 		this.pos = pos;
 	}

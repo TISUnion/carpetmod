@@ -221,7 +221,7 @@
              }
 +            catch (StackOverflowError e)
 +            {
-+                throw new UpdateSuppressionException(this, pos);
++                throw new UpdateSuppressionException(e, this, pos);
 +            }
 +            catch (UpdateSuppressionException e)
 +            {
