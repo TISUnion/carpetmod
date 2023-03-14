@@ -1,22 +1,21 @@
-package carpet.logging.microtiming.tickstages;
+package carpet.logging.microtiming.tickphase.substages;
 
 import carpet.logging.microtiming.MicroTimingLoggerManager;
-import carpet.utils.TextUtil;
 import carpet.utils.Messenger;
+import carpet.utils.TextUtil;
 import net.minecraft.block.BlockEventData;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.world.World;
 
-public class BlockEventTickStageExtra extends TickStageExtraBase
+public class BlockEventSubStage extends AbstractSubStage
 {
 	private final World world;
 	private final BlockEventData blockEventData;
 	private final int order;
 	private final int depth;
 
-	public BlockEventTickStageExtra(World world, BlockEventData blockEventData, int order, int depth)
+	public BlockEventSubStage(World world, BlockEventData blockEventData, int order, int depth)
 	{
 		this.world = world;
 		this.blockEventData = blockEventData;
@@ -27,13 +26,11 @@ public class BlockEventTickStageExtra extends TickStageExtraBase
 	@Override
 	public ITextComponent toText()
 	{
-		BlockPos pos = this.blockEventData.getPosition();
 		return Messenger.c(
-				String.format("w %s: ", MicroTimingLoggerManager.tr("Block")),
-				Messenger.block(this.blockEventData.getBlock()),
-				String.format("w \n%s: %d", MicroTimingLoggerManager.tr("Order"), this.order),
-				String.format("w \n%s: %d", MicroTimingLoggerManager.tr("Depth"), this.depth),
-				String.format("w \n%s: [%d, %d, %d]", MicroTimingLoggerManager.tr("Position"), pos.getX(), pos.getY(), pos.getZ())
+				Messenger.s(MicroTimingLoggerManager.tr("Block")), "w : ", Messenger.block(this.blockEventData.getBlock()), Messenger.newLine(),
+				Messenger.s(MicroTimingLoggerManager.tr("Order")), String.format("w : %d\n", this.order),
+				Messenger.s(MicroTimingLoggerManager.tr("Depth")), String.format("w : %d\n", this.depth),
+				Messenger.s(MicroTimingLoggerManager.tr("Position")), String.format("w : %s", TextUtil.coord(this.blockEventData.getPosition()))
 		);
 	}
 

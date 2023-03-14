@@ -4,7 +4,7 @@
  package net.minecraft.world;
  
 +import carpet.logging.microtiming.MicroTimingLoggerManager;
-+import carpet.logging.microtiming.tickstages.TileTickTickStageExtra;
++import carpet.logging.microtiming.tickphase.substages.TileTickSubStage;
 +import carpet.settings.CarpetSettings;
 +import com.google.common.collect.Iterators;
  import com.google.common.collect.Lists;
@@ -103,7 +103,7 @@
 +                    try {
 +                        // TISCM Micro Timing logger
 +                        MicroTimingLoggerManager.setTickStageDetail(this.world, String.valueOf(nextticklistentry1.priority.getPriority()));
-+                        MicroTimingLoggerManager.setTickStageExtra(this.world, new TileTickTickStageExtra(this.world, nextticklistentry1, eventCount++));
++                        MicroTimingLoggerManager.setSubTickStage(this.world, new TileTickSubStage(this.world, nextticklistentry1, eventCount++));
 +                        // end TISCM Micro Timing logger
                          this.tickFunction.accept(nextticklistentry1);
 -                    }
@@ -129,7 +129,7 @@
              this.pendingTickListEntriesThisTick.clear();
 +
 +            MicroTimingLoggerManager.setTickStageDetail(this.world, null); // TISCM Micro Timing logger
-+            MicroTimingLoggerManager.setTickStageExtra(this.world, null); // TISCM Micro Timing logger
++            MicroTimingLoggerManager.setSubTickStage(this.world, null); // TISCM Micro Timing logger
          }
      }
  

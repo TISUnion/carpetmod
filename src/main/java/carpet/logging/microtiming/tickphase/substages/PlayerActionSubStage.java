@@ -1,12 +1,12 @@
-package carpet.logging.microtiming.tickstages;
+package carpet.logging.microtiming.tickphase.substages;
 
 import carpet.utils.Messenger;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.text.ITextComponent;
 
-public class PlayerEntityTickStageExtra extends PlayerRelatedTickStageExtra
+public class PlayerActionSubStage extends AbstractPlayerRelatedSubStage
 {
-	public PlayerEntityTickStageExtra(EntityPlayerMP player)
+	public PlayerActionSubStage(EntityPlayerMP player)
 	{
 		super(player);
 	}
@@ -15,7 +15,7 @@ public class PlayerEntityTickStageExtra extends PlayerRelatedTickStageExtra
 	public ITextComponent toText()
 	{
 		return Messenger.c(
-				String.format("w %s\n", this.tr("Ticking player entity")),
+				Messenger.s(tr("player_action")), Messenger.newLine(),
 				super.toText()
 		);
 	}

@@ -1,20 +1,21 @@
 package carpet.logging.microtiming;
 
 import carpet.CarpetServer;
+import carpet.logging.AbstractLogger;
 import carpet.logging.LoggerRegistry;
 import carpet.logging.microtiming.enums.BlockUpdateType;
 import carpet.logging.microtiming.enums.EventType;
 import carpet.logging.microtiming.enums.TickStage;
 import carpet.logging.microtiming.events.*;
 import carpet.logging.microtiming.marker.MicroTimingMarkerManager;
-import carpet.logging.microtiming.tickstages.TickStageExtraBase;
+import carpet.logging.microtiming.tickphase.TickPhase;
+import carpet.logging.microtiming.tickphase.substages.AbstractSubStage;
 import carpet.logging.microtiming.utils.MicroTimingContext;
 import carpet.logging.microtiming.utils.MicroTimingUtil;
 import carpet.settings.CarpetSettings;
 import carpet.utils.GameUtil;
 import carpet.utils.Translator;
 import com.google.common.collect.Lists;
-import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEventData;
 import net.minecraft.block.state.IBlockState;
@@ -36,15 +37,17 @@ import net.minecraft.world.TickPriority;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public class MicroTimingLoggerManager
 {
     private static MicroTimingLoggerManager instance;
-    public static final Translator TRANSLATOR = (new MicroTimingLogger(null)).getTranslator();
+    public static final Translator TRANSLATOR = (new AbstractLogger(MicroTimingLogger.NAME){}).getTranslator();
+    private TickPhase offWorldTickPhase = new TickPhase(TickStage.UNKNOWN, null);
+    public ThreadLocal<WorldServer> currentWorld = ThreadLocal.withInitial(() -> null);
 
     private final List<MicroTimingLogger> loggers = Lists.newArrayList();
     private long lastFlushTime;
@@ -280,15 +283,16 @@ public class MicroTimingLoggerManager
     }
 
     /*
-     * ------------
-     *  Tick Stage
-     * ------------
+     * --------------------
+     *  Tick Stage / Phase
+     * --------------------
      */
 
     public static void setTickStage(World world, TickStage stage)
     {
         getWorldLogger(world).ifPresent(logger -> logger.setTickStage(stage));
     }
+
     public static void setTickStage(TickStage stage)
     {
         if (instance != null)
@@ -297,6 +301,7 @@ public class MicroTimingLoggerManager
             {
                 logger.setTickStage(stage);
             }
+            instance.offWorldTickPhase = instance.offWorldTickPhase.withMainStage(stage);
         }
     }
 
@@ -305,18 +310,20 @@ public class MicroTimingLoggerManager
         getWorldLogger(world).ifPresent(logger -> logger.setTickStageDetail(detail));
     }
 
-    public static void setTickStageExtra(World world, TickStageExtraBase stage)
+    public static void setSubTickStage(World world, AbstractSubStage stage)
     {
-        getWorldLogger(world).ifPresent(logger -> logger.setTickStageExtra(stage));
+        getWorldLogger(world).ifPresent(logger -> logger.setSubTickStage(stage));
     }
-    public static void setTickStageExtra(TickStageExtraBase stage)
+
+    public static void setSubTickStage(AbstractSubStage stage)
     {
         if (instance != null)
         {
             for (MicroTimingLogger logger : instance.loggers)
             {
-                logger.setTickStageExtra(stage);
+                logger.setSubTickStage(stage);
             }
+            instance.offWorldTickPhase = instance.offWorldTickPhase.withSubStage(stage);
         }
     }
 
@@ -346,21 +353,28 @@ public class MicroTimingLoggerManager
         }
     }
 
-    public static Optional<TickStage> getTickStage(World world)
+    /*
+     * ----------------
+     *     For API
+     * ----------------
+     */
+
+    public static void setCurrentWorld(WorldServer world)
     {
-        return getWorldLogger(world).map(MicroTimingLogger::getTickStage);
+        getInstance().currentWorld.set(world);
     }
 
-    public static Optional<String> getTickStageDetail(World world)
+    @Nullable
+    public static WorldServer getCurrentWorld()
     {
-        return getWorldLogger(world).map(MicroTimingLogger::getTickStageDetail);
+        return getInstance().currentWorld.get();
     }
 
-    public static Optional<TickStageExtraBase> getTickStageExtra(World world)
+    @Nullable
+    public static TickPhase getOffWorldTickPhase()
     {
-        return getWorldLogger(world).map(MicroTimingLogger::getTickStageExtra);
+        return getInstance().offWorldTickPhase;
     }
-
     /*
      * ----------------
      *   Marker Logic

@@ -6,7 +6,7 @@
 +import carpet.CarpetServer;
 +import carpet.helpers.TickSpeed;
 +import carpet.logging.microtiming.MicroTimingLoggerManager;
-+import carpet.logging.microtiming.tickstages.PlayerEntityTickStageExtra;
++import carpet.logging.microtiming.tickphase.substages.PlayerEntitySubStage;
 +import carpet.network.CarpetClient;
 +import carpet.network.CarpetServerNetworkHandler;
 +import carpet.network.tiscm.TISCMProtocol;
@@ -55,7 +55,7 @@
  
      public void tick()
      {
-+        MicroTimingLoggerManager.setTickStageExtra(new PlayerEntityTickStageExtra(this.player));  // TISCM Micro Timing logger
++        MicroTimingLoggerManager.setSubTickStage(new PlayerEntitySubStage(this.player));  // TISCM Micro Timing logger
 +
          this.captureCurrentPosition();
          this.player.playerTick();
@@ -83,7 +83,7 @@
              this.disconnect(new TextComponentTranslation("multiplayer.disconnect.idling"));
          }
 +
-+        MicroTimingLoggerManager.setTickStageExtra(null);  // TISCM Micro Timing logger
++        MicroTimingLoggerManager.setSubTickStage(null);  // TISCM Micro Timing logger
      }
  
      public void captureCurrentPosition()

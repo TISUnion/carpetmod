@@ -1,8 +1,10 @@
 package carpet.logging.logHelpers;
 
 import carpet.logging.LoggerRegistry;
+import carpet.logging.microtiming.MicroTimingAccess;
 import carpet.logging.microtiming.MicroTimingLoggerManager;
 import carpet.logging.microtiming.enums.TickStage;
+import carpet.logging.microtiming.tickphase.TickPhase;
 import carpet.utils.Messenger;
 import carpet.utils.deobfuscator.StackTracePrinter;
 import net.minecraft.util.text.ITextComponent;
@@ -18,22 +20,15 @@ public class ChunkLogHelper
 {
     public static void onChunkNewState(World worldIn, int x, int z, String state)
     {
-        Optional<TickStage> tickStage = MicroTimingLoggerManager.getTickStage(worldIn);
-        tickStage.ifPresent(stage -> LoggerRegistry.getLogger("chunkdebug").log(option -> {
-            ITextComponent[] phase = new ITextComponent[]{Messenger.s(stage.tr(), "y")};
-            MicroTimingLoggerManager.getTickStageDetail(worldIn).ifPresent(detail -> {
-                phase[0].appendText("." + MicroTimingLoggerManager.tr("stage_detail." + detail, detail));
-            });
-            MicroTimingLoggerManager.getTickStageExtra(worldIn).ifPresent(extra -> {
-                phase[0] = Messenger.fancy(null, phase[0], extra.toText(), extra.getClickEvent());
-            });
+        TickPhase tickPhase = MicroTimingAccess.getTickPhase(worldIn);
+        LoggerRegistry.getLogger("chunkdebug").log(option -> {
             ITextComponent text = Messenger.c(
                     "g [" + worldIn.getGameTime() + "] ",
                     "w X:" + x + " ",
                     "w Z:" + z + " ",
                     state + " ",
                     "g at ",
-                    phase[0],
+                    tickPhase.toText("y"),
                     "g  in ",
                     Messenger.dimension(worldIn).applyTextStyle(TextFormatting.DARK_GREEN),
                     "w  ",
@@ -55,6 +50,6 @@ public class ChunkLogHelper
                 }
             }
             return new ITextComponent[]{text};
-        }));
+        });
     }
 }

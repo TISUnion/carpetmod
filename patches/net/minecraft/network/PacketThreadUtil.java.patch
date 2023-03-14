@@ -5,7 +5,7 @@
  
 +import carpet.logging.microtiming.MicroTimingLoggerManager;
 +import carpet.logging.microtiming.enums.TickStage;
-+import carpet.logging.microtiming.tickstages.PlayerActionTickStageExtra;
++import carpet.logging.microtiming.tickphase.substages.PlayerActionSubStage;
  import net.minecraft.util.IThreadListener;
  
  public class PacketThreadUtil
@@ -18,12 +18,12 @@
 +                {
 +                    NetHandlerPlayServer handler = (NetHandlerPlayServer)processor;
 +                    MicroTimingLoggerManager.setTickStage(TickStage.PLAYER_ACTION);
-+                    MicroTimingLoggerManager.setTickStageExtra(new PlayerActionTickStageExtra(handler.player));
++                    MicroTimingLoggerManager.setSubTickStage(new PlayerActionSubStage(handler.player));
 +                }
 +
                  packetIn.processPacket(processor);
 +
-+                MicroTimingLoggerManager.setTickStageExtra(null);
++                MicroTimingLoggerManager.setSubTickStage(null);
 +                MicroTimingLoggerManager.setTickStage(TickStage.ASYNC_TASK);
              });
              throw ThreadQuickExitException.INSTANCE;

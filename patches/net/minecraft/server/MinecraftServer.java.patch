@@ -210,7 +210,7 @@
          this.updateTimeLightAndEntities(hasTimeLeft);
  
          if (i - this.nanoTimeSinceStatusRefresh >= 5000000000L)
-@@ -810,10 +878,28 @@
+@@ -810,10 +878,29 @@
  
          if (this.tickCounter % 900 == 0)
          {
@@ -234,12 +234,13 @@
 +            }
 +            // TISCM autosave logger
 +            AutoSaveLogHelper.onAutoSave(this.getWorld(DimensionType.OVERWORLD).getGameTime(), timeCost);
++            MicroTimingLoggerManager.setTickStage(TickStage.UNKNOWN);  // TISCM Micro Timing logger
 +            CarpetProfiler.end_current_section();
 +            endTickTask(); // RSMM
          }
  
          this.profiler.startSection("snooper");
-@@ -829,16 +915,40 @@
+@@ -829,16 +916,40 @@
          }
  
          this.profiler.endSection();
@@ -280,7 +281,7 @@
          FutureTask<?> futuretask;
  
          while ((futuretask = this.futureTaskQueue.poll()) != null)
-@@ -847,8 +957,12 @@
+@@ -847,13 +958,19 @@
          }
  
          this.profiler.endStartSection("commandFunctions");
@@ -293,7 +294,14 @@
  
          for (WorldServer worldserver : this.getWorlds())
          {
-@@ -870,26 +984,66 @@
+             long i = Util.nanoTime();
+ 
++            MicroTimingLoggerManager.setCurrentWorld(worldserver);  // TISCM Micro Timing logger
++
+             if (worldserver.dimension.getType() == DimensionType.OVERWORLD || this.getAllowNether())
+             {
+                 this.profiler.startSection(() ->
+@@ -870,26 +987,66 @@
  
                  this.profiler.startSection("tick");
  
@@ -362,8 +370,12 @@
                  }
  
                  this.profiler.endSection();
-@@ -905,10 +1059,16 @@
+@@ -903,12 +1060,20 @@
+             {
+                 return new long[100];
              }))[this.tickCounter % 100] = Util.nanoTime() - i;
++
++            MicroTimingLoggerManager.setCurrentWorld(null);  // TISCM Micro Timing logger
          }
  
 +        CarpetProfiler.start_section(null, "Network");
@@ -379,7 +391,7 @@
          this.profiler.endStartSection("tickables");
  
          for (int j = 0; j < this.tickables.size(); ++j)
-@@ -917,6 +1077,8 @@
+@@ -917,6 +1082,8 @@
          }
  
          this.profiler.endSection();
@@ -388,7 +400,7 @@
      }
  
      public boolean getAllowNether()
-@@ -929,6 +1091,12 @@
+@@ -929,6 +1096,12 @@
          this.tickables.add(tickable);
      }
  
@@ -401,7 +413,7 @@
      public static void main(String[] p_main_0_)
      {
          Bootstrap.register();
-@@ -1004,6 +1172,11 @@
+@@ -1004,6 +1177,11 @@
                  }
              }
  
@@ -413,7 +425,7 @@
              YggdrasilAuthenticationService yggdrasilauthenticationservice = new YggdrasilAuthenticationService(Proxy.NO_PROXY, UUID.randomUUID().toString());
              MinecraftSessionService minecraftsessionservice = yggdrasilauthenticationservice.createMinecraftSessionService();
              GameProfileRepository gameprofilerepository = yggdrasilauthenticationservice.createProfileRepository();
-@@ -1142,7 +1315,8 @@
+@@ -1142,7 +1320,8 @@
  
      public String getServerModName()
      {
@@ -423,7 +435,7 @@
      }
  
      public CrashReport addServerInfoToCrashReport(CrashReport report)
-@@ -1605,6 +1779,12 @@
+@@ -1605,6 +1784,12 @@
      {
          return this.serverTime;
      }
@@ -436,7 +448,7 @@
  
      public Thread getServerThread()
      {
-@@ -1639,6 +1819,7 @@
+@@ -1639,6 +1824,7 @@
          }
          else
          {
@@ -444,7 +456,7 @@
              this.getPlayerList().saveAllPlayerData();
              this.resourcePacks.reloadPacksFromFinders();
              this.loadDataPacks(this.getWorld(DimensionType.OVERWORLD).getWorldInfo());
-@@ -1825,4 +2006,28 @@
+@@ -1825,4 +2011,28 @@
              return 0;
          }
      }

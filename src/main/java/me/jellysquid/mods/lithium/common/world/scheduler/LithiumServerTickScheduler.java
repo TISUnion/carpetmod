@@ -1,7 +1,7 @@
 package me.jellysquid.mods.lithium.common.world.scheduler;
 
 import carpet.logging.microtiming.MicroTimingLoggerManager;
-import carpet.logging.microtiming.tickstages.TileTickTickStageExtra;
+import carpet.logging.microtiming.tickphase.substages.TileTickSubStage;
 import carpet.settings.CarpetSettings;
 import com.google.common.collect.Iterators;
 import it.unimi.dsi.fastutil.longs.Long2ObjectAVLTreeMap;
@@ -263,7 +263,7 @@ public class LithiumServerTickScheduler<T> extends ServerTickList<T> {
             try {
                 // TISCM Micro Timing logger
                 MicroTimingLoggerManager.setTickStageDetail(this.world, String.valueOf(tick.priority.getPriority()));
-                MicroTimingLoggerManager.setTickStageExtra(this.world, new TileTickTickStageExtra(this.world, tick, eventCounter++));
+                MicroTimingLoggerManager.setSubTickStage(this.world, new TileTickSubStage(this.world, tick, eventCounter++));
                 // end TISCM Micro Timing logger
 
                 // Mark as consumed before execution per vanilla behaviour
@@ -286,7 +286,7 @@ public class LithiumServerTickScheduler<T> extends ServerTickList<T> {
         }
 
         MicroTimingLoggerManager.setTickStageDetail(this.world, null); // TISCM Micro Timing logger
-        MicroTimingLoggerManager.setTickStageExtra(this.world, null); // TISCM Micro Timing logger
+        MicroTimingLoggerManager.setSubTickStage(this.world, null); // TISCM Micro Timing logger
 
 
         // We finished executing those ticks, so empty the list.

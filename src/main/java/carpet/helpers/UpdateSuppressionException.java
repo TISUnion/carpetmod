@@ -2,7 +2,9 @@ package carpet.helpers;
 
 import carpet.logging.Logger;
 import carpet.logging.LoggerRegistry;
+import carpet.logging.microtiming.MicroTimingAccess;
 import carpet.logging.microtiming.MicroTimingLoggerManager;
+import carpet.logging.microtiming.tickphase.TickPhase;
 import carpet.utils.Messenger;
 import carpet.utils.Translator;
 import com.google.common.base.Suppliers;
@@ -10,6 +12,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -22,19 +25,10 @@ public class UpdateSuppressionException extends RuntimeException
 	public UpdateSuppressionException(StackOverflowError cause, World world, BlockPos pos)
 	{
 		super(cause);
-		ITextComponent[] phase = new ITextComponent[]{Messenger.s("?")};
-		MicroTimingLoggerManager.getTickStage(world).ifPresent(stage -> {
-			phase[0] = Messenger.s(stage.tr());
-		});
-		MicroTimingLoggerManager.getTickStageDetail(world).ifPresent(detail -> {
-			phase[0].appendText("." + MicroTimingLoggerManager.tr("stage_detail." + detail, detail));
-		});
-		MicroTimingLoggerManager.getTickStageExtra(world).ifPresent(extra -> {
-			phase[0] = Messenger.fancy(null, phase[0], extra.toText(), extra.getClickEvent());
-		});
+		TickPhase tickPhase = MicroTimingAccess.getTickPhase(world);
 		this.textHolder = Suppliers.memoize(() -> tr.advTr("exception_detail", "Update Suppression in %1$s at %2$s",
 				Messenger.coord(pos, world.getDimension().getType()),
-				phase[0]
+				tickPhase.toText()
 		));
 	}
 

@@ -1,17 +1,16 @@
-package carpet.logging.microtiming.tickstages;
+package carpet.logging.microtiming.tickphase.substages;
 
-import carpet.logging.microtiming.MicroTimingLoggerManager;
-import carpet.utils.TextUtil;
 import carpet.utils.Messenger;
+import carpet.utils.TextUtil;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.event.ClickEvent;
 
-public abstract class PlayerRelatedTickStageExtra extends TickStageExtraBase
+public abstract class AbstractPlayerRelatedSubStage extends AbstractSubStage
 {
 	protected final EntityPlayerMP player;
 
-	public PlayerRelatedTickStageExtra(EntityPlayerMP player)
+	public AbstractPlayerRelatedSubStage(EntityPlayerMP player)
 	{
 		this.player = player;
 	}
@@ -20,7 +19,8 @@ public abstract class PlayerRelatedTickStageExtra extends TickStageExtraBase
 	public ITextComponent toText()
 	{
 		return Messenger.c(
-				String.format("w %s: %s", MicroTimingLoggerManager.tr("Player"), this.player.getGameProfile().getName())
+				Messenger.s(tr("Player")),
+				String.format("w : %s", this.player.getGameProfile().getName())
 		);
 	}
 

@@ -9,10 +9,10 @@ import carpet.logging.microtiming.message.IndentedMessage;
 import carpet.logging.microtiming.message.MessageList;
 import carpet.logging.microtiming.message.MessageType;
 import carpet.logging.microtiming.message.MicroTimingMessage;
-import carpet.logging.microtiming.tickstages.TickStageExtraBase;
+import carpet.logging.microtiming.tickphase.TickPhase;
+import carpet.logging.microtiming.tickphase.substages.AbstractSubStage;
 import carpet.logging.microtiming.utils.MicroTimingContext;
 import carpet.logging.microtiming.utils.MicroTimingUtil;
-import carpet.utils.TextUtil;
 import carpet.utils.Messenger;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -27,9 +27,7 @@ public class MicroTimingLogger extends AbstractLogger
 	// [stage][detail]^[extra]
 	public static final String NAME = "microTiming";
 
-	private TickStage stage;
-	private String stageDetail;
-	private TickStageExtraBase stageExtra;
+	private TickPhase tickPhase;
 	private final WorldServer world;
 	public final MessageList messageList = new MessageList();
 
@@ -37,45 +35,33 @@ public class MicroTimingLogger extends AbstractLogger
 	{
 		super(NAME);
 		this.world = world;
-	}
-	
-	public void setTickStage(TickStage stage)
-	{
-		this.stage = stage;
-		this.stageDetail = null;
-		this.stageExtra = null;
+		this.tickPhase = new TickPhase(TickStage.UNKNOWN, this.world.getDimension().getType());
 	}
 
-	public TickStage getTickStage()
+	public void setTickStage(TickStage stage)
 	{
-		return this.stage;
+		this.tickPhase = this.tickPhase.withMainStage(stage);
 	}
 
 	public void setTickStageDetail(String stageDetail)
 	{
-		this.stageDetail = stageDetail;
+		this.tickPhase = this.tickPhase.withDetailed(stageDetail);
 	}
 
-	public String getTickStageDetail()
+	public void setSubTickStage(AbstractSubStage subStage)
 	{
-		return this.stageDetail;
+		this.tickPhase = this.tickPhase.withSubStage(subStage);
 	}
 
-	public void setTickStageExtra(TickStageExtraBase extra)
+	public TickPhase getTickPhase()
 	{
-		this.stageExtra = extra;
-	}
-
-	public TickStageExtraBase getTickStageExtra()
-	{
-		return this.stageExtra;
+		return this.tickPhase;
 	}
 
 	public WorldServer getWorld()
 	{
 		return this.world;
 	}
-
 
 	public void addMessage(MicroTimingContext context)
 	{

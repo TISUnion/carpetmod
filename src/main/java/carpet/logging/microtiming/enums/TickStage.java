@@ -1,9 +1,12 @@
 package carpet.logging.microtiming.enums;
 
 import carpet.logging.microtiming.MicroTimingLoggerManager;
+import carpet.utils.Messenger;
+import net.minecraft.util.text.ITextComponent;
 
 public enum TickStage
 {
+	UNKNOWN("Unknown", false),
 	SPAWNING("Spawning", true),
 	CHUNK_UNLOADING("ChunkUnloading", true),
 	WORLD_BORDER("WorldBorder", true),
@@ -48,6 +51,11 @@ public enum TickStage
 	public String tr()
 	{
 		return MicroTimingLoggerManager.tr("stage." + this.name, this.name);
+	}
+
+	public ITextComponent toText()
+	{
+		return Messenger.s(this.tr());
 	}
 
 	public boolean isInsideWorld()

@@ -1,20 +1,20 @@
-package carpet.logging.microtiming.tickstages;
+package carpet.logging.microtiming.tickphase.substages;
 
 import carpet.logging.microtiming.MicroTimingLoggerManager;
-import carpet.utils.TextUtil;
 import carpet.utils.Messenger;
+import carpet.utils.TextUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.event.ClickEvent;
 
-public class EntityTickStageExtra extends TickStageExtraBase
+public class EntitySubStage extends AbstractSubStage
 {
 	private final Entity entity;
 	private final int order;
 	private final Vec3d pos;
 
-	public EntityTickStageExtra(Entity entity, int order)
+	public EntitySubStage(Entity entity, int order)
 	{
 		this.entity = entity;
 		this.order = order;
@@ -25,12 +25,10 @@ public class EntityTickStageExtra extends TickStageExtraBase
 	public ITextComponent toText()
 	{
 		return Messenger.c(
-				String.format("w %s: ", MicroTimingLoggerManager.tr("Entity")),
-				this.entity.getDisplayName(),
-				String.format("w \n%s: ", MicroTimingLoggerManager.tr("Type")),
-				this.entity.getType().getName(),
-				String.format("w \n%s: %d", MicroTimingLoggerManager.tr("Order"), this.order),
-				String.format("w \n%s: [%.2f, %.2f, %.2f]", MicroTimingLoggerManager.tr("Position"), this.pos.x, this.pos.y, this.pos.z)
+				Messenger.s(MicroTimingLoggerManager.tr("Entity")), "w : ", this.entity.getDisplayName(), "w \n",
+				Messenger.s(MicroTimingLoggerManager.tr("Type")), "w : ", Messenger.entityType(this.entity), "w \n",
+				Messenger.s(MicroTimingLoggerManager.tr("Order")), String.format("w : %d\n", this.order),
+				Messenger.s(MicroTimingLoggerManager.tr("Position")), String.format("w : %s", TextUtil.coord(this.pos))
 		);
 	}
 
