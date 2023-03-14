@@ -3,44 +3,54 @@ package carpet.helpers;
 import carpet.logging.Logger;
 import carpet.logging.LoggerRegistry;
 import carpet.logging.microtiming.MicroTimingAccess;
-import carpet.logging.microtiming.MicroTimingLoggerManager;
 import carpet.logging.microtiming.tickphase.TickPhase;
 import carpet.utils.Messenger;
 import carpet.utils.Translator;
-import com.google.common.base.Suppliers;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 public class UpdateSuppressionException extends RuntimeException
 {
-	private static final Translator tr = new Translator("rule.yeetUpdateSuppressionCrash");
-	private final Supplier<ITextComponent> textHolder;
+	private static final Translator translator = new Translator("rule.yeetUpdateSuppressionCrash");
+	private final World world;
+	private final BlockPos pos;
+	private TickPhase tickPhase;
 
 	public UpdateSuppressionException(StackOverflowError cause, World world, BlockPos pos)
 	{
 		super(cause);
-		TickPhase tickPhase = MicroTimingAccess.getTickPhase(world);
-		this.textHolder = Suppliers.memoize(() -> tr.advTr("exception_detail", "Update Suppression in %1$s at %2$s",
-				Messenger.coord(pos, world.getDimension().getType()),
-				tickPhase.toText()
-		));
+		this.world = world;
+		this.pos = pos;
 	}
 
-	public ITextComponent getMessageText()
+	public ITextComponent getMessageText(@Nullable TickPhase tickPhase)
 	{
-		return this.textHolder.get();
+		if (tickPhase != null)
+		{
+			return translator.advTr(
+					"exception_detail", "Update Suppression in %1$s at %2$s",
+					Messenger.coord(this.pos, this.world.getDimension().getType()),
+					tickPhase.toText()
+			);
+		}
+		else
+		{
+			return translator.advTr(
+					"exception_detail_simple", "Update Suppression at %1$s",
+					Messenger.coord(this.pos, this.world.getDimension().getType())
+			);
+		}
 	}
 
 	@Override
 	public String getMessage()
 	{
-		return this.getMessageText().getString();
+		return this.getMessageText(null).getString();
 	}
 
 	@Override
@@ -55,10 +65,11 @@ public class UpdateSuppressionException extends RuntimeException
 		// to prevent NoClassDefFoundError due to stack overflow again when loading this class
 	}
 
-	public static void report(UpdateSuppressionException exception)
+	public void report(@Nullable World tickingWorld)
 	{
+		TickPhase tickPhase = MicroTimingAccess.getTickPhase(tickingWorld);
 		ITextComponent message = Messenger.formatting(
-				tr.advTr("report_message", "You just caused a server crash: %1$s", exception.getMessageText()),
+				translator.advTr("report_message", "You just caused a server crash: %1$s", this.getMessageText(tickPhase)),
 				TextFormatting.RED, TextFormatting.ITALIC
 		);
 

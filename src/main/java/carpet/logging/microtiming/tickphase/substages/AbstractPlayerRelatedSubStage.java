@@ -1,5 +1,6 @@
 package carpet.logging.microtiming.tickphase.substages;
 
+import carpet.logging.microtiming.MicroTimingLoggerManager;
 import carpet.utils.Messenger;
 import carpet.utils.TextUtil;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -19,7 +20,7 @@ public abstract class AbstractPlayerRelatedSubStage extends AbstractSubStage
 	public ITextComponent toText()
 	{
 		return Messenger.c(
-				Messenger.s(tr("Player")),
+				Messenger.s(MicroTimingLoggerManager.tr("Player")),
 				String.format("w : %s", this.player.getGameProfile().getName())
 		);
 	}

@@ -95,7 +95,7 @@
 +            Optional<UpdateSuppressionException> use = UpdateSuppressionException.extractInCauses(throwable);
 +            if (CarpetSettings.yeetUpdateSuppressionCrash && use.isPresent())
 +            {
-+                UpdateSuppressionException.report(use.get());
++                use.get().report(null);
 +                LOGGER.error("Update Suppression in player tick", throwable);
 +            }
 +            else

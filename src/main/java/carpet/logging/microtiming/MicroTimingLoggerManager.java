@@ -375,6 +375,7 @@ public class MicroTimingLoggerManager
     {
         return getInstance().offWorldTickPhase;
     }
+
     /*
      * ----------------
      *   Marker Logic

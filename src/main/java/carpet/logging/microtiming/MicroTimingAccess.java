@@ -4,6 +4,8 @@ import carpet.logging.microtiming.tickphase.TickPhase;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 
+import javax.annotation.Nullable;
+
 public class MicroTimingAccess
 {
 	public static TickPhase getTickPhase(WorldServer world)
@@ -11,7 +13,7 @@ public class MicroTimingAccess
 		return world.getMicroTickLogger().getTickPhase();
 	}
 
-	public static TickPhase getTickPhase(World world)
+	public static TickPhase getTickPhase(@Nullable World world)
 	{
 		return world instanceof WorldServer ? getTickPhase((WorldServer)world) : getTickPhase();
 	}

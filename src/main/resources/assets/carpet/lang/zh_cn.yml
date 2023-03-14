@@ -361,6 +361,7 @@ rule:
     extra:
       '0': 警告：更新抑制后可能会发生未知的游戏表现。为了安全起见，建议尽早重启服务器或备份存档
     exception_detail: '在%2$s阶段触发于%1$s的更新抑制'
+    exception_detail_simple: '触发于%1$s的更新抑制'
     report_message: '你刚刚造成了服务端崩溃: %1$s'
 
 logger:
