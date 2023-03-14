@@ -4,6 +4,7 @@ import carpet.commands.*;
 import carpet.commands.lifetime.LifeTimeCommand;
 import carpet.commands.lifetime.LifeTimeTracker;
 import carpet.helpers.TickSpeed;
+import carpet.helpers.UpdateSuppressionException;
 import carpet.logging.LoggerRegistry;
 import carpet.logging.microtiming.MicroTimingLoggerManager;
 import carpet.logging.microtiming.marker.MicroTimingMarkerManager;
@@ -44,6 +45,7 @@ public class CarpetServer // static for now - easier to handle all around the co
     {
         CarpetServer.minecraft_server = server;
         McpMapping.init();
+        UpdateSuppressionException.noop();
     }
 
     public static void onServerLoaded(MinecraftServer server)

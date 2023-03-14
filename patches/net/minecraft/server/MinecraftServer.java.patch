@@ -293,7 +293,7 @@
  
          for (WorldServer worldserver : this.getWorlds())
          {
-@@ -870,26 +984,52 @@
+@@ -870,26 +984,66 @@
  
                  this.profiler.startSection("tick");
  
@@ -304,19 +304,26 @@
                  }
                  catch (Throwable throwable1)
                  {
++                    // TISCM deobfuscateCrashReportStackTrace
 +                    if (CarpetSettings.deobfuscateCrashReportStackTrace)
 +                    {
 +                        StackTraceDeobfuscator.deobfuscateThrowableStackTrace(throwable1);
 +                    }
++
                      CrashReport crashreport = CrashReport.makeCrashReport(throwable1, "Exception ticking world");
                      worldserver.fillCrashReport(crashreport);
 -                    throw new ReportedException(crashreport);
++
++                    // TISCM yeetUpdateSuppressionCrash
 +                    Optional<UpdateSuppressionException> use = UpdateSuppressionException.extractInCauses(throwable1);
-+                    if (CarpetSettings.yeetUpdateSuppressionCrash && use.isPresent()) {
-+                        Messenger.print_server_message(this, "You just caused a server crash in world tick: " + use.get());
++                    if (CarpetSettings.yeetUpdateSuppressionCrash && use.isPresent())
++                    {
++                        UpdateSuppressionException.report(use.get());
 +                        LOGGER.error("Update Suppression in world tick", throwable1);
 +                    }
-+                    else {
++                    else
++                    {
++                        // vanilla
 +                        throw new ReportedException(crashreport);
 +                    }
                  }
@@ -330,25 +337,32 @@
                  }
                  catch (Throwable throwable)
                  {
++                    // TISCM deobfuscateCrashReportStackTrace
 +                    if (CarpetSettings.deobfuscateCrashReportStackTrace)
 +                    {
 +                        StackTraceDeobfuscator.deobfuscateThrowableStackTrace(throwable);
 +                    }
++
                      CrashReport crashreport1 = CrashReport.makeCrashReport(throwable, "Exception ticking world entities");
                      worldserver.fillCrashReport(crashreport1);
 -                    throw new ReportedException(crashreport1);
++
++                    // TISCM yeetUpdateSuppressionCrash
 +                    Optional<UpdateSuppressionException> use = UpdateSuppressionException.extractInCauses(throwable);
-+                    if (CarpetSettings.yeetUpdateSuppressionCrash && use.isPresent()) {
-+                        Messenger.print_server_message(this, "You just caused a server crash in update entities: " + use.get());
++                    if (CarpetSettings.yeetUpdateSuppressionCrash && use.isPresent())
++                    {
++                        UpdateSuppressionException.report(use.get());
 +                        LOGGER.error("Update Suppression in world tick", throwable);
 +                    }
-+                    else {
++                    else
++                    {
++                        // vanilla
 +                        throw new ReportedException(crashreport1);
 +                    }
                  }
  
                  this.profiler.endSection();
-@@ -905,10 +1045,16 @@
+@@ -905,10 +1059,16 @@
              }))[this.tickCounter % 100] = Util.nanoTime() - i;
          }
  
@@ -365,7 +379,7 @@
          this.profiler.endStartSection("tickables");
  
          for (int j = 0; j < this.tickables.size(); ++j)
-@@ -917,6 +1063,8 @@
+@@ -917,6 +1077,8 @@
          }
  
          this.profiler.endSection();
@@ -374,7 +388,7 @@
      }
  
      public boolean getAllowNether()
-@@ -929,6 +1077,12 @@
+@@ -929,6 +1091,12 @@
          this.tickables.add(tickable);
      }
  
@@ -387,7 +401,7 @@
      public static void main(String[] p_main_0_)
      {
          Bootstrap.register();
-@@ -1004,6 +1158,11 @@
+@@ -1004,6 +1172,11 @@
                  }
              }
  
@@ -399,7 +413,7 @@
              YggdrasilAuthenticationService yggdrasilauthenticationservice = new YggdrasilAuthenticationService(Proxy.NO_PROXY, UUID.randomUUID().toString());
              MinecraftSessionService minecraftsessionservice = yggdrasilauthenticationservice.createMinecraftSessionService();
              GameProfileRepository gameprofilerepository = yggdrasilauthenticationservice.createProfileRepository();
-@@ -1142,7 +1301,8 @@
+@@ -1142,7 +1315,8 @@
  
      public String getServerModName()
      {
@@ -409,7 +423,7 @@
      }
  
      public CrashReport addServerInfoToCrashReport(CrashReport report)
-@@ -1605,6 +1765,12 @@
+@@ -1605,6 +1779,12 @@
      {
          return this.serverTime;
      }
@@ -422,7 +436,7 @@
  
      public Thread getServerThread()
      {
-@@ -1639,6 +1805,7 @@
+@@ -1639,6 +1819,7 @@
          }
          else
          {
@@ -430,7 +444,7 @@
              this.getPlayerList().saveAllPlayerData();
              this.resourcePacks.reloadPacksFromFinders();
              this.loadDataPacks(this.getWorld(DimensionType.OVERWORLD).getWorldInfo());
-@@ -1825,4 +1992,28 @@
+@@ -1825,4 +2006,28 @@
              return 0;
          }
      }
