@@ -1,8 +1,9 @@
 --- a/net/minecraft/block/BlockNote.java
 +++ b/net/minecraft/block/BlockNote.java
-@@ -1,7 +1,10 @@
+@@ -1,7 +1,11 @@
  package net.minecraft.block;
  
++import carpet.logging.LoggerRegistry;
 +import carpet.logging.threadstone.ThreadstoneLogger;
 +import carpet.settings.CarpetSettings;
  import net.minecraft.block.state.IBlockState;
@@ -11,7 +12,7 @@
  import net.minecraft.init.Particles;
  import net.minecraft.item.BlockItemUseContext;
  import net.minecraft.state.BooleanProperty;
-@@ -11,14 +14,18 @@
+@@ -11,14 +15,18 @@
  import net.minecraft.state.properties.BlockStateProperties;
  import net.minecraft.state.properties.NoteBlockInstrument;
  import net.minecraft.stats.StatList;
@@ -31,7 +32,7 @@
  {
      public static final EnumProperty<NoteBlockInstrument> INSTRUMENT = BlockStateProperties.NOTE_BLOCK_INSTRUMENT;
      public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
-@@ -44,8 +51,21 @@
+@@ -44,8 +52,21 @@
      {
          boolean flag = worldIn.isBlockPowered(pos);
  
@@ -53,7 +54,7 @@
              if (flag)
              {
                  this.triggerNote(worldIn, pos);
-@@ -55,6 +75,54 @@
+@@ -55,6 +76,57 @@
          }
      }
  
@@ -72,7 +73,10 @@
 +        {
 +            HttpUtil.DOWNLOADER_EXECUTOR.submit(() -> {
 +                // IBlockState#updateNeighbors = PP update
-+                ThreadstoneLogger.getInstance().onNoteBlockDebugThreadStarted();
++                if (CarpetSettings.threadstoneLogger && LoggerRegistry.__threadstone)
++                {
++                    ThreadstoneLogger.getInstance().onNoteBlockDebugThreadStarted();
++                }
 +                try
 +                {
 +                    this.getDefaultState().updateNeighbors(worldIn, pos, 2);
@@ -108,7 +112,7 @@
      private void triggerNote(World worldIn, BlockPos pos)
      {
          if (worldIn.getBlockState(pos.up()).isAir())
-@@ -101,4 +169,16 @@
+@@ -101,4 +173,16 @@
      {
          builder.add(INSTRUMENT, POWERED, NOTE);
      }
