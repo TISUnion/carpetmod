@@ -562,7 +562,7 @@ logger:
         .: 可视化投掷物记录器：可视化规则未启用
         hint: 点击以启用
   instantfall:
-    flag_changed: 瞬时落沙 flag 已切换为 %s
+    flag_changed: 瞬时落沙flag已切换为%s
 
 raid_invalidate_reason:
   difficulty_peaceful: 难度被设为和平
