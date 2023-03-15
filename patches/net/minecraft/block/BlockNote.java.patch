@@ -54,7 +54,7 @@
              if (flag)
              {
                  this.triggerNote(worldIn, pos);
-@@ -55,6 +76,57 @@
+@@ -55,6 +76,60 @@
          }
      }
  
@@ -83,7 +83,10 @@
 +                }
 +                catch (Throwable throwable)
 +                {
-+                    ThreadstoneLogger.getInstance().onExceptionallyEndedAsyncThread(throwable);
++                    if (CarpetSettings.threadstoneLogger && LoggerRegistry.__threadstone)
++                    {
++                        ThreadstoneLogger.getInstance().onExceptionallyEndedAsyncThread(throwable);
++                    }
 +                }
 +            });
 +        }
@@ -112,7 +115,7 @@
      private void triggerNote(World worldIn, BlockPos pos)
      {
          if (worldIn.getBlockState(pos.up()).isAir())
-@@ -101,4 +173,16 @@
+@@ -101,4 +176,16 @@
      {
          builder.add(INSTRUMENT, POWERED, NOTE);
      }

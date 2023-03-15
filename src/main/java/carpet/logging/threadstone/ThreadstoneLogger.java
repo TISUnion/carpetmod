@@ -72,6 +72,10 @@ public class ThreadstoneLogger extends AbstractHUDLogger {
         this.logText(Messenger.format(formatter, args));
     }
 
+    // ============================= hooks =============================
+    // all hooks should be checked using CarpetSettings.threadstoneLogger && LoggerRegistry.__threadstone
+    // to ensure that they only get triggered when necessary
+
     public void onExceptionallyEndedAsyncThread(Throwable throwable) {
         this.logFormat("Exception occurred: %s", throwable);
     }
