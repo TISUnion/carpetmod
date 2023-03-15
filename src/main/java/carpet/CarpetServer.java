@@ -10,6 +10,7 @@ import carpet.logging.microtiming.MicroTimingLoggerManager;
 import carpet.logging.microtiming.marker.MicroTimingMarkerManager;
 import carpet.logging.microtiming.utils.MicroTimingStandardCarpetLogger;
 import carpet.logging.phantom.PhantomLogger;
+import carpet.logging.instantfall.InstantFallFlagWatcher;
 import carpet.network.CarpetServerNetworkHandler;
 import carpet.network.tiscm.TISCMServerPacketHandler;
 import carpet.script.CarpetScriptServer;
@@ -81,6 +82,7 @@ public class CarpetServer // static for now - easier to handle all around the co
 
         MicroTimingMarkerManager.getInstance().tick();
         PhantomLogger.getInstance().tick();
+        InstantFallFlagWatcher.getInstance().tick();
     }
 
     public static void registerCarpetCommands(CommandDispatcher<CommandSource> dispatcher)

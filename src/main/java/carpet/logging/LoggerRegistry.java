@@ -1,6 +1,7 @@
 package carpet.logging;
 
 import carpet.logging.commandblock.CommandBlockLogger;
+import carpet.logging.instantfall.InstantFallLogger;
 import carpet.logging.lifetime.LifeTimeHUDLogger;
 import carpet.logging.microtiming.utils.MicroTimingStandardCarpetLogger;
 import carpet.logging.phantom.PhantomLogger;
@@ -46,6 +47,7 @@ public class LoggerRegistry
     public static boolean __savestate;
     public static boolean __phantom;
     public static boolean __threadstone;
+    public static boolean __instantfall;
 
     public static void initLoggers()
     {
@@ -74,6 +76,7 @@ public class LoggerRegistry
         registerLogger("savestate", new Logger("savestate",null, null));
         registerLogger("phantom", PhantomLogger.getInstance().createCarpetLogger());
         registerLogger(ThreadstoneLogger.NAME, ThreadstoneLogger.getInstance().createCarpetLogger());
+        registerLogger(InstantFallLogger.NAME, InstantFallLogger.getInstance().createCarpetLogger());
     }
 
     /**
