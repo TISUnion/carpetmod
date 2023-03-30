@@ -1,14 +1,15 @@
 --- a/net/minecraft/entity/item/EntityFallingBlock.java
 +++ b/net/minecraft/entity/item/EntityFallingBlock.java
-@@ -1,5 +1,7 @@
+@@ -1,5 +1,8 @@
  package net.minecraft.entity.item;
  
 +import carpet.logging.LoggerRegistry;
 +import carpet.logging.logHelpers.TrajectoryLogHelper;
++import carpet.settings.CarpetSettings;
  import com.google.common.collect.Lists;
  import java.util.List;
  import net.minecraft.block.Block;
-@@ -44,6 +46,20 @@
+@@ -44,6 +47,20 @@
      public NBTTagCompound tileEntityData;
      protected static final DataParameter<BlockPos> ORIGIN = EntityDataManager.createKey(EntityFallingBlock.class, DataSerializers.BLOCK_POS);
  
@@ -29,7 +30,7 @@
      public EntityFallingBlock(World worldIn)
      {
          super(EntityType.FALLING_BLOCK, worldIn);
-@@ -63,6 +79,9 @@
+@@ -63,6 +80,9 @@
          this.prevPosY = y;
          this.prevPosZ = z;
          this.setOrigin(new BlockPos(this));
@@ -39,7 +40,7 @@
      }
  
      public boolean canBeAttackedWithItem()
-@@ -98,6 +117,11 @@
+@@ -98,6 +118,11 @@
  
      public void tick()
      {
@@ -51,3 +52,12 @@
          if (this.fallTile.isAir())
          {
              this.remove();
+@@ -117,7 +142,7 @@
+                 {
+                     this.world.removeBlock(blockpos);
+                 }
+-                else if (!this.world.isRemote)
++                else if (!this.world.isRemote && !CarpetSettings.yeetFallingBlockSuicide) // TISCM
+                 {
+                     this.remove();
+                     return;

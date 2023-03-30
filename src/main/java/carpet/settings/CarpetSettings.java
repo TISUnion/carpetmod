@@ -803,6 +803,13 @@ public class CarpetSettings
     )
     public static boolean debugNoteBlocks = false;
 
+    @Rule(
+            desc = "When a falling block executes its tile tick code, it will check the given amount of times " +
+                    "for a possible falling block swap. Set to <= 0 to disable. Hardcoded to be capped at 1 << 20. ",
+            category = {EXPERIMENTAL}
+    )
+    public static int fallingBlockSwapAttempts = 0;
+
     /*
     @Rule(
             desc = "If a beacon receives an NC update when a purpur block is adjacent, " +
@@ -1358,6 +1365,23 @@ public class CarpetSettings
             category = YEET
     )
     public static boolean yeetUpdateSuppressionCrash;
+
+    @Rule(
+            desc = "yeet the mechanic of a falling block removing itself when not in the same block its created \n" +
+                    "as on its first tick as an entity. Can be used in conjunction with fallingBlockSwapAttempts \n" +
+                    "for falling block swap PoCs. ",
+            category = YEET
+    )
+    public static boolean yeetFallingBlockSuicide = false;
+
+    @Rule(
+            desc = "Don't let Fallen find this <3 \n" +
+                    "I might use this flag for debugging purposes, so that if I want to add a wild debug feature, \n" +
+                    "then I can turn this off to enable that. Most of these code won't make it to the commits, \n" +
+                    "so it is intended that this flag is unused. - Void",
+            category = FEATURE
+    )
+    public static boolean isNellaforaxCute = true;
 
     //////////////////////////////////
     //  TISCM bundled mod switches  //
