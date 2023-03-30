@@ -116,6 +116,7 @@ public class CarpetServer // static for now - easier to handle all around the co
         ClusterCommand.getInstance().registerCommand(dispatcher);
         PaletteCommand.getInstance().registerCommand(dispatcher);
         ThreadstoneCommand.getInstance().registerCommand(dispatcher);
+        TouchCommand.getInstance().registerCommand(dispatcher);
     }
 
     public static void disconnect()

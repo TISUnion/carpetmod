@@ -810,6 +810,13 @@ public class CarpetSettings
     )
     public static int fallingBlockSwapAttempts = 0;
 
+    @Rule(
+            desc = "An impulse command block executes its command instantly on an async thread when \n" +
+                    "a purpur block is underneath. Requires instantCommandBlock to function. ",
+            category = EXPERIMENTAL
+    )
+    public static boolean asyncCommandBlock = false;
+
     /*
     @Rule(
             desc = "If a beacon receives an NC update when a purpur block is adjacent, " +

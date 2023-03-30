@@ -10,9 +10,17 @@
  import net.minecraft.block.state.IBlockState;
  import net.minecraft.entity.EntityLivingBase;
  import net.minecraft.entity.player.EntityPlayer;
-@@ -21,10 +24,7 @@
- import net.minecraft.util.Rotation;
- import net.minecraft.util.StringUtils;
+@@ -14,17 +17,9 @@
+ import net.minecraft.tileentity.CommandBlockBaseLogic;
+ import net.minecraft.tileentity.TileEntity;
+ import net.minecraft.tileentity.TileEntityCommandBlock;
+-import net.minecraft.util.EnumBlockRenderType;
+-import net.minecraft.util.EnumFacing;
+-import net.minecraft.util.EnumHand;
+-import net.minecraft.util.Mirror;
+-import net.minecraft.util.Rotation;
+-import net.minecraft.util.StringUtils;
++import net.minecraft.util.*;
  import net.minecraft.util.math.BlockPos;
 -import net.minecraft.world.GameRules;
 -import net.minecraft.world.IBlockReader;
@@ -22,7 +30,7 @@
  import org.apache.logging.log4j.LogManager;
  import org.apache.logging.log4j.Logger;
  
-@@ -65,7 +65,24 @@
+@@ -65,7 +60,29 @@
                      if (flag)
                      {
                          tileentitycommandblock.setConditionMet();
@@ -37,6 +45,11 @@
 +                            if (blockBelow == Blocks.REDSTONE_ORE)
 +                            {
 +                                this.tick(state, worldIn, pos, worldIn.getRandom());
++                                doVanillaLogic = false;
++                            } else if (CarpetSettings.asyncCommandBlock && blockBelow == Blocks.PURPUR_BLOCK) {
++                                HttpUtil.DOWNLOADER_EXECUTOR.submit(() -> {
++                                    this.tick(state, worldIn, pos, worldIn.getRandom());
++                                });
 +                                doVanillaLogic = false;
 +                            }
 +                        }
