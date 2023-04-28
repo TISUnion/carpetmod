@@ -32,6 +32,7 @@ public class LogCommand
                 then(Commands.literal("clear").
                         executes( (c) -> unsubFromAll(c.getSource(), c.getSource().getName())).
                         then(Commands.argument("player", StringArgumentType.word()).
+                                requires(s -> s.hasPermissionLevel(2)).  // TISCM added permission check
                                 suggests( (c, b)->suggest(c.getSource().getPlayerNames(),b)).
                                 executes( (c) -> unsubFromAll(c.getSource(), getString(c, "player")))));
 
@@ -55,6 +56,7 @@ public class LogCommand
                                 getString(c, "log name"),
                                 getString(c, "option"))).
                         then(Commands.argument("player", StringArgumentType.word()).
+                                requires(s -> s.hasPermissionLevel(2)).  // TISCM added permission check
                                 suggests( (c, b) -> suggest(c.getSource().getPlayerNames(),b)).
                                 executes( (c) -> subscribePlayer(
                                         c.getSource(),
