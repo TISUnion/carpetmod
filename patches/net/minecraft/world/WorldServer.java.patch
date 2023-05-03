@@ -1,16 +1,18 @@
 --- a/net/minecraft/world/WorldServer.java
 +++ b/net/minecraft/world/WorldServer.java
-@@ -1,8 +1,20 @@
+@@ -1,8 +1,22 @@
  package net.minecraft.world;
  
 +import carpet.commands.lifetime.LifeTimeWorldTracker;
 +import carpet.helpers.TickSpeed;
++import carpet.logging.LoggerRegistry;
 +import carpet.logging.microtiming.MicroTimingLogger;
 +import carpet.logging.microtiming.MicroTimingLoggerManager;
 +import carpet.logging.microtiming.enums.EventType;
 +import carpet.logging.microtiming.enums.TickStage;
 +import carpet.logging.microtiming.events.ExecuteBlockEventEvent;
 +import carpet.logging.microtiming.tickphase.substages.BlockEventSubStage;
++import carpet.logging.playerCheckLight.PlayerCheckLightLogger;
 +import carpet.settings.CarpetSettings;
 +import carpet.utils.CarpetProfiler;
 +import carpet.utils.TISCMConfig;
@@ -21,7 +23,7 @@
  import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
  import java.util.Iterator;
  import java.util.List;
-@@ -14,6 +26,9 @@
+@@ -14,6 +28,9 @@
  import java.util.stream.Stream;
  import javax.annotation.Nonnull;
  import javax.annotation.Nullable;
@@ -31,7 +33,7 @@
  import net.minecraft.block.Block;
  import net.minecraft.block.BlockEventData;
  import net.minecraft.block.state.IBlockState;
-@@ -52,6 +67,7 @@
+@@ -52,6 +69,7 @@
  import net.minecraft.server.management.PlayerChunkMap;
  import net.minecraft.tags.BlockTags;
  import net.minecraft.tags.NetworkTagManager;
@@ -39,7 +41,7 @@
  import net.minecraft.util.DamageSource;
  import net.minecraft.util.IProgressUpdate;
  import net.minecraft.util.IThreadListener;
-@@ -83,31 +99,58 @@
+@@ -83,31 +101,58 @@
  import net.minecraft.world.storage.WorldSavedDataStorage;
  import net.minecraftforge.api.distmarker.Dist;
  import net.minecraftforge.api.distmarker.OnlyIn;
@@ -108,7 +110,7 @@
      private boolean insideTick;
  
      public WorldServer(MinecraftServer server, ISaveHandler p_i49819_2_, WorldSavedDataStorage p_i49819_3_, WorldInfo p_i49819_4_, DimensionType p_i49819_5_, Profiler p_i49819_6_)
-@@ -122,13 +165,39 @@
+@@ -122,13 +167,39 @@
          this.calculateInitialSkylight();
          this.calculateInitialWeather();
          this.getWorldBorder().setSize(server.getMaxWorldSize());
@@ -149,7 +151,7 @@
          if (villagecollection == null)
          {
              this.villageCollection = new VillageCollection(this);
-@@ -140,7 +209,9 @@
+@@ -140,7 +211,9 @@
              this.villageCollection.setWorld(this);
          }
  
@@ -160,7 +162,7 @@
  
          if (scoreboardsavedata == null)
          {
-@@ -170,6 +241,8 @@
+@@ -170,6 +243,8 @@
  
      public void tick(BooleanSupplier hasTimeLeft)
      {
@@ -169,7 +171,7 @@
          this.insideTick = true;
          super.tick(hasTimeLeft);
  
-@@ -191,15 +264,32 @@
+@@ -191,15 +266,32 @@
              this.wakeAllPlayers();
          }
  
@@ -207,7 +209,7 @@
          this.chunkProvider.tick(hasTimeLeft);
          int j = this.calculateSkylightSubtracted(1.0F);
  
-@@ -208,26 +298,85 @@
+@@ -208,26 +300,85 @@
              this.setSkylightSubtracted(j);
          }
  
@@ -300,7 +302,7 @@
          this.insideTick = false;
      }
  
-@@ -270,7 +419,7 @@
+@@ -270,7 +421,7 @@
                  }
              }
  
@@ -309,7 +311,7 @@
          }
      }
  
-@@ -281,6 +430,7 @@
+@@ -281,6 +432,7 @@
  
      protected void wakeAllPlayers()
      {
@@ -317,7 +319,7 @@
          this.allPlayersSleeping = false;
  
          for (EntityPlayer entityplayer : this.playerEntities.stream().filter(EntityPlayer::isPlayerSleeping).collect(Collectors.toList()))
-@@ -292,6 +442,7 @@
+@@ -292,6 +444,7 @@
          {
              this.resetRainAndThunder();
          }
@@ -325,7 +327,7 @@
      }
  
      private void resetRainAndThunder()
-@@ -306,6 +457,13 @@
+@@ -306,6 +459,13 @@
      {
          if (this.allPlayersSleeping && !this.isRemote)
          {
@@ -339,7 +341,7 @@
              for (EntityPlayer entityplayer : this.playerEntities)
              {
                  if (!entityplayer.isSpectator() && !entityplayer.isPlayerFullyAsleep())
-@@ -362,6 +520,12 @@
+@@ -362,6 +522,12 @@
  
      protected void playerCheckLight()
      {
@@ -352,7 +354,41 @@
          this.profiler.startSection("playerCheckLight");
  
          if (!this.playerEntities.isEmpty())
-@@ -397,9 +561,12 @@
+@@ -371,7 +537,32 @@
+             int j = MathHelper.floor(entityplayer.posX) + this.rand.nextInt(11) - 5;
+             int k = MathHelper.floor(entityplayer.posY) + this.rand.nextInt(11) - 5;
+             int l = MathHelper.floor(entityplayer.posZ) + this.rand.nextInt(11) - 5;
+-            this.checkLight(new BlockPos(j, k, l));
++
++            // TISCM playerCheckLight logger
++            BlockPos blockPos = new BlockPos(j, k, l);
++            int oldSkyLight = -1, oldBlockLight = -1;
++            if (LoggerRegistry.__playerCheckLight)
++            {
++                oldSkyLight = this.getLightFor(EnumLightType.SKY, blockPos);
++                oldBlockLight = this.getLightFor(EnumLightType.BLOCK, blockPos);
++            }
++
++            this.checkLight(blockPos);
++
++            // TISCM playerCheckLight logger
++            if (LoggerRegistry.__playerCheckLight && oldSkyLight != -1 && oldBlockLight != -1)
++            {
++                int newSkyLight = this.getLightFor(EnumLightType.SKY, blockPos);
++                int newBlockLight = this.getLightFor(EnumLightType.BLOCK, blockPos);
++                if (newSkyLight != oldSkyLight)
++                {
++                    PlayerCheckLightLogger.getInstance().onLightChanged(this, blockPos, entityplayer, EnumLightType.SKY, oldSkyLight, newSkyLight);
++                }
++                if (newBlockLight != oldBlockLight)
++                {
++                    PlayerCheckLightLogger.getInstance().onLightChanged(this, blockPos, entityplayer, EnumLightType.BLOCK, oldBlockLight, newBlockLight);
++                }
++            }
+         }
+ 
+         this.profiler.endSection();
+@@ -397,9 +588,12 @@
              boolean flag1 = this.isThundering();
              this.profiler.startSection("pollingChunks");
  
@@ -365,7 +401,7 @@
                  Chunk chunk = iterator.next();
                  int j = chunk.x * 16;
                  int k = chunk.z * 16;
-@@ -407,7 +574,21 @@
+@@ -407,7 +601,21 @@
                  chunk.enqueueRelightChecks();
                  this.profiler.endStartSection("tickChunk");
                  chunk.tick(false);
@@ -387,7 +423,7 @@
  
                  if (flag && flag1 && this.rand.nextInt(100000) == 0)
                  {
-@@ -434,6 +615,8 @@
+@@ -434,6 +642,8 @@
                  }
  
                  this.profiler.endStartSection("iceandsnow");
@@ -396,7 +432,7 @@
  
                  if (this.rand.nextInt(16) == 0)
                  {
-@@ -460,6 +643,8 @@
+@@ -460,6 +670,8 @@
                  }
  
                  this.profiler.endStartSection("tickBlocks");
@@ -405,7 +441,7 @@
  
                  if (i > 0)
                  {
-@@ -493,13 +678,25 @@
+@@ -493,13 +705,25 @@
                          }
                      }
                  }
@@ -432,7 +468,7 @@
      {
          BlockPos blockpos = this.getHeight(Heightmap.Type.MOTION_BLOCKING, pos);
          AxisAlignedBB axisalignedbb = (new AxisAlignedBB(blockpos, new BlockPos(blockpos.getX(), this.getHeight(), blockpos.getZ()))).grow(3.0D);
-@@ -543,6 +740,7 @@
+@@ -543,6 +767,7 @@
  
      protected void tickPlayers()
      {
@@ -440,7 +476,7 @@
          super.tickPlayers();
          this.profiler.endStartSection("players");
  
-@@ -597,6 +795,7 @@
+@@ -597,6 +822,7 @@
  
              this.profiler.endSection();
          }
@@ -448,7 +484,7 @@
      }
  
      public void resetUpdateEntityTick()
-@@ -608,8 +807,11 @@
+@@ -608,8 +834,11 @@
      {
          if (this.worldInfo.getGenerator() != WorldType.DEBUG_ALL_BLOCK_STATES)
          {
@@ -460,7 +496,7 @@
          }
      }
  
-@@ -619,18 +821,32 @@
+@@ -619,18 +848,32 @@
  
          if (ifluidstate.getFluid() == fluidTickEntry.getTarget())
          {
@@ -493,7 +529,7 @@
      }
  
      public void tickEntity(Entity entityIn, boolean forceUpdate)
-@@ -1010,7 +1226,7 @@
+@@ -1010,7 +1253,7 @@
  
          for (EntityPlayer entityplayer : this.playerEntities)
          {
@@ -502,7 +538,7 @@
              {
                  ((EntityPlayerMP)entityplayer).connection.sendPacket(new SPacketExplosion(x, y, z, strength, explosion.getAffectedBlockPositions(), explosion.getPlayerKnockbackMap().get(entityplayer)));
              }
-@@ -1021,26 +1237,60 @@
+@@ -1021,26 +1264,60 @@
  
      public void addBlockEvent(BlockPos pos, Block blockIn, int eventID, int eventParam)
      {
@@ -566,7 +602,7 @@
      }
  
      public void close()
-@@ -1194,4 +1444,54 @@
+@@ -1194,4 +1471,54 @@
      {
          return this.server.getNetworkTagManager();
      }
