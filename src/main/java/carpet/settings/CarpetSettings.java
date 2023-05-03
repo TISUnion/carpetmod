@@ -844,6 +844,12 @@ public class CarpetSettings
     )
     public static boolean threadstoneLogger = false;
 
+    @Rule(
+            desc = "Disable random light checks nearby players",
+            category = CREATIVE
+    )
+    public static boolean playerCheckLightDisabled = false;
+
 
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$

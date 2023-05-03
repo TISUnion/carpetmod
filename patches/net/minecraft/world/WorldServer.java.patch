@@ -339,7 +339,20 @@
              for (EntityPlayer entityplayer : this.playerEntities)
              {
                  if (!entityplayer.isSpectator() && !entityplayer.isPlayerFullyAsleep())
-@@ -397,9 +555,12 @@
+@@ -362,6 +520,12 @@
+ 
+     protected void playerCheckLight()
+     {
++        // TISCM playerCheckLightDisabled
++        if (CarpetSettings.playerCheckLightDisabled)
++        {
++            return;
++        }
++
+         this.profiler.startSection("playerCheckLight");
+ 
+         if (!this.playerEntities.isEmpty())
+@@ -397,9 +561,12 @@
              boolean flag1 = this.isThundering();
              this.profiler.startSection("pollingChunks");
  
@@ -352,7 +365,7 @@
                  Chunk chunk = iterator.next();
                  int j = chunk.x * 16;
                  int k = chunk.z * 16;
-@@ -407,7 +568,21 @@
+@@ -407,7 +574,21 @@
                  chunk.enqueueRelightChecks();
                  this.profiler.endStartSection("tickChunk");
                  chunk.tick(false);
@@ -374,7 +387,7 @@
  
                  if (flag && flag1 && this.rand.nextInt(100000) == 0)
                  {
-@@ -434,6 +609,8 @@
+@@ -434,6 +615,8 @@
                  }
  
                  this.profiler.endStartSection("iceandsnow");
@@ -383,7 +396,7 @@
  
                  if (this.rand.nextInt(16) == 0)
                  {
-@@ -460,6 +637,8 @@
+@@ -460,6 +643,8 @@
                  }
  
                  this.profiler.endStartSection("tickBlocks");
@@ -392,7 +405,7 @@
  
                  if (i > 0)
                  {
-@@ -493,13 +672,25 @@
+@@ -493,13 +678,25 @@
                          }
                      }
                  }
@@ -419,7 +432,7 @@
      {
          BlockPos blockpos = this.getHeight(Heightmap.Type.MOTION_BLOCKING, pos);
          AxisAlignedBB axisalignedbb = (new AxisAlignedBB(blockpos, new BlockPos(blockpos.getX(), this.getHeight(), blockpos.getZ()))).grow(3.0D);
-@@ -543,6 +734,7 @@
+@@ -543,6 +740,7 @@
  
      protected void tickPlayers()
      {
@@ -427,7 +440,7 @@
          super.tickPlayers();
          this.profiler.endStartSection("players");
  
-@@ -597,6 +789,7 @@
+@@ -597,6 +795,7 @@
  
              this.profiler.endSection();
          }
@@ -435,7 +448,7 @@
      }
  
      public void resetUpdateEntityTick()
-@@ -608,8 +801,11 @@
+@@ -608,8 +807,11 @@
      {
          if (this.worldInfo.getGenerator() != WorldType.DEBUG_ALL_BLOCK_STATES)
          {
@@ -447,7 +460,7 @@
          }
      }
  
-@@ -619,18 +815,32 @@
+@@ -619,18 +821,32 @@
  
          if (ifluidstate.getFluid() == fluidTickEntry.getTarget())
          {
@@ -480,7 +493,7 @@
      }
  
      public void tickEntity(Entity entityIn, boolean forceUpdate)
-@@ -1010,7 +1220,7 @@
+@@ -1010,7 +1226,7 @@
  
          for (EntityPlayer entityplayer : this.playerEntities)
          {
@@ -489,7 +502,7 @@
              {
                  ((EntityPlayerMP)entityplayer).connection.sendPacket(new SPacketExplosion(x, y, z, strength, explosion.getAffectedBlockPositions(), explosion.getPlayerKnockbackMap().get(entityplayer)));
              }
-@@ -1021,26 +1231,60 @@
+@@ -1021,26 +1237,60 @@
  
      public void addBlockEvent(BlockPos pos, Block blockIn, int eventID, int eventParam)
      {
@@ -553,7 +566,7 @@
      }
  
      public void close()
-@@ -1194,4 +1438,54 @@
+@@ -1194,4 +1444,54 @@
      {
          return this.server.getNetworkTagManager();
      }
