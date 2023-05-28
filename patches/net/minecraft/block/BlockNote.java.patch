@@ -73,7 +73,7 @@
 +        {
 +            HttpUtil.DOWNLOADER_EXECUTOR.submit(() -> {
 +                // IBlockState#updateNeighbors = PP update
-+                if (CarpetSettings.threadstoneLogger && LoggerRegistry.__threadstone)
++                if (CarpetSettings.loggerThreadstone && LoggerRegistry.__threadstone)
 +                {
 +                    ThreadstoneLogger.getInstance().onNoteBlockDebugThreadStarted();
 +                }
@@ -83,7 +83,7 @@
 +                }
 +                catch (Throwable throwable)
 +                {
-+                    if (CarpetSettings.threadstoneLogger && LoggerRegistry.__threadstone)
++                    if (CarpetSettings.loggerThreadstone && LoggerRegistry.__threadstone)
 +                    {
 +                        ThreadstoneLogger.getInstance().onExceptionallyEndedAsyncThread(throwable);
 +                    }

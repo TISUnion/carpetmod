@@ -15,7 +15,7 @@
          HttpUtil.DOWNLOADER_EXECUTOR.submit(() ->
          {
 +            // TISCM threadstone logger logs beacons
-+            boolean logBeacons = CarpetSettings.threadstoneLogger && LoggerRegistry.__threadstone;
++            boolean logBeacons = CarpetSettings.loggerThreadstone && LoggerRegistry.__threadstone;
 +            long startNano = logBeacons ? System.nanoTime() : 0;
 +
 +            // TISCM threadstone logger add try

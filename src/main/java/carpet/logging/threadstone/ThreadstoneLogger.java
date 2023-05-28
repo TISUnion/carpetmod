@@ -36,7 +36,7 @@ public class ThreadstoneLogger extends AbstractHUDLogger {
     public HUDLogger createCarpetLogger()
     {
         HUDLogger logger = super.createCarpetLogger();
-        logger.addSubscriptionValidator((p, o) -> CarpetSettings.threadstoneLogger);
+        logger.addSubscriptionValidator((p, o) -> CarpetSettings.loggerThreadstone);
         return logger;
     }
 
@@ -73,7 +73,7 @@ public class ThreadstoneLogger extends AbstractHUDLogger {
     }
 
     // ============================= hooks =============================
-    // all hooks should be checked using CarpetSettings.threadstoneLogger && LoggerRegistry.__threadstone
+    // all hooks should be checked using CarpetSettings.loggerThreadstone && LoggerRegistry.__threadstone
     // to ensure that they only get triggered when necessary
 
     public void onExceptionallyEndedAsyncThread(Throwable throwable) {

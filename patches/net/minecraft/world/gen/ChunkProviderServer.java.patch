@@ -80,7 +80,7 @@
              if (this.lastAccessed != null && this.lastAccessed.getPos().x == x && this.lastAccessed.getPos().z == z)
              {
 +                // TISCM threadstone logger
-+                if (CarpetSettings.threadstoneLogger)
++                if (CarpetSettings.loggerThreadstone)
 +                {
 +                    this.chunkLoadingCacheStatistic.onLRUHit();
 +                }
@@ -89,7 +89,7 @@
              }
  
 +            // TISCM threadstone logger
-+            if (CarpetSettings.threadstoneLogger)
++            if (CarpetSettings.loggerThreadstone)
 +            {
 +                this.chunkLoadingCacheStatistic.onLRUMissed();
 +            }
@@ -102,7 +102,7 @@
              if (load)
              {
 +                // TISCM threadstone logger
-+                if (CarpetSettings.threadstoneLogger && LoggerRegistry.__threadstone && ThreadstoneLogger.isOnGlassThread())
++                if (CarpetSettings.loggerThreadstone && LoggerRegistry.__threadstone && ThreadstoneLogger.isOnGlassThread())
 +                {
 +                    ThreadstoneLogger.getInstance().onAsyncLoadChunk(x, z);
 +                }
@@ -115,7 +115,7 @@
          else if (generate)
          {
 +            // TISCM threadstone logger
-+            if (CarpetSettings.threadstoneLogger && LoggerRegistry.__threadstone && ThreadstoneLogger.isOnGlassThread())
++            if (CarpetSettings.loggerThreadstone && LoggerRegistry.__threadstone && ThreadstoneLogger.isOnGlassThread())
 +            {
 +                ThreadstoneLogger.getInstance().onAsyncGenerateChunk(x, z);
 +            }

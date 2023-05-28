@@ -21,7 +21,7 @@
 +
 +            // threadstone logger
 +            ReportedException exception = new ReportedException(crashreport);
-+            if (CarpetSettings.threadstoneLogger && LoggerRegistry.__threadstone) {
++            if (CarpetSettings.loggerThreadstone && LoggerRegistry.__threadstone) {
 +                ThreadstoneLogger.getInstance().onConcurrentWriteCrash(exception);
 +            }
 +            throw exception;

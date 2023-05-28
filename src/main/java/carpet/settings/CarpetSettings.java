@@ -98,7 +98,7 @@ public class CarpetSettings
     @Rule(
             desc = "Enables /threadstone or /ts command for some threadstone tools",
             extra = {
-                    "See also: rule threadstoneLogger"
+                    "See also: rule loggerThreadstone"
             },
             category = COMMAND
     )
@@ -852,7 +852,7 @@ public class CarpetSettings
             },
             category = EXPERIMENTAL
     )
-    public static boolean threadstoneLogger = false;
+    public static boolean loggerThreadstone = false;
 
     @Rule(
             desc = "Switch for ghostPlayer logger",
