@@ -6,6 +6,7 @@ import carpet.settings.SettingsManager;
 import carpet.utils.*;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multiset;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -20,10 +21,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.item.EntityTNTPrimed;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.server.management.PlayerChunkMapEntry;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.ClassInheritanceMultiMap;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.IRegistry;
 import net.minecraft.util.text.ITextComponent;
@@ -82,15 +86,22 @@ public class InfoCommand
                         then(literal("container").
                                 executes((c) -> showWorldContainer(c.getSource(), false)).
                                 then(literal("detailed").
-                                        executes(c -> showWorldContainer(c.getSource(), true)))).
+                                        executes(c -> showWorldContainer(c.getSource(), true))).
+                                then(literal("player_related").
+                                        executes(c -> showWorldPlayerRelatedContainer(c.getSource())))).
                         then(literal("ticking_order").
                                 executes((c) -> showWorldTickOrder(c.getSource()))).
                         then(literal("weather").
-                                executes((c) -> showWeather(c.getSource()))));
+                                executes((c) -> showWeather(c.getSource())))).
+                then(literal("chunk").
+                        then(literal("entity_list").
+                                then(literal("current").
+                                        executes(c -> infoChunkEntityListCurrent(c.getSource()))).
+                                then(literal("all").
+                                        executes(c -> infoChunkEntityListAll(c.getSource())))));
 
         dispatcher.register(command);
     }
-
 
     private static <T, K> void showCountsInCollection(CommandSource source, Collection<T> collection, Function<T, K> keyExtractor, Function<K, ITextComponent> nameGetter)
     {
@@ -137,7 +148,7 @@ public class InfoCommand
         Messenger.m(source, Messenger.s(String.format("Player entities: %d", world.playerEntities.size())));
         if (detailed)
         {
-            world.playerEntities.forEach(player -> Messenger.m(source, "g - ", player.getName()));
+            listPlayerInContainer(source, world.loadedEntityList);
         }
 
         Messenger.m(source, Messenger.s(String.format("Weather entities: %d", world.weatherEffects.size())));
@@ -183,6 +194,75 @@ public class InfoCommand
         if (detailed)
         {
             showCountsInCollection(source, world.blockEventQueue, BlockEventData::getBlock, Messenger::block);
+        }
+
+        return 1;
+    }
+
+    private static void listPlayerInContainer(CommandSource source, Iterable<? extends Entity> container)
+    {
+        int i = 0;
+        for (Entity entity : container)
+        {
+            if (entity instanceof EntityPlayer)
+            {
+                i++;
+                Messenger.m(source, String.format("f %d. ", i), Messenger.format("%s (id %s)", entity.getName(), entity.getEntityId()));
+            }
+        }
+    }
+
+    private static int showWorldPlayerRelatedContainer(CommandSource source)
+    {
+        WorldServer world = source.getWorld();
+
+        Messenger.m(source, Messenger.s(""));
+        Messenger.m(source, "w Current World: ", Messenger.dimension(world));
+
+        Messenger.m(source, Messenger.s("Regular entities (loadedEntityList):"));
+        listPlayerInContainer(source, world.loadedEntityList);
+
+        Messenger.m(source, Messenger.s("UUID entity mapping (entitiesByUuid):"));
+        listPlayerInContainer(source, world.getEntitiesByUuid().values());
+
+        Messenger.m(source, Messenger.s("EntityId entity mapping (entitiesById):"));
+        listPlayerInContainer(source, world.getEntitiesById().extractValues());
+
+        Messenger.m(source, Messenger.s("Player entities (playerEntities):"));
+        listPlayerInContainer(source, world.playerEntities);
+
+        Messenger.m(source, Messenger.s("PlayerChunkMap:"));
+        listPlayerInContainer(source, world.getPlayerChunkMap().getPlayers());
+
+        Messenger.m(source, Messenger.s("Chunk section entity lists:"));
+        Map<Entity, List<ITextComponent>> playerSections = Maps.newLinkedHashMap();  // entity -> texts of chunk section pos
+        for (Chunk chunk : world.getChunkProvider().getLoadedChunks())
+        {
+            ClassInheritanceMultiMap<Entity>[] entityLists = chunk.getEntityLists();
+            for (int y = 0, entityListsLength = entityLists.length; y < entityListsLength; y++)
+            {
+                ClassInheritanceMultiMap<Entity> entityList = entityLists[y];
+                for (Entity entity : entityList)
+                {
+                    if (entity instanceof EntityPlayer)
+                    {
+                        playerSections.computeIfAbsent(entity, k -> Lists.newArrayList()).
+                                add(Messenger.format("[%s, %s, %s]", chunk.x, y, chunk.z));
+                    }
+                }
+            }
+        }
+        int i = 0;
+        for (Map.Entry<Entity, List<ITextComponent>> entry : playerSections.entrySet())
+        {
+            Entity entity = entry.getKey();
+            List<ITextComponent> coords = entry.getValue();
+            i++;
+            Messenger.m(
+                    source, String.format("g %d. ", i),
+                    Messenger.format("%s (id %s), ", entity.getName(), entity.getEntityId()),
+                    Messenger.hover(Messenger.format("in %s chunk sections", coords.size()), Messenger.join(Messenger.s("\n"), coords))
+            );
         }
 
         return 1;
@@ -262,6 +342,54 @@ public class InfoCommand
                     "g " + order + ". ",
                     Messenger.dimension(world)
             ));
+        }
+        return 1;
+    }
+
+    private static void printChunkEntityList(CommandSource source, Chunk chunk, boolean alwaysShowTitle)
+    {
+        ClassInheritanceMultiMap<Entity>[] entityLists = chunk.getEntityLists();
+
+        if (Arrays.stream(entityLists).anyMatch(m -> !m.isEmpty()) || alwaysShowTitle)
+        {
+            Messenger.m(source, Messenger.format("Chunk %s in %s", Messenger.coord(chunk.getPos()), Messenger.dimension(chunk.getWorld())));
+        }
+        for (int i = 0; i < entityLists.length; i++)
+        {
+            ClassInheritanceMultiMap<Entity> entities = entityLists[i];
+            if (!entities.isEmpty())
+            {
+                Messenger.m(source, Messenger.format("  Section #%s (y in [%s, %s])", i, i * 16, i * 16 + 15));
+                for (Entity entity : entities)
+                {
+                    Messenger.m(source, Messenger.format("   %s %s (id %s)", Messenger.s("-", "g"), Messenger.entity(entity), entity.getEntityId()));
+                }
+            }
+        }
+    }
+
+    private static int infoChunkEntityListCurrent(CommandSource source)
+    {
+        ChunkPos chunkPos = new ChunkPos(new BlockPos(source.getPos()));
+        if (source.getWorld().isChunkLoaded(chunkPos.x, chunkPos.z))
+        {
+            Chunk chunk = source.getWorld().getChunk(chunkPos.x, chunkPos.z);
+            printChunkEntityList(source, chunk, true);
+            return 1;
+        }
+        else
+        {
+            Messenger.m(source, Messenger.format("Chunk %s is not loaded", Messenger.coord(chunkPos)));
+            return 0;
+        }
+    }
+
+    private static int infoChunkEntityListAll(CommandSource source)
+    {
+        Messenger.m(source, Messenger.format("========= World: %s =========", Messenger.dimension(source.getWorld())));
+        for (Chunk chunk : source.getWorld().getChunkProvider().getLoadedChunks())
+        {
+            printChunkEntityList(source, chunk, false);
         }
         return 1;
     }

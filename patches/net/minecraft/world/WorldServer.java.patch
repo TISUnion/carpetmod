@@ -656,4 +656,10 @@
 +    public Multimeter getMultimeter() {
 +        return getMultimeterServer().getMultimeter();
 +    }
++
++    // TISCM add getter
++    public Map<UUID, Entity> getEntitiesByUuid()
++    {
++        return entitiesByUuid;
++    }
  }

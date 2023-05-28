@@ -205,7 +205,7 @@
          }
      }
  
-@@ -309,4 +398,22 @@
+@@ -309,4 +398,28 @@
  
          return d0;
      }
@@ -226,5 +226,11 @@
 +    public void setChanges(int changes)
 +    {
 +        this.changes = changes;
++    }
++
++    // TISCM added getter
++    public List<EntityPlayerMP> getPlayers()
++    {
++        return players;
 +    }
  }

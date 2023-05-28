@@ -38,7 +38,7 @@
          if (this.sortMissingChunks && i % 4L == 0L)
          {
              this.sortMissingChunks = false;
-@@ -446,4 +458,10 @@
+@@ -446,4 +458,22 @@
              this.getWorld().getChunkProvider().queueUnload(chunk);
          }
      }
@@ -47,5 +47,17 @@
 +    public int getPlayerViewRadius()
 +    {
 +        return this.playerViewRadius;
++    }
++
++    // TISCM added getter
++    public List<EntityPlayerMP> getPlayers()
++    {
++        return players;
++    }
++
++    // TISCM added getter
++    public List<PlayerChunkMapEntry> getEntries()
++    {
++        return entries;
 +    }
  }

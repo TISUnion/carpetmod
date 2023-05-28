@@ -1,0 +1,32 @@
+--- a/net/minecraft/util/IntHashMap.java
++++ b/net/minecraft/util/IntHashMap.java
+@@ -1,6 +1,8 @@
+ package net.minecraft.util;
+ 
+ import javax.annotation.Nullable;
++import java.util.ArrayList;
++import java.util.List;
+ 
+ public class IntHashMap<V>
+ {
+@@ -193,6 +195,20 @@
+         }
+     }
+ 
++    // TISCM add extractor
++    public List<V> extractValues()
++    {
++        List<V> result = new ArrayList<>();
++        for (Entry<V> entry : this.slots)
++        {
++            for (; entry != null; entry = entry.nextEntry)
++            {
++                result.add(entry.valueEntry);
++            }
++        }
++        return result;
++    }
++
+     static class Entry<V>
+         {
+             private final int hashEntry;

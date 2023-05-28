@@ -643,4 +643,10 @@
 +    public void onBlockEntityTick(TileEntity blockEntity) {
 +        
 +    }
++
++    // TISCM add getter
++    public IntHashMap<Entity> getEntitiesById()
++    {
++        return entitiesById;
++    }
  }
