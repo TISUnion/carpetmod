@@ -501,7 +501,7 @@ public class Messenger
         ITextComponent entityDisplayName = entity.getName();
         String entityTypeStr = Optional.ofNullable(EntityType.getId(entity.getType())).map(ResourceLocation::toString).orElse("?");
         ITextComponent hoverText = Messenger.c(
-                translator.advTr("entity_type", "Entity type: %1$s (%2$s)", entityBaseName, s(entityTypeStr), newLine()),
+                translator.advTr("entity_type", "Entity type: %1$s (%2$s)", entityBaseName, s(entityTypeStr)), newLine(),
                 getTeleportHint(entityDisplayName)
         );
         return fancy(style, entityDisplayName, hoverText, new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, TextUtil.tp(entity)));
