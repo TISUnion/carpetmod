@@ -850,15 +850,15 @@ public class CarpetSettings
                     "You need to set this rule value to true before using the threadstone logger",
                     "See also: rule commandThreadstone"
             },
-            category = EXPERIMENTAL
+            category = {LOGGER, EXPERIMENTAL}
     )
     public static boolean loggerThreadstone = false;
 
     @Rule(
             desc = "Switch for ghostPlayer logger",
-            category = EXPERIMENTAL
+            category = LOGGER
     )
-    public static boolean loggerGhostPlayer = false;
+    public static boolean loggerGhostPlayer = true;
 
     @Rule(
             desc = "Disable random light checks nearby players",

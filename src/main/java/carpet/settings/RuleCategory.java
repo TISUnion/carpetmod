@@ -12,4 +12,5 @@ public class RuleCategory
     public static final String YEET = "yeet";
     public static final String CLIENT = "client";
     public static final String TISCM_PROTOCOL = "TISCM_PROTOCOL";
+    public static final String LOGGER = "logger";
 }
