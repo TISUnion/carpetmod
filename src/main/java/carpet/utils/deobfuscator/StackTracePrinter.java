@@ -28,7 +28,7 @@ public class StackTracePrinter
 
 	public static StackTracePrinter create()
 	{
-		return new StackTracePrinter();
+		return new StackTracePrinter().ignore(StackTraceDeobfuscator.class);
 	}
 
 	// limits the maximum display line
