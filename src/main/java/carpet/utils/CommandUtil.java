@@ -2,7 +2,10 @@ package carpet.utils;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.command.CommandSource;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
+
+import java.util.Optional;
 
 public class CommandUtil
 {
@@ -15,20 +18,35 @@ public class CommandUtil
 		return false;
 	}
 
-	public static boolean isPlayerCommandSource(CommandSource commandSource)
+	public static Optional<EntityPlayerMP> getPlayer(CommandSource source)
 	{
-		if (commandSource != null)
+		if (source != null)
 		{
 			try
 			{
-				commandSource.asPlayer();
-				return true;
+				return Optional.of(source.asPlayer());
 			}
-			catch (CommandSyntaxException e)
+			catch (CommandSyntaxException ignored)
 			{
-				return false;
 			}
 		}
-		return false;
+		return Optional.empty();
+	}
+
+	public static boolean isPlayerCommandSource(CommandSource source)
+	{
+		return getPlayer(source).isPresent();
+	}
+
+	public static boolean isCreativePlayer(CommandSource source)
+	{
+		return getPlayer(source).
+				map(EntityPlayerMP::isCreative).
+				orElse(false);
+	}
+
+	public static boolean canCheat(CommandSource source)
+	{
+		return source.hasPermissionLevel(2);  // commonly used in cheaty commands
 	}
 }

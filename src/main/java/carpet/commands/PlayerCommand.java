@@ -3,6 +3,7 @@ package carpet.commands;
 import carpet.patches.EntityPlayerMPFake;
 import carpet.settings.CarpetSettings;
 import carpet.settings.SettingsManager;
+import carpet.utils.CommandUtil;
 import carpet.utils.Messenger;
 import com.google.common.collect.Sets;
 import com.mojang.brigadier.CommandDispatcher;
@@ -479,6 +480,22 @@ public class PlayerCommand
         catch (CommandSyntaxException ignored)
         {
         }
+
+        // TISCM rule fakePlayerRemoteSpawning
+        if (!SettingsManager.canUseCommand(context.getSource(), CarpetSettings.fakePlayerRemoteSpawning))
+        {
+            final int MAX_ALLOWED_REMOTE_RANGE = 16;
+            Vec3d sourcePos = context.getSource().getPos();
+            DimensionType sourceDimension = context.getSource().getWorld().getDimension().getType();
+
+            // only allow remote bot spawning iif. the bot pos is closed enough to the player
+            if (!sourceDimension.equals(dim) || pos.distanceTo(sourcePos) >= MAX_ALLOWED_REMOTE_RANGE)
+            {
+                Messenger.m(context.getSource(), "rb Remote player spawning is not allowed");
+                return 0;
+            }
+        }
+
         EntityPlayer p = EntityPlayerMPFake.createFake(
                 getString(context,"player"),
                 context.getSource().getServer(),

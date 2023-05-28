@@ -6,6 +6,7 @@ import carpet.logging.microtiming.marker.MicroTimingMarkerManager;
 import carpet.utils.Messenger;
 import carpet.utils.TISCMConfig;
 import carpet.utils.Translations;
+import com.google.common.collect.ImmutableList;
 import net.minecraft.command.CommandSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
@@ -865,6 +866,26 @@ public class CarpetSettings
             category = CREATIVE
     )
     public static boolean playerCheckLightDisabled = false;
+
+    @Rule(
+            desc = "The permission requirement for spawning remotely a fake player with `/player` command",
+            extra = "Here \"remotely\" means spawning a fake player at more than 16m away, or in other dimension",
+            options = {"true", "false", "ops", "0", "1", "2", "3", "4"},
+            category = SURVIVAL,
+            validate = PermissionLevelValidator.class
+    )
+    public static String fakePlayerRemoteSpawning = "true";
+
+    public static class PermissionLevelValidator extends Validator<String>
+    {
+        public static final ImmutableList<String> OPTIONS = ImmutableList.of("true", "false", "ops", "0", "1", "2", "3", "4");
+
+        @Override
+        public String validate(CommandSource source, ParsedRule<String> currentRule, String newValue, String string)
+        {
+            return OPTIONS.contains(newValue.toLowerCase()) ? newValue : null;
+        }
+    }
 
 
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
