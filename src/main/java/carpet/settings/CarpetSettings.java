@@ -855,6 +855,12 @@ public class CarpetSettings
     public static boolean threadstoneLogger = false;
 
     @Rule(
+            desc = "Switch for ghostPlayer logger",
+            category = EXPERIMENTAL
+    )
+    public static boolean loggerGhostPlayer = false;
+
+    @Rule(
             desc = "Disable random light checks nearby players",
             category = CREATIVE
     )
