@@ -116,7 +116,7 @@ public class GhostPlayerLogger extends AbstractLogger
 		        Messenger.fancy(
 						Messenger.format("[%s, %s, %s]", chunk.x, y, chunk.z),
 				        Messenger.s("Chunk section coordinate"),
-				        new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, String.format("/tp %d %d %d", chunk.x * 16 + 8, y * 16 + 8, chunk.z))
+				        new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, String.format("/tp %d %d %d", chunk.x * 16 + 8, y * 16 + 8, chunk.z * 16 + 8))
 		        ),
 		        actionName
         );
