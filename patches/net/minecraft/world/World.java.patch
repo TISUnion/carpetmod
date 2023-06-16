@@ -218,7 +218,7 @@
 +                onBlockUpdate(pos, iblockstate);
                  iblockstate.neighborChanged(this, pos, blockIn, fromPos);
              }
-+            catch (StackOverflowError e)
++            catch (StackOverflowError | OutOfMemoryError | ClassCastException e)
 +            {
 +                throw new UpdateSuppressionException(e, this, pos);
 +            }

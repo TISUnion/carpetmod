@@ -326,7 +326,7 @@
 +                    Optional<UpdateSuppressionException> use = UpdateSuppressionException.extractInCauses(throwable1);
 +                    if (CarpetSettings.yeetUpdateSuppressionCrash && use.isPresent())
 +                    {
-+                        use.get().report(worldserver);
++                        use.get().report();
 +                        LOGGER.error("Update Suppression in world tick", throwable1);
 +                    }
 +                    else
@@ -359,7 +359,7 @@
 +                    Optional<UpdateSuppressionException> use = UpdateSuppressionException.extractInCauses(throwable);
 +                    if (CarpetSettings.yeetUpdateSuppressionCrash && use.isPresent())
 +                    {
-+                        use.get().report(worldserver);
++                        use.get().report();
 +                        LOGGER.error("Update Suppression in world tick", throwable);
 +                    }
 +                    else
