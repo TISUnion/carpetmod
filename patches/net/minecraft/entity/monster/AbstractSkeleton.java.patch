@@ -1,0 +1,24 @@
+--- a/net/minecraft/entity/monster/AbstractSkeleton.java
++++ b/net/minecraft/entity/monster/AbstractSkeleton.java
+@@ -3,6 +3,8 @@
+ import java.time.LocalDate;
+ import java.time.temporal.ChronoField;
+ import javax.annotation.Nullable;
++
++import carpet.settings.CarpetSettings;
+ import net.minecraft.block.state.IBlockState;
+ import net.minecraft.entity.CreatureAttribute;
+ import net.minecraft.entity.EntityCreature;
+@@ -131,6 +133,12 @@
+                 flag = false;
+             }
+ 
++            // TISCM undeadDontBurnInSunlight
++            if (CarpetSettings.undeadDontBurnInSunlight)
++            {
++                flag = false;
++            }
++
+             if (flag)
+             {
+                 this.setFire(8);

@@ -1,0 +1,25 @@
+--- a/net/minecraft/entity/monster/EntityPhantom.java
++++ b/net/minecraft/entity/monster/EntityPhantom.java
+@@ -2,6 +2,8 @@
+ 
+ import java.util.List;
+ import javax.annotation.Nullable;
++
++import carpet.settings.CarpetSettings;
+ import net.minecraft.entity.CreatureAttribute;
+ import net.minecraft.entity.EntityBodyHelper;
+ import net.minecraft.entity.EntityFlying;
+@@ -152,7 +154,12 @@
+     {
+         if (this.isInDaylight())
+         {
+-            this.setFire(8);
++            // TISCM undeadDontBurnInSunlight wrapped setFire call
++//            this.setFire(8);
++            if (CarpetSettings.undeadDontBurnInSunlight)
++            {
++                this.setFire(8);
++            }
+         }
+ 
+         super.livingTick();

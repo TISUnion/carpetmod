@@ -1,15 +1,29 @@
 --- a/net/minecraft/entity/monster/EntityZombie.java
 +++ b/net/minecraft/entity/monster/EntityZombie.java
-@@ -5,6 +5,8 @@
+@@ -5,6 +5,9 @@
  import java.util.List;
  import java.util.UUID;
  import javax.annotation.Nullable;
 +
 +import carpet.commands.lifetime.spawning.LiteralSpawningReason;
++import carpet.settings.CarpetSettings;
  import net.minecraft.block.Block;
  import net.minecraft.block.state.IBlockState;
  import net.minecraft.entity.CreatureAttribute;
-@@ -368,6 +370,8 @@
+@@ -283,6 +286,12 @@
+                 flag = false;
+             }
+ 
++            // TISCM undeadDontBurnInSunlight
++            if (CarpetSettings.undeadDontBurnInSunlight)
++            {
++                flag = false;
++            }
++
+             if (flag)
+             {
+                 this.setFire(8);
+@@ -368,6 +377,8 @@
  
                          if (!this.world.isAnyPlayerWithinRangeAt((double)i1, (double)j1, (double)k1, 7.0D) && this.world.checkNoEntityCollision(entityzombie, entityzombie.getBoundingBox()) && this.world.isCollisionBoxesEmpty(entityzombie, entityzombie.getBoundingBox()) && !this.world.containsAnyLiquid(entityzombie.getBoundingBox()))
                          {

@@ -887,6 +887,13 @@ public class CarpetSettings
         }
     }
 
+    @Rule(
+            desc = "Prevent undead creatures burning in sunlight",
+            extra = "Their helmets will still get damaged in sunlight though",
+            category = CREATIVE
+    )
+    public static boolean undeadDontBurnInSunlight = false;
+
 
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$
