@@ -55,6 +55,7 @@ Notes:
 
 - Remember to `genPatches` before committing your changes
 - Remember to `setup` after switching git branch / pulling from remote repository
-- You need to download TISCM_libs from [here](https://files.catbox.moe/xqp3xy.zip) and unzip it into the project folder, since some library providers are down
+- You need to also pull subproject [TISCM_libs](https://github.com/TISUnion/TISCM_libs), since some library providers are down
+  - e.g. `git submodule update --init`
 
 See also: https://github.com/gnembon/carpetmod/blob/master/README.md
