@@ -41,13 +41,7 @@ public class UpdateSuppressionException extends RuntimeException
 	@Override
 	public String getMessage()
 	{
-		return this.getMessageText().getString();
-	}
-
-	@Override
-	public String toString()
-	{
-		return this.getMessage();
+		return String.format("%s (%s)", this.getMessageText().getString(), this.getCause().getClass().getSimpleName());
 	}
 
 	public static void noop()
