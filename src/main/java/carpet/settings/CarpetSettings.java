@@ -896,9 +896,9 @@ public class CarpetSettings
     public static boolean undeadDontBurnInSunlight = false;
 
     @Rule(
-            desc = "Activator / Powered rail on an emerald ore simulates a update suppressor",
+            desc = "Activator / Powered rail on an redstone ore simulates a update suppressor",
             extra = {
-                    "Right before a powered activator / powered rail on an emerald ore setting its powered state to false, throw the given JVM throwable",
+                    "Right before a powered activator / powered rail on an redstone ore setting its powered state to false, throw the given JVM throwable",
                     "false: rule disabled; true: rule enable and use StackOverflowError; others: feature enable and use given throwable"
             },
             category = CREATIVE,
