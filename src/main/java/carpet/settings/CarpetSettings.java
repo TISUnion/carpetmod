@@ -1,6 +1,7 @@
 package carpet.settings;
 
 import carpet.CarpetServer;
+import carpet.helpers.UpdateSuppressionSimulator;
 import carpet.logging.microtiming.enums.MicroTimingTarget;
 import carpet.logging.microtiming.marker.MicroTimingMarkerManager;
 import carpet.utils.Messenger;
@@ -893,6 +894,27 @@ public class CarpetSettings
             category = CREATIVE
     )
     public static boolean undeadDontBurnInSunlight = false;
+
+    @Rule(
+            desc = "Activator / Powered rail on an emerald ore simulates a update suppressor",
+            extra = {
+                    "Right before a powered activator / powered rail on an emerald ore setting its powered state to false, throw the given JVM throwable",
+                    "false: rule disabled; true: rule enable and use StackOverflowError; others: feature enable and use given throwable"
+            },
+            category = CREATIVE,
+            options = {"false", "true", "StackOverflowError", "OutOfMemoryError", "ClassCastException"},
+            validate = UpdateSuppressionSimulatorValidator.class
+    )
+    public static String updateSuppressionSimulator = "false";
+
+    public static class UpdateSuppressionSimulatorValidator extends Validator<String>
+    {
+        @Override
+        public String validate(CommandSource source, ParsedRule<String> currentRule, String newValue, String string)
+        {
+            return UpdateSuppressionSimulator.tryAcceptRule(newValue) ? newValue : null;
+        }
+    }
 
 
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$

@@ -1,15 +1,18 @@
 --- a/net/minecraft/block/BlockRailPowered.java
 +++ b/net/minecraft/block/BlockRailPowered.java
-@@ -1,5 +1,8 @@
+@@ -1,6 +1,11 @@
  package net.minecraft.block;
  
++import carpet.helpers.UpdateSuppressionSimulator;
 +import carpet.logging.microtiming.MicroTimingLoggerManager;
 +import carpet.logging.microtiming.enums.EventType;
 +import carpet.settings.CarpetSettings;
  import net.minecraft.block.state.IBlockState;
++import net.minecraft.init.Blocks;
  import net.minecraft.state.BooleanProperty;
  import net.minecraft.state.EnumProperty;
-@@ -11,8 +14,9 @@
+ import net.minecraft.state.IProperty;
+@@ -11,8 +16,9 @@
  import net.minecraft.util.Rotation;
  import net.minecraft.util.math.BlockPos;
  import net.minecraft.world.World;
@@ -20,7 +23,7 @@
  {
      public static final EnumProperty<RailShape> SHAPE = BlockStateProperties.RAIL_SHAPE_STRAIGHT;
      public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
-@@ -25,7 +29,8 @@
+@@ -25,7 +31,8 @@
  
      protected boolean findPoweredRailSignal(World worldIn, BlockPos pos, IBlockState state, boolean p_176566_4_, int p_176566_5_)
      {
@@ -30,7 +33,7 @@
          {
              return false;
          }
-@@ -177,15 +182,19 @@
+@@ -177,15 +184,29 @@
          boolean flag = state.get(POWERED);
          boolean flag1 = worldIn.isBlockPowered(pos) || this.findPoweredRailSignal(worldIn, pos, state, true, 0) || this.findPoweredRailSignal(worldIn, pos, state, false, 0);
  
@@ -38,8 +41,18 @@
 +
          if (flag1 != flag)
          {
++            // TISCM updateSuppressionSimulator
++            if (UpdateSuppressionSimulator.isActivated())
++            {
++                if (!flag1 && worldIn.getBlockState(pos.down()).getBlock() == Blocks.EMERALD_ORE)
++                {
++                    UpdateSuppressionSimulator.kaboom();
++                }
++            }
++
              worldIn.setBlockState(pos, state.with(POWERED, Boolean.valueOf(flag1)), 3);
 +            MicroTimingLoggerManager.onEmitBlockUpdate(worldIn, this, pos, EventType.ACTION_START, "updateState");  // TISCM Micro Timing logger
++
              worldIn.notifyNeighborsOfStateChange(pos.down(), this);
  
              if (state.get(SHAPE).isAscending())
@@ -50,7 +63,7 @@
          }
      }
  
-@@ -333,4 +342,22 @@
+@@ -333,4 +354,22 @@
      {
          builder.add(SHAPE, POWERED);
      }
