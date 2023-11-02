@@ -44,7 +44,7 @@
 +            // TISCM updateSuppressionSimulator
 +            if (UpdateSuppressionSimulator.isActivated())
 +            {
-+                if (!flag1 && worldIn.getBlockState(pos.down()).getBlock() == Blocks.REDSTONE_ORE)
++                if (!flag1 && worldIn.getBlockState(pos.down()).getBlock() == Blocks.LAPIS_ORE)
 +                {
 +                    UpdateSuppressionSimulator.kaboom();
 +                }
