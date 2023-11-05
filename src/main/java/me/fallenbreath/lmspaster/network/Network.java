@@ -1,11 +1,31 @@
+/*
+ * This file is part of the Litematica Server Paster project, licensed under the
+ * GNU Lesser General Public License v3.0
+ *
+ * Copyright (C) 2023  Fallen_Breath and contributors
+ *
+ * Litematica Server Paster is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Litematica Server Paster is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Litematica Server Paster.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package me.fallenbreath.lmspaster.network;
 
 import com.google.common.collect.Sets;
 import io.netty.buffer.Unpooled;
 import me.fallenbreath.lmspaster.LitematicaServerPasterMod;
 import me.fallenbreath.lmspaster.util.RegistryUtil;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.play.client.CPacketCustomPayload;
 import net.minecraft.network.play.server.SPacketCustomPayload;
 import net.minecraft.util.ResourceLocation;
 
@@ -16,7 +36,7 @@ import java.util.function.Consumer;
 
 public class Network
 {
-	public static final ResourceLocation CHANNEL = RegistryUtil.id("network");
+	public static final ResourceLocation CHANNEL = RegistryUtil.id("network_v2");
 
 	public static class C2S
 	{
@@ -57,13 +77,6 @@ public class Network
 				ALL_PACKET_IDS[i++] = id;
 			}
 		}
-
-		public static CPacketCustomPayload packet(Consumer<PacketBuffer> byteBufBuilder)
-		{
-			PacketBuffer packetByteBuf = new PacketBuffer(Unpooled.buffer());
-			byteBufBuilder.accept(packetByteBuf);
-			return new CPacketCustomPayload(CHANNEL, packetByteBuf);
-		}
 	}
 
 	public static class S2C
@@ -71,10 +84,13 @@ public class Network
 		public static final int HI = 0;
 		public static final int ACCEPT_PACKETS = 1;
 
-		public static SPacketCustomPayload packet(Consumer<PacketBuffer> byteBufBuilder)
+		public static SPacketCustomPayload packet(int packetId, Consumer<NBTTagCompound> payloadBuilder)
 		{
+			NBTTagCompound nbt = new NBTTagCompound();
+			payloadBuilder.accept(nbt);
 			PacketBuffer packetByteBuf = new PacketBuffer(Unpooled.buffer());
-			byteBufBuilder.accept(packetByteBuf);
+			packetByteBuf.writeVarInt(packetId);
+			packetByteBuf.writeCompoundTag(nbt);
 			return new SPacketCustomPayload(CHANNEL, packetByteBuf);
 		}
 	}

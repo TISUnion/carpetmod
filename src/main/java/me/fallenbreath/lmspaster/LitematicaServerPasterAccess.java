@@ -1,6 +1,7 @@
 package me.fallenbreath.lmspaster;
 
 import carpet.settings.CarpetSettings;
+import me.fallenbreath.lmspaster.network.LmsPasterPayload;
 import me.fallenbreath.lmspaster.network.Network;
 import me.fallenbreath.lmspaster.network.ServerNetworkHandler;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -22,7 +23,8 @@ public class LitematicaServerPasterAccess
 		ResourceLocation channel = packetIn.getChannel();
 		if (Network.CHANNEL.equals(channel))
 		{
-			ServerNetworkHandler.handleClientPacket(packetIn.getData(), player);
+			LmsPasterPayload payload = new LmsPasterPayload(packetIn.getData());
+			ServerNetworkHandler.handleClientPacket(payload, player);
 		}
 	}
 }
