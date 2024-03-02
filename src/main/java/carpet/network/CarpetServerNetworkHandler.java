@@ -5,6 +5,7 @@ import carpet.helpers.TickSpeed;
 import carpet.settings.CarpetSettings;
 import carpet.settings.ParsedRule;
 import carpet.settings.SettingsManager;
+import carpet.utils.NetworkUtil;
 import io.netty.buffer.Unpooled;
 import net.minecraft.command.CommandSource;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -35,6 +36,8 @@ public class CarpetServerNetworkHandler
     {
         if (data != null)
         {
+            data = ProtocolFixer.fixCarpetPacket(data);
+
             int id = data.readVarInt();
             if (id == CarpetClient.HELLO)
                 onHello(player, data);
@@ -124,7 +127,7 @@ public class CarpetServerNetworkHandler
 
     private static void onClientData(EntityPlayerMP player, PacketBuffer data)
     {
-        NBTTagCompound compound = data.readCompoundTag();
+        NBTTagCompound compound = NetworkUtil.readNbt(data);
         if (compound == null) return;
         for (String key: compound.keySet())
         {

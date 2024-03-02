@@ -20,6 +20,7 @@
 
 package me.fallenbreath.lmspaster.network;
 
+import carpet.utils.NetworkUtil;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
@@ -39,7 +40,7 @@ public class LmsPasterPayload
 
 	public LmsPasterPayload(PacketBuffer buf)
 	{
-		this(buf.readVarInt(), buf.readCompoundTag());
+		this(buf.readVarInt(), NetworkUtil.readNbt(buf));
 	}
 
 	public int getPacketId()

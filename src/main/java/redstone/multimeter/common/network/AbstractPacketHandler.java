@@ -1,5 +1,6 @@
 package redstone.multimeter.common.network;
 
+import carpet.utils.NetworkUtil;
 import io.netty.buffer.Unpooled;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.Packet;
@@ -38,7 +39,7 @@ public abstract class AbstractPacketHandler {
 			throw new IllegalStateException("Unable to decode packet: " + id);
 		}
 		
-		NBTTagCompound data = buffer.readCompoundTag();
+		NBTTagCompound data = NetworkUtil.readNbt(buffer);
 		packet.decode(data);
 		
 		return packet;

@@ -2,6 +2,7 @@ package carpet.network.tiscm;
 
 import carpet.CarpetServer;
 import carpet.utils.NbtUtil;
+import carpet.utils.NetworkUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.minecraft.nbt.NBTTagCompound;
@@ -42,7 +43,7 @@ public class TISCMServerPacketHandler
 	public void dispatch(NetHandlerPlayServer networkHandler, PacketBuffer packetByteBuf)
 	{
 		String packetId = packetByteBuf.readString(Short.MAX_VALUE);
-		NBTTagCompound payload = packetByteBuf.readCompoundTag();
+		NBTTagCompound payload = NetworkUtil.readNbt(packetByteBuf);
 		HandlerContext.C2S ctx = new HandlerContext.C2S(networkHandler, payload);
 		ctx.runSynced(() -> TISCMProtocol.C2S.fromId(packetId).
 				map(this.handlers::get).

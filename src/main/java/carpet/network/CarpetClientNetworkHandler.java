@@ -5,6 +5,7 @@ import carpet.helpers.TickSpeed;
 import carpet.settings.CarpetSettings;
 import carpet.settings.ParsedRule;
 import carpet.settings.SettingsManager;
+import carpet.utils.NetworkUtil;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.nbt.INBTBase;
@@ -54,6 +55,8 @@ public class CarpetClientNetworkHandler
     {
         if (data != null)
         {
+            data = ProtocolFixer.fixCarpetPacket(data);
+
             int id = data.readVarInt();
             if (id == CarpetClient.HI)
                 onHi(data);
@@ -92,7 +95,7 @@ public class CarpetClientNetworkHandler
 
     private static void onSyncData(PacketBuffer data, EntityPlayerSP player)
     {
-        NBTTagCompound compound = data.readCompoundTag();
+        NBTTagCompound compound = NetworkUtil.readNbt(data);
         if (compound == null) return;
         for (String key: compound.keySet())
         {

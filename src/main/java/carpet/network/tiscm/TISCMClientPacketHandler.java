@@ -3,6 +3,7 @@ package carpet.network.tiscm;
 import carpet.CarpetServer;
 import carpet.helpers.ServerMsptMetricsDataSyncer;
 import carpet.utils.NbtUtil;
+import carpet.utils.NetworkUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import net.minecraft.client.Minecraft;
@@ -44,7 +45,7 @@ public class TISCMClientPacketHandler
 	public void dispatch(NetHandlerPlayClient networkHandler, PacketBuffer packetByteBuf)
 	{
 		String packetId = packetByteBuf.readString(Short.MAX_VALUE);
-		NBTTagCompound payload = packetByteBuf.readCompoundTag();
+		NBTTagCompound payload = NetworkUtil.readNbt(packetByteBuf);
 		TISCMProtocol.S2C.fromId(packetId).
 				map(this.handlers::get).
 				ifPresent( handler -> handler.accept(new HandlerContext.S2C(networkHandler, payload)));
