@@ -48,7 +48,7 @@ public class NetworkUtil
 	{
 		int n = buf.readableBytes();
 
-		buf.markReaderIndex();
+		int prevReaderIndex = buf.readerIndex();
 		try
 		{
 			if (n < 2)
@@ -90,7 +90,7 @@ public class NetworkUtil
 		}
 		finally
 		{
-			buf.resetReaderIndex();
+			buf.readerIndex(prevReaderIndex);
 		}
 
 		return NbtStyle.UNKNOWN;
@@ -111,12 +111,12 @@ public class NetworkUtil
 		{
 			// I'm < mc1.20.2 (OLD), trying to read a nbt in NEW style
 
-			buf.markReaderIndex();
+			int prevReaderIndex = buf.readerIndex();
 			PacketBuffer tweakedBuf = new PacketBuffer(Unpooled.buffer());
 			tweakedBuf.writeByte(buf.readByte());  // 0x0A, tag type
 			tweakedBuf.writeByte(0).writeByte(0);  // 2* 0x00
 			tweakedBuf.writeBytes(buf);
-			buf.resetReaderIndex();
+			buf.readerIndex(prevReaderIndex);
 
 			NBTTagCompound nbt = tweakedBuf.readCompoundTag();
 

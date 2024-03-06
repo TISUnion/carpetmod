@@ -13,7 +13,7 @@ public class ProtocolFixer
 {
 	public static PacketBuffer fixCarpetPacket(PacketBuffer buf)
 	{
-		buf.markReaderIndex();
+		int prevReaderIndex = buf.readerIndex();
 		try
 		{
 			// try the old v1 protocol
@@ -35,7 +35,7 @@ public class ProtocolFixer
 		}
 		finally
 		{
-			buf.resetReaderIndex();
+			buf.readerIndex(prevReaderIndex);
 		}
 
 		// try protocol v2 from fabric-carpet >= 1.4.114
