@@ -916,6 +916,16 @@ public class CarpetSettings
         }
     }
 
+    @Rule(
+            desc = "Remove the permission requirement for the debug nbt request of client's F3+I action",
+            extra = {
+                    "In vanilla, the request needs permission level 2 at least",
+                    "Carpet TIS Addition is required to be installed on the client"
+            },
+            category = {CLIENT}
+    )
+    public static boolean debugNbtQueryNoPermission = false;
+
 
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$

@@ -109,6 +109,24 @@
                  {
                      LOGGER.warn("{} (vehicle of {}) moved too quickly! {},{},{}", entity.getName().getString(), this.player.getName().getString(), d6, d7, d8);
                      this.netManager.sendPacket(new SPacketMoveVehicle(entity));
+@@ -754,7 +770,7 @@
+     {
+         PacketThreadUtil.checkThreadAndEnqueue(packetIn, this, this.player.getServerWorld());
+ 
+-        if (this.player.hasPermissionLevel(2))
++        if (this.player.hasPermissionLevel(2) /*tiscm start*/ || CarpetSettings.debugNbtQueryNoPermission /*tiscm end*/)
+         {
+             Entity entity = this.player.getServerWorld().getEntityByID(packetIn.getEntityId());
+ 
+@@ -770,7 +786,7 @@
+     {
+         PacketThreadUtil.checkThreadAndEnqueue(packetIn, this, this.player.getServerWorld());
+ 
+-        if (this.player.hasPermissionLevel(2))
++        if (this.player.hasPermissionLevel(2) /*tiscm start*/ || CarpetSettings.debugNbtQueryNoPermission /*tiscm end*/)
+         {
+             TileEntity tileentity = this.player.getServerWorld().getTileEntity(packetIn.getPosition());
+             NBTTagCompound nbttagcompound = tileentity != null ? tileentity.write(new NBTTagCompound()) : null;
 @@ -831,6 +847,12 @@
                          double d10 = this.player.motionX * this.player.motionX + this.player.motionY * this.player.motionY + this.player.motionZ * this.player.motionZ;
                          double d11 = d7 * d7 + d8 * d8 + d9 * d9;
