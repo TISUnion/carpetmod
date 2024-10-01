@@ -926,6 +926,30 @@ public class CarpetSettings
     )
     public static boolean debugNbtQueryNoPermission = false;
 
+    @Rule(
+            desc = "When spawning mobs, if baby variant exists, spawn the baby variant with given probably",
+            extra = {
+                    "Set it to -1 to disable the rule and use vanilla logic"
+            },
+            category = {CREATIVE},
+            options = {"-1", "0", "0.5", "1"},
+            strict = false
+    )
+    public static double spawnBabyProbably = -1;
+
+    @Rule(
+            desc = "When spawning mobs, if jockey variant exists, spawn the jockey variant with given probably",
+            extra = {
+                    "Affected jockeys: chicken jockey, spider jockey, strider jockey",
+                    "For striders, the spawn ratio between zombified piglin and baby strider is still 1:3",
+                    "Set it to -1 to disable the rule and use vanilla logic"
+            },
+            category = {CREATIVE},
+            options = {"-1", "0", "0.5", "1"},
+            strict = false
+    )
+    public static double spawnJockeyProbably = -1;
+
 
     // /$$$$$$$$ /$$$$$$  /$$$$$$   /$$$$$$  /$$      /$$
     //|__  $$__/|_  $$_/ /$$__  $$ /$$__  $$| $$$    /$$$

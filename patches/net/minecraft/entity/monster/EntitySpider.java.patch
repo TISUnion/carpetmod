@@ -1,0 +1,24 @@
+--- a/net/minecraft/entity/monster/EntitySpider.java
++++ b/net/minecraft/entity/monster/EntitySpider.java
+@@ -2,6 +2,9 @@
+ 
+ import java.util.Random;
+ import javax.annotation.Nullable;
++
++import carpet.CarpetServer;
++import carpet.settings.CarpetSettings;
+ import net.minecraft.block.state.IBlockState;
+ import net.minecraft.entity.CreatureAttribute;
+ import net.minecraft.entity.EntityLivingBase;
+@@ -168,7 +171,10 @@
+     {
+         entityLivingData = super.onInitialSpawn(difficulty, entityLivingData, itemNbt);
+ 
+-        if (this.world.rand.nextInt(100) == 0)
++        // TISCM spawnJockeyProbably
++        boolean forcedJockeyTISCM = CarpetSettings.spawnJockeyProbably > 0 && CarpetServer.rand.nextFloat() <= CarpetSettings.spawnJockeyProbably;
++
++        if (this.world.rand.nextInt(100) == 0 || forcedJockeyTISCM)
+         {
+             EntitySkeleton entityskeleton = new EntitySkeleton(this.world);
+             entityskeleton.setLocationAndAngles(this.posX, this.posY, this.posZ, this.rotationYaw, 0.0F);
