@@ -1,14 +1,15 @@
 --- a/net/minecraft/world/Teleporter.java
 +++ b/net/minecraft/world/Teleporter.java
-@@ -1,5 +1,7 @@
+@@ -1,5 +1,8 @@
  package net.minecraft.world;
  
++import carpet.logging.portalCache.PortalCacheLogger;
 +import carpet.settings.CarpetSettings;
 +import carpet.utils.portalsearcher.*;
  import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
  import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
  import it.unimi.dsi.fastutil.objects.ObjectIterator;
-@@ -10,6 +12,7 @@
+@@ -10,6 +13,7 @@
  import net.minecraft.entity.Entity;
  import net.minecraft.entity.player.EntityPlayerMP;
  import net.minecraft.init.Blocks;
@@ -16,7 +17,7 @@
  import net.minecraft.util.EnumFacing;
  import net.minecraft.util.math.BlockPos;
  import net.minecraft.util.math.ChunkPos;
-@@ -22,6 +25,8 @@
+@@ -22,6 +26,8 @@
      private final WorldServer world;
      private final Random random;
      private final Long2ObjectMap<Teleporter.PortalPosition> destinationCoordinateCache = new Long2ObjectOpenHashMap<>(4096);
@@ -25,7 +26,7 @@
  
      public Teleporter(WorldServer worldIn)
      {
-@@ -76,6 +81,7 @@
+@@ -76,6 +82,7 @@
          int j = MathHelper.floor(entityIn.posX);
          int k = MathHelper.floor(entityIn.posZ);
          boolean flag = true;
@@ -33,7 +34,7 @@
          BlockPos blockpos = BlockPos.ORIGIN;
          long l = ChunkPos.asLong(j, k);
  
-@@ -87,10 +93,34 @@
+@@ -87,10 +94,34 @@
              teleporter$portalposition.lastUpdateTime = this.world.getGameTime();
              flag = false;
          }
@@ -69,7 +70,7 @@
              for (int i1 = -128; i1 <= 128; ++i1)
              {
                  BlockPos blockpos2;
-@@ -119,6 +149,7 @@
+@@ -119,6 +150,7 @@
                      }
                  }
              }
@@ -77,8 +78,13 @@
          }
  
          if (d0 >= 0.0D)
-@@ -128,6 +159,15 @@
+@@ -126,8 +158,20 @@
+             if (flag)
+             {
                  this.destinationCoordinateCache.put(l, new Teleporter.PortalPosition(blockpos, this.world.getGameTime()));
++
++                // TISCM portalCache logger
++                PortalCacheLogger.getInstance().onPortalCacheAdded(this.world, new ChunkPos(l), blockpos, this.world.getGameTime(), entityIn);
              }
  
 +            /* carpet mod */
@@ -93,7 +99,7 @@
              double d5 = (double)blockpos.getX() + 0.5D;
              double d7 = (double)blockpos.getZ() + 0.5D;
              BlockPattern.PatternHelper blockpattern$patternhelper = BLOCK_NETHER_PORTAL.createPatternHelper(this.world, blockpos);
-@@ -139,14 +179,35 @@
+@@ -139,14 +183,35 @@
              {
                  ++d2;
              }
@@ -132,7 +138,7 @@
              }
  
              float f = 0.0F;
-@@ -394,6 +455,13 @@
+@@ -394,6 +459,13 @@
              }
          }
  
@@ -146,8 +152,35 @@
          return true;
      }
  
-@@ -413,9 +481,36 @@
-                     objectiterator.remove();
+@@ -402,20 +474,60 @@
+         if (worldTime % 100L == 0L)
+         {
+             long i = worldTime - 300L;
+-            ObjectIterator<Teleporter.PortalPosition> objectiterator = this.destinationCoordinateCache.values().iterator();
+ 
++            // TISCM portalCache logger
++//            ObjectIterator<Teleporter.PortalPosition> objectiterator = this.destinationCoordinateCache.values().iterator();
++//            while (objectiterator.hasNext())
++//            {
++//                Teleporter.PortalPosition teleporter$portalposition = objectiterator.next();
++            ObjectIterator<Long2ObjectMap.Entry<PortalPosition>> objectiterator = this.destinationCoordinateCache.long2ObjectEntrySet().iterator();
++
+             while (objectiterator.hasNext())
+             {
+-                Teleporter.PortalPosition teleporter$portalposition = objectiterator.next();
++                Long2ObjectMap.Entry<PortalPosition> entry = objectiterator.next();
++                Teleporter.PortalPosition teleporter$portalposition = entry.getValue();
+ 
+                 if (teleporter$portalposition == null || teleporter$portalposition.lastUpdateTime < i)
+                 {
+-                    objectiterator.remove();
++                    // TISCM portalCache logger
++	                if (teleporter$portalposition != null)
++	                {
++		                PortalCacheLogger.getInstance().onPortalCacheDeleted(this.world, new ChunkPos(entry.getLongKey()), teleporter$portalposition, teleporter$portalposition.lastUpdateTime, i);
++	                }
++
++	                objectiterator.remove();
                  }
              }
 +            /* carpet mod */

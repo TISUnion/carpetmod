@@ -587,6 +587,16 @@ logger:
         hint: 点击以启用
   instantfall:
     flag_changed: 瞬时落沙flag已切换为%s
+  portalCache:
+    added: '地狱门缓存已创建: %s -> %s'
+    added_hover: |-
+      当前时间: %s
+      实体: %s
+    deleted: '地狱门缓存已删除: %s -> %s'
+    deleted_hover: |-
+      当前时间: %s
+      上次缓存更新时间: %s
+    range: '%s中的对应范围:'
 
 raid_invalidate_reason:
   difficulty_peaceful: 难度被设为和平

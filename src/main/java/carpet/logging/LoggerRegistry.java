@@ -7,6 +7,7 @@ import carpet.logging.lifetime.LifeTimeHUDLogger;
 import carpet.logging.microtiming.utils.MicroTimingStandardCarpetLogger;
 import carpet.logging.phantom.PhantomLogger;
 import carpet.logging.playerCheckLight.PlayerCheckLightLogger;
+import carpet.logging.portalCache.PortalCacheLogger;
 import carpet.logging.threadstone.ThreadstoneLogger;
 import carpet.logging.tickwarp.TickWarpHUDLogger;
 import carpet.settings.CarpetSettings;
@@ -52,6 +53,7 @@ public class LoggerRegistry
     public static boolean __instantfall;
     public static boolean __playerCheckLight;
     public static boolean __ghostPlayer;
+    public static boolean __portalCache;
 
     public static void initLoggers()
     {
@@ -83,6 +85,7 @@ public class LoggerRegistry
         registerLogger(InstantFallLogger.NAME, InstantFallLogger.getInstance().createCarpetLogger());
         registerLogger(PlayerCheckLightLogger.NAME, PlayerCheckLightLogger.getInstance().createCarpetLogger());
         registerLogger(GhostPlayerLogger.NAME, GhostPlayerLogger.getInstance().createCarpetLogger());
+        registerLogger(PortalCacheLogger.NAME, PortalCacheLogger.getInstance().createCarpetLogger());
     }
 
     /**
