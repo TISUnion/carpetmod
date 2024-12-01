@@ -31,5 +31,5 @@ public class LithiumConfig
 	public static final boolean TAG                             = LITHIUM_ENABLE && true;
 	public static final boolean WORLD_BLOCK_ENTITY_TICKING      = LITHIUM_ENABLE && true;
 	public static final boolean WORLD_EXPLOSIONS                = LITHIUM_ENABLE && true;
-	public static final boolean WORLD_TICK_SCHEDULER            = LITHIUM_ENABLE && false;
+	public static final boolean WORLD_TICK_SCHEDULER            = LITHIUM_ENABLE && true;
 }
