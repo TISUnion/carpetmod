@@ -229,6 +229,7 @@ def projectMod = project(':' + settings.modname) {
                 "org.lwjgl.util.DebugLoader": "true"
         ]
         environment += [
+                // https://maven.fallenbreath.me/tiscm13/tiscm13_forge_gradle_assets.zip
                 assetDirectory: file("${gradle.getGradleUserHomeDir()}/caches/forge_gradle/assets/"),
                 nativesDirectory: extractNatives.output
         ]
