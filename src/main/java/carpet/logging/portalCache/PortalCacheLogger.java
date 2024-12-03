@@ -45,7 +45,7 @@ public class PortalCacheLogger extends AbstractLogger
 			range = Messenger.c(
 					advTr("range", "Range in %s:", Messenger.dimension(DimensionType.OVERWORLD)),
 					Messenger.s("\n"),
-					rangeStr
+					Messenger.s(rangeStr)
 			);
 		}
 		return Messenger.fancy(
