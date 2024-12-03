@@ -26,31 +26,47 @@ public class PortalCacheLogger extends AbstractLogger
 		return INSTANCE;
 	}
 
+	private static DimensionType getOtherSideDimension(World world)
+	{
+		DimensionType dimensionType = world.getDimension().getType();
+		if (dimensionType == DimensionType.OVERWORLD)
+		{
+			return DimensionType.NETHER;
+		}
+		else if (dimensionType == DimensionType.NETHER)
+		{
+			return DimensionType.OVERWORLD;
+		}
+		else
+		{
+			return null;
+		}
+	}
+
 	public ITextComponent posRange(World dstWorld, ChunkPos pos)
 	{
-		ITextComponent range = Messenger.s("?");
+		DimensionType dstDim = dstWorld.getDimension().getType();
+		DimensionType srcDim = getOtherSideDimension(dstWorld);
+
 		String rangeStr = null;
-		if (dstWorld.getDimension().getType() == DimensionType.OVERWORLD)
+		if (dstDim == DimensionType.OVERWORLD)
 		{
 			rangeStr = String.format("[%s, %s] -> [%s, %s]", pos.x / 8.0, pos.z / 8.0, (pos.x + 1) / 8.0, (pos.z + 1) / 8.0);
-			range = Messenger.c(
-					advTr("range", "Range in %s:", Messenger.dimension(DimensionType.NETHER)),
-					Messenger.s("\n"),
-					Messenger.s(rangeStr)
-			);
 		}
-		else if (dstWorld.getDimension().getType() == DimensionType.NETHER)
+		else if (dstDim == DimensionType.NETHER)
 		{
 			rangeStr = String.format("[%s, %s] -> [%s, %s]", pos.x * 8, pos.z * 8, (pos.x + 1) * 8, (pos.z + 1) * 8);
-			range = Messenger.c(
-					advTr("range", "Range in %s:", Messenger.dimension(DimensionType.OVERWORLD)),
-					Messenger.s("\n"),
-					Messenger.s(rangeStr)
-			);
 		}
+
 		return Messenger.fancy(
 				Messenger.format("[%s, *, %s]", pos.x, pos.z),
-				range,
+				rangeStr != null && srcDim != null ?
+						Messenger.c(
+								advTr("range", "Range in %s:", Messenger.dimension(srcDim)),
+								Messenger.s("\n"),
+								Messenger.s(rangeStr)
+						) :
+						Messenger.s("?"),
 				rangeStr != null ? new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, rangeStr) : null
 		);
 	}
@@ -65,7 +81,8 @@ public class PortalCacheLogger extends AbstractLogger
 				Messenger.format("(%s) ", Messenger.dimension(dstWorld)),
 				advTr(
 						"added", "Portal Cache added: %s -> %s",
-						posRange(dstWorld, pos), Messenger.coord(target)
+						posRange(dstWorld, pos),
+						Messenger.coord(target, dstWorld.getDimension().getType())
 				)
 		)});
 	}
@@ -80,7 +97,8 @@ public class PortalCacheLogger extends AbstractLogger
 				Messenger.format("(-> %s) ", Messenger.dimension(dstWorld)),
 				advTr(
 						"deleted", "Portal Cache deleted: %s -> %s",
-						posRange(dstWorld, pos), Messenger.coord(target)
+						posRange(dstWorld, pos),
+						Messenger.coord(target, dstWorld.getDimension().getType())
 				)
 		)});
 	}
