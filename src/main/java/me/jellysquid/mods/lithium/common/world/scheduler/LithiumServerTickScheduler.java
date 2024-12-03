@@ -344,17 +344,27 @@ public class LithiumServerTickScheduler<T> extends ServerTickList<T> {
      * scheduled ticks which are set to execute at a different time.
      */
     private void addScheduledTick(NextTickListEntry<T> tick) {
-        TickEntry<T> entry = this.scheduledTicks.computeIfAbsent(tick, this::createTickEntry);
+        // TISCM fix field value not up-to-date. see git history for yhe original lithium impl
+        TickEntry<T> oldEntry = this.scheduledTicks.get(tick);
+        if (oldEntry != null && oldEntry.scheduled)
+        {
+            // TISCM Micro Timing logger
+            this.scheduleSuccess = false;
+            return;
+        }
 
         // TISCM Micro Timing logger
-        this.scheduleSuccess = !entry.scheduled;
+        this.scheduleSuccess = true;
 
-        if (!entry.scheduled) {
-            TickEntryQueue<T> timeIdx = this.scheduledTicksOrdered.computeIfAbsent(getBucketKey(tick.scheduledTime, tick.priority), key -> new TickEntryQueue<>());
-            timeIdx.push(entry);
+        TickEntry<T> entry = this.createTickEntry(tick);
+        this.scheduledTicks.put(tick, entry);
 
-            entry.scheduled = true;
-        }
+        // the entry is newly created, so the scheduled flag is always false
+
+        TickEntryQueue<T> timeIdx = this.scheduledTicksOrdered.computeIfAbsent(getBucketKey(tick.scheduledTime, tick.priority), key -> new TickEntryQueue<>());
+        timeIdx.push(entry);
+
+        entry.scheduled = true;
     }
 
     private TickEntry<T> createTickEntry(NextTickListEntry<T> tick) {
