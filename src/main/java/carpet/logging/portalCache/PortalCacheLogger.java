@@ -76,9 +76,12 @@ public class PortalCacheLogger extends AbstractLogger
 		this.log(() -> new ITextComponent[]{Messenger.c(
 				Messenger.hover(
 						Messenger.s("[+] ", TextFormatting.GREEN),
-						advTr("added_hover", "Now Time: %s\nEntity: %s", nowTime, Messenger.entity(entity))
+						advTr("added_hover", "Now Time: %s\nEntity: %s (%s)", nowTime, Messenger.entity(entity), Messenger.entityType(entity))
 				),
-				Messenger.format("(%s) ", Messenger.dimension(dstWorld)),
+				Messenger.hover(
+						Messenger.format("(%s) ", Messenger.dimension(dstWorld)),
+						advTr("destination_dimension", "Destination dimension: %s", Messenger.dimension(dstWorld))
+				),
 				advTr(
 						"added", "Portal Cache added: %s -> %s",
 						posRange(dstWorld, pos),
@@ -94,7 +97,10 @@ public class PortalCacheLogger extends AbstractLogger
 						Messenger.s("[-] ", TextFormatting.RED),
 						advTr("deleted_hover", "Now Time: %s\nLast Update: %s", nowTime, lastUpdateTime)
 				),
-				Messenger.format("(-> %s) ", Messenger.dimension(dstWorld)),
+				Messenger.hover(
+						Messenger.format("(%s) ", Messenger.dimension(dstWorld)),
+						advTr("destination_dimension", "Destination dimension: %s", Messenger.dimension(dstWorld))
+				),
 				advTr(
 						"deleted", "Portal Cache deleted: %s -> %s",
 						posRange(dstWorld, pos),

@@ -597,6 +597,7 @@ logger:
       当前时间: %s
       上次缓存更新时间: %s
     range: '%s中的对应范围:'
+    destination_dimension: '传送目标维度: %s'
 
 raid_invalidate_reason:
   difficulty_peaceful: 难度被设为和平
