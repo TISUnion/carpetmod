@@ -185,8 +185,8 @@ def projectMod = project(':' + settings.modname) {
     }
     dependencies {
         // World Edit
-        compile 'com.sk89q.worldedit:worldedit-core:7.2.7'
-        worldEditLibs ('com.sk89q.worldedit:worldedit-core:7.2.7') {
+        compile 'com.github.TISUnion.WorldEdit:worldedit-core:9621654d2b'
+        worldEditLibs ('com.github.TISUnion.WorldEdit:worldedit-core:9621654d2b') {
             exclude group: 'com.ibm.icu'  // not used in worldedit at all
             exclude group: 'org.antlr', module: 'antlr4'  // only reserves the runtime package
             exclude group: 'org.yaml'  // worldedit only uses yaml stuffs in bukkit
